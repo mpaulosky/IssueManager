@@ -1,0 +1,39 @@
+{
+  "agents": {
+    "gandalf": {
+      "persistent_name": "Gandalf",
+      "universe": "The Lord of the Rings",
+      "created_at": "2026-02-17T23:58:12.685Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "aragorn": {
+      "persistent_name": "Aragorn",
+      "universe": "The Lord of the Rings",
+      "created_at": "2026-02-17T23:58:12.685Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "arwen": {
+      "persistent_name": "Arwen",
+      "universe": "The Lord of the Rings",
+      "created_at": "2026-02-17T23:58:12.685Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "gimli": {
+      "persistent_name": "Gimli",
+      "universe": "The Lord of the Rings",
+      "created_at": "2026-02-17T23:58:12.685Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "legolas": {
+      "persistent_name": "Legolas",
+      "universe": "The Lord of the Rings",
+      "created_at": "2026-02-17T23:58:12.685Z",
+      "legacy_named": false,
+      "status": "active"
+    }
+  }
+}

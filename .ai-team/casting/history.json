@@ -1,0 +1,22 @@
+{
+  "universe_usage_history": [
+    {
+      "assignment_id": "issuemanager-init",
+      "universe": "The Lord of the Rings",
+      "timestamp": "2026-02-17T23:58:12.685Z"
+    }
+  ],
+  "assignment_cast_snapshots": {
+    "issuemanager-init": {
+      "universe": "The Lord of the Rings",
+      "agent_map": {
+        "gandalf": "Gandalf",
+        "aragorn": "Aragorn",
+        "arwen": "Arwen",
+        "gimli": "Gimli",
+        "legolas": "Legolas"
+      },
+      "created_at": "2026-02-17T23:58:12.685Z"
+    }
+  }
+}
