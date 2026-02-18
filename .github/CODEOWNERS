@@ -1,0 +1,50 @@
+# IssueManager CODEOWNERS
+# This file defines automatic reviewers based on changed files.
+# Squad members are assigned by domain expertise.
+#
+# Format: path/pattern @username @username ...
+# Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Lead: Architecture and overall design decisions
+/docs/ @mpaulosky
+/.ai-team/ @mpaulosky
+*.md @mpaulosky
+
+# Backend: CQRS handlers, domain logic, vertical slices, APIs
+/src/**/Domain/ @mpaulosky
+/src/**/Application/ @mpaulosky
+/src/**/Infrastructure/ @mpaulosky
+/src/**/*.API/ @mpaulosky
+/src/**/Program.cs @mpaulosky
+
+# Frontend: Blazor components, pages, UI
+/src/**/Web/ @mpaulosky
+/src/**/*.razor @mpaulosky
+/src/**/*.razor.cs @mpaulosky
+/src/**/*.razor.css @mpaulosky
+
+# Testing: Test cases, test strategy, coverage
+/tests/ @mpaulosky
+/src/**/*.Tests @mpaulosky
+/src/**/*.Test @mpaulosky
+
+# Infrastructure & DevOps: Aspire, MongoDB, deployment, CI/CD
+/src/**/AppHost/ @mpaulosky
+/src/**/ServiceDefaults/ @mpaulosky
+/.github/workflows/ @mpaulosky
+/docker* @mpaulosky
+
+# GitHub Ops: Repository configuration, workflows automation
+/.github/ @mpaulosky
+/.github/CODEOWNERS @mpaulosky
+/.github/BRANCH_PROTECTION.md @mpaulosky
+/.github/BRANCHING_STRATEGY.md @mpaulosky
+/.github/ISSUE_TEMPLATE/ @mpaulosky
+/.github/PULL_REQUEST_TEMPLATE.md @mpaulosky
+
+# Design System (if applicable)
+/docs/design/ @mpaulosky
+/src/**/design/ @mpaulosky
+
+# All files fallback to lead
+* @mpaulosky
