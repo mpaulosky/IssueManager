@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+	<PropertyGroup>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+		<CentralPackageVersionsFile>$(MSBuildThisFileDirectory)Directory.Packages.props</CentralPackageVersionsFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageVersion Include="Aspire.Hosting" Version="9.0.0" />
+		<PackageVersion Include="Aspire.Hosting.AppHost" Version="9.0.0" />
+		<PackageVersion Include="Aspire.Hosting.MongoDB" Version="9.0.0" />
+
+		<!-- OpenTelemetry -->
+		<PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.10.0" />
+		<PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.10.0" />
+
+		<!-- Microsoft -->
+		<PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
+		<PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0" />
+		<PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.0.0" />
+
+		<!-- MongoDB -->
+		<PackageVersion Include="MongoDB.Entities" Version="25.0.0" />
+		<PackageVersion Include="MongoDB.Driver" Version="3.2.0" />
+
+		<!-- API Documentation -->
+		<PackageVersion Include="Scalar.AspNetCore" Version="1.2.51" />
+
+		<!-- Testing (for later use) -->
+		<PackageVersion Include="xunit" Version="2.8.1" />
+		<PackageVersion Include="xunit.runner.visualstudio" Version="2.8.1" />
+		<PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+		<PackageVersion Include="FluentAssertions" Version="6.12.1" />
+		<PackageVersion Include="NSubstitute" Version="5.2.0" />
+	</ItemGroup>
+</Project>
