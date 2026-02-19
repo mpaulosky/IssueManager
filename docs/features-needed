@@ -1,0 +1,436 @@
+# New features
+
+We are using MongoDB, so we will need to use the appropriate data types and structures to store and manage our records effectively in the database. Below are the new features we plan to implement, along with the necessary data structures and properties for each feature.
+
+## Category
+
+Requirement: Each Issue requires one
+
+- Add a "Category" field to each Issue, allowing users to categorize their issues (e.g., Bug, Feature Request, Documentation, etc.). This will help in organizing and prioritizing issues more effectively.
+- Implement a filter option to view issues by category, enabling users to quickly find relevant issues based on their interests or expertise.
+- Provide a dropdown menu for selecting the category when creating or editing an issue, ensuring consistency in categorization across the platform.
+- Allow users to create custom categories, giving them the flexibility to tailor the categorization system to their specific needs and workflows.
+- Display the category prominently in the issue list and issue details view, making it easy for users to identify the type of issue at a glance.
+- Integrate category-based notifications, allowing users to subscribe to specific categories and receive updates when new issues are created or existing issues are updated within those categories.
+- Enable sorting and prioritization of issues based on their categories, helping teams to focus on high-priority issues within specific categories.
+- Implement soft deletion for categories, allowing administrators to archive or hide categories without permanently deleting them, preserving historical data and maintaining the integrity of existing issues.
+- Create a category class and a dto record to represent the categories in the system, ensuring that the necessary properties are included to support the features outlined above.
+
+```csharp
+/// <summary>
+///   Category class
+/// </summary>
+[Serializable]
+public class Category
+{
+	/// <summary>
+	///   Gets or sets the identifier.
+	/// </summary>
+	/// <value>
+	///   The identifier.
+	/// </value>
+	[BsonId]
+	[BsonElement("_id")]
+	[BsonRepresentation(BsonType.ObjectId)]
+	public ObjectId? Id { get; set; } = ObjectId.Empty;
+
+	/// <summary>
+	///   Gets or sets the name of the category.
+	/// </summary>
+	/// <value>
+	///   The name of the category.
+	/// </value>
+	[BsonElement("category_name")]
+	[BsonRepresentation(BsonType.String)]
+	public string CategoryName { get; set; } = string.Empty;
+
+	/// <summary>
+	///   Gets or sets the category description.
+	/// </summary>
+	/// <value>
+	///   The category description.
+	/// </value>
+	[BsonElement("category-description")]
+	[BsonRepresentation(BsonType.String)]
+	public string CategoryDescription { get; set; } = string.Empty;
+
+	/// <summary>
+	///   Gets or sets a value indicating whether this <see cref="Category" /> is archived.
+	/// </summary>
+	/// <value>
+	///   <c>true</c> if archived; otherwise, <c>false</c>.
+	/// </value>
+	[BsonElement("archived")]
+	[BsonRepresentation(BsonType.Boolean)]
+	public bool Archived { get; set; }
+
+	/// <summary>
+	///   Gets or sets who archived the record.
+	/// </summary>
+	/// <value>
+	///   Who archived the record.
+	/// </value>
+	public UserDto ArchivedBy { get; set; } = UserDto.Empty;
+}
+```
+
+## Status
+
+Requirement: Each Issue requires one
+
+- Add a "Status" field to each Issue, allowing users to track the progress of their issues (e.g., Open, In Progress, Resolved, Closed, etc.). This will help in managing and monitoring the lifecycle of each issue effectively.
+- Implement a visual indicator for each status, such as color-coding or icons, to make it easier for users to quickly identify the status of an issue at a glance.
+- Provide a dropdown menu for selecting the status when creating or editing an issue, ensuring consistency in status updates across the platform.
+- Allow users to filter issues by status, enabling them to focus on specific stages of the issue lifecycle (e.g., viewing only open issues or resolved issues).
+- Enable bulk status updates, allowing users to change the status of multiple issues at once, improving efficiency in managing large numbers of issues.
+- Integrate status-based notifications, allowing users to subscribe to specific statuses and receive updates when issues change status, helping them stay informed about the progress of issues they are interested in.
+- Implement a status history log, allowing users to view the history of status changes for each issue, providing transparency and accountability in issue management.
+- Allow administrators to customize the available statuses, giving them the flexibility to tailor the status options to their specific workflows and processes.
+- Implement soft deletion for statuses, allowing administrators to archive or hide statuses without permanently deleting them, preserving historical data and maintaining the integrity of existing issues.
+- Create a status class and a dto record to represent the statuses in the system, ensuring that the necessary properties are included to support the features outlined above.
+
+```csharp
+/// <summary>
+///   Status class
+/// </summary>
+[Serializable]
+public class Status
+{
+	/// <summary>
+	///   Gets or sets the identifier.
+	/// </summary>
+	/// <value>
+	///   The identifier.
+	/// </value>
+	[BsonId]
+	[BsonRepresentation(BsonType.ObjectId)]
+	public ObjectId Id { get; set; } = ObjectId.Empty;
+
+	/// <summary>
+	///   Gets or sets the name of the status.
+	/// </summary>
+	/// <value>
+	///   The name of the status.
+	/// </value>
+	[BsonElement("status_name")]
+	[BsonRepresentation(BsonType.String)]
+	public string StatusName { get; set; } = string.Empty;
+
+	/// <summary>
+	///   Gets or sets the status description.
+	/// </summary>
+	/// <value>
+	///   The status description.
+	/// </value>
+	[BsonElement("status_description")]
+	[BsonRepresentation(BsonType.String)]
+	public string StatusDescription { get; set; } = string.Empty;
+
+	/// <summary>
+	///   Gets or sets a value indicating whether this <see cref="Status" /> is archived.
+	/// </summary>
+	/// <value>
+	///   <c>true</c> if archived; otherwise, <c>false</c>.
+	/// </value>
+	[BsonElement("archived")]
+	[BsonRepresentation(BsonType.Boolean)]
+	public bool Archived { get; set; }
+
+	/// <summary>
+	///   Gets or sets who archived the record.
+	/// </summary>
+	/// <value>
+	///   Who archived the record.
+	/// </value>
+	public UserDto ArchivedBy { get; set; } = UserDto.Empty;
+}
+```
+
+## Comments
+
+Requirement: Each Issue requires zero or more
+
+- Add a "Comments" section to each Issue, allowing users to discuss and provide feedback on the issue. This will facilitate collaboration and communication among users working on the same issue.
+- Implement a threaded comment system, allowing users to reply to specific comments, making it easier to follow conversations and discussions related to an issue.
+- Provide rich text formatting options for comments, enabling users to format their comments with bold, italics, lists, links, and other formatting features to enhance readability and clarity.
+- Allow users to attach files or images to their comments, providing additional context and information related to the issue.
+- Implement a notification system for comments, allowing users to subscribe to comment updates and receive notifications when new comments are added or when someone replies to their comment, keeping them informed about ongoing discussions.
+- Enable comment editing and deletion, allowing users to correct mistakes or remove comments if necessary, while maintaining a history of changes for accountability and transparency.
+- Integrate a comment moderation system, allowing administrators to review and manage comments to ensure they adhere to community guidelines and maintain a positive and constructive environment for discussion.
+- Allow users to upvote or downvote comments, providing a way to highlight helpful or relevant comments and encourage constructive feedback within the community.
+- Implement a comment search feature, allowing users to search for specific comments within an issue, making it easier to find relevant information and discussions related to the issue.
+- Provide a comment sorting option, allowing users to sort comments by date, popularity, or relevance, helping them to quickly find the most important or recent comments in an issue.
+- Create a comment class and a dto record to represent the comments in the system, ensuring that the necessary properties are included to support the features outlined above.
+
+```csharp
+[Serializable]
+public class Comment
+{
+	/// <summary>
+	///   Gets or sets the identifier.
+	/// </summary>
+	/// <value>
+	///   The identifier.
+	/// </value>
+	[BsonId]
+	[BsonRepresentation(BsonType.ObjectId)]
+	public ObjectId Id { get; set; } = ObjectId.Empty;
+
+	/// <summary>
+	///   Gets or sets the title.
+	/// </summary>
+	/// <value>
+	///   The title.
+	/// </value>
+	[BsonElement("comment_title")]
+	[BsonRepresentation(BsonType.String)]
+	public string Title { get; set; } = string.Empty;
+
+	/// <summary>
+	///   Gets or sets the description.
+	/// </summary>
+	/// <value>
+	///   The description.
+	/// </value>
+	[BsonElement("comment_description")]
+	[BsonRepresentation(BsonType.String)]
+	public string Description { get; init; } = string.Empty;
+
+	/// <summary>
+	///   Gets or sets the date created.
+	/// </summary>
+	/// <value>
+	///   The date created.
+	/// </value>
+	[BsonElement("date_created")]
+	[BsonRepresentation(BsonType.DateTime)]
+	public DateTime DateCreated { get; init; } = DateTime.UtcNow;
+
+	/// <summary>
+	///   Gets or sets the issue.
+	/// </summary>
+	/// <value>
+	///   The issue.
+	/// </value>
+	public IssueDto Issue { get; set; } = IssueDto.Empty;
+
+	/// <summary>
+	///   Gets or sets the author.
+	/// </summary>
+	/// <value>
+	///   The author.
+	/// </value>
+	public UserDto Author { get; set; } = UserDto.Empty;
+
+	/// <summary>
+	///   Gets or sets the user votes.
+	/// </summary>
+	/// <value>
+	///   The user votes.
+	/// </value>
+	public HashSet<string> UserVotes { get; init; } = new();
+
+	/// <summary>
+	///   Gets or sets a value indicating whether this <see cref="CommentModel" /> is archived.
+	/// </summary>
+	/// <value>
+	///   <c>true</c> if archived; otherwise, <c>false</c>.
+	/// </value>
+	[BsonElement("archived")]
+	[BsonRepresentation(BsonType.Boolean)]
+	public bool Archived { get; set; }
+
+	/// <summary>
+	///   Gets or sets who archived the record.
+	/// </summary>
+	/// <value>
+	///   Who archived the record.
+	/// </value>
+	public UserDto ArchivedBy { get; set; } = UserDto.Empty;
+
+	/// <summary>
+	///   Gets or sets that this comment is the selected answer to the associated Issue.
+	/// </summary>
+	/// <value>
+	///   <c>true</c> if is the answer; otherwise, <c>false</c>.
+	/// </value>
+	[BsonElement("is_answer")]
+	[BsonRepresentation(BsonType.Boolean)]
+	public bool IsAnswer { get; set; }
+
+	/// <summary>
+	///   Gets or sets the user that selected this comment as the answer to the associated Issue.
+	/// </summary>
+	/// <value>
+	///   Who selected this comment as the answer to the associated Issue.
+	/// </value>
+	public UserDto AnswerSelectedBy { get; set; } = UserDto.Empty;
+}
+```
+
+## User
+
+- This is not stored in the database
+- The values are retrieved from the Auth0 loged in user
+- The User class is used to represent the user information in the system, including their identifier, display name, and email address. This information is essential for associating users with their actions and contributions within the platform, such as creating issues, commenting, and managing categories and statuses. The User class will be used in various parts of the application to ensure that user-related data is consistently represented and accessible throughout the system.
+- Create a User class to represent the user information in the system, ensuring that the necessary properties are included to support the features outlined above.
+- The UserDto record will be used to transfer user data between different layers of the application, such as between the database and the user interface, while the User class will be used to represent the user information within the application logic.
+
+```csharp
+
+/// <summary>
+///   User class
+/// </summary>
+[Serializable]
+public class User
+{
+	/// <summary>
+	///   Gets or sets the identifier.
+	/// </summary>
+	/// <value>
+	///   The identifier.
+	/// </value>
+	[BsonId]
+	[BsonElement("_id")]
+	[BsonRepresentation(BsonType.ObjectId)]
+	public string Id { get; set; } = string.Empty;
+
+	/// <summary>
+	///   Gets or sets the display name.
+	/// </summary>
+	/// <value>
+	///   The display name.
+	/// </value>
+	[BsonElement("display_name")]
+	[BsonRepresentation(BsonType.String)]
+	public string Name { get; set; } = string.Empty;
+
+	/// <summary>
+	///   Gets or sets the email address.
+	/// </summary>
+	/// <value>
+	///   The email address.
+	/// </value>
+	[BsonElement("email_address")]
+	[BsonRepresentation(BsonType.String)]
+	public string Email { get; set; } = string.Empty;
+}
+```
+
+## Issue
+- The Issue class will be used to represent the issues in the system, including their title, description, category, status, author, and other relevant information. This class will be essential for managing and displaying issues within the application, allowing users to create, view, and interact with issues effectively.
+
+```csharp
+
+/// <summary>
+///   Issue class
+/// </summary>
+[Serializable]
+public class Issue
+{
+	/// <summary>
+	///   Gets or sets the identifier.
+	/// </summary>
+	/// <value>
+	///   The identifier.
+	/// </value>
+	[BsonId]
+	[BsonRepresentation(BsonType.ObjectId)]
+	public string Id { get; set; } = string.Empty;
+
+	/// <summary>
+	///   Gets or sets the title.
+	/// </summary>
+	/// <value>
+	///   The title.
+	/// </value>
+	[BsonElement("issue_title")]
+	[BsonRepresentation(BsonType.String)]
+	public string Title { get; set; } = string.Empty;
+
+	/// <summary>
+	///   Gets or sets the description.
+	/// </summary>
+	/// <value>
+	///   The description.
+	/// </value>
+	[BsonElement("issue_description")]
+	[BsonRepresentation(BsonType.String)]
+	public string Description { get; set; } = string.Empty;
+
+	/// <summary>
+	///   Gets or sets the date created.
+	/// </summary>
+	/// <value>
+	///   The date created.
+	/// </value>
+	[BsonElement("date_created")]
+	[BsonRepresentation(BsonType.DateTime)]
+	public DateTime DateCreated { get; init; } = DateTime.UtcNow;
+
+	/// <summary>
+	///   Gets or sets the category.
+	/// </summary>
+	/// <value>
+	///   The category.
+	/// </value>
+	public CategoryDto Category { get; set; } = CategoryDto.Empty;
+
+	/// <summary>
+	///   Gets or sets the author.
+	/// </summary>
+	/// <value>
+	///   The author.
+	/// </value>
+	public UserDto Author { get; set; } = UserDto.Empty;
+
+	/// <summary>
+	///   Gets or sets the issue status.
+	/// </summary>
+	/// <value>
+	///   The issue status.
+	/// </value>
+	public StatusDto IssueStatus { get; set; } = StatusDto.Empty;
+
+	/// <summary>
+	///   Gets or sets a value indicating whether this <see cref="Issue" /> is archived.
+	/// </summary>
+	/// <value>
+	///   <c>true</c> if archived; otherwise, <c>false</c>.
+	/// </value>
+	[BsonElement("archived")]
+	[BsonRepresentation(BsonType.Boolean)]
+	public bool Archived { get; set; }
+
+	/// <summary>
+	///   Gets or sets who archived the record.
+	/// </summary>
+	/// <value>
+	///   Who archived the record.
+	/// </value>
+	public UserDto ArchivedBy { get; set; } = UserDto.Empty;
+
+	/// <summary>
+	///   Gets or sets a value indicating whether [approved for release].
+	/// </summary>
+	/// <value>
+	///   <c>true</c> if [approved for release]; otherwise, <c>false</c>.
+	/// </value>
+	[BsonElement("approved_for_release")]
+	[BsonRepresentation(BsonType.Boolean)]
+	public bool ApprovedForRelease { get; set; }
+
+	/// <summary>
+	///   Gets or sets a value indicating whether this <see cref="Issue" /> is rejected.
+	/// </summary>
+	/// <value>
+	///   <c>true</c> if rejected; otherwise, <c>false</c>.
+	/// </value>
+	[BsonElement("rejected")]
+	[BsonRepresentation(BsonType.Boolean)]
+	public bool Rejected { get; set; }
+}
+```
+
+
+
