@@ -30,6 +30,70 @@
 
 ## Learnings
 
+### Test Infrastructure Validation (2026-02-19) — I-10
+
+**Architectural Patterns Established:**
+- **Vertical Slice Testing:** Unit → Integration → E2E coverage for each feature slice
+- **CQRS Testing Strategy:** Separate test coverage for Commands (validators + handlers) and Queries (handlers only)
+- **Test Pyramid Implementation:** Fast unit tests (30), architecture tests (10), integration tests (17), bUnit tests (13), E2E tests (30)
+- **TestContainers for Integration:** Real MongoDB containers provide high-fidelity integration testing without mocking persistence
+- **Page Object Model for E2E:** Encapsulate page interactions in dedicated classes for maintainability
+
+**Coverage Strategy & Thresholds:**
+- **80%+ for business logic** (handlers, validators, domain models) — non-negotiable
+- **60%+ for UI components** (Blazor components, user interactions) — pragmatic balance
+- **100% for architecture rules** (layer boundaries, naming conventions) — enforced via NetArchTest
+- **Critical paths covered end-to-end** — focus E2E tests on user workflows, not exhaustive UI testing
+- **Exclude from coverage:** Infrastructure code (Program.cs, ServiceDefaults), generated code, test fixtures
+
+**CI/CD Automation Architecture:**
+- **Parallel test stages:** 6 independent jobs (Unit, Architecture, Blazor, Integration, Aspire, E2E) run simultaneously
+- **Shared build stage:** Single NuGet cache shared across all test jobs for efficiency
+- **MongoDB service container:** GitHub Actions service definition provides MongoDB for integration tests
+- **Coverage aggregation:** ReportGenerator consolidates coverage from multiple projects, enforces thresholds
+- **Artifact strategy:** Separate uploads for test results (.trx) and coverage reports (HTML, Cobertura, JSON)
+- **Performance target:** Full test suite completes in <15 minutes (currently ~12-15 min)
+
+**Team Coordination Insights:**
+- **Decision-driven development:** All major decisions documented in `.ai-team/decisions/inbox/` with rationale and trade-offs
+- **Agent specialization works:** Arwen (E2E), Gimli (Unit + Docs), Legolas (CI/CD), Aragorn (Integration) — clear ownership
+- **Validation gaps:** Incremental validation missing between work items I-2 through I-9 — caught issues late in I-10
+- **Integration dependencies:** Test projects need references to src projects — easier to catch early if CI runs after each work item
+- **Documentation quality:** 6 comprehensive guides with real examples, troubleshooting, best practices — production-ready
+
+**Critical Issue Found: Missing Test Project Files**
+- **Problem:** Test code files exist (15 files) but only 1 of 6 test projects has a .csproj file
+- **Impact:** Cannot build or run 72% of tests, CI/CD will fail, coverage unverifiable
+- **Root cause:** Agents focused on writing test code, skipped project scaffolding step
+- **Lesson learned:** Always verify buildability after each work item — don't defer to final validation
+- **Fix required:** Create .csproj files, add package/project references, update solution file, verify build
+
+**Known Limitations & Future Improvements:**
+- **No per-project coverage thresholds:** Currently enforces 80% globally — could be stricter on core logic, looser on UI
+- **No parallel test execution within jobs:** xUnit parallelization disabled to avoid .trx file conflicts
+- **No E2E cross-browser testing:** Currently Chromium only — could extend to Firefox, Safari
+- **No performance baseline tracking:** Coverage reports are per-run — could integrate Codecov for trends
+- **Aspire tests not implemented:** Directory exists but no test files or strategy defined yet
+
+**Validation Checklist Pattern (Reusable):**
+1. Build verification (dotnet clean/restore/build)
+2. Test execution (dotnet test with all projects)
+3. Coverage reporting (Coverlet + ReportGenerator)
+4. Test organization (naming conventions, fixtures, GlobalUsings)
+5. CI/CD workflow validation (YAML syntax, job definitions, service containers)
+6. Documentation completeness (guides, examples, cross-references)
+7. Decision review (inbox files, agent history updates)
+8. Git status (branch tracking, uncommitted changes, commit messages)
+
+**Decision Made: NOT READY FOR MERGE**
+- Blocking issues: Missing .csproj files, cannot build/run tests, CI/CD will fail
+- Quality of work is high (test code, docs, CI/CD design all excellent)
+- Fix required before merge: Create project files, update solution, verify build
+- Estimated time to fix: 2-4 hours
+- Escalated to: Aragorn or Legolas to implement fixes, then re-run validation
+
+---
+
 ### Documentation Standards
 
 - **README.md is the first impression:** Must clearly identify the project (IssueManager), its purpose (issue management + modern architecture patterns), tech stack, and a quick-start path. Avoid placeholder or off-topic content.

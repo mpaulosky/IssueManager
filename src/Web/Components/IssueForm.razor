@@ -1,0 +1,113 @@
+@namespace IssueManager.Web.Components
+@using IssueManager.Shared.Domain
+
+<div class="form-container">
+	<EditForm Model="@FormModel" OnValidSubmit="@OnFormSubmit">
+		<DataAnnotationsValidator />
+		<ValidationSummary />
+
+		<div class="form-group mb-3">
+			<label for="title" class="form-label">Title</label>
+			<InputText id="title" @bind-Value="FormModel.Title" class="form-control" placeholder="Enter issue title" />
+			<ValidationMessage For="@(() => FormModel.Title)" />
+		</div>
+
+		<div class="form-group mb-3">
+			<label for="description" class="form-label">Description</label>
+			<InputTextArea id="description" @bind-Value="FormModel.Description" class="form-control" rows="5" placeholder="Enter issue description (optional)" />
+			<ValidationMessage For="@(() => FormModel.Description)" />
+		</div>
+
+		<div class="form-group mb-3">
+			<label for="status" class="form-label">Status</label>
+			<InputSelect id="status" @bind-Value="FormModel.Status" class="form-select">
+				<option value="@IssueStatus.Open">Open</option>
+				<option value="@IssueStatus.InProgress">In Progress</option>
+				<option value="@IssueStatus.Closed">Closed</option>
+			</InputSelect>
+			<ValidationMessage For="@(() => FormModel.Status)" />
+		</div>
+
+		<div class="form-actions">
+			<button type="submit" class="btn btn-primary" disabled="@IsSubmitting">
+				@if (IsSubmitting)
+				{
+					<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+				}
+				@(IsEditMode ? "Update Issue" : "Create Issue")
+			</button>
+			@if (OnCancel.HasDelegate)
+			{
+				<button type="button" class="btn btn-secondary ms-2" @onclick="HandleCancel" disabled="@IsSubmitting">
+					Cancel
+				</button>
+			}
+		</div>
+	</EditForm>
+</div>
+
+@code {
+	/// <summary>
+	/// Event callback invoked when the form is successfully submitted.
+	/// </summary>
+	[Parameter]
+	public EventCallback<CreateIssueRequest> OnSubmit { get; set; }
+
+	/// <summary>
+	/// Event callback invoked when the user cancels the form.
+	/// </summary>
+	[Parameter]
+	public EventCallback OnCancel { get; set; }
+
+	/// <summary>
+	/// Indicates whether the form is in edit mode (updating an existing issue).
+	/// </summary>
+	[Parameter]
+	public bool IsEditMode { get; set; } = false;
+
+	/// <summary>
+	/// Initial values for the form when in edit mode.
+	/// </summary>
+	[Parameter]
+	public CreateIssueRequest? InitialValues { get; set; }
+
+	/// <summary>
+	/// Indicates whether the form is currently submitting.
+	/// </summary>
+	[Parameter]
+	public bool IsSubmitting { get; set; } = false;
+
+	private CreateIssueRequest FormModel = new();
+
+	/// <summary>
+	/// Initializes the form with initial values if provided.
+	/// </summary>
+	protected override void OnInitialized()
+	{
+		if (InitialValues != null)
+		{
+			FormModel = InitialValues with { };
+		}
+	}
+
+	/// <summary>
+	/// Updates the form model when parameters change.
+	/// </summary>
+	protected override void OnParametersSet()
+	{
+		if (InitialValues != null && FormModel != InitialValues)
+		{
+			FormModel = InitialValues with { };
+		}
+	}
+
+	private async Task OnFormSubmit()
+	{
+		await OnSubmit.InvokeAsync(FormModel);
+	}
+
+	private async Task HandleCancel()
+	{
+		await OnCancel.InvokeAsync();
+	}
+}
