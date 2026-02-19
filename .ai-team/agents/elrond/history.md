@@ -189,3 +189,46 @@
 - GitHub platform-level branch protection rules still need manual configuration in repo settings
 - .gitignore at repository root still missing (noted in earlier audit)
 - README.md and SECURITY.md content mismatch still needs correction
+
+### 2026-02-20: Release Workflow GitVersion Fix
+
+**Issue Identified:**
+- `squad-release.yml` was configured for Node.js/package.json versioning
+- Project is .NET 10.0 using GitVersion for semantic versioning
+- Release automation was non-functional for the actual tech stack
+
+**Root Cause:**
+- Workflow template was likely copied from a Node.js project template
+- Version source mismatch between CI (`squad-ci.yml` uses GitVersion) and Release (`squad-release.yml` used package.json)
+- No Node.js tests, no package.json, no npm tooling in the project
+
+**Solution Implemented:**
+- Replaced `actions/setup-node@v6` with `actions/setup-dotnet@v5`
+- Removed Node.js test step (`node --test test/*.test.js`)
+- Added GitVersion setup and execution steps (matching `squad-ci.yml` pattern)
+- Updated version extraction to use `steps.gitversion.outputs.majorMinorPatch`
+- Preserved tag deduplication and release creation logic
+
+**Key Pattern Learning:**
+- Both CI and Release workflows now use identical GitVersion integration (version 6.3.0)
+- Version extraction uses `majorMinorPatch` for release tags (e.g., `v1.2.3`)
+- `fullSemVer` is captured for enhanced release notes if needed
+- No breaking changes to tag creation, release verification, or GitHub release logic
+
+**Impact:**
+- Release automation is now functional with .NET projects
+- Semantic versioning is consistent across CI and Release pipelines
+- No manual version management required (GitVersion calculates from git history)
+- Single source of truth: git commit history + tags
+
+**Files Modified:**
+- `.github/workflows/squad-release.yml` — updated to use GitVersion instead of Node.js
+
+**Files Created:**
+- `.ai-team/decisions/inbox/elrond-gitversion-release.md` — architectural decision document
+
+**Validation:**
+- Workflow syntax is valid (follows GitHub Actions patterns)
+- GitVersion outputs match those used in `squad-ci.yml`
+- Tag and release creation logic remains unchanged
+- No build/test failures introduced (only removed incompatible Node.js test step)
