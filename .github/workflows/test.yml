@@ -59,7 +59,7 @@ jobs:
         run: dotnet restore
 
       - name: Build solution
-        run: dotnet build IssueManager.slnx --configuration Release --no-restore
+        run: dotnet build IssueManager.sln --configuration Release --no-restore
 
   test-unit:
     name: Unit Tests
@@ -88,7 +88,7 @@ jobs:
         run: dotnet restore
 
       - name: Build solution
-        run: dotnet build IssueManager.slnx --configuration Release --no-restore
+        run: dotnet build IssueManager.sln --configuration Release --no-restore
 
       - name: Run Unit Tests
         id: unit-tests
@@ -142,7 +142,7 @@ jobs:
         run: dotnet restore
 
       - name: Build solution
-        run: dotnet build IssueManager.slnx --configuration Release --no-restore
+        run: dotnet build IssueManager.sln --configuration Release --no-restore
 
       - name: Run Architecture Tests
         id: arch-tests
@@ -195,7 +195,7 @@ jobs:
         run: dotnet restore
 
       - name: Build solution
-        run: dotnet build IssueManager.slnx --configuration Release --no-restore
+        run: dotnet build IssueManager.sln --configuration Release --no-restore
 
       - name: Run bUnit Tests
         id: bunit-tests
@@ -262,7 +262,7 @@ jobs:
         run: dotnet restore
 
       - name: Build solution
-        run: dotnet build IssueManager.slnx --configuration Release --no-restore
+        run: dotnet build IssueManager.sln --configuration Release --no-restore
 
       - name: Run Integration Tests
         id: integration-tests
@@ -316,7 +316,7 @@ jobs:
         run: dotnet restore
 
       - name: Build solution
-        run: dotnet build IssueManager.slnx --configuration Release --no-restore
+        run: dotnet build IssueManager.sln --configuration Release --no-restore
 
       - name: Run Aspire Tests
         id: aspire-tests
@@ -370,7 +370,7 @@ jobs:
         run: dotnet restore
 
       - name: Build solution
-        run: dotnet build IssueManager.slnx --configuration Release --no-restore
+        run: dotnet build IssueManager.sln --configuration Release --no-restore
 
       - name: Run E2E Tests
         id: e2e-tests
