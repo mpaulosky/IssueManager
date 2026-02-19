@@ -1,111 +1,75 @@
 namespace IssueManager.Shared.Domain.Models;
 
 /// <summary>
-///   Issue class representing the main entity for tracking issues.
+/// Represents an issue in the issue tracking system.
 /// </summary>
-[Serializable]
-public class Issue
+/// <param name="Id">The unique identifier for the issue.</param>
+/// <param name="Title">The title of the issue.</param>
+/// <param name="Description">The description of the issue.</param>
+/// <param name="AuthorId">The ID of the user who created the issue.</param>
+/// <param name="CreatedAt">The timestamp when the issue was created.</param>
+public record Issue(string Id, string Title, string Description, string AuthorId, DateTime CreatedAt)
 {
 	/// <summary>
-	///   Gets or sets the unique identifier for the issue.
+	/// Gets the unique identifier for the issue.
 	/// </summary>
-	/// <value>
-	///   The unique identifier.
-	/// </value>
-	[BsonId]
-	[BsonElement("_id")]
-	[BsonRepresentation(BsonType.ObjectId)]
-	public string Id { get; set; } = string.Empty;
+	public string Id { get; init; } = !string.IsNullOrWhiteSpace(Id)
+		? Id
+		: throw new ArgumentException("Issue ID cannot be empty.", nameof(Id));
 
 	/// <summary>
-	///   Gets or sets the title of the issue.
+	/// Gets the title of the issue.
 	/// </summary>
-	/// <value>
-	///   The title.
-	/// </value>
-	[BsonElement("issue_title")]
-	[BsonRepresentation(BsonType.String)]
-	public string Title { get; set; } = string.Empty;
+	public string Title { get; init; } = !string.IsNullOrWhiteSpace(Title)
+		? Title
+		: throw new ArgumentException("Issue title cannot be empty.", nameof(Title));
 
 	/// <summary>
-	///   Gets or sets the description of the issue.
+	/// Gets the description of the issue.
 	/// </summary>
-	/// <value>
-	///   The description.
-	/// </value>
-	[BsonElement("issue_description")]
-	[BsonRepresentation(BsonType.String)]
-	public string Description { get; set; } = string.Empty;
+	public string Description { get; init; } = !string.IsNullOrWhiteSpace(Description)
+		? Description
+		: throw new ArgumentException("Issue description cannot be empty.", nameof(Description));
 
 	/// <summary>
-	///   Gets or sets the date the issue was created.
+	/// Gets the ID of the user who created the issue.
 	/// </summary>
-	/// <value>
-	///   The date created.
-	/// </value>
-	[BsonElement("date_created")]
-	[BsonRepresentation(BsonType.DateTime)]
-	public DateTime DateCreated { get; init; } = DateTime.UtcNow;
+	public string AuthorId { get; init; } = !string.IsNullOrWhiteSpace(AuthorId)
+		? AuthorId
+		: throw new ArgumentException("Author ID cannot be empty.", nameof(AuthorId));
 
 	/// <summary>
-	///   Gets or sets the category of the issue.
+	/// Gets the timestamp when the issue was created.
 	/// </summary>
-	/// <value>
-	///   The category.
-	/// </value>
-	public CategoryDto Category { get; set; } = CategoryDto.Empty;
+	public DateTime CreatedAt { get; init; } = CreatedAt != default ? CreatedAt : throw new ArgumentException("Created date cannot be default.", nameof(CreatedAt));
 
 	/// <summary>
-	///   Gets or sets the author of the issue.
+	/// Gets the ID of the category.
 	/// </summary>
-	/// <value>
-	///   The author.
-	/// </value>
-	public UserDto Author { get; set; } = UserDto.Empty;
+	public string? CategoryId { get; init; }
 
 	/// <summary>
-	///   Gets or sets the status of the issue.
+	/// Gets the ID of the status.
 	/// </summary>
-	/// <value>
-	///   The issue status.
-	/// </value>
-	public StatusDto IssueStatus { get; set; } = StatusDto.Empty;
+	public string? StatusId { get; init; }
 
 	/// <summary>
-	///   Gets or sets a value indicating whether this <see cref="Issue" /> is archived.
+	/// Gets the timestamp when the issue was last updated.
 	/// </summary>
-	/// <value>
-	///   <c>true</c> if archived; otherwise, <c>false</c>.
-	/// </value>
-	[BsonElement("archived")]
-	[BsonRepresentation(BsonType.Boolean)]
-	public bool Archived { get; set; }
+	public DateTime? UpdatedAt { get; init; }
 
 	/// <summary>
-	///   Gets or sets who archived the record.
+	/// Gets a value indicating whether this issue is archived.
 	/// </summary>
-	/// <value>
-	///   The user who archived the record.
-	/// </value>
-	public UserDto ArchivedBy { get; set; } = UserDto.Empty;
+	public bool IsArchived { get; init; }
 
 	/// <summary>
-	///   Gets or sets a value indicating whether this issue is approved for release.
+	/// Gets a value indicating whether this issue is approved for release.
 	/// </summary>
-	/// <value>
-	///   <c>true</c> if approved for release; otherwise, <c>false</c>.
-	/// </value>
-	[BsonElement("approved_for_release")]
-	[BsonRepresentation(BsonType.Boolean)]
-	public bool ApprovedForRelease { get; set; }
+	public bool ApprovedForRelease { get; init; }
 
 	/// <summary>
-	///   Gets or sets a value indicating whether this <see cref="Issue" /> is rejected.
+	/// Gets a value indicating whether this issue is rejected.
 	/// </summary>
-	/// <value>
-	///   <c>true</c> if rejected; otherwise, <c>false</c>.
-	/// </value>
-	[BsonElement("rejected")]
-	[BsonRepresentation(BsonType.Boolean)]
-	public bool Rejected { get; set; }
+	public bool Rejected { get; init; }
 }
