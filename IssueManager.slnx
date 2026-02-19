@@ -6,6 +6,7 @@
   "projects": [
     "src/AppHost/AppHost.csproj",
     "src/ServiceDefaults/ServiceDefaults.csproj",
+    "src/Shared/Shared.csproj",
     "src/Api/Api.csproj",
     "src/Web/Web.csproj"
   ]

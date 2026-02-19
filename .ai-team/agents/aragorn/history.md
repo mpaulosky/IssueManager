@@ -27,4 +27,21 @@
 
 ## Learnings
 
-*Append new patterns, MongoDB insights, and backend decisions here as you work.*
+### Issue #2 — Shared Library Implementation (2026-02-17)
+
+**Completed:**
+- Created `IssueManager.Shared` class library (net10.0, C# 14.0)
+- Registered in IssueManager.slnx solution file
+- Zero external NuGet dependencies (only .NET BCL)
+- Placeholder Utilities.cs class for compileability
+
+**Patterns Established:**
+- Shared library will grow organically (no premature structure)
+- Content areas: DTOs, Extensions, Constants, Validators, Domain enums, Result types
+- Vertical slices consume Shared selectively — no forced coupling
+
+**Technical Details:**
+- Project config matches ServiceDefaults/Api/Web conventions
+- Nullable enabled, ImplicitUsings enabled
+- RootNamespace: `IssueManager.Shared`
+- Shared csproj uses no dependencies beyond Directory.Packages.props
