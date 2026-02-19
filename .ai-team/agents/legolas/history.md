@@ -37,3 +37,47 @@
 - Aspire debug manifests should be excluded but `.ai-team/` and `.github/` must be version controlled
 - Test coverage reports and logs are transient — exclude to reduce noise
 - For Blazor + Aspire projects, also exclude `appsettings.Development.local.json` to allow local overrides without commits
+
+### CI/CD Pipeline Design — Test Execution (2026-02-17)
+
+#### Parallelization Strategy
+- **6 independent test jobs** (Unit, Architecture, bUnit, Integration, Aspire, E2E) run simultaneously
+- **Single shared build job** with NuGet cache reduces redundancy (~5-10 min)
+- **Total execution time: ~12-15 minutes** (parallel much faster than sequential ~30 min)
+- Safe to parallelize because test suites have no shared state; each job is idempotent
+
+#### Coverage Gates & Reporting
+- **Coverlet collector** enabled on Unit, bUnit, Integration, Aspire (XPlat Code Coverage format)
+- **Architecture tests excluded** from coverage due to NetArchTest + Coverlet conflict (noted in original CI)
+- **80% threshold** enforced as warning (can be made hard gate via branch protection)
+- **ReportGenerator** aggregates `.cobertura.xml` files → HTML + Cobertura + JSON summary
+- **Codecov integration** for historical tracking and badge generation
+
+#### MongoDB in CI vs Local Dev
+- **CI:** GitHub Actions service container (mongo:7.0) auto-provisioned with health checks
+- **Local Dev:** Testcontainers or Docker Compose for developer flexibility
+- **Service-based in CI** avoids Docker-in-Docker complexity; replicates production topology
+
+#### Test Environment vs Production Configuration
+- **CI env vars:** Dummy Auth0 values, test MongoDB connection string
+- **Production:** Secrets stored in GitHub Secrets or Key Vault, rotated regularly
+- **Aspire configuration:** Different manifests for dev (localhost), test (CI container), prod (cloud)
+- **E2E tests:** Run in headless mode in CI (Playwright --headless flag)
+
+#### Artifact & Reporting Strategy
+- **Per-job TRX uploads** named by test type (unit-test-results, integration-test-results, etc.)
+- **EnricoMi action** parses TRX files and publishes to GitHub check suite (visible on PR)
+- **Coverage reports** uploaded separately (HTML, Cobertura, JSON) for visibility
+- **Job summary** auto-generated in GitHub Actions UI for quick overview
+
+#### Error Handling & Observability
+- Each job explicitly exits code 1 on test failure (hard failure propagation)
+- Timeout protection: 10-20 min per job depending on type
+- Coverage warnings (not failures) if <80% — allows CI to pass but alerts developers
+- ReportGenerator handles missing files gracefully (warns instead of crashing)
+
+#### Performance Considerations
+- **NuGet cache hit:** 50-60% reduction in restore time (subsequent jobs benefit)
+- **Build cache:** `dotnet build` is incremental; most builds skip unchanged projects
+- **Timeout margins:** 15 min build + 10 min tests + 2 min overhead = 27 min total, well below 30 min runner default
+- **Parallelism limit:** 6 jobs OK for standard GitHub runner; cost scales linearly
