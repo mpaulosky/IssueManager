@@ -1,39 +1,31 @@
 namespace IssueManager.Shared.Domain.Models;
 
 /// <summary>
-///   User class representing Auth0 user information (not stored in database, used as DTO).
+/// Represents a user in the system.
 /// </summary>
-[Serializable]
-public class User
+/// <param name="Id">The unique identifier for the user.</param>
+/// <param name="Name">The display name of the user.</param>
+/// <param name="Email">The email address of the user.</param>
+public record User(string Id, string Name, string Email)
 {
 	/// <summary>
-	///   Gets or sets the unique identifier for the user.
+	/// Gets the unique identifier for the user.
 	/// </summary>
-	/// <value>
-	///   The unique identifier.
-	/// </value>
-	[BsonId]
-	[BsonElement("_id")]
-	[BsonRepresentation(BsonType.ObjectId)]
-	public string Id { get; set; } = string.Empty;
+	public string Id { get; init; } = !string.IsNullOrWhiteSpace(Id)
+		? Id
+		: throw new ArgumentException("User ID cannot be empty.", nameof(Id));
 
 	/// <summary>
-	///   Gets or sets the display name of the user.
+	/// Gets the display name of the user.
 	/// </summary>
-	/// <value>
-	///   The display name.
-	/// </value>
-	[BsonElement("display_name")]
-	[BsonRepresentation(BsonType.String)]
-	public string Name { get; set; } = string.Empty;
+	public string Name { get; init; } = !string.IsNullOrWhiteSpace(Name)
+		? Name
+		: throw new ArgumentException("User name cannot be empty.", nameof(Name));
 
 	/// <summary>
-	///   Gets or sets the email address of the user.
+	/// Gets the email address of the user.
 	/// </summary>
-	/// <value>
-	///   The email address.
-	/// </value>
-	[BsonElement("email_address")]
-	[BsonRepresentation(BsonType.String)]
-	public string Email { get; set; } = string.Empty;
+	public string Email { get; init; } = !string.IsNullOrWhiteSpace(Email)
+		? Email
+		: throw new ArgumentException("User email cannot be empty.", nameof(Email));
 }

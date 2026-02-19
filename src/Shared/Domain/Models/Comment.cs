@@ -1,109 +1,74 @@
 namespace IssueManager.Shared.Domain.Models;
 
 /// <summary>
-///   Comment class for issue discussions with threaded support, voting, and answer marking.
+/// Represents a comment on an issue.
 /// </summary>
-[Serializable]
-public class Comment
+/// <param name="Id">The unique identifier for the comment.</param>
+/// <param name="Title">The title of the comment.</param>
+/// <param name="Description">The description of the comment.</param>
+/// <param name="IssueId">The ID of the issue this comment belongs to.</param>
+/// <param name="AuthorId">The ID of the user who created the comment.</param>
+/// <param name="CreatedAt">The timestamp when the comment was created.</param>
+public record Comment(
+	string Id,
+	string Title,
+	string Description,
+	string IssueId,
+	string AuthorId,
+	DateTime CreatedAt)
 {
 	/// <summary>
-	///   Gets or sets the unique identifier for the comment.
+	/// Gets the unique identifier for the comment.
 	/// </summary>
-	/// <value>
-	///   The unique identifier.
-	/// </value>
-	[BsonId]
-	[BsonElement("_id")]
-	[BsonRepresentation(BsonType.ObjectId)]
-	public ObjectId Id { get; set; } = ObjectId.Empty;
+	public string Id { get; init; } = !string.IsNullOrWhiteSpace(Id)
+		? Id
+		: throw new ArgumentException("Comment ID cannot be empty.", nameof(Id));
 
 	/// <summary>
-	///   Gets or sets the title of the comment.
+	/// Gets the title of the comment.
 	/// </summary>
-	/// <value>
-	///   The title.
-	/// </value>
-	[BsonElement("comment_title")]
-	[BsonRepresentation(BsonType.String)]
-	public string Title { get; set; } = string.Empty;
+	public string Title { get; init; } = !string.IsNullOrWhiteSpace(Title)
+		? Title
+		: throw new ArgumentException("Comment title cannot be empty.", nameof(Title));
 
 	/// <summary>
-	///   Gets or sets the description of the comment.
+	/// Gets the description of the comment.
 	/// </summary>
-	/// <value>
-	///   The description.
-	/// </value>
-	[BsonElement("comment_description")]
-	[BsonRepresentation(BsonType.String)]
-	public string Description { get; init; } = string.Empty;
+	public string Description { get; init; } = !string.IsNullOrWhiteSpace(Description)
+		? Description
+		: throw new ArgumentException("Comment description cannot be empty.", nameof(Description));
 
 	/// <summary>
-	///   Gets or sets the date the comment was created.
+	/// Gets the ID of the issue this comment belongs to.
 	/// </summary>
-	/// <value>
-	///   The date created.
-	/// </value>
-	[BsonElement("date_created")]
-	[BsonRepresentation(BsonType.DateTime)]
-	public DateTime DateCreated { get; init; } = DateTime.UtcNow;
+	public string IssueId { get; init; } = !string.IsNullOrWhiteSpace(IssueId)
+		? IssueId
+		: throw new ArgumentException("Issue ID cannot be empty.", nameof(IssueId));
 
 	/// <summary>
-	///   Gets or sets the issue this comment belongs to.
+	/// Gets the ID of the user who created the comment.
 	/// </summary>
-	/// <value>
-	///   The associated issue.
-	/// </value>
-	public IssueDto Issue { get; set; } = IssueDto.Empty;
+	public string AuthorId { get; init; } = !string.IsNullOrWhiteSpace(AuthorId)
+		? AuthorId
+		: throw new ArgumentException("Author ID cannot be empty.", nameof(AuthorId));
 
 	/// <summary>
-	///   Gets or sets the author of the comment.
+	/// Gets the timestamp when the comment was created.
 	/// </summary>
-	/// <value>
-	///   The author.
-	/// </value>
-	public UserDto Author { get; set; } = UserDto.Empty;
+	public DateTime CreatedAt { get; init; } = CreatedAt != default ? CreatedAt : throw new ArgumentException("Created date cannot be default.", nameof(CreatedAt));
 
 	/// <summary>
-	///   Gets or sets the user votes for this comment.
+	/// Gets the user votes for this comment.
 	/// </summary>
-	/// <value>
-	///   The collection of user IDs who have voted.
-	/// </value>
-	public HashSet<string> UserVotes { get; init; } = new();
+	public IReadOnlySet<string> UserVotes { get; init; } = new HashSet<string>();
 
 	/// <summary>
-	///   Gets or sets a value indicating whether this <see cref="Comment" /> is archived.
+	/// Gets a value indicating whether this comment is the selected answer.
 	/// </summary>
-	/// <value>
-	///   <c>true</c> if archived; otherwise, <c>false</c>.
-	/// </value>
-	[BsonElement("archived")]
-	[BsonRepresentation(BsonType.Boolean)]
-	public bool Archived { get; set; }
+	public bool IsAnswer { get; init; }
 
 	/// <summary>
-	///   Gets or sets who archived the record.
+	/// Gets the ID of the user who selected this as the answer, if applicable.
 	/// </summary>
-	/// <value>
-	///   The user who archived the record.
-	/// </value>
-	public UserDto ArchivedBy { get; set; } = UserDto.Empty;
-
-	/// <summary>
-	///   Gets or sets a value indicating whether this comment is the selected answer to the associated issue.
-	/// </summary>
-	/// <value>
-	///   <c>true</c> if this is the answer; otherwise, <c>false</c>.
-	/// </value>
-	[BsonElement("is_answer")]
-	[BsonRepresentation(BsonType.Boolean)]
-	public bool IsAnswer { get; set; }
-
-	/// <summary>
-	///   Gets or sets the user who selected this comment as the answer to the associated issue.
-	/// </summary>
-	/// <value>
-	///   The user who selected this as the answer.
-	/// </value>
-	public UserDto AnswerSelectedBy { get; set; } = UserDto.Empty;
+	public string? AnswerSelectedById { get; init; }
 }

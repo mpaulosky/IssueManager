@@ -1,57 +1,31 @@
 namespace IssueManager.Shared.Domain.Models;
 
 /// <summary>
-///   Category class for categorizing issues (e.g., Bug, Feature Request, Documentation).
+/// Represents a category for organizing and classifying issues.
 /// </summary>
-[Serializable]
-public class Category
+/// <param name="Id">The unique identifier for the category.</param>
+/// <param name="Name">The name of the category.</param>
+/// <param name="Description">The description of the category.</param>
+public record Category(string Id, string Name, string Description)
 {
 	/// <summary>
-	///   Gets or sets the unique identifier for the category.
+	/// Gets the unique identifier for the category.
 	/// </summary>
-	/// <value>
-	///   The unique identifier.
-	/// </value>
-	[BsonId]
-	[BsonElement("_id")]
-	[BsonRepresentation(BsonType.ObjectId)]
-	public ObjectId? Id { get; set; } = ObjectId.Empty;
+	public string Id { get; init; } = !string.IsNullOrWhiteSpace(Id)
+		? Id
+		: throw new ArgumentException("Category ID cannot be empty.", nameof(Id));
 
 	/// <summary>
-	///   Gets or sets the name of the category.
+	/// Gets the name of the category.
 	/// </summary>
-	/// <value>
-	///   The name of the category.
-	/// </value>
-	[BsonElement("category_name")]
-	[BsonRepresentation(BsonType.String)]
-	public string CategoryName { get; set; } = string.Empty;
+	public string Name { get; init; } = !string.IsNullOrWhiteSpace(Name)
+		? Name
+		: throw new ArgumentException("Category name cannot be empty.", nameof(Name));
 
 	/// <summary>
-	///   Gets or sets the category description.
+	/// Gets the description of the category.
 	/// </summary>
-	/// <value>
-	///   The category description.
-	/// </value>
-	[BsonElement("category_description")]
-	[BsonRepresentation(BsonType.String)]
-	public string CategoryDescription { get; set; } = string.Empty;
-
-	/// <summary>
-	///   Gets or sets a value indicating whether this <see cref="Category" /> is archived.
-	/// </summary>
-	/// <value>
-	///   <c>true</c> if archived; otherwise, <c>false</c>.
-	/// </value>
-	[BsonElement("archived")]
-	[BsonRepresentation(BsonType.Boolean)]
-	public bool Archived { get; set; }
-
-	/// <summary>
-	///   Gets or sets who archived the record.
-	/// </summary>
-	/// <value>
-	///   The user who archived the record.
-	/// </value>
-	public UserDto ArchivedBy { get; set; } = UserDto.Empty;
+	public string Description { get; init; } = !string.IsNullOrWhiteSpace(Description)
+		? Description
+		: throw new ArgumentException("Category description cannot be empty.", nameof(Description));
 }
