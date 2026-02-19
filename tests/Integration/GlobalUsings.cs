@@ -1,0 +1,9 @@
+global using Xunit;
+global using FluentAssertions;
+global using IssueManager.Shared.Domain;
+global using IssueManager.Shared.Validators;
+global using IssueManager.Api.Data;
+global using IssueManager.Api.Handlers;
+global using Testcontainers.MongoDb;
+global using DotNet.Testcontainers.Builders;
+global using FluentValidation;
