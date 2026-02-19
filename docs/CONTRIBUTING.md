@@ -175,6 +175,91 @@ See [docs/](../docs) for feature documentation guidelines.
 The documentation for the project is always needed. We are always looking for help to add content to the `/docs`
 section of the repository with proper links back through to the main `/README.md`.
 
+## Testing
+
+All code contributions must include appropriate tests. We follow a comprehensive testing strategy with multiple test types.
+
+### Test Requirements
+
+Before submitting a PR, ensure:
+- ✅ All tests pass locally (`dotnet test`)
+- ✅ New features include tests (unit + integration)
+- ✅ Bug fixes include regression tests
+- ✅ Coverage meets targets (80%+ for handlers, 60%+ for components)
+- ✅ Tests are fast (<5s for unit/arch, <30s for integration)
+- ✅ No flaky tests (tests pass 10/10 times)
+
+### Test Types
+
+We use five types of tests:
+
+1. **Unit Tests** — Fast, focused tests for validators, domain models, and services
+   - Location: `tests/Unit/`
+   - Frameworks: xUnit, FluentValidation, FluentAssertions
+   - Guide: [Unit Testing Guide](guides/UNIT-TESTS.md)
+
+2. **Architecture Tests** — Enforce design rules and layer boundaries
+   - Location: `tests/Architecture/`
+   - Framework: NetArchTest.Rules
+   - Guide: [Architecture Testing Guide](guides/ARCHITECTURE-TESTS.md)
+
+3. **Integration Tests** — Test full vertical slices with real MongoDB
+   - Location: `tests/Integration/`
+   - Frameworks: xUnit, TestContainers, MongoDB
+   - Guide: [Integration Testing Guide](guides/INTEGRATION-TESTS.md)
+
+4. **Blazor Component Tests** — Test component rendering and interactions
+   - Location: `tests/BlazorTests/`
+   - Frameworks: bUnit, xUnit
+   - Guide: [Blazor Component Testing Guide](guides/BUNIT-BLAZOR-TESTS.md)
+
+5. **E2E Tests** — Browser automation for critical user workflows
+   - Location: `tests/E2E/`
+   - Framework: Playwright
+   - Guide: [E2E Testing Guide](guides/E2E-PLAYWRIGHT-TESTS.md)
+
+### Running Tests
+
+```bash
+# Run all tests
+dotnet test
+
+# Run specific test suite
+dotnet test tests/Unit
+dotnet test tests/Integration
+dotnet test tests/BlazorTests
+dotnet test tests/Architecture
+dotnet test tests/E2E
+
+# Run with coverage
+dotnet test --collect:"XPlat Code Coverage"
+
+# Run in watch mode
+dotnet watch test --project tests/Unit
+```
+
+### Test Documentation
+
+For comprehensive testing guides, see:
+- **[Testing Strategy](TESTING.md)** — Philosophy, pyramid, coverage goals
+- **[Unit Testing Guide](guides/UNIT-TESTS.md)** — xUnit, FluentValidation, FluentAssertions
+- **[Architecture Testing Guide](guides/ARCHITECTURE-TESTS.md)** — NetArchTest, design rules
+- **[Integration Testing Guide](guides/INTEGRATION-TESTS.md)** — TestContainers, MongoDB
+- **[Blazor Component Testing Guide](guides/BUNIT-BLAZOR-TESTS.md)** — bUnit, component lifecycle
+- **[E2E Testing Guide](guides/E2E-PLAYWRIGHT-TESTS.md)** — Playwright, browser automation
+- **[Test Data & Fixtures Guide](guides/TEST-DATA.md)** — Builders, factories, isolation
+
+### Quality Checklist
+
+When reviewing PRs, verify:
+- [ ] Tests exist for new code
+- [ ] Tests are clear and maintainable
+- [ ] Tests follow naming conventions (descriptive names)
+- [ ] Test data is isolated (no shared state)
+- [ ] Assertions are specific (not just `Should().BeTrue()`)
+- [ ] No commented-out tests
+- [ ] Tests pass consistently (no flaky tests)
+
 ---
 
 Thank you for helping us make this project better!
