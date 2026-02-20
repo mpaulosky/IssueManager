@@ -13,6 +13,7 @@ This Product Requirements Document (PRD) defines the comprehensive testing frame
 **Purpose:** Ensure consistent, high-quality test coverage across all layers of the application while maintaining rapid feedback loops and sustainable test maintenance.
 
 **Scope:** All test categories across the IssueManager vertical slice architecture:
+
 - Unit tests (domain logic, handlers, validators)
 - Integration tests (full slices with real MongoDB)
 - Architecture tests (layering, dependency rules, naming conventions)
@@ -21,6 +22,7 @@ This Product Requirements Document (PRD) defines the comprehensive testing frame
 - End-to-end tests (full stack browser automation)
 
 **Success Criteria:**
+
 - 80%+ coverage of business logic (commands, queries, domain validators)
 - 100% compliance with architecture rules
 - All vertical slices include unit + integration tests before PR merge
@@ -50,12 +52,14 @@ As of 2026-02-18, IssueManager has established test foundations across six proje
 ### What's Working
 
 ✅ **Core test infrastructure is stable:**
+
 - All five main test projects build successfully (net10.0, C# 14.0)
 - Consistent dependency management via Directory.Packages.props
 - GlobalUsings.cs in each project for common imports
 - CI/CD pipeline executes all test categories in parallel (squad-test.yml)
 
 ✅ **Test patterns are established:**
+
 - xunit for all test runners (console output, attribute-based organization)
 - FluentAssertions for readable assertions across all projects
 - NSubstitute for mocking dependencies (Unit, BlazorTests)
@@ -64,6 +68,7 @@ As of 2026-02-18, IssueManager has established test foundations across six proje
 - NetArchTest.Rules for architecture compliance (Architecture)
 
 ✅ **Domain modeling is clear:**
+
 - Vertical slice architecture with one feature per slice
 - CQRS pattern: Commands (state changes), Queries (data retrieval)
 - Handlers orchestrate logic; validators enforce rules before execution
@@ -72,19 +77,23 @@ As of 2026-02-18, IssueManager has established test foundations across six proje
 ### What's Incomplete
 
 ⏳ **E2E tests are not yet running:**
+
 - 31 tests written but failing in CI (Playwright browser binaries missing)
 - Requires `dotnet tool install --global Microsoft.Playwright.CLI && playwright install --with-deps chromium`
 - Tracked in decisions (PR #14 feedback: fix must go to squad-test.yml test-e2e job)
 
 ⏳ **Aspire tests are placeholder:**
+
 - Project structure exists but no tests written
 - Will validate app host configuration, service wiring, health checks
 
 ⏳ **Coverage baselines not yet established:**
+
 - No formal coverage thresholds defined per category
 - No aggregated coverage reporting in CI/CD
 
 ⏳ **Test naming/structure conventions not yet documented:**
+
 - Patterns exist organically but need formalization for consistency
 
 ### Project Tech Stack Context
@@ -105,6 +114,7 @@ As of 2026-02-18, IssueManager has established test foundations across six proje
 ### 1. Unit Tests
 
 **When to write:**
+
 - Testing domain validators (FluentValidation rules)
 - Testing command handlers (state change logic, pre-conditions)
 - Testing query handlers (data transformation, filtering)
@@ -113,6 +123,7 @@ As of 2026-02-18, IssueManager has established test foundations across six proje
 - Edge cases, boundary conditions, error scenarios
 
 **What to test:**
+
 - **Happy path:** Valid input → Expected output
 - **Validation failures:** Invalid input → Appropriate error messages
 - **Edge cases:** Null values, empty collections, boundary values
@@ -122,6 +133,7 @@ As of 2026-02-18, IssueManager has established test foundations across six proje
 **Expected coverage:** 80%+ of business logic code paths
 
 **Tools & libraries:**
+
 - `xunit` — Test runner and attributes ([Theory], [Fact])
 - `FluentAssertions` — Readable assertions (Should().Be(), etc.)
 - `FluentValidation` — Domain validators being tested
@@ -146,10 +158,12 @@ tests/Unit/
 ```
 
 **Naming convention:** `{SubjectUnderTest}Tests.cs`
+
 - Test method: `{Method}_{Scenario}_{ExpectedResult}()`
 - Example: `CreateIssue_WithValidInput_ReturnsNewId()`
 
 **Assertion pattern:**
+
 ```csharp
 // Arrange
 var validator = new IssueValidator();
@@ -168,6 +182,7 @@ result.Errors.Should().Contain(e => e.PropertyName == nameof(CreateIssueCommand.
 ### 2. Integration Tests
 
 **When to write:**
+
 - Testing full vertical slices end-to-end
 - Testing handler + repository interaction with real MongoDB
 - Testing data persistence and retrieval
@@ -175,6 +190,7 @@ result.Errors.Should().Contain(e => e.PropertyName == nameof(CreateIssueCommand.
 - Testing validation + domain logic + persistence together
 
 **What to test:**
+
 - **Full slice workflow:** Command received → Handler executes → Data persisted → Query retrieves
 - **MongoDB operations:** Create, read, update, delete via EF Core
 - **Data integrity:** Constraints enforced, relationships maintained
@@ -184,6 +200,7 @@ result.Errors.Should().Contain(e => e.PropertyName == nameof(CreateIssueCommand.
 **Expected coverage:** 60%+ of handler/repository code paths (avoid redundancy with unit tests)
 
 **Tools & libraries:**
+
 - `xunit` — Test runner
 - `FluentAssertions` — Readable assertions
 - `Testcontainers.MongoDb` — Isolated MongoDB instance per test run
@@ -206,6 +223,7 @@ tests/Integration/
 ```
 
 **Setup pattern (MongoDbFixture.cs):**
+
 ```csharp
 public class MongoDbFixture : IAsyncLifetime
 {
@@ -230,6 +248,7 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 ```
 
 **Test method pattern:**
+
 ```csharp
 [Fact]
 public async Task CreateIssue_WithValidCommand_PersistsToDatabase()
@@ -254,12 +273,14 @@ public async Task CreateIssue_WithValidCommand_PersistsToDatabase()
 ### 3. Architecture Tests
 
 **When to write:**
+
 - On every build (to enforce layering and dependency rules)
 - When adding new projects or restructuring code
 - When enforcing naming conventions across the codebase
 - Verify no circular dependencies exist
 
 **What to test:**
+
 - **Layering rules:** Api layer doesn't reference Web, Domain doesn't reference Api
 - **Naming conventions:** All validators end with "Validator", all handlers named "*Handler"
 - **Dependency rules:** No external dependencies in Domain layer (except BCL)
@@ -268,6 +289,7 @@ public async Task CreateIssue_WithValidCommand_PersistsToDatabase()
 **Expected coverage:** 100% compliance (all rules enforced on every build)
 
 **Tools & libraries:**
+
 - `xunit` — Test runner
 - `FluentAssertions` — Readable assertions
 - `NetArchTest.Rules` — Architecture rule definitions
@@ -317,6 +339,7 @@ public void Domain_ShouldNotDependOn_Api()
 ### 4. Blazor Component Tests (bUnit)
 
 **When to write:**
+
 - Testing component rendering with different parameter combinations
 - Testing user interactions (click, input, form submission)
 - Testing component lifecycle (OnInitialized, OnParametersSet)
@@ -324,6 +347,7 @@ public void Domain_ShouldNotDependOn_Api()
 - Testing error boundaries and error states
 
 **What to test:**
+
 - **Rendering:** Component renders correctly with given parameters
 - **Interaction:** User actions trigger event callbacks, update state
 - **Lifecycle:** Components initialize, update parameters, clean up correctly
@@ -333,6 +357,7 @@ public void Domain_ShouldNotDependOn_Api()
 **Expected coverage:** 60%+ of component code (focus on logic, not trivial markup)
 
 **Tools & libraries:**
+
 - `xunit` — Test runner
 - `bunit` — Blazor component testing library
 - `FluentAssertions` — Readable assertions
@@ -402,12 +427,14 @@ public async Task IssueFormComponent_OnSubmit_CallsCallback()
 ### 5. Aspire Orchestration Tests
 
 **When to write:**
+
 - Testing app host configuration and service registration
 - Verifying all services are wired correctly
 - Testing health check endpoints
 - Testing service discovery and networking
 
 **What to test:**
+
 - **Service wiring:** All required services are registered
 - **Configuration:** Environment variables, settings passed correctly
 - **Health checks:** All services expose health check endpoints
@@ -416,6 +443,7 @@ public async Task IssueFormComponent_OnSubmit_CallsCallback()
 **Expected coverage:** 100% of app host configuration paths
 
 **Tools & libraries:**
+
 - `xunit` — Test runner
 - `FluentAssertions` — Readable assertions
 - `Aspire.Hosting` — App host configuration testing
@@ -456,6 +484,7 @@ public async Task AppHost_WithAllServices_ConfiguresSuccessfully()
 ### 6. End-to-End Tests (Playwright)
 
 **When to write:**
+
 - Testing complete user workflows from browser
 - Validating full-stack integration (UI → API → Database)
 - Testing cross-browser compatibility
@@ -463,6 +492,7 @@ public async Task AppHost_WithAllServices_ConfiguresSuccessfully()
 - Pre-release validation
 
 **What to test:**
+
 - **User workflows:** Create issue → View issue → Edit issue → Delete issue
 - **Authentication:** Login, logout, permission-based access
 - **Data consistency:** Changes in UI reflected in database
@@ -472,6 +502,7 @@ public async Task AppHost_WithAllServices_ConfiguresSuccessfully()
 **Expected coverage:** 100% of happy-path user workflows (not error scenarios)
 
 **Tools & libraries:**
+
 - `xunit` — Test runner
 - `Playwright` — Browser automation (Chromium, Firefox, WebKit)
 
@@ -530,6 +561,7 @@ Define measurable coverage expectations per category:
 | **Integration** | Repository layer, full slice workflows | 60%+ | Integration test coverage report |
 
 **Coverage aggregation:**
+
 - Unit + Integration + BlazorTests coverage combined should reach 75%+ overall
 - Excluded from coverage: trivial getters/setters, auto-generated code
 - Target is sustainable coverage, not 100% (diminishing returns after 80%)
@@ -547,7 +579,7 @@ The testing strategy follows the traditional test pyramid for optimal speed and 
    🟨🟨🟨🟨🟨 Architecture (Instant, All)
 ```
 
-### Execution Priority (in CI/CD):
+### Execution Priority (in CI/CD)
 
 1. **Layer 1 — Architecture Tests** (runs first, ~5 seconds)
    - Instant feedback on structural violations
@@ -630,6 +662,7 @@ public async Task CreateIssue_WithEmptyTitle_ReturnsFailed()
 ```
 
 **Patterns:**
+
 - Test happy path (valid input → success)
 - Test validation failures (invalid input → error)
 - Test command effects via mocked repository (Received() assertions)
@@ -681,6 +714,7 @@ public async Task GetIssueById_WithNonExistentId_ReturnsNotFound()
 ```
 
 **Patterns:**
+
 - Test data retrieval with mocked repository
 - Test filtering/transformation logic
 - Test null/not-found scenarios
@@ -749,6 +783,7 @@ public class CreateIssueValidatorTests
 ```
 
 **Patterns:**
+
 - Use [Theory] with [InlineData] for boundary testing
 - Test each validation rule independently
 - Test null, empty, whitespace edge cases
@@ -846,12 +881,14 @@ These are mandatory requirements that the team follows to maintain test quality:
 ### For All New Features
 
 ✅ **Every vertical slice must include:**
+
 - At least one unit test per command/query handler
 - At least one integration test validating the full slice
 - Validators tested independently with [Theory] tests covering all rules
 - 80%+ code coverage for business logic in the slice
 
 ✅ **Before PR merge:**
+
 - All tests pass locally (`dotnet test` in test directory)
 - Architecture tests pass (NetArchTest.Rules)
 - No test skips or TODO tests in the PR
@@ -861,6 +898,7 @@ These are mandatory requirements that the team follows to maintain test quality:
 ### For Architecture & Layering
 
 ✅ **Every project must:**
+
 - Define architecture rules in Architecture.csproj (naming conventions, layering)
 - Maintain zero circular dependencies
 - Follow naming convention (e.g., handlers end with "Handler", validators end with "Validator")
@@ -869,6 +907,7 @@ These are mandatory requirements that the team follows to maintain test quality:
 ### For E2E Tests
 
 ✅ **Every user workflow must have:**
+
 - At least one happy-path E2E test
 - Test exercises full stack (UI → API → Database)
 - Test verifies data persists and is visible in UI
@@ -876,12 +915,14 @@ These are mandatory requirements that the team follows to maintain test quality:
 ### For Coverage & Quality
 
 ✅ **Coverage targets:**
+
 - Business logic: 80%+ (no new slices below this)
 - UI components: 60%+ (Blazor rendering, basic interactions)
 - Architecture: 100% (all rules pass every build)
 - E2E: 100% happy path coverage (all workflows tested)
 
 ✅ **No pull requests merge without:**
+
 - 80%+ business logic coverage in the changed code
 - All architecture tests passing
 - All modified tests passing
@@ -1122,6 +1163,7 @@ This PRD establishes a comprehensive, sustainable testing strategy for IssueMana
 6. **Scales with the project** — Test infrastructure grows as features are added
 
 **Next Steps for the Team:**
+
 1. Review and approve this PRD in team standup
 2. Begin Phase 1: Coverage baseline assessment
 3. Assign owner for each phase (recommended: Gimli for Phase 2, Aragorn for Phase 3)
