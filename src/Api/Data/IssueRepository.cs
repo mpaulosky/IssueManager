@@ -72,6 +72,39 @@ public class IssueRepository : IIssueRepository
 	}
 
 	/// <inheritdoc />
+	public async Task<(IReadOnlyList<Issue> Items, long Total)> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+	{
+		var filter = Builders<IssueEntity>.Filter.Eq(x => x.IsArchived, false);
+		
+		var total = await _collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
+		
+		var entities = await _collection
+			.Find(filter)
+			.Skip((page - 1) * pageSize)
+			.Limit(pageSize)
+			.ToListAsync(cancellationToken);
+
+		var items = entities.Select(e => e.ToDomain()).ToList();
+		
+		return (items, total);
+	}
+
+	/// <inheritdoc />
+	public async Task<bool> ArchiveAsync(string issueId, CancellationToken cancellationToken = default)
+	{
+		var update = Builders<IssueEntity>.Update
+			.Set(x => x.IsArchived, true)
+			.Set(x => x.UpdatedAt, DateTime.UtcNow);
+		
+		var result = await _collection.UpdateOneAsync(
+			x => x.Id == issueId,
+			update,
+			cancellationToken: cancellationToken);
+
+		return result.ModifiedCount > 0;
+	}
+
+	/// <inheritdoc />
 	public async Task<long> CountAsync(CancellationToken cancellationToken = default)
 	{
 		return await _collection.CountDocumentsAsync(_ => true, cancellationToken: cancellationToken);
@@ -89,6 +122,7 @@ internal class IssueEntity
 	public string Status { get; set; } = string.Empty;
 	public DateTime CreatedAt { get; set; }
 	public DateTime UpdatedAt { get; set; }
+	public bool IsArchived { get; set; }
 	public List<LabelEntity>? Labels { get; set; }
 
 	public static IssueEntity FromDomain(Issue issue)
@@ -101,6 +135,7 @@ internal class IssueEntity
 			Status = issue.Status.ToString(),
 			CreatedAt = issue.CreatedAt,
 			UpdatedAt = issue.UpdatedAt,
+			IsArchived = false,
 			Labels = issue.Labels?.Select(l => new LabelEntity { Name = l.Name, Color = l.Color }).ToList()
 		};
 	}
