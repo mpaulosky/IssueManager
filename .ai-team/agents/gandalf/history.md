@@ -178,3 +178,53 @@
 - Gained faster CI/CD execution (removed longest-running test job)
 - Reduced maintenance burden (no Playwright version management)
 - Aligns with Aspire project maturity level
+
+---
+
+## 2026-02-19: CRUD API Design for Shared Models
+
+**Context:** mpaulosky requested full CRUD operations for Issue, Comment, User, Category, Status models. Current API is incomplete (only Create, GetById, UpdateStatus for Issue; no Comment, User, Category, Status endpoints).
+
+**Architectural Decision:**
+
+Scope: Full CRUD endpoints for all 5 models, organized as vertical slices with CQRS command/query handlers.
+
+**Key Decisions:**
+
+1. **Soft-Delete via IsArchived Flag for Audit Domains**
+   - Issue and Comment use soft-delete (set IsArchived = true on DELETE)
+   - Preserves audit trail and enables undo
+   - User, Category, Status use hard-delete (reference data, not audit-tracked)
+
+2. **Commands/Queries Cohabitate in src/Shared/Validators/**
+   - Mirrors existing pattern (CreateIssueCommand already there)
+   - Keeps domain contracts and validators colocated
+   - Reduces cognitive load during feature development
+
+3. **Pagination Required from Day One**
+   - All List endpoints: page, pageSize, totalPages
+   - Default 20 items/page, max 100
+   - Filtering (status, labels, date) deferred to Sprint 2+
+
+**RESTful Endpoint Patterns:**
+- POST `/api/v1/issues` → CreateIssueHandler
+- GET `/api/v1/issues/:id` → GetIssueHandler
+- PATCH `/api/v1/issues/:id` → UpdateIssueHandler (title + description)
+- DELETE `/api/v1/issues/:id` → DeleteIssueHandler (soft-delete)
+- GET `/api/v1/issues` → ListIssuesHandler (paginated, excludes archived)
+- Similar patterns for Comment, User, Category, Status
+
+**Risk Mitigation:**
+- Cascade delete: Issue archive cascades to Comments (documented in model)
+- Concurrent updates: Last-write-wins for now; version field if needed later
+- Breaking changes: Keep existing handlers; extend incrementally; CI catches incompatibilities
+- Authorization: Extract user context from JWT; enforce owner/admin checks in handlers
+
+**Three-Sprint Decomposition:**
+1. **Sprint 1** (Aragorn): Issue CRUD + pagination (handlers, validators, endpoints)
+2. **Sprint 2** (Aragorn): Comment CRUD + vote/answer logic
+3. **Sprint 3** (Aragorn): User, Category, Status CRUD + admin authorization
+4. **Parallel** (Gimli): 80% handler/repository coverage (unit + integration tests)
+5. **Parallel** (Arwen): Blazor UI after Issue CRUD endpoints stabilize
+
+**Document Created:** `.ai-team/decisions/inbox/gandalf-crud-api-design.md` with full rationale, endpoint specs, error shapes, and implementation roadmap.
