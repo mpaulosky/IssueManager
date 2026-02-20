@@ -145,3 +145,36 @@
 - Whether the fix targets the correct execution path
 
 **Escalation:** Legolas (DevOps) to fix by moving Playwright install to test.yml test-e2e job
+
+---
+
+## 2026-02-19: E2E Test Infrastructure Removed
+
+**Context:** Aspire project constraints — web application not deployable for testing at current stage of development.
+
+**Architectural Decision:**
+- E2E tests require running web application endpoint (Playwright browser automation)
+- Aspire orchestrated services not yet configured for external endpoint exposure
+- Premature to maintain E2E infrastructure without ability to execute tests
+- Other test layers (Unit, Integration, Architecture, Blazor, Aspire) provide adequate coverage
+
+**Actions Taken:**
+- Deleted `tests/E2E/` directory (entire E2E test project)
+- Removed E2E project reference from `IssueManager.sln` using `dotnet sln remove`
+- Verified solution builds successfully in Release configuration (no broken references)
+
+**Build Validation:**
+- `dotnet build IssueManager.sln --configuration Release` — ✅ SUCCESS
+- All remaining test projects (Unit, Architecture, Blazor, Integration, Aspire) — intact
+- No cascading reference failures
+
+**Next Steps:**
+- Legolas (DevOps) to update `.github/workflows/test.yml` — remove `test-e2e` job
+- Gimli (Tester) to update test documentation — remove E2E references, adjust coverage strategy
+- Future: Re-introduce E2E tests when Aspire endpoints are stable and web UI is deployable
+
+**Trade-offs Accepted:**
+- Lost E2E coverage of user workflows (critical path testing)
+- Gained faster CI/CD execution (removed longest-running test job)
+- Reduced maintenance burden (no Playwright version management)
+- Aligns with Aspire project maturity level

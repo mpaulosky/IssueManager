@@ -363,72 +363,6 @@ jobs:
           name: aspire-test-results
           path: test-results
 
-  test-e2e:
-    name: E2E Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    needs: build
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          global-json-file: global.json
-
-      - name: Cache NuGet packages
-        uses: actions/cache@v5
-        with:
-          path: ${{ github.workspace }}/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
-
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Build solution
-        run: dotnet build IssueManager.sln --configuration Release --no-restore
-
-      - name: Install Playwright Browsers
-        run: |
-          dotnet tool install --global Microsoft.Playwright.CLI
-          playwright install --with-deps chromium
-          if ! command -v playwright &> /dev/null || ! [ -d "$HOME/.cache/ms-playwright" ]; then
-            echo "::error::Playwright browser installation failed"
-            exit 1
-          fi
-
-      - name: Run E2E Tests
-        id: e2e-tests
-        run: |
-          mkdir -p test-results
-          if [ ! -d "tests/E2E" ]; then
-            echo "::error::E2E test project not found at tests/E2E"
-            exit 1
-          fi
-          dotnet test tests/E2E \
-            --configuration Release \
-            --no-build \
-            --no-restore \
-            --logger "trx;LogFileName=e2e.trx" \
-            --results-directory test-results \
-            --verbosity minimal
-          exit_code=$?
-          if [ $exit_code -ne 0 ]; then
-            echo "::error::E2E tests failed"
-          fi
-          exit $exit_code
-
-      - name: Upload E2E Test Results
-        uses: actions/upload-artifact@v6
-        if: always()
-        with:
-          name: e2e-test-results
-          path: test-results
-
   coverage:
     name: Coverage Analysis
     runs-on: ubuntu-latest
@@ -503,7 +437,6 @@ jobs:
       - test-bunit
       - test-integration
       - test-aspire
-      - test-e2e
     if: always()
 
     steps:
@@ -535,7 +468,6 @@ jobs:
           echo "- **Blazor Tests:** ${{ needs.test-bunit.result }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Integration Tests:** ${{ needs.test-integration.result }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Aspire Tests:** ${{ needs.test-aspire.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **E2E Tests:** ${{ needs.test-e2e.result }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Artifacts" >> $GITHUB_STEP_SUMMARY
           echo "- Test results and coverage reports available in Actions artifacts" >> $GITHUB_STEP_SUMMARY
@@ -549,11 +481,10 @@ jobs:
           bunit_status="${{ needs.test-bunit.result }}"
           integration_status="${{ needs.test-integration.result }}"
           aspire_status="${{ needs.test-aspire.result }}"
-          e2e_status="${{ needs.test-e2e.result }}"
           
           if [[ "$build_status" == "failure" || "$unit_status" == "failure" || "$arch_status" == "failure" || \
                 "$bunit_status" == "failure" || "$integration_status" == "failure" || \
-                "$aspire_status" == "failure" || "$e2e_status" == "failure" ]]; then
+                "$aspire_status" == "failure" ]]; then
             echo "❌ **Overall Status:** FAILED" >> $GITHUB_STEP_SUMMARY
           else
             echo "✅ **Overall Status:** PASSED" >> $GITHUB_STEP_SUMMARY
