@@ -9,7 +9,7 @@ namespace IssueManager.Shared.Domain.DTOs;
 /// <param name="Archived">Indicates whether the status is archived.</param>
 /// <param name="ArchivedBy">The user who archived the status.</param>
 public record StatusDto(
-	ObjectId Id,
+	string Id,
 	string StatusName,
 	string StatusDescription,
 	bool Archived,
@@ -19,7 +19,7 @@ public record StatusDto(
 	///   Gets an empty StatusDto instance.
 	/// </summary>
 	public static StatusDto Empty => new(
-		ObjectId.Empty,
+		string.Empty,
 		string.Empty,
 		string.Empty,
 		false,

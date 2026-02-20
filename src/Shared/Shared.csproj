@@ -8,6 +8,5 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <PackageReference Include="FluentValidation" />
-	  <PackageReference Include="MongoDB.Bson" />
 	</ItemGroup>
 </Project>

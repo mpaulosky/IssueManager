@@ -9,7 +9,7 @@ namespace IssueManager.Shared.Domain.DTOs;
 /// <param name="Archived">Indicates whether the category is archived.</param>
 /// <param name="ArchivedBy">The user who archived the category.</param>
 public record CategoryDto(
-	ObjectId? Id,
+	string? Id,
 	string CategoryName,
 	string CategoryDescription,
 	bool Archived,
@@ -19,7 +19,7 @@ public record CategoryDto(
 	///   Gets an empty CategoryDto instance.
 	/// </summary>
 	public static CategoryDto Empty => new(
-		ObjectId.Empty,
+		string.Empty,
 		string.Empty,
 		string.Empty,
 		false,
