@@ -74,7 +74,7 @@ jobs:
           echo "MajorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}"
 
       - name: Restore dependencies
-        run: dotnet IssueManager.slnx restore
+        run: dotnet restore
 
       - name: Build solution
         run: dotnet build IssueManager.sln --configuration Release --no-restore
