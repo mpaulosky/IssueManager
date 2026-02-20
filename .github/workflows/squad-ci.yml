@@ -82,8 +82,7 @@ jobs:
       - name: Install Playwright Browsers
         run: |
           dotnet tool update --global Microsoft.Playwright.CLI || dotnet tool install --global Microsoft.Playwright.CLI --ignore-failed-sources
-          playwright install chromium
-          playwright install-deps chromium
+          playwright install --with-deps chromium
 
       - name: Run Tests
         id: run-tests
