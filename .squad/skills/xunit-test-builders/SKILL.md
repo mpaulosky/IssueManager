@@ -32,11 +32,11 @@ var issue = IssueBuilder.Default().Build();
 var issue = IssueBuilder.Default()
     .WithTitle("Custom Title")
     .WithDescription("Custom Description")
-    .AsArchived()
+    .AsClosed()
     .Build();
 
 // Predefined scenario
-var archivedIssue = IssueBuilder.Archived().Build();
+var closedIssue = IssueBuilder.Closed().Build();
 ```
 
 ---

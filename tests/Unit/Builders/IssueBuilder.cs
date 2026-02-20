@@ -99,6 +99,15 @@ public class IssueBuilder
 	public static IssueBuilder Default() => new();
 
 	/// <summary>
+	/// Sets the issue status to Closed.
+	/// </summary>
+	public IssueBuilder AsClosed()
+	{
+		_status = IssueStatus.Closed;
+		return this;
+	}
+
+	/// <summary>
 	/// Creates a closed issue builder.
 	/// </summary>
 	public static IssueBuilder Closed() => new IssueBuilder().WithStatus(IssueStatus.Closed);
