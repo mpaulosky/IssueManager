@@ -23,17 +23,17 @@ public record IssueDto(
 	StatusDto Status)
 {
 	/// <summary>
-	///   Initializes a new instance of the <see cref="IssueDto" /> record.
+	///   Initializes a new instance of the <see cref="IssueDto" /> record from a Domain Issue.
 	/// </summary>
 	/// <param name="issue">The issue.</param>
-	public IssueDto(Issue issue) : this(
-		issue.Id,
+	public IssueDto(Domain.Issue issue) : this(
+		ObjectId.Parse(issue.Id),
 		issue.Title,
-		issue.Description,
-		issue.DateCreated,
-		issue.Author,
-		issue.Category,
-		issue.IssueStatus)
+		issue.Description ?? string.Empty,
+		issue.CreatedAt,
+		UserDto.Empty,
+		CategoryDto.Empty,
+		new StatusDto(issue.Status.ToString(), issue.Status.ToString()))
 	{
 	}
 
