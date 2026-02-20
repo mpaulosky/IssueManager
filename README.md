@@ -1,5 +1,10 @@
 # IssueManager
 
+[![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![CI/CD](https://github.com/mpaulosky/IssueManager/actions/workflows/squad-ci.yml/badge.svg)](https://github.com/mpaulosky/IssueManager/actions/workflows/squad-ci.yml)
+[![CodeCov Coverage](https://codecov.io/gh/mpaulosky/IssueManager/branch/main/graph/badge.svg)](https://codecov.io/gh/mpaulosky/IssueManager)
+
 An issue management application built with modern architecture patterns and async/reactive workflows. IssueManager demonstrates vertical slice architecture, CQRS, and MongoDB integration in a production-ready .NET application.
 
 ## Quick Start
