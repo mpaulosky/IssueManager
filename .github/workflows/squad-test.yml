@@ -62,6 +62,16 @@ jobs:
       - name: Build solution
         run: dotnet build IssueManager.sln --configuration Release --no-restore
 
+      - name: Cache build artifacts
+        uses: actions/cache@v5
+        with:
+          path: |
+            **/bin/Release/
+            **/obj/
+          key: ${{ runner.os }}-build-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props', 'global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
   test-unit:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -77,6 +87,16 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Restore build artifacts
+        uses: actions/cache@v5
+        with:
+          path: |
+            **/bin/Release/
+            **/obj/
+          key: ${{ runner.os }}-build-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props', 'global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
       - name: Cache NuGet packages
         uses: actions/cache@v5
         with:
@@ -87,9 +107,6 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore
-
-      - name: Build solution
-        run: dotnet build IssueManager.sln --configuration Release --no-restore
 
       - name: Run Unit Tests
         id: unit-tests
@@ -135,6 +152,16 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Restore build artifacts
+        uses: actions/cache@v5
+        with:
+          path: |
+            **/bin/Release/
+            **/obj/
+          key: ${{ runner.os }}-build-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props', 'global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
       - name: Cache NuGet packages
         uses: actions/cache@v5
         with:
@@ -145,9 +172,6 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore
-
-      - name: Build solution
-        run: dotnet build IssueManager.sln --configuration Release --no-restore
 
       - name: Run Architecture Tests
         id: arch-tests
@@ -192,6 +216,16 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Restore build artifacts
+        uses: actions/cache@v5
+        with:
+          path: |
+            **/bin/Release/
+            **/obj/
+          key: ${{ runner.os }}-build-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props', 'global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
       - name: Cache NuGet packages
         uses: actions/cache@v5
         with:
@@ -202,9 +236,6 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore
-
-      - name: Build solution
-        run: dotnet build IssueManager.sln --configuration Release --no-restore
 
       - name: Run bUnit Tests
         id: bunit-tests
@@ -263,6 +294,16 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Restore build artifacts
+        uses: actions/cache@v5
+        with:
+          path: |
+            **/bin/Release/
+            **/obj/
+          key: ${{ runner.os }}-build-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props', 'global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
       - name: Cache NuGet packages
         uses: actions/cache@v5
         with:
@@ -273,9 +314,6 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore
-
-      - name: Build solution
-        run: dotnet build IssueManager.sln --configuration Release --no-restore
 
       - name: Run Integration Tests
         id: integration-tests
@@ -321,6 +359,16 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Restore build artifacts
+        uses: actions/cache@v5
+        with:
+          path: |
+            **/bin/Release/
+            **/obj/
+          key: ${{ runner.os }}-build-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props', 'global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
       - name: Cache NuGet packages
         uses: actions/cache@v5
         with:
@@ -331,9 +379,6 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore
-
-      - name: Build solution
-        run: dotnet build IssueManager.sln --configuration Release --no-restore
 
       - name: Run Aspire Tests
         id: aspire-tests
