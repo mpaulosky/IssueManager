@@ -1,7 +1,7 @@
 using FluentValidation;
 using IssueManager.Api.Data;
-using IssueManager.Shared.Domain.DTOs;
-using IssueManager.Shared.Validators;
+
+using Shared.Validators;
 
 namespace IssueManager.Api.Handlers;
 

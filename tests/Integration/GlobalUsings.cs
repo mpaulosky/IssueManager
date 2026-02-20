@@ -4,7 +4,6 @@ global using FluentValidation;
 global using Testcontainers.MongoDb;
 global using DotNet.Testcontainers.Builders;
 global using MongoDB.Driver;
-global using IssueManager.Shared.Domain;
-global using IssueManager.Shared.Validators;
+
 global using IssueManager.Api.Data;
 global using IssueManager.Api.Handlers;

@@ -1,6 +1,9 @@
-using IssueManager.Shared.Domain;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using MongoDB.Entities;
+
+using Shared.Domain;
 
 namespace IssueManager.Api.Data;
 
@@ -90,10 +93,12 @@ public class IssueRepository : IIssueRepository
 	}
 
 	/// <inheritdoc />
-	public async Task<bool> ArchiveAsync(string issueId, CancellationToken cancellationToken = default)
+	public async Task<bool> ArchiveAsync(string issueId, string archivedBy, CancellationToken cancellationToken = default)
 	{
 		var update = Builders<IssueEntity>.Update
 			.Set(x => x.IsArchived, true)
+			.Set(x => x.ArchivedBy, archivedBy)
+			.Set(x => x.ArchivedAt, DateTime.UtcNow)
 			.Set(x => x.UpdatedAt, DateTime.UtcNow);
 		
 		var result = await _collection.UpdateOneAsync(
@@ -116,13 +121,35 @@ public class IssueRepository : IIssueRepository
 /// </summary>
 internal class IssueEntity
 {
+	[BsonId]
+	[BsonRepresentation(BsonType.String)]
 	public string Id { get; set; } = string.Empty;
+
+	[BsonElement("title")]
 	public string Title { get; set; } = string.Empty;
+
+	[BsonElement("description")]
 	public string? Description { get; set; }
+
+	[BsonElement("status")]
 	public string Status { get; set; } = string.Empty;
+
+	[BsonElement("createdAt")]
 	public DateTime CreatedAt { get; set; }
+
+	[BsonElement("updatedAt")]
 	public DateTime UpdatedAt { get; set; }
+
+	[BsonElement("isArchived")]
 	public bool IsArchived { get; set; }
+
+	[BsonElement("archivedBy")]
+	public string? ArchivedBy { get; set; }
+
+	[BsonElement("archivedAt")]
+	public DateTime? ArchivedAt { get; set; }
+
+	[BsonElement("labels")]
 	public List<LabelEntity>? Labels { get; set; }
 
 	public static IssueEntity FromDomain(Issue issue)
@@ -135,14 +162,16 @@ internal class IssueEntity
 			Status = issue.Status.ToString(),
 			CreatedAt = issue.CreatedAt,
 			UpdatedAt = issue.UpdatedAt,
-			IsArchived = false,
+			IsArchived = issue.IsArchived,
+			ArchivedBy = issue.ArchivedBy,
+			ArchivedAt = issue.ArchivedAt,
 			Labels = issue.Labels?.Select(l => new LabelEntity { Name = l.Name, Color = l.Color }).ToList()
 		};
 	}
 
 	public Issue ToDomain()
 	{
-		return new Issue(
+		var issue = new Issue(
 			Id: Id,
 			Title: Title,
 			Description: Description,
@@ -150,7 +179,13 @@ internal class IssueEntity
 			CreatedAt: CreatedAt,
 			UpdatedAt: UpdatedAt,
 			Labels: Labels?.Select(l => new Label(l.Name, l.Color)).ToList()
-		);
+		)
+		{
+			IsArchived = IsArchived,
+			ArchivedBy = ArchivedBy,
+			ArchivedAt = ArchivedAt
+		};
+		return issue;
 	}
 }
 
@@ -159,6 +194,9 @@ internal class IssueEntity
 /// </summary>
 internal class LabelEntity
 {
+	[BsonElement("name")]
 	public string Name { get; set; } = string.Empty;
+
+	[BsonElement("color")]
 	public string Color { get; set; } = string.Empty;
 }

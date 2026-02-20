@@ -1,6 +1,7 @@
 using FluentValidation;
 using IssueManager.Api.Data;
-using IssueManager.Shared.Validators;
+
+using Shared.Validators;
 
 namespace IssueManager.Api.Handlers;
 
@@ -11,14 +12,16 @@ public class DeleteIssueHandler
 {
 	private readonly IIssueRepository _repository;
 	private readonly DeleteIssueValidator _validator;
+	private readonly IHttpContextAccessor _httpContextAccessor;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="DeleteIssueHandler"/> class.
 	/// </summary>
-	public DeleteIssueHandler(IIssueRepository repository, DeleteIssueValidator validator)
+	public DeleteIssueHandler(IIssueRepository repository, DeleteIssueValidator validator, IHttpContextAccessor httpContextAccessor)
 	{
 		_repository = repository;
 		_validator = validator;
+		_httpContextAccessor = httpContextAccessor;
 	}
 
 	/// <summary>
@@ -33,7 +36,10 @@ public class DeleteIssueHandler
 			throw new ValidationException(validationResult.Errors);
 		}
 
+		// Get current user from HttpContext
+		var currentUser = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
+
 		// Archive the issue (soft-delete)
-		return await _repository.ArchiveAsync(command.Id, cancellationToken);
+		return await _repository.ArchiveAsync(command.Id, currentUser, cancellationToken);
 	}
 }

@@ -1,4 +1,4 @@
-namespace IssueManager.Shared.Domain;
+namespace Shared.Domain;
 
 /// <summary>
 /// Represents an issue in the issue tracking system.
@@ -32,6 +32,26 @@ public record Issue(
 	public string Title { get; init; } = !string.IsNullOrWhiteSpace(Title)
 		? Title
 		: throw new ArgumentException("Issue title cannot be empty.", nameof(Title));
+
+	/// <summary>
+	/// Gets the detailed description of the issue.
+	/// </summary>
+	public string? Description { get; init; }
+
+	/// <summary>
+	/// Gets the current status of the issue.
+	/// </summary>
+	public IssueStatus Status { get; init; }
+
+	/// <summary>
+	/// Gets the timestamp when the issue was created.
+	/// </summary>
+	public DateTime CreatedAt { get; init; }
+
+	/// <summary>
+	/// Gets the timestamp when the issue was last updated.
+	/// </summary>
+	public DateTime UpdatedAt { get; init; }
 
 	/// <summary>
 	/// Gets the collection of labels attached to the issue.
@@ -80,4 +100,19 @@ public record Issue(
 			UpdatedAt = DateTime.UtcNow
 		};
 	}
+
+	/// <summary>
+	/// Gets or sets a value indicating whether the issue is archived (soft-deleted).
+	/// </summary>
+	public bool IsArchived { get; set; } = false;
+
+	/// <summary>
+	/// Gets or sets the user who archived the issue.
+	/// </summary>
+	public string? ArchivedBy { get; set; }
+
+	/// <summary>
+	/// Gets or sets the timestamp when the issue was archived.
+	/// </summary>
+	public DateTime? ArchivedAt { get; set; }
 }

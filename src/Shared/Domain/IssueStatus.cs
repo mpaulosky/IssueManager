@@ -1,4 +1,4 @@
-namespace IssueManager.Shared.Domain;
+namespace Shared.Domain;
 
 /// <summary>
 /// Represents the possible states of an issue.

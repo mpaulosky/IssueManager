@@ -1,5 +1,9 @@
 using FluentAssertions;
 using NetArchTest.Rules;
+
+using Shared.Domain;
+using Shared.Validators;
+
 using Xunit;
 
 namespace IssueManager.Tests.Architecture;
@@ -25,7 +29,7 @@ public class ArchitectureTests
 	public void SharedLayer_ShouldNotDependOnHigherLayers()
 	{
 		// Arrange
-		var sharedAssembly = typeof(IssueManager.Shared.Domain.Label).Assembly;
+		var sharedAssembly = typeof(Label).Assembly;
 
 		// Act
 		var result = Types.InAssembly(sharedAssembly)
@@ -48,7 +52,7 @@ public class ArchitectureTests
 	public void DomainModels_ShouldNotDependOnInfrastructure()
 	{
 		// Arrange
-		var sharedAssembly = typeof(IssueManager.Shared.Domain.Issue).Assembly;
+		var sharedAssembly = typeof(Issue).Assembly;
 
 		// Act
 		var result = Types.InAssembly(sharedAssembly)
@@ -71,7 +75,7 @@ public class ArchitectureTests
 	public void Validators_ShouldOnlyDependOnFluentValidationAndDomain()
 	{
 		// Arrange
-		var sharedAssembly = typeof(IssueManager.Shared.Validators.CreateIssueValidator).Assembly;
+		var sharedAssembly = typeof(CreateIssueValidator).Assembly;
 
 		// Act
 		var result = Types.InAssembly(sharedAssembly)
@@ -95,7 +99,7 @@ public class ArchitectureTests
 	public void Validators_ShouldNotDependOnHigherLayers()
 	{
 		// Arrange
-		var sharedAssembly = typeof(IssueManager.Shared.Validators.CreateIssueValidator).Assembly;
+		var sharedAssembly = typeof(CreateIssueValidator).Assembly;
 
 		// Act
 		var result = Types.InAssembly(sharedAssembly)
@@ -117,7 +121,7 @@ public class ArchitectureTests
 	public void Validators_ShouldFollowNamingConvention()
 	{
 		// Arrange
-		var sharedAssembly = typeof(IssueManager.Shared.Validators.CreateIssueValidator).Assembly;
+		var sharedAssembly = typeof(CreateIssueValidator).Assembly;
 
 		// Act
 		var result = Types.InAssembly(sharedAssembly)
@@ -143,7 +147,7 @@ public class ArchitectureTests
 	public void DomainModels_ShouldBeRecords()
 	{
 		// Arrange
-		var sharedAssembly = typeof(IssueManager.Shared.Domain.Issue).Assembly;
+		var sharedAssembly = typeof(Issue).Assembly;
 
 		// Act
 		var domainTypes = Types.InAssembly(sharedAssembly)
@@ -254,7 +258,7 @@ public class ArchitectureTests
 	public void SharedLayer_PublicTypesShouldHaveDocumentation()
 	{
 		// Arrange
-		var sharedAssembly = typeof(IssueManager.Shared.Domain.Issue).Assembly;
+		var sharedAssembly = typeof(Issue).Assembly;
 
 		// Act - Note: This test checks that types are defined; XML doc enforcement is done by compiler warnings
 		var publicTypes = Types.InAssembly(sharedAssembly)

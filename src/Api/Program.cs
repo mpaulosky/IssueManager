@@ -1,8 +1,9 @@
 using IssueManager.ServiceDefaults;
 using IssueManager.Api.Data;
 using IssueManager.Api.Handlers;
-using IssueManager.Shared.Validators;
-using IssueManager.Shared.Domain.DTOs;
+
+using Shared.Validators;
+
 using static IssueManager.Api.Handlers.GetIssueHandler;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddServiceDefaults();
 
 builder.Services.AddOpenApi();
+
+// Register HttpContextAccessor for accessing current user context
+builder.Services.AddHttpContextAccessor();
 
 // Register repository
 var connectionString = builder.Configuration.GetConnectionString("IssueManagerDb") 

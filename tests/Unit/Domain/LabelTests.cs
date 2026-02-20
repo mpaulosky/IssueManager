@@ -1,5 +1,6 @@
 using FluentAssertions;
-using IssueManager.Shared.Domain;
+
+using Shared.Domain;
 
 namespace IssueManager.Tests.Unit.Domain;
 

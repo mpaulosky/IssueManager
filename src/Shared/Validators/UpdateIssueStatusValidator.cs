@@ -1,7 +1,8 @@
 using FluentValidation;
-using IssueManager.Shared.Domain;
 
-namespace IssueManager.Shared.Validators;
+using Shared.Domain;
+
+namespace Shared.Validators;
 
 /// <summary>
 /// Command for updating the status of an issue.
