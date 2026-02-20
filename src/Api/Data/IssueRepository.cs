@@ -171,11 +171,16 @@ internal class IssueEntity
 
 	public Issue ToDomain()
 	{
+		// Fall back to Open if the stored value is unknown, empty, or has unexpected casing.
+		var status = Enum.TryParse<IssueStatus>(Status, ignoreCase: true, out var parsedStatus)
+			? parsedStatus
+			: IssueStatus.Open;
+
 		var issue = new Issue(
 			Id: Id,
 			Title: Title,
 			Description: Description,
-			Status: Enum.Parse<IssueStatus>(Status),
+			Status: status,
 			CreatedAt: CreatedAt,
 			UpdatedAt: UpdatedAt,
 			Labels: Labels?.Select(l => new Label(l.Name, l.Color)).ToList()
