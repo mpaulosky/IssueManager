@@ -41,9 +41,9 @@
 ### CI/CD Pipeline Design — Test Execution (2026-02-17)
 
 #### Parallelization Strategy
-- **6 independent test jobs** (Unit, Architecture, bUnit, Integration, Aspire, E2E) run simultaneously
+- **5 independent test jobs** (Unit, Architecture, bUnit, Integration, Aspire) run simultaneously
 - **Single shared build job** with NuGet cache reduces redundancy (~5-10 min)
-- **Total execution time: ~12-15 minutes** (parallel much faster than sequential ~30 min)
+- **Total execution time: ~10-12 minutes** (parallel much faster than sequential ~25 min)
 - Safe to parallelize because test suites have no shared state; each job is idempotent
 
 #### Coverage Gates & Reporting
@@ -62,7 +62,6 @@
 - **CI env vars:** Dummy Auth0 values, test MongoDB connection string
 - **Production:** Secrets stored in GitHub Secrets or Key Vault, rotated regularly
 - **Aspire configuration:** Different manifests for dev (localhost), test (CI container), prod (cloud)
-- **E2E tests:** Run in headless mode in CI (Playwright --headless flag)
 
 #### Artifact & Reporting Strategy
 - **Per-job TRX uploads** named by test type (unit-test-results, integration-test-results, etc.)
@@ -80,4 +79,37 @@
 - **NuGet cache hit:** 50-60% reduction in restore time (subsequent jobs benefit)
 - **Build cache:** `dotnet build` is incremental; most builds skip unchanged projects
 - **Timeout margins:** 15 min build + 10 min tests + 2 min overhead = 27 min total, well below 30 min runner default
-- **Parallelism limit:** 6 jobs OK for standard GitHub runner; cost scales linearly
+- **Parallelism limit:** 5 jobs OK for standard GitHub runner; cost scales linearly
+
+---
+
+### E2E Test Removal — 2026-02-17
+
+#### Why Removed
+- **Aspire projects do not expose a static web endpoint** suitable for Playwright E2E testing
+- **Service discovery is dynamic** — Aspire uses ephemeral ports and service mesh routing
+- **E2E tests cannot reliably target the Blazor UI** without complex orchestration or external deployment
+- **CI build time reduced** by ~5 minutes (removed Playwright browser install + E2E execution)
+
+#### Changes Made
+- **Removed `test-e2e` job** from `.github/workflows/test.yml` (lines 366-431)
+- **Updated `report` job dependencies** — removed `test-e2e` from `needs` list
+- **Updated job summary script** — removed `e2e_status` variable and E2E Tests line from output
+- **Verified `squad-ci.yml`** — no E2E references found (already clean)
+
+#### Remaining Test Jobs
+1. `build` — Solution build with NuGet caching
+2. `test-unit` — Unit tests with coverage
+3. `test-architecture` — NetArchTest rules (no coverage)
+4. `test-bunit` — Blazor component tests with coverage
+5. `test-integration` — Integration tests with MongoDB service
+6. `test-aspire` — Aspire orchestration tests with coverage
+7. `coverage` — Aggregate coverage from all sources
+8. `report` — Unified test result summary
+
+#### Future E2E Strategy (if needed)
+- Deploy Aspire app to temporary container/K8s environment in CI
+- Wait for service readiness via health checks
+- Run Playwright tests against deployed endpoints
+- Teardown after test completion
+- **Trade-off:** Adds 10-15 min to CI pipeline vs current in-process testing
