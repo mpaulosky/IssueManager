@@ -114,3 +114,34 @@
 - Approval gates: Gandalf (architecture), Gimli (quality), Legolas (infrastructure).
 - No merges without review. The squad model requires visibility and ownership.
 - Team structure is defined in `.ai-team/routing.md`—contributors should understand domain boundaries and who to ask.
+
+---
+
+## 2026-02-19: PR #14 Review — CI/CD Workflow Architecture
+
+**Learning:** When reviewing CI/CD changes, verify the fix targets the correct workflow file.
+
+**Key Insight:**
+- IssueManager has multiple workflow files with different purposes:
+  - `test.yml`: Comprehensive test suite with 6 parallel jobs (unit, architecture, bunit, integration, aspire, e2e)
+  - `squad-ci.yml`: Simple single-job build+test verification for basic checks
+  - Other squad-*.yml files for docs, releases, issue triage, etc.
+
+**PR #14 Issue:**
+- Attempted to fix E2E test failures (missing Playwright browsers)
+- Modified `squad-ci.yml` but E2E tests actually run in `test.yml` (test-e2e job, lines 346-398)
+- Would not fix the actual problem
+
+**Review Process Validated:**
+1. Read PR description (problem statement clear)
+2. Examine diff (change conceptually correct)
+3. Check workflow runs (test.yml failed, not squad-ci.yml)
+4. Cross-reference file structure (E2E tests exist in tests/E2E with Playwright dependency)
+5. Identify architectural mismatch (wrong workflow file)
+
+**Lesson:** Always verify:
+- Which workflow file runs which tests
+- Where the failing tests actually execute
+- Whether the fix targets the correct execution path
+
+**Escalation:** Legolas (DevOps) to fix by moving Playwright install to test.yml test-e2e job

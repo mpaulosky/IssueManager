@@ -15,7 +15,7 @@ namespace IssueManager.Shared.Domain.DTOs;
 /// <param name="IsAnswer">Indicates whether this comment is the selected answer.</param>
 /// <param name="AnswerSelectedBy">The user who selected this as the answer.</param>
 public record CommentDto(
-	ObjectId Id,
+	string Id,
 	string Title,
 	string Description,
 	DateTime DateCreated,
@@ -31,7 +31,7 @@ public record CommentDto(
 	///   Gets an empty CommentDto instance.
 	/// </summary>
 	public static CommentDto Empty => new(
-		ObjectId.Empty,
+		string.Empty,
 		string.Empty,
 		string.Empty,
 		DateTime.UtcNow,
