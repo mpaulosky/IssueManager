@@ -33,6 +33,16 @@ public interface IIssueRepository
 	Task<IReadOnlyList<Issue>> GetAllAsync(CancellationToken cancellationToken = default);
 
 	/// <summary>
+	/// Gets paginated issues from the database, excluding archived issues by default.
+	/// </summary>
+	Task<(IReadOnlyList<Issue> Items, long Total)> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken = default);
+
+	/// <summary>
+	/// Soft-deletes an issue by setting IsArchived to true.
+	/// </summary>
+	Task<bool> ArchiveAsync(string issueId, CancellationToken cancellationToken = default);
+
+	/// <summary>
 	/// Counts the total number of issues in the database.
 	/// </summary>
 	Task<long> CountAsync(CancellationToken cancellationToken = default);
