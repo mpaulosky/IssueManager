@@ -6,7 +6,6 @@
 
 [![CI/CD](https://github.com/mpaulosky/IssueManager/actions/workflows/squad-ci.yml/badge.svg)](https://github.com/mpaulosky/IssueManager/actions/workflows/squad-ci.yml)
 [![Test Suite](https://github.com/mpaulosky/IssueManager/actions/workflows/squad-test.yml/badge.svg)](https://github.com/mpaulosky/IssueManager/actions/workflows/squad-test.yml)
-[![Copilot code review](https://github.com/mpaulosky/IssueManager/actions/workflows/copilot-pull-request-reviewer/copilot-pull-request-reviewer/badge.svg)](https://github.com/mpaulosky/IssueManager/actions/workflows/copilot-pull-request-reviewer/copilot-pull-request-reviewer)
 
 [![CodeCov Coverage](https://codecov.io/gh/mpaulosky/IssueManager/branch/main/graph/badge.svg)](https://codecov.io/gh/mpaulosky/IssueManager)
 [![Coverage Trend](https://img.shields.io/badge/Coverage-Trend-blue?logo=codecov)](https://codecov.io/gh/mpaulosky/IssueManager/commits/main)
