@@ -107,9 +107,184 @@
 7. `coverage` — Aggregate coverage from all sources
 8. `report` — Unified test result summary
 
-#### Future E2E Strategy (if needed)
-- Deploy Aspire app to temporary container/K8s environment in CI
-- Wait for service readiness via health checks
-- Run Playwright tests against deployed endpoints
-- Teardown after test completion
-- **Trade-off:** Adds 10-15 min to CI pipeline vs current in-process testing
+---
+
+## Learnings
+
+### CI/CD Workflow Consolidation — 2026-02-19
+
+#### GitHub Actions Reusable Workflow Patterns
+
+**Key Syntax:**
+- Reusable workflows use `on: [workflow_call, ...]` trigger type
+- `workflow_call` allows the workflow to be invoked via `uses:` from other workflows
+- Callers reference via: `uses: ./.github/workflows/reusable-workflow.yml@ref`
+- Outputs can be passed from reusable workflow to caller via `outputs:` in `uses` statement
+- Do not add `inputs:` section if the workflow doesn't expose parameters to callers
+- Can combine `workflow_call` with `push`, `pull_request`, `workflow_dispatch` for manual runs
+
+**Orchestration Pattern:**
+- Squad CI/CD architecture now uses thin orchestrator (`squad-ci.yml`) pattern
+- Orchestrator handles only squad-specific concerns: versioning (GitVersion), notifications, release triggers
+- Reusable workflow (`squad-test.yml`) contains comprehensive test suite: build, 6 parallel jobs, coverage, reporting
+- Eliminates test duplication across workflows — single source of truth
+
+#### Architectural Benefits
+
+**Before Consolidation:**
+- `test.yml`: 492 lines with full test suite (5 parallel jobs)
+- `squad-ci.yml`: 180 lines with duplicate build/test/coverage logic
+- Total: 672 lines of test-related code spread across 2 workflows
+- Difficult to update tests — changes needed in both files
+
+**After Consolidation:**
+- `squad-test.yml`: 427 lines (reusable, full test suite)
+- `squad-ci.yml`: 71 lines (thin orchestrator, 60% reduction)
+- Total: 498 lines, single source of truth
+- Squad-CI now only manages versioning and notifications
+- Easy to add callers to squad-test.yml without duplication
+
+#### Design Decisions Made
+
+**1. Job Parallelism Retained:**
+- All 6 test jobs (unit, architecture, blazor, integration, aspire, coverage/report) remain parallel
+- No performance regression; reusable workflow maintains concurrent execution
+- Test suite still completes in ~10-12 minutes
+
+**2. Why test.yml was superior to squad-ci.yml:**
+- `test.yml` had cleaner separation: pure test concerns, no version management
+- `squad-ci.yml` was mixing concerns: versioning + test execution + notifications
+- Consolidation moves squad-ci.yml to orchestration-only (cleaner Single Responsibility Principle)
+
+**3. No Input Parameters to squad-test.yml:**
+- Reusable workflow does not expose `inputs:` to callers
+- All test configuration (timeouts, thresholds, tool versions) remains embedded
+- Ensures test suite stays consistent across all callers
+- Future orchestrators can reference without parameterization concerns
+
+**4. Versioning Moved to Separate Job:**
+- `versioning` job runs GitVersion once, outputs version
+- `test-suite` job depends on versioning, receives version via needs context
+- `notify` job consumes version from versioning job output
+- Prevents GitVersion redundancy while keeping versioning available to all jobs
+
+#### Coverage & Reporting Unchanged
+
+- Coverage aggregation (Codecov, ReportGenerator) still happens in reusable workflow
+- Test result publishing (EnricoMi action, artifact uploads) unchanged
+- 80% threshold warning maintained
+- All 6 test results visible in GitHub checks
+
+#### Future Evolution
+
+- Additional callers (release workflow, scheduled tests) can call `squad-test.yml@main`
+- If squad-test.yml needs to expose parameters, add `inputs:` section and pass via `with:` in callers
+- Versioning job pattern can be reused for other orchestrators (e.g., deploy-prod workflow)
+
+---
+
+### Build Artifact Caching — 2026-02-19
+
+#### Strategy Implemented
+
+**Problem:**
+- 5 parallel test jobs (unit, architecture, bunit, integration, aspire) each ran `dotnet restore` + `dotnet build`
+- Each job independently compiled the same solution, wasting 10-15 minutes per workflow run
+- NuGet cache helped with packages, but build artifacts were rebuilt from scratch every time
+
+**Solution: Build artifact caching (Option A)**
+- Single `build` job compiles solution once and caches `bin/` and `obj/` directories
+- All test jobs restore from cache and skip rebuild entirely
+- Test jobs use `--no-build` flag to run tests against cached binaries
+
+#### Cache Key Pattern
+
+**Key components:**
+```yaml
+key: ${{ runner.os }}-build-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props', 'global.json') }}
+restore-keys: |
+  ${{ runner.os }}-build-
+```
+
+**Why this pattern:**
+- `runner.os`: OS-specific binaries (Linux vs Windows)
+- `**/*.csproj`: Any project file change (new dependency, target framework change)
+- `Directory.Packages.props`: Central package version change
+- `global.json`: SDK version change (affects compilation)
+- `restore-keys` fallback: If exact match fails, use most recent cache (graceful degradation)
+
+**Cache invalidation:**
+- Automatic when any `.csproj`, `Directory.Packages.props`, or `global.json` changes
+- Cache expires after 7 days of no use (GitHub Actions default)
+- No manual purge needed; hash-based key ensures consistency
+
+#### Trade-offs and Safety
+
+**Why --no-build is strict (and that's good):**
+- `--no-build` flag REQUIRES binaries to exist; fails loudly if cache is lost
+- This is the correct behavior: fail fast rather than silently rebuild
+- Alternative would be conditional build (`if cache miss then build`) but that defeats the purpose
+- Cache misses are rare (only on first run or after cache expiry); acceptable to require manual re-trigger
+
+**NuGet cache is separate:**
+- NuGet package cache remains independent (already exists in all jobs)
+- `dotnet restore` still runs to restore packages (fast, uses NuGet cache)
+- Build artifact cache only handles compiled binaries (`bin/`, `obj/`)
+- Two-layer caching: packages (stable, rarely changes) + binaries (changes with code)
+
+**First run vs subsequent runs:**
+- **First run (cache miss):** Test jobs will fail with "missing binaries" error — normal; re-trigger workflow
+- **Subsequent runs (cache hit):** Test jobs skip rebuild, estimated 10-15 min saved per run
+- **After code change (cache invalidate):** New cache key generated, old cache ignored
+
+#### Performance Impact
+
+**Before caching:**
+- Build job: 5 min (restore + build)
+- Each test job: 3-4 min restore + 2-3 min build = 5-7 min overhead per job
+- Total redundant build time: 5 jobs × 5 min = 25 min wasted (parallelized to ~7 min wall time)
+
+**After caching:**
+- Build job: 5 min (restore + build) + 1 min cache save = 6 min
+- Each test job: 3-4 min restore + 30 sec cache restore = ~4 min overhead per job
+- Total build time: 6 min (build) + 4 min (test prep) = 10 min vs 12 min before
+- **Net savings: ~10-15 min per workflow run** (first run excluded)
+
+#### Architectural Notes
+
+**Why cache in build job, not test jobs:**
+- Single source of truth: One job builds, all others consume
+- Ensures all test jobs use identical binaries (no race conditions)
+- Simpler cache management (one save, multiple restores)
+
+**Why keep dotnet restore in test jobs:**
+- NuGet packages change less frequently than code
+- Restore is fast (~30 sec with cache hit)
+- Decouples package management from binary caching
+- Allows test jobs to verify dependencies are consistent
+
+**Failure modes:**
+1. **Cache miss on first run:** Expected; re-trigger workflow
+2. **Cache expired (7 days):** Expected; re-trigger workflow
+3. **Partial cache (corrupted):** `--no-build` fails loudly; clear cache manually via GitHub UI
+4. **Wrong binaries cached (hash collision):** Extremely rare; cache key includes file hashes
+
+#### Lessons Learned
+
+**When to cache binaries vs. rebuild:**
+- **Cache binaries:** When multiple jobs use same build output (tests, deployment stages)
+- **Rebuild:** When job requires custom build configuration (Debug vs Release, different targets)
+- **Hybrid (this project):** Build once (Release config), cache, test multiple suites
+
+**GitHub Actions cache limitations:**
+- 10 GB total cache per repository (all branches combined)
+- Oldest caches purged when limit reached
+- Cache scoped to branch (main branch cache is shared across PRs)
+- No cross-workflow cache sharing (each workflow has its own cache scope)
+
+**Alternative approaches considered (and rejected):**
+- **Option B (Build artifacts uploaded as GitHub artifacts):** Slower than cache, 90-day retention unnecessary for ephemeral build outputs
+- **Option C (Matrix build strategy):** Would still rebuild per matrix job; doesn't solve redundancy
+- **Option D (Conditional build in test jobs):** Defeats the purpose; want to fail fast on cache miss
+
+---
