@@ -178,3 +178,27 @@
 - Gained faster CI/CD execution (removed longest-running test job)
 - Reduced maintenance burden (no Playwright version management)
 - Aligns with Aspire project maturity level
+
+---
+
+## 2026-02-20: Issue #17 Triage — squad-ci.yml .NET Compatibility Review
+
+**Context:** Issue #17 requests comprehensive review of `squad-ci.yml` workflow after recent updates (E2E removal, ReportGenerator config, coverage fixes).
+
+**Routing Decision:** Assigned to **Legolas** (DevOps/Infrastructure)
+
+**Rationale:**
+- This is pure CI/CD workflow review work — job triggers, build/test steps, coverage reporting, dependency sequencing
+- Legolas owns workflow automation and CI/CD tooling per `routing.md`
+- Requires deep understanding of .NET build tooling, GitHub Actions, and workflow orchestration
+- Not backend logic (Aragorn), not testing strategy (Gimli), not UI (Arwen) — infrastructure domain
+
+**Scope:**
+- Verify `squad-ci.yml` job triggers and event filters for .NET projects
+- Validate build/test steps use correct .NET commands and solution structure
+- Ensure coverage reporting integrates with Coverlet and ReportGenerator
+- Review job dependency graph and error handling for .NET-specific failures
+
+**Labels Applied:** `squad`, `squad:legolas`
+
+**Learning:** CI/CD workflow reviews fall squarely in Legolas's domain — clear routing pattern for future similar issues.
