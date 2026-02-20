@@ -79,6 +79,12 @@ jobs:
       - name: Build solution
         run: dotnet build IssueManager.sln --configuration Release --no-restore
 
+      - name: Install Playwright Browsers
+        run: |
+          dotnet tool install --global Microsoft.Playwright.CLI
+          playwright install chromium
+          playwright install-deps chromium
+
       - name: Run Tests
         id: run-tests
         run: |
