@@ -372,6 +372,11 @@ jobs:
       - name: Build solution
         run: dotnet build IssueManager.sln --configuration Release --no-restore
 
+      - name: Install Playwright Browsers
+        run: |
+          dotnet tool install --global Microsoft.Playwright.CLI
+          playwright install --with-deps chromium
+
       - name: Run E2E Tests
         id: e2e-tests
         run: |
