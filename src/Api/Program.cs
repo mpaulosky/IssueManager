@@ -1,9 +1,8 @@
 using IssueManager.ServiceDefaults;
 using IssueManager.Api.Data;
 using IssueManager.Api.Handlers;
-using Shared.DTOs;
-using Shared.Validators;
-
+using IssueManager.Shared.Validators;
+using IssueManager.Shared.Domain.DTOs;
 using static IssueManager.Api.Handlers.GetIssueHandler;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,9 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddServiceDefaults();
 
 builder.Services.AddOpenApi();
-
-// Register HttpContextAccessor for accessing current user context
-builder.Services.AddHttpContextAccessor();
 
 // Register repository
 var connectionString = builder.Configuration.GetConnectionString("IssueManagerDb") 
@@ -55,7 +51,7 @@ issuesApi.MapGet("", async (int? page, int? pageSize, ListIssuesHandler handler)
 })
 .WithName("ListIssues")
 .WithSummary("Get a paginated list of issues")
-.Produces<List<IssueDto>>(StatusCodes.Status200OK)
+.Produces<PaginatedResponse<IssueResponseDto>>(StatusCodes.Status200OK)
 .Produces(StatusCodes.Status400BadRequest);
 
 // Get Issue by ID
