@@ -93,12 +93,10 @@ public class IssueRepository : IIssueRepository
 	}
 
 	/// <inheritdoc />
-	public async Task<bool> ArchiveAsync(string issueId, string archivedBy, CancellationToken cancellationToken = default)
+	public async Task<bool> ArchiveAsync(string issueId, CancellationToken cancellationToken = default)
 	{
 		var update = Builders<IssueEntity>.Update
 			.Set(x => x.IsArchived, true)
-			.Set(x => x.ArchivedBy, archivedBy)
-			.Set(x => x.ArchivedAt, DateTime.UtcNow)
 			.Set(x => x.UpdatedAt, DateTime.UtcNow);
 		
 		var result = await _collection.UpdateOneAsync(
@@ -139,17 +137,7 @@ internal class IssueEntity
 
 	[BsonElement("updatedAt")]
 	public DateTime UpdatedAt { get; set; }
-
-	[BsonElement("isArchived")]
 	public bool IsArchived { get; set; }
-
-	[BsonElement("archivedBy")]
-	public string? ArchivedBy { get; set; }
-
-	[BsonElement("archivedAt")]
-	public DateTime? ArchivedAt { get; set; }
-
-	[BsonElement("labels")]
 	public List<LabelEntity>? Labels { get; set; }
 
 	public static IssueEntity FromDomain(Issue issue)
@@ -162,9 +150,7 @@ internal class IssueEntity
 			Status = issue.Status.ToString(),
 			CreatedAt = issue.CreatedAt,
 			UpdatedAt = issue.UpdatedAt,
-			IsArchived = issue.IsArchived,
-			ArchivedBy = issue.ArchivedBy,
-			ArchivedAt = issue.ArchivedAt,
+			IsArchived = false,
 			Labels = issue.Labels?.Select(l => new LabelEntity { Name = l.Name, Color = l.Color }).ToList()
 		};
 	}

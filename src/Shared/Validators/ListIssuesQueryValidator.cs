@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Shared.Validators;
+namespace IssueManager.Shared.Validators;
 
 /// <summary>
 /// Validates the ListIssuesQuery.
