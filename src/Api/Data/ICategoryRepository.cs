@@ -7,7 +7,12 @@
 // Project Name :  Shared
 // =============================================
 
-namespace Api.Data;
+using MongoDB.Bson;
+using Shared.Abstractions;
+using Shared.Domain;
+using Shared.Models;
+
+namespace IssueManager.Api.Data;
 
 /// <summary>
 /// Provides data access operations for category entities in the data store.

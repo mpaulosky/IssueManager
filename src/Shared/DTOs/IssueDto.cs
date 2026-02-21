@@ -33,7 +33,7 @@ public record IssueDto(
 		issue.CreatedAt,
 		UserDto.Empty,
 		CategoryDto.Empty,
-		new StatusDto(issue.Status.ToString(), issue.Status.ToString()))
+		new StatusDto(issue.Status.ToString(), issue.Status.ToString(), null))
 	{
 	}
 

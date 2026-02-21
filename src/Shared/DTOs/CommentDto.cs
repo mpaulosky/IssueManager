@@ -14,7 +14,7 @@ namespace Shared.DTOs;
 /// </summary>
 [Serializable]
 public record CommentDto(
-	ObjectId Id,
+	string Id,
 	string Title,
 	string Description,
 	DateTime DateCreated,
@@ -26,7 +26,7 @@ public record CommentDto(
 	/// </summary>
 	/// <param name="comment">The comment.</param>
 	public CommentDto(Comment comment) : this(
-		comment.Id,
+		comment.Id.ToString(),
 		comment.Title,
 		comment.Description,
 		comment.DateCreated,
@@ -36,7 +36,7 @@ public record CommentDto(
 	}
 
 	public static CommentDto Empty => new(
-		ObjectId.Empty,
+		string.Empty,
 		string.Empty,
 		string.Empty,
 		DateTime.UtcNow,
