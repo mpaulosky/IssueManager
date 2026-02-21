@@ -1,4 +1,4 @@
-using IssueManager.Shared.Domain.Models;
+using global::Shared.Domain;
 
 namespace IssueManager.Tests.Unit.Builders;
 
@@ -10,14 +10,10 @@ public class IssueBuilder
 	private string _id = Guid.NewGuid().ToString();
 	private string _title = "Default Test Issue";
 	private string _description = "Default test description";
-	private string _authorId = "test-user-123";
+	private IssueStatus _status = IssueStatus.Open;
 	private DateTime _createdAt = DateTime.UtcNow;
-	private DateTime? _updatedAt;
+	private DateTime _updatedAt = DateTime.UtcNow;
 	private bool _isArchived;
-	private string? _categoryId;
-	private string? _statusId;
-	private bool _approvedForRelease;
-	private bool _rejected;
 
 	/// <summary>
 	/// Sets the issue ID.
@@ -47,11 +43,11 @@ public class IssueBuilder
 	}
 
 	/// <summary>
-	/// Sets the author ID.
+	/// Sets the issue status.
 	/// </summary>
-	public IssueBuilder WithAuthorId(string authorId)
+	public IssueBuilder WithStatus(IssueStatus status)
 	{
-		_authorId = authorId;
+		_status = status;
 		return this;
 	}
 
@@ -67,7 +63,7 @@ public class IssueBuilder
 	/// <summary>
 	/// Sets the updated at timestamp.
 	/// </summary>
-	public IssueBuilder WithUpdatedAt(DateTime? updatedAt)
+	public IssueBuilder WithUpdatedAt(DateTime updatedAt)
 	{
 		_updatedAt = updatedAt;
 		return this;
@@ -92,42 +88,6 @@ public class IssueBuilder
 	}
 
 	/// <summary>
-	/// Sets the category ID.
-	/// </summary>
-	public IssueBuilder WithCategoryId(string? categoryId)
-	{
-		_categoryId = categoryId;
-		return this;
-	}
-
-	/// <summary>
-	/// Sets the status ID.
-	/// </summary>
-	public IssueBuilder WithStatusId(string? statusId)
-	{
-		_statusId = statusId;
-		return this;
-	}
-
-	/// <summary>
-	/// Marks the issue as approved for release.
-	/// </summary>
-	public IssueBuilder AsApprovedForRelease()
-	{
-		_approvedForRelease = true;
-		return this;
-	}
-
-	/// <summary>
-	/// Marks the issue as rejected.
-	/// </summary>
-	public IssueBuilder AsRejected()
-	{
-		_rejected = true;
-		return this;
-	}
-
-	/// <summary>
 	/// Builds the Issue instance.
 	/// </summary>
 	public Issue Build()
@@ -136,15 +96,11 @@ public class IssueBuilder
 			Id: _id,
 			Title: _title,
 			Description: _description,
-			AuthorId: _authorId,
-			CreatedAt: _createdAt)
+			Status: _status,
+			CreatedAt: _createdAt,
+			UpdatedAt: _updatedAt)
 		{
-			UpdatedAt = _updatedAt,
-			IsArchived = _isArchived,
-			CategoryId = _categoryId,
-			StatusId = _statusId,
-			ApprovedForRelease = _approvedForRelease,
-			Rejected = _rejected
+			IsArchived = _isArchived
 		};
 	}
 
@@ -159,7 +115,7 @@ public class IssueBuilder
 	public static IssueBuilder Archived() => new IssueBuilder().AsArchived();
 
 	/// <summary>
-	/// Creates an issue builder with a specific title.
+	/// Creates a closed issue builder.
 	/// </summary>
-	public static IssueBuilder WithTitle(string title) => new IssueBuilder().WithTitle(title);
+	public static IssueBuilder Closed() => new IssueBuilder().WithStatus(IssueStatus.Closed);
 }

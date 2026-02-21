@@ -36,22 +36,22 @@ public record Issue(
 	/// <summary>
 	/// Gets the detailed description of the issue.
 	/// </summary>
-	public string? Description { get; init; }
+	public string? Description { get; init; } = Description;
 
 	/// <summary>
 	/// Gets the current status of the issue.
 	/// </summary>
-	public IssueStatus Status { get; init; }
+	public IssueStatus Status { get; init; } = Status;
 
 	/// <summary>
 	/// Gets the timestamp when the issue was created.
 	/// </summary>
-	public DateTime CreatedAt { get; init; }
+	public DateTime CreatedAt { get; init; } = CreatedAt;
 
 	/// <summary>
 	/// Gets the timestamp when the issue was last updated.
 	/// </summary>
-	public DateTime UpdatedAt { get; init; }
+	public DateTime UpdatedAt { get; init; } = UpdatedAt;
 
 	/// <summary>
 	/// Gets the collection of labels attached to the issue.

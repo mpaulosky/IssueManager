@@ -48,15 +48,13 @@ public class DeleteIssueHandlerTests : IAsyncLifetime
 		await _repository.CreateAsync(issue);
 
 		// Act
-		var result = await _repository.ArchiveAsync(issue.Id, "testuser");
+		var result = await _repository.ArchiveAsync(issue.Id);
 
 		// Assert
 		result.Should().BeTrue();
 
 		var retrieved = await _repository.GetByIdAsync(issue.Id);
 		retrieved!.IsArchived.Should().BeTrue();
-		retrieved.ArchivedBy.Should().Be("testuser");
-		retrieved.ArchivedAt.Should().NotBeNull();
 	}
 
 	[Fact]
@@ -65,10 +63,10 @@ public class DeleteIssueHandlerTests : IAsyncLifetime
 		// Arrange
 		var issue = Issue.Create("Already Archived Issue", "Description");
 		await _repository.CreateAsync(issue);
-		await _repository.ArchiveAsync(issue.Id, "firstuser");
+		await _repository.ArchiveAsync(issue.Id);
 
-		// Act - archive again (already archived, ModifiedCount will be 0)
-		var result = await _repository.ArchiveAsync(issue.Id, "seconduser");
+		// Act - archive again (already archived, MatchedCount still > 0)
+		var result = await _repository.ArchiveAsync(issue.Id);
 
 		// Assert - should return true (issue was found), not false (issue not found)
 		result.Should().BeTrue();
@@ -78,7 +76,7 @@ public class DeleteIssueHandlerTests : IAsyncLifetime
 	public async Task ArchiveAsync_NonExistentIssue_ReturnsFalse()
 	{
 		// Act
-		var result = await _repository.ArchiveAsync("non-existent-id", "testuser");
+		var result = await _repository.ArchiveAsync("non-existent-id");
 
 		// Assert
 		result.Should().BeFalse();

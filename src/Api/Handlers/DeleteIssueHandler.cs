@@ -1,6 +1,7 @@
 using FluentValidation;
 using IssueManager.Api.Data;
 using IssueManager.Shared.Validators;
+using global::Shared.Exceptions;
 
 namespace IssueManager.Api.Handlers;
 
@@ -33,7 +34,21 @@ public class DeleteIssueHandler
 			throw new ValidationException(validationResult.Errors);
 		}
 
-		// Archive the issue (soft-delete)
-		return await _repository.ArchiveAsync(command.Id, cancellationToken);
+		// Get the existing issue
+		var existingIssue = await _repository.GetByIdAsync(command.Id, cancellationToken);
+		if (existingIssue is null)
+		{
+			throw new NotFoundException($"Issue with ID '{command.Id}' was not found.");
+		}
+
+		// If already archived, this is idempotent - return success without updating
+		if (existingIssue.IsArchived)
+		{
+			return true;
+		}
+
+		// Archive the issue via the dedicated archive operation
+		await _repository.ArchiveAsync(command.Id, cancellationToken);
+		return true;
 	}
 }
