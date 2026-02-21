@@ -2,6 +2,7 @@ using IssueManager.ServiceDefaults;
 using IssueManager.Api.Data;
 using IssueManager.Api.Handlers;
 using IssueManager.Shared.Validators;
+using global::Shared.Validators;
 using IssueManager.Shared.Domain.DTOs;
 using static IssueManager.Api.Handlers.GetIssueHandler;
 
@@ -33,6 +34,36 @@ builder.Services.AddSingleton<GetIssueHandler>();
 builder.Services.AddSingleton<UpdateIssueStatusHandler>();
 
 var app = builder.Build();
+
+app.UseExceptionHandler(errorApp => errorApp.Run(async context =>
+{
+	var ex = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
+	if (ex is FluentValidation.ValidationException validationEx)
+	{
+		context.Response.StatusCode = StatusCodes.Status400BadRequest;
+		context.Response.ContentType = "application/problem+json";
+		var errors = validationEx.Errors
+			.GroupBy(e => e.PropertyName)
+			.ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+		await context.Response.WriteAsJsonAsync(new { title = "Validation failed", errors });
+	}
+	else if (ex is global::Shared.Exceptions.NotFoundException notFoundEx)
+	{
+		context.Response.StatusCode = StatusCodes.Status404NotFound;
+		context.Response.ContentType = "application/problem+json";
+		await context.Response.WriteAsJsonAsync(new { title = "Not Found", detail = notFoundEx.Message });
+	}
+	else if (ex is global::Shared.Exceptions.ConflictException conflictEx)
+	{
+		context.Response.StatusCode = StatusCodes.Status409Conflict;
+		context.Response.ContentType = "application/problem+json";
+		await context.Response.WriteAsJsonAsync(new { title = "Conflict", detail = conflictEx.Message });
+	}
+	else
+	{
+		context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+	}
+}));
 
 app.UseHttpsRedirection();
 app.MapOpenApi();
@@ -82,20 +113,21 @@ issuesApi.MapPatch("{id}", async (string id, UpdateIssueCommand command, UpdateI
 {
 	var commandWithId = command with { Id = id };
 	var result = await handler.Handle(commandWithId);
-	return result is not null ? Results.Ok(result) : Results.NotFound();
+	return Results.Ok(result);
 })
 .WithName("UpdateIssue")
 .WithSummary("Update an existing issue")
 .Produces(StatusCodes.Status200OK)
 .Produces(StatusCodes.Status400BadRequest)
-.Produces(StatusCodes.Status404NotFound);
+.Produces(StatusCodes.Status404NotFound)
+.Produces(StatusCodes.Status409Conflict);
 
 // Delete Issue (soft-delete)
 issuesApi.MapDelete("{id}", async (string id, DeleteIssueHandler handler) =>
 {
 	var command = new DeleteIssueCommand { Id = id };
-	var result = await handler.Handle(command);
-	return result ? Results.NoContent() : Results.NotFound();
+	await handler.Handle(command);
+	return Results.NoContent();
 })
 .WithName("DeleteIssue")
 .WithSummary("Delete (archive) an issue")

@@ -1,7 +1,13 @@
 using FluentAssertions;
+
+using FluentValidation;
+
+using global::Shared.Domain;
+
 using IssueManager.Api.Data;
 using IssueManager.Api.Handlers;
-using IssueManager.Shared.Domain.Models;
+using IssueManager.Shared.Validators;
+
 using NSubstitute;
 
 namespace IssueManager.Tests.Unit.Handlers;
@@ -17,7 +23,7 @@ public class ListIssuesHandlerTests
 	public ListIssuesHandlerTests()
 	{
 		_repository = Substitute.For<IIssueRepository>();
-		_handler = new ListIssuesHandler(_repository);
+		_handler = new ListIssuesHandler(_repository, new ListIssuesQueryValidator());
 	}
 
 	[Fact]
@@ -27,11 +33,8 @@ public class ListIssuesHandlerTests
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
 
 		var issues = GenerateIssues(20);
-		_repository.GetAllAsync(1, 20, false, Arg.Any<CancellationToken>())
-			.Returns(issues);
-
-		_repository.CountAsync(false, Arg.Any<CancellationToken>())
-			.Returns(42);
+		_repository.GetAllAsync(1, 20, Arg.Any<CancellationToken>())
+		.Returns(((IReadOnlyList<Issue>)issues, 42L));
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
@@ -40,7 +43,7 @@ public class ListIssuesHandlerTests
 		result.Items.Should().HaveCount(20);
 		result.Page.Should().Be(1);
 		result.PageSize.Should().Be(20);
-		result.TotalCount.Should().Be(42);
+		result.Total.Should().Be(42);
 		result.TotalPages.Should().Be(3); // 42 / 20 = 2.1 → 3 pages
 	}
 
@@ -51,11 +54,8 @@ public class ListIssuesHandlerTests
 		var query = new ListIssuesQuery { Page = 2, PageSize = 10 };
 
 		var issues = GenerateIssues(10);
-		_repository.GetAllAsync(2, 10, false, Arg.Any<CancellationToken>())
-			.Returns(issues);
-
-		_repository.CountAsync(false, Arg.Any<CancellationToken>())
-			.Returns(42);
+		_repository.GetAllAsync(2, 10, Arg.Any<CancellationToken>())
+		.Returns(((IReadOnlyList<Issue>)issues, 42L));
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
@@ -64,7 +64,7 @@ public class ListIssuesHandlerTests
 		result.Items.Should().HaveCount(10);
 		result.Page.Should().Be(2);
 		result.PageSize.Should().Be(10);
-		result.TotalCount.Should().Be(42);
+		result.Total.Should().Be(42);
 		result.TotalPages.Should().Be(5); // 42 / 10 = 4.2 → 5 pages
 	}
 
@@ -75,11 +75,8 @@ public class ListIssuesHandlerTests
 		var query = new ListIssuesQuery { Page = 3, PageSize = 20 };
 
 		var issues = GenerateIssues(2); // Last page has only 2 items
-		_repository.GetAllAsync(3, 20, false, Arg.Any<CancellationToken>())
-			.Returns(issues);
-
-		_repository.CountAsync(false, Arg.Any<CancellationToken>())
-			.Returns(42);
+		_repository.GetAllAsync(3, 20, Arg.Any<CancellationToken>())
+		.Returns(((IReadOnlyList<Issue>)issues, 42L));
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
@@ -88,7 +85,7 @@ public class ListIssuesHandlerTests
 		result.Items.Should().HaveCount(2);
 		result.Page.Should().Be(3);
 		result.PageSize.Should().Be(20);
-		result.TotalCount.Should().Be(42);
+		result.Total.Should().Be(42);
 		result.TotalPages.Should().Be(3);
 	}
 
@@ -98,11 +95,8 @@ public class ListIssuesHandlerTests
 		// Arrange
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
 
-		_repository.GetAllAsync(1, 20, false, Arg.Any<CancellationToken>())
-			.Returns(new List<Issue>());
-
-		_repository.CountAsync(false, Arg.Any<CancellationToken>())
-			.Returns(0);
+		_repository.GetAllAsync(1, 20, Arg.Any<CancellationToken>())
+		.Returns(((IReadOnlyList<Issue>)new List<Issue>(), 0L));
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
@@ -111,7 +105,7 @@ public class ListIssuesHandlerTests
 		result.Items.Should().BeEmpty();
 		result.Page.Should().Be(1);
 		result.PageSize.Should().Be(20);
-		result.TotalCount.Should().Be(0);
+		result.Total.Should().Be(0);
 		result.TotalPages.Should().Be(0);
 	}
 
@@ -121,11 +115,8 @@ public class ListIssuesHandlerTests
 		// Arrange
 		var query = new ListIssuesQuery { Page = 10, PageSize = 20 };
 
-		_repository.GetAllAsync(10, 20, false, Arg.Any<CancellationToken>())
-			.Returns(new List<Issue>());
-
-		_repository.CountAsync(false, Arg.Any<CancellationToken>())
-			.Returns(42); // Only 3 pages exist
+		_repository.GetAllAsync(10, 20, Arg.Any<CancellationToken>())
+		.Returns(((IReadOnlyList<Issue>)new List<Issue>(), 42L));
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
@@ -147,7 +138,7 @@ public class ListIssuesHandlerTests
 
 		// Assert
 		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Page*greater than 0*");
+		.WithMessage("*Page*greater than or equal to 1*");
 	}
 
 	[Fact]
@@ -161,7 +152,7 @@ public class ListIssuesHandlerTests
 
 		// Assert
 		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*PageSize*greater than 0*");
+		.WithMessage("*Page size*between 1 and 100*");
 	}
 
 	[Fact]
@@ -175,7 +166,7 @@ public class ListIssuesHandlerTests
 
 		// Assert
 		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*PageSize*100*");
+		.WithMessage("*Page size*between 1 and 100*");
 	}
 
 	[Fact]
@@ -185,17 +176,14 @@ public class ListIssuesHandlerTests
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
 
 		var issues = GenerateIssues(10);
-		_repository.GetAllAsync(1, 20, false, Arg.Any<CancellationToken>())
-			.Returns(issues);
-
-		_repository.CountAsync(false, Arg.Any<CancellationToken>())
-			.Returns(10);
+		_repository.GetAllAsync(1, 20, Arg.Any<CancellationToken>())
+		.Returns(((IReadOnlyList<Issue>)issues, 10L));
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		await _repository.Received(1).GetAllAsync(1, 20, false, Arg.Any<CancellationToken>());
+		await _repository.Received(1).GetAllAsync(1, 20, Arg.Any<CancellationToken>());
 		result.Items.Should().HaveCount(10);
 	}
 
@@ -205,18 +193,16 @@ public class ListIssuesHandlerTests
 		// Arrange
 		var query = new ListIssuesQuery { Page = 1, PageSize = 3 };
 
-		var issues = new List<Issue>
-		{
-			new("1", "Issue 1", "Desc", "user1", DateTime.UtcNow.AddDays(-3)),
-			new("2", "Issue 2", "Desc", "user2", DateTime.UtcNow.AddDays(-2)),
-			new("3", "Issue 3", "Desc", "user3", DateTime.UtcNow.AddDays(-1))
-		};
+		// Create issues already in expected descending order (newest first)
+		var orderedIssues = new List<Issue>
+{
+new("3", "Issue 3", "Desc", IssueStatus.Open, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(-1)),
+new("2", "Issue 2", "Desc", IssueStatus.Open, DateTime.UtcNow.AddDays(-2), DateTime.UtcNow.AddDays(-2)),
+new("1", "Issue 1", "Desc", IssueStatus.Open, DateTime.UtcNow.AddDays(-3), DateTime.UtcNow.AddDays(-3))
+};
 
-		_repository.GetAllAsync(1, 3, false, Arg.Any<CancellationToken>())
-			.Returns(issues.OrderByDescending(i => i.CreatedAt).ToList());
-
-		_repository.CountAsync(false, Arg.Any<CancellationToken>())
-			.Returns(3);
+		_repository.GetAllAsync(1, 3, Arg.Any<CancellationToken>())
+		.Returns(((IReadOnlyList<Issue>)orderedIssues, 3L));
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
@@ -234,11 +220,12 @@ public class ListIssuesHandlerTests
 		for (int i = 0; i < count; i++)
 		{
 			issues.Add(new Issue(
-				Id: Guid.NewGuid().ToString(),
-				Title: $"Issue {i + 1}",
-				Description: $"Description {i + 1}",
-				AuthorId: "user-123",
-				CreatedAt: DateTime.UtcNow.AddDays(-i)));
+			Id: Guid.NewGuid().ToString(),
+			Title: $"Issue {i + 1}",
+			Description: $"Description {i + 1}",
+			Status: IssueStatus.Open,
+			CreatedAt: DateTime.UtcNow.AddDays(-i),
+			UpdatedAt: DateTime.UtcNow.AddDays(-i)));
 		}
 		return issues;
 	}

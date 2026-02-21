@@ -1,4 +1,4 @@
-namespace IssueManager.Shared.Domain;
+namespace Shared.Domain;
 
 /// <summary>
 /// Represents a label that can be attached to an issue for categorization.

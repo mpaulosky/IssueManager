@@ -1,7 +1,8 @@
 using FluentAssertions;
 using IssueManager.Api.Data;
 using IssueManager.Api.Handlers;
-using IssueManager.Shared.Domain.Models;
+using global::Shared.Domain;
+using global::Shared.Exceptions;
 using IssueManager.Shared.Validators;
 using NSubstitute;
 
@@ -32,11 +33,9 @@ public class UpdateIssueHandlerTests
 			Id: issueId,
 			Title: "Original Title",
 			Description: "Original Description",
-			AuthorId: "user-123",
-			CreatedAt: DateTime.UtcNow.AddDays(-1))
-		{
-			UpdatedAt = DateTime.UtcNow.AddDays(-1)
-		};
+			Status: IssueStatus.Open,
+			CreatedAt: DateTime.UtcNow.AddDays(-1),
+			UpdatedAt: DateTime.UtcNow.AddDays(-1));
 
 		var command = new UpdateIssueCommand
 		{
@@ -65,7 +64,7 @@ public class UpdateIssueHandlerTests
 		result.Should().NotBeNull();
 		result.Title.Should().Be("Updated Title");
 		result.Description.Should().Be("Updated Description");
-		result.UpdatedAt.Should().NotBeNull();
+		result.UpdatedAt.Should().BeAfter(DateTime.MinValue);
 		result.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
 
 		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
@@ -163,8 +162,9 @@ public class UpdateIssueHandlerTests
 			Id: issueId,
 			Title: "Archived Issue",
 			Description: "This is archived",
-			AuthorId: "user-123",
-			CreatedAt: DateTime.UtcNow.AddDays(-1))
+			Status: IssueStatus.Open,
+			CreatedAt: DateTime.UtcNow.AddDays(-1),
+			UpdatedAt: DateTime.UtcNow.AddDays(-1))
 		{
 			IsArchived = true
 		};
@@ -196,11 +196,9 @@ public class UpdateIssueHandlerTests
 			Id: issueId,
 			Title: "Same Title",
 			Description: "Same Description",
-			AuthorId: "user-123",
-			CreatedAt: DateTime.UtcNow.AddDays(-1))
-		{
-			UpdatedAt = DateTime.UtcNow.AddHours(-1)
-		};
+			Status: IssueStatus.Open,
+			CreatedAt: DateTime.UtcNow.AddDays(-1),
+			UpdatedAt: DateTime.UtcNow.AddHours(-1));
 
 		var command = new UpdateIssueCommand
 		{
@@ -221,9 +219,9 @@ public class UpdateIssueHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.UpdatedAt.Should().NotBeNull();
+		result.UpdatedAt.Should().BeAfter(DateTime.MinValue);
 		result.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
-		result.UpdatedAt.Should().BeAfter(existingIssue.UpdatedAt!.Value);
+		result.UpdatedAt.Should().BeAfter(existingIssue.UpdatedAt);
 	}
 
 	[Fact]
@@ -235,8 +233,9 @@ public class UpdateIssueHandlerTests
 			Id: issueId,
 			Title: "Original Title",
 			Description: "Original Description",
-			AuthorId: "user-123",
-			CreatedAt: DateTime.UtcNow.AddDays(-1));
+			Status: IssueStatus.Open,
+			CreatedAt: DateTime.UtcNow.AddDays(-1),
+			UpdatedAt: DateTime.UtcNow.AddDays(-1));
 
 		var command = new UpdateIssueCommand
 		{
