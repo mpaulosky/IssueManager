@@ -1,6 +1,6 @@
 using FluentValidation;
 using IssueManager.Api.Data;
-using Shared.Domain;
+using global::Shared.Domain;
 using IssueManager.Shared.Validators;
 using global::Shared.Exceptions;
 

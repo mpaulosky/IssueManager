@@ -2,7 +2,7 @@ using IssueManager.ServiceDefaults;
 using IssueManager.Api.Data;
 using IssueManager.Api.Handlers;
 using IssueManager.Shared.Validators;
-using Shared.Validators;
+using global::Shared.Validators;
 using IssueManager.Shared.Domain.DTOs;
 using static IssueManager.Api.Handlers.GetIssueHandler;
 
