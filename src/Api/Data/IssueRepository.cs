@@ -104,7 +104,7 @@ public class IssueRepository : IIssueRepository
 			update,
 			cancellationToken: cancellationToken);
 
-		return result.ModifiedCount > 0;
+		return result.MatchedCount > 0;
 	}
 
 	/// <inheritdoc />
