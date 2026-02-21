@@ -52,6 +52,11 @@ public class UpdateIssueHandler
 		var updatedIssue = existingIssue.Update(command.Title, command.Description);
 
 		// Persist the updated issue
-		return await _repository.UpdateAsync(updatedIssue, cancellationToken);
+		var result = await _repository.UpdateAsync(updatedIssue, cancellationToken);
+		if (result is null)
+		{
+			throw new NotFoundException($"Issue with ID '{command.Id}' could not be updated.");
+		}
+		return result;
 	}
 }

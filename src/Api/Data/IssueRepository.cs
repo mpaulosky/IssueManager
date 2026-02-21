@@ -152,7 +152,9 @@ internal class IssueEntity
 			Status = issue.Status.ToString(),
 			CreatedAt = issue.CreatedAt,
 			UpdatedAt = issue.UpdatedAt,
-			IsArchived = false,
+			IsArchived = issue.IsArchived,
+			ArchivedBy = issue.ArchivedBy,
+			ArchivedAt = issue.ArchivedAt,
 			Labels = issue.Labels?.Select(l => new LabelEntity { Name = l.Name, Color = l.Color }).ToList()
 		};
 	}

@@ -1,7 +1,6 @@
 using FluentValidation;
 using IssueManager.Api.Data;
 using IssueManager.Shared.Validators;
-using global::Shared.Domain;
 using global::Shared.Exceptions;
 
 namespace IssueManager.Api.Handlers;
@@ -48,13 +47,8 @@ public class DeleteIssueHandler
 			return true;
 		}
 
-		// Archive the issue via update
-		var archivedIssue = existingIssue with
-		{
-			IsArchived = true,
-			UpdatedAt = DateTime.UtcNow
-		};
-		await _repository.UpdateAsync(archivedIssue, cancellationToken);
+		// Archive the issue via the dedicated archive operation
+		await _repository.ArchiveAsync(command.Id, cancellationToken);
 		return true;
 	}
 }
