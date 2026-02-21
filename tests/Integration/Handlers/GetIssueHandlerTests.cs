@@ -1,3 +1,5 @@
+using Shared.Domain;
+
 namespace IssueManager.Tests.Integration.Handlers;
 
 /// <summary>

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using IssueManager.Shared.Domain;
+
+using Shared.Domain;
 
 namespace IssueManager.Web.Components;
 

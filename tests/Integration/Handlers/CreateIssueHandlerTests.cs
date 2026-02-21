@@ -1,5 +1,8 @@
 using IssueManager.Tests.Integration.Fixtures;
 
+using Shared.Domain;
+using Shared.Validators;
+
 namespace IssueManager.Tests.Integration.Handlers;
 
 /// <summary>

@@ -4,9 +4,10 @@
 		<LangVersion>14.0</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<RootNamespace>IssueManager.Shared</RootNamespace>
+		<RootNamespace>Shared</RootNamespace>
 	</PropertyGroup>
 	<ItemGroup>
 	  <PackageReference Include="FluentValidation" />
+	  <PackageReference Include="MongoDB.Bson" />
 	</ItemGroup>
 </Project>

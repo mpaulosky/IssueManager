@@ -1,6 +1,7 @@
 using FluentAssertions;
-using IssueManager.Shared.Domain;
-using IssueManager.Shared.Validators;
+
+using Shared.Domain;
+using Shared.Validators;
 
 namespace IssueManager.Tests.Unit.Validators;
 

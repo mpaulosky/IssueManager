@@ -1,5 +1,6 @@
 using IssueManager.Api.Data;
-using IssueManager.Shared.Domain;
+
+using Shared.Domain;
 
 namespace IssueManager.Api.Handlers;
 

@@ -1,4 +1,4 @@
-namespace IssueManager.Shared;
+namespace Shared;
 
 /// <summary>
 /// Placeholder utilities class for the Shared library.

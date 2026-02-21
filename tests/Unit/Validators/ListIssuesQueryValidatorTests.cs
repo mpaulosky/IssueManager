@@ -62,7 +62,7 @@ public class ListIssuesQueryValidatorTests
 		result.IsValid.Should().BeFalse();
 		result.Errors.Should().HaveCount(1);
 		result.Errors[0].PropertyName.Should().Be("Page");
-		result.Errors[0].ErrorMessage.Should().Contain("greater than 0");
+		result.Errors[0].ErrorMessage.Should().Contain("greater than or equal to 1");
 	}
 
 	[Fact]
@@ -100,7 +100,7 @@ public class ListIssuesQueryValidatorTests
 		result.IsValid.Should().BeFalse();
 		result.Errors.Should().HaveCount(1);
 		result.Errors[0].PropertyName.Should().Be("PageSize");
-		result.Errors[0].ErrorMessage.Should().Contain("greater than 0");
+		result.Errors[0].ErrorMessage.Should().Contain("between 1 and 100");
 	}
 
 	[Fact]

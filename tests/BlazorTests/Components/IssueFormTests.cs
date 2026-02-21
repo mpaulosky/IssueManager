@@ -1,9 +1,12 @@
 using Bunit;
 using FluentAssertions;
-using IssueManager.Shared.Domain;
+
 using IssueManager.Tests.BlazorTests.Fixtures;
 using IssueManager.Web.Components;
 using Microsoft.AspNetCore.Components;
+
+using Shared.Domain;
+
 using Xunit;
 
 namespace IssueManager.Tests.BlazorTests.Components;

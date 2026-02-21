@@ -1,4 +1,4 @@
-namespace IssueManager.Shared.Domain.Enums;
+namespace Shared.Domain.Enums;
 
 /// <summary>
 ///   Represents the lifecycle status of an issue.

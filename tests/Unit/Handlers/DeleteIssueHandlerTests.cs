@@ -1,7 +1,10 @@
 using FluentAssertions;
+using FluentValidation;
 using IssueManager.Api.Data;
 using IssueManager.Api.Handlers;
-using IssueManager.Shared.Domain.Models;
+using global::Shared.Domain;
+using global::Shared.Exceptions;
+using IssueManager.Shared.Validators;
 using NSubstitute;
 
 namespace IssueManager.Tests.Unit.Handlers;
@@ -17,7 +20,7 @@ public class DeleteIssueHandlerTests
 	public DeleteIssueHandlerTests()
 	{
 		_repository = Substitute.For<IIssueRepository>();
-		_handler = new DeleteIssueHandler(_repository);
+		_handler = new DeleteIssueHandler(_repository, new DeleteIssueValidator());
 	}
 
 	[Fact]
@@ -29,8 +32,9 @@ public class DeleteIssueHandlerTests
 			Id: issueId,
 			Title: "Issue to Delete",
 			Description: "This will be archived",
-			AuthorId: "user-123",
-			CreatedAt: DateTime.UtcNow.AddDays(-1))
+			Status: IssueStatus.Open,
+			CreatedAt: DateTime.UtcNow.AddDays(-1),
+			UpdatedAt: DateTime.UtcNow.AddDays(-1))
 		{
 			IsArchived = false
 		};
@@ -40,23 +44,15 @@ public class DeleteIssueHandlerTests
 		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
 			.Returns(existingIssue);
 
-		var archivedIssue = existingIssue with
-		{
-			IsArchived = true,
-			UpdatedAt = DateTime.UtcNow
-		};
-
-		_repository.UpdateAsync(Arg.Any<Issue>(), Arg.Any<CancellationToken>())
-			.Returns(archivedIssue);
+		_repository.ArchiveAsync(issueId, Arg.Any<CancellationToken>())
+			.Returns(true);
 
 		// Act
 		await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
 		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
-		await _repository.Received(1).UpdateAsync(
-			Arg.Is<Issue>(i => i.IsArchived == true && i.Id == issueId),
-			Arg.Any<CancellationToken>());
+		await _repository.Received(1).ArchiveAsync(issueId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -86,11 +82,11 @@ public class DeleteIssueHandlerTests
 			Id: issueId,
 			Title: "Already Archived",
 			Description: "Already archived",
-			AuthorId: "user-123",
-			CreatedAt: DateTime.UtcNow.AddDays(-1))
+			Status: IssueStatus.Open,
+			CreatedAt: DateTime.UtcNow.AddDays(-1),
+			UpdatedAt: DateTime.UtcNow.AddHours(-1))
 		{
-			IsArchived = true,
-			UpdatedAt = DateTime.UtcNow.AddHours(-1)
+			IsArchived = true
 		};
 
 		var command = new DeleteIssueCommand { Id = issueId };
@@ -98,17 +94,16 @@ public class DeleteIssueHandlerTests
 		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
 			.Returns(archivedIssue);
 
-		// Act & Assert - Should be idempotent (either succeed silently or throw)
-		// Decision: Return success (204) without updating (idempotent)
+		// Act — should succeed idempotently without calling ArchiveAsync
 		await _handler.Handle(command, CancellationToken.None);
 
 		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
-		// Should NOT call UpdateAsync since already archived
-		await _repository.DidNotReceive().UpdateAsync(Arg.Any<Issue>(), Arg.Any<CancellationToken>());
+		// Should NOT call ArchiveAsync since already archived
+		await _repository.DidNotReceive().ArchiveAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_ValidIssue_UpdatesTimestamp()
+	public async Task Handle_ValidIssue_CallsArchive()
 	{
 		// Arrange
 		var issueId = Guid.NewGuid().ToString();
@@ -116,11 +111,11 @@ public class DeleteIssueHandlerTests
 			Id: issueId,
 			Title: "Issue to Delete",
 			Description: "This will be archived",
-			AuthorId: "user-123",
-			CreatedAt: DateTime.UtcNow.AddDays(-1))
+			Status: IssueStatus.Open,
+			CreatedAt: DateTime.UtcNow.AddDays(-1),
+			UpdatedAt: DateTime.UtcNow.AddHours(-2))
 		{
-			IsArchived = false,
-			UpdatedAt = DateTime.UtcNow.AddHours(-2)
+			IsArchived = false
 		};
 
 		var command = new DeleteIssueCommand { Id = issueId };
@@ -128,22 +123,15 @@ public class DeleteIssueHandlerTests
 		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
 			.Returns(existingIssue);
 
-		var archivedIssue = existingIssue with
-		{
-			IsArchived = true,
-			UpdatedAt = DateTime.UtcNow
-		};
-
-		_repository.UpdateAsync(Arg.Any<Issue>(), Arg.Any<CancellationToken>())
-			.Returns(archivedIssue);
+		_repository.ArchiveAsync(issueId, Arg.Any<CancellationToken>())
+			.Returns(true);
 
 		// Act
-		await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await _repository.Received(1).UpdateAsync(
-			Arg.Is<Issue>(i => i.UpdatedAt != null && i.UpdatedAt > existingIssue.UpdatedAt),
-			Arg.Any<CancellationToken>());
+		result.Should().BeTrue();
+		await _repository.Received(1).ArchiveAsync(issueId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
