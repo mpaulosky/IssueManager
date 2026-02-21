@@ -34,6 +34,24 @@ builder.Services.AddSingleton<UpdateIssueStatusHandler>();
 
 var app = builder.Build();
 
+app.UseExceptionHandler(errorApp => errorApp.Run(async context =>
+{
+	var ex = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
+	if (ex is FluentValidation.ValidationException validationEx)
+	{
+		context.Response.StatusCode = StatusCodes.Status400BadRequest;
+		context.Response.ContentType = "application/problem+json";
+		var errors = validationEx.Errors
+			.GroupBy(e => e.PropertyName)
+			.ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+		await context.Response.WriteAsJsonAsync(new { title = "Validation failed", errors });
+	}
+	else
+	{
+		context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+	}
+}));
+
 app.UseHttpsRedirection();
 app.MapOpenApi();
 

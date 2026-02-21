@@ -138,6 +138,8 @@ internal class IssueEntity
 	[BsonElement("updatedAt")]
 	public DateTime UpdatedAt { get; set; }
 	public bool IsArchived { get; set; }
+	public string? ArchivedBy { get; set; }
+	public DateTime? ArchivedAt { get; set; }
 	public List<LabelEntity>? Labels { get; set; }
 
 	public static IssueEntity FromDomain(Issue issue)
@@ -161,7 +163,9 @@ internal class IssueEntity
 			Id: Id,
 			Title: Title,
 			Description: Description,
-			Status: Enum.Parse<IssueStatus>(Status),
+			Status: Enum.TryParse<IssueStatus>(Status, ignoreCase: true, out var parsedStatus)
+				? parsedStatus
+				: IssueStatus.Open,
 			CreatedAt: CreatedAt,
 			UpdatedAt: UpdatedAt,
 			Labels: Labels?.Select(l => new Label(l.Name, l.Color)).ToList()
