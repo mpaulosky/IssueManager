@@ -102,17 +102,17 @@ public record Issue(
 	}
 
 	/// <summary>
-	/// Gets or sets a value indicating whether the issue is archived (soft-deleted).
+	/// Gets a value indicating whether the issue is archived (soft-deleted).
 	/// </summary>
-	public bool IsArchived { get; set; } = false;
+	public bool IsArchived { get; init; } = false;
 
 	/// <summary>
-	/// Gets or sets the user who archived the issue.
+	/// Gets the user who archived the issue.
 	/// </summary>
-	public string? ArchivedBy { get; set; }
+	public string? ArchivedBy { get; init; }
 
 	/// <summary>
-	/// Gets or sets the timestamp when the issue was archived.
+	/// Gets the timestamp when the issue was archived.
 	/// </summary>
-	public DateTime? ArchivedAt { get; set; }
+	public DateTime? ArchivedAt { get; init; }
 }

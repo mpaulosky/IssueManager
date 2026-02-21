@@ -138,6 +138,8 @@ internal class IssueEntity
 	[BsonElement("updatedAt")]
 	public DateTime UpdatedAt { get; set; }
 	public bool IsArchived { get; set; }
+	public string? ArchivedBy { get; set; }
+	public DateTime? ArchivedAt { get; set; }
 	public List<LabelEntity>? Labels { get; set; }
 
 	public static IssueEntity FromDomain(Issue issue)
