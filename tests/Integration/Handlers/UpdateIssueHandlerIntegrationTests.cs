@@ -1,7 +1,7 @@
 using FluentAssertions;
 using IssueManager.Api.Data;
 using IssueManager.Api.Handlers;
-using IssueManager.Shared.Domain.Models;
+using global::Shared.Domain;
 using IssueManager.Shared.Validators;
 using Testcontainers.MongoDb;
 

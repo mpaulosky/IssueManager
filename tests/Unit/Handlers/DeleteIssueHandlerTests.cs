@@ -1,7 +1,9 @@
 using FluentAssertions;
 using IssueManager.Api.Data;
 using IssueManager.Api.Handlers;
-using IssueManager.Shared.Domain.Models;
+using global::Shared.Domain;
+using global::Shared.Exceptions;
+using IssueManager.Shared.Validators;
 using NSubstitute;
 
 namespace IssueManager.Tests.Unit.Handlers;
@@ -17,7 +19,7 @@ public class DeleteIssueHandlerTests
 	public DeleteIssueHandlerTests()
 	{
 		_repository = Substitute.For<IIssueRepository>();
-		_handler = new DeleteIssueHandler(_repository);
+		_handler = new DeleteIssueHandler(_repository, new DeleteIssueValidator());
 	}
 
 	[Fact]
@@ -29,8 +31,9 @@ public class DeleteIssueHandlerTests
 			Id: issueId,
 			Title: "Issue to Delete",
 			Description: "This will be archived",
-			AuthorId: "user-123",
-			CreatedAt: DateTime.UtcNow.AddDays(-1))
+			Status: IssueStatus.Open,
+			CreatedAt: DateTime.UtcNow.AddDays(-1),
+			UpdatedAt: DateTime.UtcNow.AddDays(-1))
 		{
 			IsArchived = false
 		};
@@ -86,11 +89,11 @@ public class DeleteIssueHandlerTests
 			Id: issueId,
 			Title: "Already Archived",
 			Description: "Already archived",
-			AuthorId: "user-123",
-			CreatedAt: DateTime.UtcNow.AddDays(-1))
+			Status: IssueStatus.Open,
+			CreatedAt: DateTime.UtcNow.AddDays(-1),
+			UpdatedAt: DateTime.UtcNow.AddHours(-1))
 		{
-			IsArchived = true,
-			UpdatedAt = DateTime.UtcNow.AddHours(-1)
+			IsArchived = true
 		};
 
 		var command = new DeleteIssueCommand { Id = issueId };
@@ -116,11 +119,11 @@ public class DeleteIssueHandlerTests
 			Id: issueId,
 			Title: "Issue to Delete",
 			Description: "This will be archived",
-			AuthorId: "user-123",
-			CreatedAt: DateTime.UtcNow.AddDays(-1))
+			Status: IssueStatus.Open,
+			CreatedAt: DateTime.UtcNow.AddDays(-1),
+			UpdatedAt: DateTime.UtcNow.AddHours(-2))
 		{
-			IsArchived = false,
-			UpdatedAt = DateTime.UtcNow.AddHours(-2)
+			IsArchived = false
 		};
 
 		var command = new DeleteIssueCommand { Id = issueId };

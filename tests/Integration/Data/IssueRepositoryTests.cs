@@ -1,6 +1,6 @@
 using FluentAssertions;
 using IssueManager.Api.Data;
-using IssueManager.Shared.Domain.Models;
+using global::Shared.Domain;
 using Testcontainers.MongoDb;
 
 namespace IssueManager.Tests.Integration.Data;
