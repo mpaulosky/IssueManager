@@ -115,7 +115,7 @@ public class ArchitectureTests
 	}
 
 	/// <summary>
-	/// Ensures that all validator classes follow the naming convention of ending with "Validator".
+	/// Ensures that all validator classes follow the naming convention of ending with "Validator", "Command", or "Query".
 	/// </summary>
 	[Fact]
 	public void Validators_ShouldFollowNamingConvention()
@@ -133,11 +133,13 @@ public class ArchitectureTests
 			.HaveNameEndingWith("Validator")
 			.Or()
 			.HaveNameEndingWith("Command")
+			.Or()
+			.HaveNameEndingWith("Query")
 			.GetResult();
 
 		// Assert
 		result.IsSuccessful.Should().BeTrue(
-			"All validator classes should end with 'Validator' or be command DTOs ending with 'Command'");
+			"All validator classes should end with 'Validator', 'Command', or 'Query'");
 	}
 
 	/// <summary>

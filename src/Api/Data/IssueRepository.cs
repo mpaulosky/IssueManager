@@ -69,6 +69,7 @@ public class IssueRepository : IIssueRepository
 	{
 		var entities = await _collection
 			.Find(_ => true)
+			.SortByDescending(x => x.CreatedAt)
 			.ToListAsync(cancellationToken);
 
 		return entities.Select(e => e.ToDomain()).ToList();
@@ -83,6 +84,7 @@ public class IssueRepository : IIssueRepository
 		
 		var entities = await _collection
 			.Find(filter)
+			.SortByDescending(x => x.CreatedAt)
 			.Skip((page - 1) * pageSize)
 			.Limit(pageSize)
 			.ToListAsync(cancellationToken);
