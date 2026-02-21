@@ -1,4 +1,4 @@
-namespace Shared.Validators;
+namespace IssueManager.Shared.Validators;
 
 /// <summary>
 /// Command for updating an existing issue.

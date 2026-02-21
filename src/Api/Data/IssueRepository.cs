@@ -95,12 +95,10 @@ public class IssueRepository : IIssueRepository
 	}
 
 	/// <inheritdoc />
-	public async Task<bool> ArchiveAsync(string issueId, string archivedBy, CancellationToken cancellationToken = default)
+	public async Task<bool> ArchiveAsync(string issueId, CancellationToken cancellationToken = default)
 	{
 		var update = Builders<IssueEntity>.Update
 			.Set(x => x.IsArchived, true)
-			.Set(x => x.ArchivedBy, archivedBy)
-			.Set(x => x.ArchivedAt, DateTime.UtcNow)
 			.Set(x => x.UpdatedAt, DateTime.UtcNow);
 		
 		var result = await _collection.UpdateOneAsync(
@@ -108,7 +106,7 @@ public class IssueRepository : IIssueRepository
 			update,
 			cancellationToken: cancellationToken);
 
-		return result.ModifiedCount > 0;
+		return result.MatchedCount > 0;
 	}
 
 	/// <inheritdoc />
@@ -141,17 +139,9 @@ internal class IssueEntity
 
 	[BsonElement("updatedAt")]
 	public DateTime UpdatedAt { get; set; }
-
-	[BsonElement("isArchived")]
 	public bool IsArchived { get; set; }
-
-	[BsonElement("archivedBy")]
 	public string? ArchivedBy { get; set; }
-
-	[BsonElement("archivedAt")]
 	public DateTime? ArchivedAt { get; set; }
-
-	[BsonElement("labels")]
 	public List<LabelEntity>? Labels { get; set; }
 
 	public static IssueEntity FromDomain(Issue issue)
@@ -173,11 +163,23 @@ internal class IssueEntity
 
 	public Issue ToDomain()
 	{
+		// Fall back to Open if the stored value is unknown, empty, has unexpected casing, or is not a defined status.
+		IssueStatus status;
+		if (Enum.TryParse<IssueStatus>(Status, ignoreCase: true, out var parsedStatus)
+		    && Enum.IsDefined(typeof(IssueStatus), parsedStatus))
+		{
+			status = parsedStatus;
+		}
+		else
+		{
+			status = IssueStatus.Open;
+		}
+
 		var issue = new Issue(
 			Id: Id,
 			Title: Title,
 			Description: Description,
-			Status: Enum.Parse<IssueStatus>(Status),
+			Status: status,
 			CreatedAt: CreatedAt,
 			UpdatedAt: UpdatedAt,
 			Labels: Labels?.Select(l => new Label(l.Name, l.Color)).ToList()

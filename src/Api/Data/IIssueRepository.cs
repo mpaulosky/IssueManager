@@ -38,10 +38,9 @@ public interface IIssueRepository
 	Task<(IReadOnlyList<Issue> Items, long Total)> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken = default);
 
 	/// <summary>
-	/// Soft-deletes an issue by setting IsArchived to true, and records who archived it.
-	/// Captures ArchivedBy (user identifier) and ArchivedAt (timestamp).
+	/// Soft-deletes an issue by setting IsArchived to true.
 	/// </summary>
-	Task<bool> ArchiveAsync(string issueId, string archivedBy, CancellationToken cancellationToken = default);
+	Task<bool> ArchiveAsync(string issueId, CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Counts the total number of issues in the database.
