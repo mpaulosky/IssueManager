@@ -171,10 +171,17 @@ internal class IssueEntity
 
 	public Issue ToDomain()
 	{
-		// Fall back to Open if the stored value is unknown, empty, or has unexpected casing.
-		var status = Enum.TryParse<IssueStatus>(Status, ignoreCase: true, out var parsedStatus)
-			? parsedStatus
-			: IssueStatus.Open;
+		// Fall back to Open if the stored value is unknown, empty, has unexpected casing, or is not a defined status.
+		IssueStatus status;
+		if (Enum.TryParse<IssueStatus>(Status, ignoreCase: true, out var parsedStatus)
+		    && Enum.IsDefined(typeof(IssueStatus), parsedStatus))
+		{
+			status = parsedStatus;
+		}
+		else
+		{
+			status = IssueStatus.Open;
+		}
 
 		var issue = new Issue(
 			Id: Id,
