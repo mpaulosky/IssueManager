@@ -39,8 +39,7 @@ app.MapOpenApi();
 
 // Issue API Endpoints
 var issuesApi = app.MapGroup("/api/v1/issues")
-	.WithTags("Issues")
-	.WithOpenApi();
+	.WithTags("Issues");
 
 // List Issues (paginated)
 issuesApi.MapGet("", async (int? page, int? pageSize, ListIssuesHandler handler) =>

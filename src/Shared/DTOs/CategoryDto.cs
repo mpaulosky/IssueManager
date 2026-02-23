@@ -13,13 +13,23 @@ namespace Shared.DTOs;
 ///   CategoryDto record
 /// </summary>
 [Serializable]
-public record CategoryDto(ObjectId Id, string CategoryName, string CategoryDescription)
+public record CategoryDto(
+	ObjectId Id,
+	string CategoryName,
+	string CategoryDescription,
+	DateTime DateCreated = default,
+	DateTime? DateModified = null)
 {
 	/// <summary>
 	///   Initializes a new instance of the <see cref="CategoryDto" /> record.
 	/// </summary>
 	/// <param name="category">The category.</param>
-	public CategoryDto(Category category) : this(category.Id, category.CategoryName, category.CategoryDescription)
+	public CategoryDto(Category category) : this(
+		category.Id,
+		category.CategoryName,
+		category.CategoryDescription,
+		category.DateCreated,
+		category.DateModified)
 	{
 	}
 

@@ -18,7 +18,12 @@ public static class CategoryMapper
 	///   Converts a <see cref="Shared.Models.Category"/> to a <see cref="CategoryDto"/>.
 	/// </summary>
 	public static CategoryDto ToDto(this Shared.Models.Category category) =>
-		new(category.Id, category.CategoryName, category.CategoryDescription);
+		new(
+			category.Id,
+			category.CategoryName,
+			category.CategoryDescription,
+			category.DateCreated,
+			category.DateModified);
 
 	/// <summary>
 	///   Converts a <see cref="CategoryDto"/> to a <see cref="Shared.Models.Category"/>.
@@ -28,6 +33,8 @@ public static class CategoryMapper
 		{
 			Id = dto.Id,
 			CategoryName = dto.CategoryName,
-			CategoryDescription = dto.CategoryDescription
+			CategoryDescription = dto.CategoryDescription,
+			DateCreated = dto.DateCreated,
+			DateModified = dto.DateModified
 		};
 }

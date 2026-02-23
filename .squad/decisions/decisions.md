@@ -149,6 +149,30 @@ Potential future hot files if more branches open:
 
 ---
 
+## Branching Process Enforcement — IssueManager
+
+**Date:** 2026-02-23  
+**Decision Type:** Process enforcement (unified from inbox)
+
+### Decision
+
+**ALL changes must go through a feature branch + build-repair skill before pushing. Direct pushes to main are prohibited.**
+
+**Rationale:**
+- Process violation occurred when release notes changes were pushed directly to main
+- Remediated by reverting main, creating feature/release-notes-automation branch, running build verification, and opening PR #40
+- This is now the documented, enforced process going forward
+
+**Key Rules:**
+1. Feature branches are mandatory for all changes
+2. Build-repair skill must validate before pushing
+3. Pull requests required for all merges to main
+4. Branch protection with "require up to date" on main enforces this
+
+*— Gandalf (Lead/Architect) & Matthew Paulosky (User Directive), 2026-02-23*
+
+---
+
 ## Sprint Cadence & Milestone Strategy — IssueManager
 
 **Architect:** Gandalf  

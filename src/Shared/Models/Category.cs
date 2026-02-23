@@ -47,6 +47,26 @@ public class Category
 	public string CategoryDescription { get; set; } = string.Empty;
 
 	/// <summary>
+	///   Gets or sets the date created.
+	/// </summary>
+	/// <value>
+	///   The date created.
+	/// </value>
+	[BsonElement("date_created")]
+	[BsonRepresentation(BsonType.DateTime)]
+	public DateTime DateCreated { get; init; } = DateTime.UtcNow;
+
+	/// <summary>
+	///   Gets or sets the date modified.
+	/// </summary>
+	/// <value>
+	///   The date modified.
+	/// </value>
+	[BsonElement("date_modified")]
+	[BsonRepresentation(BsonType.DateTime)]
+	public DateTime? DateModified { get; set; }
+
+	/// <summary>
 	///   Gets or sets a value indicating whether this <see cref="Category" /> is archived.
 	/// </summary>
 	/// <value>
