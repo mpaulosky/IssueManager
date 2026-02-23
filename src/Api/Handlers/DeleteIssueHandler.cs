@@ -1,9 +1,9 @@
 using FluentValidation;
-using IssueManager.Api.Data;
-using IssueManager.Shared.Validators;
+using Api.Data;
+using Shared.Validators;
 using global::Shared.Exceptions;
 
-namespace IssueManager.Api.Handlers;
+namespace Api.Handlers;
 
 /// <summary>
 /// Handler for deleting (soft-deleting/archiving) issues.

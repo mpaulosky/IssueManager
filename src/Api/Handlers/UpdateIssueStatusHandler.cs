@@ -1,10 +1,10 @@
 using FluentValidation;
-using IssueManager.Api.Data;
+using Api.Data;
 
 using Shared.Domain;
 using Shared.Validators;
 
-namespace IssueManager.Api.Handlers;
+namespace Api.Handlers;
 
 /// <summary>
 /// Handler for updating issue status.

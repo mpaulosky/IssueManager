@@ -1,8 +1,8 @@
-using IssueManager.Api.Data;
+using Api.Data;
 
 using Shared.Domain;
 
-namespace IssueManager.Api.Handlers;
+namespace Api.Handlers;
 
 /// <summary>
 /// Query for retrieving a single issue.

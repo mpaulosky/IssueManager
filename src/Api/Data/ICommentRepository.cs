@@ -13,7 +13,7 @@ using Shared.Domain;
 using Shared.Models;
 using DomainIssue = Shared.Domain.Issue;
 
-namespace IssueManager.Api.Data;
+namespace Api.Data;
 
 /// <summary>
 /// Provides data access operations for comment entities in the data store.

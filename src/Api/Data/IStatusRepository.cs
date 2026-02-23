@@ -12,7 +12,7 @@ using Shared.Abstractions;
 using Shared.Domain;
 using Shared.Models;
 
-namespace IssueManager.Api.Data;
+namespace Api.Data;
 
 /// <summary>
 /// Provides data access operations for status entities in the data store.

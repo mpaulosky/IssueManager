@@ -1,4 +1,4 @@
-namespace IssueManager.Shared.Validators;
+namespace Shared.Validators;
 
 /// <summary>
 /// Query for retrieving a paginated list of issues.

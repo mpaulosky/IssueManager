@@ -5,7 +5,7 @@ using MongoDB.Entities;
 
 using Shared.Domain;
 
-namespace IssueManager.Api.Data;
+namespace Api.Data;
 
 /// <summary>
 /// MongoDB implementation of the issue repository.
