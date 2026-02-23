@@ -1,6 +1,6 @@
 using IssueManager.Tests.Integration.Fixtures;
 
-using Shared.Domain;
+using Shared.DTOs;
 using Shared.Validators;
 
 namespace IssueManager.Tests.Integration.Handlers;
@@ -59,41 +59,14 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 
 		// Assert
 		result.Should().NotBeNull();
-		result.Id.Should().NotBeEmpty();
+		result.Id.Should().NotBe(MongoDB.Bson.ObjectId.Empty);
 		result.Title.Should().Be("Test Issue");
 		result.Description.Should().Be("This is a test issue description.");
-		result.Status.Should().Be(IssueStatus.Open);
 
 		// Verify persistence
-		var retrieved = await _repository.GetByIdAsync(result.Id);
+		var retrieved = await _repository.GetByIdAsync(result.Id.ToString());
 		retrieved.Should().NotBeNull();
 		retrieved!.Title.Should().Be("Test Issue");
-	}
-
-	[Fact]
-	public async Task Handle_ValidCommandWithLabels_StoresIssueWithLabels()
-	{
-		// Arrange
-		var command = new CreateIssueCommand
-		{
-			Title = "Bug Report",
-			Description = "Found a critical bug",
-			Labels = new List<string> { "bug", "critical", "backend" }
-		};
-
-		// Act
-		var result = await _handler.Handle(command);
-
-		// Assert
-		result.Should().NotBeNull();
-		result.Labels.Should().HaveCount(3);
-		result.Labels.Should().Contain(l => l.Name == "bug");
-		result.Labels.Should().Contain(l => l.Name == "critical");
-		result.Labels.Should().Contain(l => l.Name == "backend");
-
-		// Verify persistence
-		var retrieved = await _repository.GetByIdAsync(result.Id);
-		retrieved!.Labels.Should().HaveCount(3);
 	}
 
 	[Fact]
@@ -172,15 +145,15 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 
 		// Assert
 		result.Should().NotBeNull();
-		result.Description.Should().BeNull();
+		result.Description.Should().BeEmpty();
 
 		// Verify persistence
-		var retrieved = await _repository.GetByIdAsync(result.Id);
-		retrieved!.Description.Should().BeNull();
+		var retrieved = await _repository.GetByIdAsync(result.Id.ToString());
+		retrieved!.Description.Should().BeEmpty();
 	}
 
 	[Fact]
-	public async Task Handle_CreatedIssue_HasCorrectTimestamps()
+	public async Task Handle_CreatedIssue_HasDateCreated()
 	{
 		// Arrange
 		var beforeCreation = DateTime.UtcNow.AddSeconds(-1);
@@ -194,10 +167,7 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 		var afterCreation = DateTime.UtcNow.AddSeconds(1);
 
 		// Assert
-		result.CreatedAt.Should().BeAfter(beforeCreation);
-		result.CreatedAt.Should().BeBefore(afterCreation);
-		result.UpdatedAt.Should().BeAfter(beforeCreation);
-		result.UpdatedAt.Should().BeBefore(afterCreation);
-		result.CreatedAt.Should().BeCloseTo(result.UpdatedAt, TimeSpan.FromSeconds(1));
+		result.DateCreated.Should().BeAfter(beforeCreation);
+		result.DateCreated.Should().BeBefore(afterCreation);
 	}
 }

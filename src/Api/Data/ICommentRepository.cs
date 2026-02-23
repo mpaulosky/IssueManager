@@ -9,9 +9,8 @@
 
 using MongoDB.Bson;
 using Shared.Abstractions;
-using Shared.Domain;
+using Shared.DTOs;
 using Shared.Models;
-using DomainIssue = Shared.Domain.Issue;
 
 namespace Api.Data;
 
@@ -78,7 +77,7 @@ public interface ICommentRepository
 	/// The task result contains an enumerable collection of <see cref="Comment"/> instances for the specified issue.
 	/// </returns>
 	/// <exception cref="ArgumentNullException">Thrown when <paramref name="issue"/> is null.</exception>
-	Task<Result<IEnumerable<Comment>>> GetByIssueAsync(DomainIssue issue);
+	Task<Result<IEnumerable<Comment>>> GetByIssueAsync(IssueDto issue);
 
 	/// <summary>
 	/// Updates an existing comment in the data store.

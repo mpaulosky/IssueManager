@@ -20,23 +20,10 @@ public record IssueDto(
 	DateTime DateCreated,
 	UserDto Author,
 	CategoryDto Category,
-	StatusDto Status)
+	StatusDto Status,
+	bool Archived = false,
+	UserDto? ArchivedBy = null)
 {
-	/// <summary>
-	///   Initializes a new instance of the <see cref="IssueDto" /> record from a Domain Issue.
-	/// </summary>
-	/// <param name="issue">The issue.</param>
-	public IssueDto(Domain.Issue issue) : this(
-		ObjectId.Parse(issue.Id),
-		issue.Title,
-		issue.Description ?? string.Empty,
-		issue.CreatedAt,
-		UserDto.Empty,
-		CategoryDto.Empty,
-		new StatusDto(issue.Status.ToString(), issue.Status.ToString(), null))
-	{
-	}
-
 	public static IssueDto Empty => new(
 		ObjectId.Empty,
 		string.Empty,

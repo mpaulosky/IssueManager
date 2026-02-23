@@ -1,5 +1,5 @@
 using FluentAssertions;
-using IssueManager.Shared.Validators;
+using Shared.Validators;
 
 namespace IssueManager.Tests.Unit.Validators;
 

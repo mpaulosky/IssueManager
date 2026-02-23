@@ -1,0 +1,59 @@
+E:\github\IssueManager\src\ServiceDefaults\ServiceDefaults.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\src\ServiceDefaults\ServiceDefaults.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\Integration\Integration.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\Integration\Integration.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\Architecture\Architecture.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\Architecture\Architecture.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\src\Api\Api.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\src\Api\Api.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\Unit\Unit.csproj : warning NU1603: Unit depends on NSubstitute (>= 5.2.0) but NSubstitute 5.2.0 was not found. NSubstitute 5.3.0 was resolved instead.
+E:\github\IssueManager\tests\Unit\Unit.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\Unit\Unit.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\Aspire\Aspire.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\Aspire\Aspire.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj : warning NU1603: BlazorTests depends on bunit (>= 1.29.1) but bunit 1.29.1 was not found. bunit 1.29.5 was resolved instead.
+E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj : warning NU1603: BlazorTests depends on NSubstitute (>= 5.2.0) but NSubstitute 5.2.0 was not found. NSubstitute 5.3.0 was resolved instead.
+E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\src\Web\Web.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\src\Web\Web.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+  Shared -> E:\github\IssueManager\src\Shared\bin\Release\net10.0\Shared.dll
+  ServiceDefaults -> E:\github\IssueManager\src\ServiceDefaults\bin\Release\net10.0\ServiceDefaults.dll
+E:\github\IssueManager\src\AppHost\AppHost.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\src\AppHost\AppHost.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+  Api -> E:\github\IssueManager\src\Api\bin\Release\net10.0\Api.dll
+  Web -> E:\github\IssueManager\src\Web\bin\Release\net10.0\Web.dll
+  AppHost -> E:\github\IssueManager\src\AppHost\bin\Release\net10.0\AppHost.dll
+  Architecture -> E:\github\IssueManager\tests\Architecture\bin\Release\net10.0\Architecture.dll
+  Unit -> E:\github\IssueManager\tests\Unit\bin\Release\net10.0\Unit.dll
+  Integration -> E:\github\IssueManager\tests\Integration\bin\Release\net10.0\Integration.dll
+  Aspire -> E:\github\IssueManager\tests\Aspire\bin\Release\net10.0\Aspire.dll
+  BlazorTests -> E:\github\IssueManager\tests\BlazorTests\bin\Release\net10.0\BlazorTests.dll
+
+Build succeeded.
+
+E:\github\IssueManager\src\ServiceDefaults\ServiceDefaults.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\src\ServiceDefaults\ServiceDefaults.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\Integration\Integration.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\Integration\Integration.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\Architecture\Architecture.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\Architecture\Architecture.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\src\Api\Api.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\src\Api\Api.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\Unit\Unit.csproj : warning NU1603: Unit depends on NSubstitute (>= 5.2.0) but NSubstitute 5.2.0 was not found. NSubstitute 5.3.0 was resolved instead.
+E:\github\IssueManager\tests\Unit\Unit.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\Unit\Unit.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\Aspire\Aspire.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\Aspire\Aspire.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj : warning NU1603: BlazorTests depends on bunit (>= 1.29.1) but bunit 1.29.1 was not found. bunit 1.29.5 was resolved instead.
+E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj : warning NU1603: BlazorTests depends on NSubstitute (>= 5.2.0) but NSubstitute 5.2.0 was not found. NSubstitute 5.3.0 was resolved instead.
+E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\src\Web\Web.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\src\Web\Web.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\src\AppHost\AppHost.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\src\AppHost\AppHost.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+    21 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.63

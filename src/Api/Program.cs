@@ -51,7 +51,7 @@ issuesApi.MapGet("", async (int? page, int? pageSize, ListIssuesHandler handler)
 })
 .WithName("ListIssues")
 .WithSummary("Get a paginated list of issues")
-.Produces<PaginatedResponse<IssueResponseDto>>(StatusCodes.Status200OK)
+.Produces<PaginatedResponse<IssueDto>>(StatusCodes.Status200OK)
 .Produces(StatusCodes.Status400BadRequest);
 
 // Get Issue by ID

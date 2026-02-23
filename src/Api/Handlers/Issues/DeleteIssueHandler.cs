@@ -1,7 +1,16 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     DeleteIssueHandler.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Api
+// =======================================================
+
 using FluentValidation;
 using Api.Data;
 using Shared.Validators;
-using global::Shared.Exceptions;
+using Shared.Exceptions;
 
 namespace Api.Handlers;
 
@@ -27,28 +36,17 @@ public class DeleteIssueHandler
 	/// </summary>
 	public async Task<bool> Handle(DeleteIssueCommand command, CancellationToken cancellationToken = default)
 	{
-		// Validate the command
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
 		if (!validationResult.IsValid)
-		{
 			throw new ValidationException(validationResult.Errors);
-		}
 
-		// Get the existing issue
 		var existingIssue = await _repository.GetByIdAsync(command.Id, cancellationToken);
 		if (existingIssue is null)
-		{
 			throw new NotFoundException($"Issue with ID '{command.Id}' was not found.");
-		}
 
-		// If already archived, this is idempotent - return success without updating
-		if (existingIssue.IsArchived)
-		{
+		if (existingIssue.Archived)
 			return true;
-		}
 
-		// Archive the issue via the dedicated archive operation
-		await _repository.ArchiveAsync(command.Id, cancellationToken);
-		return true;
+		return await _repository.ArchiveAsync(command.Id, cancellationToken);
 	}
 }

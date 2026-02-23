@@ -1,15 +1,16 @@
 using FluentAssertions;
-using IssueManager.Api.Data;
-using IssueManager.Api.Handlers;
-using global::Shared.Domain;
-using global::Shared.Exceptions;
-using IssueManager.Shared.Validators;
+using Api.Data;
+using Api.Handlers;
+using MongoDB.Bson;
+using Shared.DTOs;
+using Shared.Exceptions;
+using Shared.Validators;
 using Testcontainers.MongoDb;
 
 namespace IssueManager.Tests.Integration.Handlers;
 
 /// <summary>
-/// Integration tests for DeleteIssueHandler (soft-delete via IsArchived) with real MongoDB database.
+/// Integration tests for DeleteIssueHandler (soft-delete via Archived) with real MongoDB database.
 /// </summary>
 public class DeleteIssueHandlerIntegrationTests : IAsyncLifetime
 {
@@ -47,64 +48,49 @@ await _mongoContainer.StopAsync();
 await _mongoContainer.DisposeAsync();
 }
 
+private static IssueDto CreateTestIssueDto(string title, string description, bool archived = false) =>
+new(ObjectId.GenerateNewId(), title, description, DateTime.UtcNow, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty, archived);
+
 [Fact]
-public async Task Handle_ValidIssue_SetsIsArchivedInDatabase()
+public async Task Handle_ValidIssue_SetsArchivedInDatabase()
 {
 // Arrange - Create an issue
-var issue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Issue to Delete",
-Description: "This will be archived",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow,
-UpdatedAt: DateTime.UtcNow)
-{
-IsArchived = false
-};
+var issue = CreateTestIssueDto("Issue to Delete", "This will be archived");
+var created = await _repository.CreateAsync(issue);
 
-await _repository.CreateAsync(issue);
-
-var command = new DeleteIssueCommand { Id = issue.Id };
+var command = new DeleteIssueCommand { Id = created.Id.ToString() };
 
 // Act
 await _handler.Handle(command, CancellationToken.None);
 
-// Assert - Verify IsArchived is set in database
-var dbIssue = await _repository.GetByIdAsync(issue.Id);
+// Assert - Verify Archived is set in database
+var dbIssue = await _repository.GetByIdAsync(created.Id.ToString());
 dbIssue.Should().NotBeNull();
-dbIssue!.IsArchived.Should().BeTrue();
-dbIssue.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
+dbIssue!.Archived.Should().BeTrue();
 }
 
 [Fact]
 public async Task Handle_ArchivedIssue_ExcludedFromListByDefault()
 {
 // Arrange - Create and archive an issue
-var issue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Issue to Archive",
-Description: "Test",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow,
-UpdatedAt: DateTime.UtcNow);
+var issue = CreateTestIssueDto("Issue to Archive", "Test");
+var created = await _repository.CreateAsync(issue);
 
-await _repository.CreateAsync(issue);
-
-var command = new DeleteIssueCommand { Id = issue.Id };
+var command = new DeleteIssueCommand { Id = created.Id.ToString() };
 
 // Act - Archive the issue
 await _handler.Handle(command, CancellationToken.None);
 
 // Assert - GetAll (paginated) should exclude archived issues
 var (allIssues, _) = await _repository.GetAllAsync(1, 100);
-allIssues.Should().NotContain(i => i.Id == issue.Id);
+allIssues.Should().NotContain(i => i.Id == created.Id);
 }
 
 [Fact]
 public async Task Handle_NonExistentIssue_ThrowsNotFoundException()
 {
 // Arrange
-var nonExistentId = Guid.NewGuid().ToString();
+var nonExistentId = ObjectId.GenerateNewId().ToString();
 var command = new DeleteIssueCommand { Id = nonExistentId };
 
 // Act
@@ -118,89 +104,59 @@ await act.Should().ThrowAsync<NotFoundException>();
 public async Task Handle_IssueNotDeleted_RecordStillExists()
 {
 // Arrange - Create an issue
-var issue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Issue to Archive",
-Description: "Should still exist in DB",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow,
-UpdatedAt: DateTime.UtcNow);
+var issue = CreateTestIssueDto("Issue to Archive", "Should still exist in DB");
+var created = await _repository.CreateAsync(issue);
 
-await _repository.CreateAsync(issue);
-
-var command = new DeleteIssueCommand { Id = issue.Id };
+var command = new DeleteIssueCommand { Id = created.Id.ToString() };
 
 // Act - Soft delete
 await _handler.Handle(command, CancellationToken.None);
 
 // Assert - Record should still exist (soft delete)
-var dbIssue = await _repository.GetByIdAsync(issue.Id);
+var dbIssue = await _repository.GetByIdAsync(created.Id.ToString());
 dbIssue.Should().NotBeNull();
-dbIssue!.Id.Should().Be(issue.Id);
-dbIssue.IsArchived.Should().BeTrue();
+dbIssue!.Id.Should().Be(created.Id);
+dbIssue.Archived.Should().BeTrue();
 }
 
 [Fact]
 public async Task Handle_AlreadyArchivedIssue_IsIdempotent()
 {
 // Arrange - Create an already archived issue
-var archivedIssue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Already Archived",
-Description: "Already archived",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow,
-UpdatedAt: DateTime.UtcNow.AddHours(-1))
-{
-IsArchived = true
-};
+var archivedIssue = CreateTestIssueDto("Already Archived", "Already archived", archived: true);
+var created = await _repository.CreateAsync(archivedIssue);
 
-await _repository.CreateAsync(archivedIssue);
-
-var command = new DeleteIssueCommand { Id = archivedIssue.Id };
+var command = new DeleteIssueCommand { Id = created.Id.ToString() };
 
 // Act - Delete already archived issue (should be idempotent)
 await _handler.Handle(command, CancellationToken.None);
 
 // Assert - Should still be archived
-var dbIssue = await _repository.GetByIdAsync(archivedIssue.Id);
+var dbIssue = await _repository.GetByIdAsync(created.Id.ToString());
 dbIssue.Should().NotBeNull();
-dbIssue!.IsArchived.Should().BeTrue();
+dbIssue!.Archived.Should().BeTrue();
 }
 
 [Fact]
 public async Task Handle_MultipleIssues_ArchivesOnlySpecifiedIssue()
 {
 // Arrange - Create multiple issues
-var issue1 = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Issue 1",
-Description: "To be archived",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow,
-UpdatedAt: DateTime.UtcNow);
+var issue1 = CreateTestIssueDto("Issue 1", "To be archived");
+var issue2 = CreateTestIssueDto("Issue 2", "Should remain active");
 
-var issue2 = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Issue 2",
-Description: "Should remain active",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow,
-UpdatedAt: DateTime.UtcNow);
+var created1 = await _repository.CreateAsync(issue1);
+var created2 = await _repository.CreateAsync(issue2);
 
-await _repository.CreateAsync(issue1);
-await _repository.CreateAsync(issue2);
-
-var command = new DeleteIssueCommand { Id = issue1.Id };
+var command = new DeleteIssueCommand { Id = created1.Id.ToString() };
 
 // Act
 await _handler.Handle(command, CancellationToken.None);
 
 // Assert
-var dbIssue1 = await _repository.GetByIdAsync(issue1.Id);
-var dbIssue2 = await _repository.GetByIdAsync(issue2.Id);
+var dbIssue1 = await _repository.GetByIdAsync(created1.Id.ToString());
+var dbIssue2 = await _repository.GetByIdAsync(created2.Id.ToString());
 
-dbIssue1!.IsArchived.Should().BeTrue();
-dbIssue2!.IsArchived.Should().BeFalse();
+dbIssue1!.Archived.Should().BeTrue();
+dbIssue2!.Archived.Should().BeFalse();
 }
 }

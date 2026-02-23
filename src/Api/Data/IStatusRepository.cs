@@ -9,7 +9,6 @@
 
 using MongoDB.Bson;
 using Shared.Abstractions;
-using Shared.Domain;
 using Shared.Models;
 
 namespace Api.Data;

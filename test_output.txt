@@ -1,0 +1,35 @@
+Test run for E:\github\IssueManager\tests\Unit\bin\Debug\net10.0\Unit.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:00.52]     IssueManager.Unit.Handlers.UpdateIssueHandlerTests.Handle_ValidCommand_ReturnsUpdatedIssue [FAIL]
+  Failed IssueManager.Unit.Handlers.UpdateIssueHandlerTests.Handle_ValidCommand_ReturnsUpdatedIssue [6 ms]
+  Error Message:
+   NSubstitute.Exceptions.AmbiguousArgumentsException : Cannot determine argument specifications to use. Please use specifications for all arguments of the same type.
+Method signature:
+    UpdateAsync(IssueDto, CancellationToken)
+Method arguments (possible arg matchers are indicated with '*'):
+    UpdateAsync(*<null>*, *System.Threading.CancellationToken*)
+All queued specifications:
+    any Nullable<DateTime>
+    any IssueDto
+    any CancellationToken
+Matched argument specifications:
+    UpdateAsync(???, ???)
+
+  Stack Trace:
+     at NSubstitute.Core.Arguments.ArgumentSpecificationsFactory.Create(IList`1 argumentSpecs, Object[] arguments, IParameterInfo[] parameterInfos, MethodInfo methodInfo, MatchArgs matchArgs)
+   at NSubstitute.Core.CallSpecificationFactory.CreateFrom(ICall call, MatchArgs matchArgs)
+   at NSubstitute.Routing.Handlers.RecordCallSpecificationHandler.Handle(ICall call)
+   at NSubstitute.Routing.Route.Handle(ICall call)
+   at NSubstitute.Core.CallRouter.Route(ICall call)
+   at NSubstitute.Proxies.CastleDynamicProxy.CastleForwardingInterceptor.Intercept(IInvocation invocation)
+   at Castle.DynamicProxy.AbstractInvocation.Proceed()
+   at NSubstitute.Proxies.CastleDynamicProxy.ProxyIdInterceptor.Intercept(IInvocation invocation)
+   at Castle.DynamicProxy.AbstractInvocation.Proceed()
+   at Castle.Proxies.ObjectProxy.UpdateAsync(IssueDto issue, CancellationToken cancellationToken)
+   at IssueManager.Unit.Handlers.UpdateIssueHandlerTests.Handle_ValidCommand_ReturnsUpdatedIssue() in E:\github\IssueManager\tests\Unit\Handlers\UpdateIssueHandlerTests.cs:line 57
+--- End of stack trace from previous location ---
+
+Failed!  - Failed:     1, Passed:    61, Skipped:     0, Total:    62, Duration: 167 ms - Unit.dll (net10.0)

@@ -1,4 +1,5 @@
-using Shared.Domain;
+using MongoDB.Bson;
+using Shared.DTOs;
 
 namespace IssueManager.Tests.Integration.Handlers;
 
@@ -40,43 +41,46 @@ public class DeleteIssueHandlerTests : IAsyncLifetime
 		await _mongoContainer.DisposeAsync();
 	}
 
+	private static IssueDto CreateTestIssueDto(string title, string description) =>
+		new(ObjectId.GenerateNewId(), title, description, DateTime.UtcNow, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty);
+
 	[Fact]
 	public async Task ArchiveAsync_ExistingUnarchivedIssue_ReturnsTrue()
 	{
 		// Arrange
-		var issue = Issue.Create("Test Issue", "Test Description");
-		await _repository.CreateAsync(issue);
+		var issue = CreateTestIssueDto("Test Issue", "Test Description");
+		var created = await _repository.CreateAsync(issue);
 
 		// Act
-		var result = await _repository.ArchiveAsync(issue.Id);
+		var result = await _repository.ArchiveAsync(created.Id.ToString());
 
 		// Assert
 		result.Should().BeTrue();
 
-		var retrieved = await _repository.GetByIdAsync(issue.Id);
-		retrieved!.IsArchived.Should().BeTrue();
+		var retrieved = await _repository.GetByIdAsync(created.Id.ToString());
+		retrieved!.Archived.Should().BeTrue();
 	}
 
 	[Fact]
-	public async Task ArchiveAsync_AlreadyArchivedIssue_ReturnsTrueIdempotent()
+	public async Task ArchiveAsync_AlreadyArchivedIssue_ReturnsFalse()
 	{
 		// Arrange
-		var issue = Issue.Create("Already Archived Issue", "Description");
-		await _repository.CreateAsync(issue);
-		await _repository.ArchiveAsync(issue.Id);
+		var issue = CreateTestIssueDto("Already Archived Issue", "Description");
+		var created = await _repository.CreateAsync(issue);
+		await _repository.ArchiveAsync(created.Id.ToString());
 
-		// Act - archive again (already archived, MatchedCount still > 0)
-		var result = await _repository.ArchiveAsync(issue.Id);
+		// Act - archive again (already archived, ModifiedCount = 0)
+		var result = await _repository.ArchiveAsync(created.Id.ToString());
 
-		// Assert - should return true (issue was found), not false (issue not found)
-		result.Should().BeTrue();
+		// Assert - should return false since no modification was made
+		result.Should().BeFalse();
 	}
 
 	[Fact]
 	public async Task ArchiveAsync_NonExistentIssue_ReturnsFalse()
 	{
 		// Act
-		var result = await _repository.ArchiveAsync("non-existent-id");
+		var result = await _repository.ArchiveAsync(ObjectId.GenerateNewId().ToString());
 
 		// Assert
 		result.Should().BeFalse();

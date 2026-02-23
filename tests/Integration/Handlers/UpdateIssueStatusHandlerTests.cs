@@ -1,4 +1,5 @@
-using Shared.Domain;
+using MongoDB.Bson;
+using Shared.DTOs;
 using Shared.Validators;
 
 namespace IssueManager.Tests.Integration.Handlers;
@@ -42,17 +43,21 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 		await _mongoContainer.DisposeAsync();
 	}
 
+	private static IssueDto CreateTestIssueDto(string title, string description) =>
+		new(ObjectId.GenerateNewId(), title, description, DateTime.UtcNow, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty);
+
 	[Fact]
 	public async Task Handle_ValidCommand_UpdatesIssueStatus()
 	{
 		// Arrange
-		var issue = Issue.Create("Test Issue", "Test Description");
-		await _repository.CreateAsync(issue);
+		var issueDto = CreateTestIssueDto("Test Issue", "Test Description");
+		var created = await _repository.CreateAsync(issueDto);
+		var newStatus = new StatusDto("InProgress", "Issue is in progress");
 
 		var command = new UpdateIssueStatusCommand
 		{
-			IssueId = issue.Id,
-			Status = IssueStatus.InProgress
+			IssueId = created.Id.ToString(),
+			Status = newStatus
 		};
 
 		// Act
@@ -60,12 +65,11 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 
 		// Assert
 		result.Should().NotBeNull();
-		result!.Status.Should().Be(IssueStatus.InProgress);
-		result.UpdatedAt.Should().BeAfter(issue.UpdatedAt);
+		result!.Status.StatusName.Should().Be("InProgress");
 
 		// Verify persistence
-		var retrieved = await _repository.GetByIdAsync(issue.Id);
-		retrieved!.Status.Should().Be(IssueStatus.InProgress);
+		var retrieved = await _repository.GetByIdAsync(created.Id.ToString());
+		retrieved!.Status.StatusName.Should().Be("InProgress");
 	}
 
 	[Fact]
@@ -74,8 +78,8 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 		// Arrange
 		var command = new UpdateIssueStatusCommand
 		{
-			IssueId = "non-existing-id",
-			Status = IssueStatus.Closed
+			IssueId = ObjectId.GenerateNewId().ToString(),
+			Status = new StatusDto("Closed", "Issue is closed")
 		};
 
 		// Act
@@ -92,7 +96,7 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 		var command = new UpdateIssueStatusCommand
 		{
 			IssueId = "",
-			Status = IssueStatus.InProgress
+			Status = new StatusDto("InProgress", "Issue is in progress")
 		};
 
 		// Act & Assert
@@ -103,36 +107,35 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 	public async Task Handle_StatusTransition_OpenToInProgressToClosed_UpdatesCorrectly()
 	{
 		// Arrange
-		var issue = Issue.Create("Status Transition Test", "Testing status transitions");
-		await _repository.CreateAsync(issue);
+		var issueDto = CreateTestIssueDto("Status Transition Test", "Testing status transitions");
+		var created = await _repository.CreateAsync(issueDto);
 
 		// Act - Transition to InProgress
 		var inProgressCommand = new UpdateIssueStatusCommand
 		{
-			IssueId = issue.Id,
-			Status = IssueStatus.InProgress
+			IssueId = created.Id.ToString(),
+			Status = new StatusDto("InProgress", "Issue is in progress")
 		};
 		var inProgressResult = await _handler.Handle(inProgressCommand);
 
 		// Assert InProgress
 		inProgressResult.Should().NotBeNull();
-		inProgressResult!.Status.Should().Be(IssueStatus.InProgress);
+		inProgressResult!.Status.StatusName.Should().Be("InProgress");
 
 		// Act - Transition to Closed
 		var closedCommand = new UpdateIssueStatusCommand
 		{
-			IssueId = issue.Id,
-			Status = IssueStatus.Closed
+			IssueId = created.Id.ToString(),
+			Status = new StatusDto("Closed", "Issue is closed")
 		};
 		var closedResult = await _handler.Handle(closedCommand);
 
 		// Assert Closed
 		closedResult.Should().NotBeNull();
-		closedResult!.Status.Should().Be(IssueStatus.Closed);
-		closedResult.UpdatedAt.Should().BeAfter(inProgressResult.UpdatedAt);
+		closedResult!.Status.StatusName.Should().Be("Closed");
 
 		// Verify final state in database
-		var retrieved = await _repository.GetByIdAsync(issue.Id);
-		retrieved!.Status.Should().Be(IssueStatus.Closed);
+		var retrieved = await _repository.GetByIdAsync(created.Id.ToString());
+		retrieved!.Status.StatusName.Should().Be("Closed");
 	}
 }
