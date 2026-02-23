@@ -1,0 +1,64 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     StatusBuilder.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Unit Tests
+// =======================================================
+
+using Shared.DTOs;
+
+namespace Tests.Unit.Builders;
+
+/// <summary>
+/// Builder for creating StatusDto test data with fluent API.
+/// </summary>
+public class StatusBuilder
+{
+	private string? _id = MongoDB.Bson.ObjectId.GenerateNewId().ToString();
+	private string _statusName = "Default Status";
+	private string _statusDescription = "Default status description";
+	private DateTime _dateCreated = DateTime.UtcNow;
+	private DateTime? _dateModified;
+
+	public StatusBuilder WithId(string id)
+	{
+		_id = id;
+		return this;
+	}
+
+	public StatusBuilder WithStatusName(string statusName)
+	{
+		_statusName = statusName;
+		return this;
+	}
+
+	public StatusBuilder WithStatusDescription(string statusDescription)
+	{
+		_statusDescription = statusDescription;
+		return this;
+	}
+
+	public StatusBuilder WithCreatedAt(DateTime createdAt)
+	{
+		_dateCreated = createdAt;
+		return this;
+	}
+
+	public StatusBuilder WithModifiedAt(DateTime? modifiedAt)
+	{
+		_dateModified = modifiedAt;
+		return this;
+	}
+
+	public StatusDto Build() =>
+		new(
+			_statusName,
+			_statusDescription,
+			_id,
+			_dateCreated,
+			_dateModified);
+
+	public static StatusBuilder Default() => new();
+}
