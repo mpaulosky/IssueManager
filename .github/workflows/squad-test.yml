@@ -111,11 +111,11 @@ jobs:
         id: unit-tests
         run: |
           mkdir -p test-results coverage-reports
-          if [ ! -d "tests/Unit" ]; then
-            echo "::error::Unit test project not found at tests/Unit"
+          if [ ! -d "tests/Unit.Tests" ]; then
+            echo "::error::Unit test project not found at tests/Unit.Tests"
             exit 1
           fi
-          dotnet test tests/Unit \
+          dotnet test tests/Unit.Tests \
             --configuration Release \
             --no-build \
             --no-restore \
@@ -176,11 +176,11 @@ jobs:
         id: arch-tests
         run: |
           mkdir -p test-results
-          if [ ! -d "tests/Architecture" ]; then
-            echo "::error::Architecture test project not found at tests/Architecture"
+          if [ ! -d "tests/Architecture.Tests" ]; then
+            echo "::error::Architecture test project not found at tests/Architecture.Tests"
             exit 1
           fi
-          dotnet test tests/Architecture \
+          dotnet test tests/Architecture.Tests \
             --configuration Release \
             --no-build \
             --no-restore \
@@ -240,11 +240,11 @@ jobs:
         id: bunit-tests
         run: |
           mkdir -p test-results coverage-reports
-          if [ ! -d "tests/BlazorTests" ]; then
-            echo "::error::Blazor test project not found at tests/BlazorTests"
+          if [ ! -d "tests/Blazor.Tests" ]; then
+            echo "::error::Blazor test project not found at tests/Blazor.Tests"
             exit 1
           fi
-          dotnet test tests/BlazorTests \
+          dotnet test tests/Blazor.Tests \
             --configuration Release \
             --no-build \
             --no-restore \
@@ -318,11 +318,11 @@ jobs:
         id: integration-tests
         run: |
           mkdir -p test-results coverage-reports
-          if [ ! -d "tests/Integration" ]; then
-            echo "::error::Integration test project not found at tests/Integration"
+          if [ ! -d "tests/Integration.Tests" ]; then
+            echo "::error::Integration test project not found at tests/Integration.Tests"
             exit 1
           fi
-          dotnet test tests/Integration \
+          dotnet test tests/Integration.Tests \
             --configuration Release \
             --no-build \
             --no-restore \

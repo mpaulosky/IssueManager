@@ -1,24 +1,28 @@
-# Build Log - 2026-02-23 12:33:50
-
-## Step 1: Restore
-- Result: SUCCESS
-- Duration: ~1.8s
-- Errors: 0
-
-## Step 2: Build (Release, no-restore)
-- Result: BUILD SUCCEEDED
-- Duration: ~5.8s
-- Warnings: 0
-- Errors: 0
-- Projects built: Shared, ServiceDefaults, AppHost, Api, Web, Architecture, Unit, BlazorTests, Aspire, Integration
-
-## Step 3: Tests (Release, no-build)
-- Unit Tests:        62/62 passed (2.4s)
-- Architecture Tests: 9/9 passed (2.4s)
-- Blazor Tests:     13/13 passed (4.0s)
-- Integration Tests: 46/46 passed (104.8s) [Docker/TestContainers - MongoDB 8.0]
-- TOTAL:           130/130 passed
+# Build Repair Log - squad/39-rename-test-folders
+Date: 2026-02-23 13:45:22
 
 ## Summary
-- Build: CLEAN (0 warnings, 0 errors)
-- Tests: ALL PASSING (130 total)
+Fixed CI failures after test folder rename. The .sln and .csproj files were
+already updated to the new folder names (Unit.Tests, Architecture.Tests,
+Blazor.Tests, Integration.Tests), but the GitHub Actions workflow
+.github/workflows/squad-test.yml still referenced the old paths.
+
+## Root Cause
+squad-test.yml had hardcoded directory checks and dotnet test paths pointing to:
+- tests/Unit     → should be tests/Unit.Tests
+- tests/Architecture → should be tests/Architecture.Tests
+- tests/BlazorTests  → should be tests/Blazor.Tests
+- tests/Integration  → should be tests/Integration.Tests
+
+## Fix Applied
+Updated .github/workflows/squad-test.yml to use new folder names.
+
+## Build Results
+- dotnet restore: SUCCESS (0 errors, 0 warnings)
+- dotnet build --configuration Release: SUCCESS (0 errors, 0 warnings)
+- dotnet test (Unit.Tests): PASSED - 62 tests
+- dotnet test (Architecture.Tests): PASSED - 9 tests
+- dotnet test (Blazor.Tests): PASSED - 13 tests
+- dotnet test (Integration.Tests): PASSED - 46 tests
+
+## Final Status: BUILD SUCCEEDED - ALL TESTS PASSED
