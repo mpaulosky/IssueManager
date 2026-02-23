@@ -2,15 +2,16 @@ using FluentAssertions;
 using FluentValidation;
 using IssueManager.Api.Data;
 using IssueManager.Api.Handlers;
-using global::Shared.Domain;
-using global::Shared.Exceptions;
+using Shared.DTOs;
+using Shared.Exceptions;
 using IssueManager.Shared.Validators;
+using MongoDB.Bson;
 using NSubstitute;
 
 namespace IssueManager.Tests.Unit.Handlers;
 
 /// <summary>
-/// Unit tests for DeleteIssueHandler (soft-delete via IsArchived).
+/// Unit tests for DeleteIssueHandler (soft-delete via Archived).
 /// </summary>
 public class DeleteIssueHandlerTests
 {
@@ -27,17 +28,16 @@ public class DeleteIssueHandlerTests
 	public async Task Handle_ValidIssue_SetsIsArchivedToTrue()
 	{
 		// Arrange
-		var issueId = Guid.NewGuid().ToString();
-		var existingIssue = new Issue(
-			Id: issueId,
-			Title: "Issue to Delete",
-			Description: "This will be archived",
-			Status: IssueStatus.Open,
-			CreatedAt: DateTime.UtcNow.AddDays(-1),
-			UpdatedAt: DateTime.UtcNow.AddDays(-1))
-		{
-			IsArchived = false
-		};
+		var issueId = ObjectId.GenerateNewId().ToString();
+		var existingIssue = new IssueDto(
+			ObjectId.Parse(issueId),
+			"Issue to Delete",
+			"This will be archived",
+			DateTime.UtcNow.AddDays(-1),
+			UserDto.Empty,
+			CategoryDto.Empty,
+			StatusDto.Empty,
+			Archived: false);
 
 		var command = new DeleteIssueCommand { Id = issueId };
 
@@ -59,11 +59,11 @@ public class DeleteIssueHandlerTests
 	public async Task Handle_NonExistentIssue_ThrowsNotFoundException()
 	{
 		// Arrange
-		var issueId = Guid.NewGuid().ToString();
+		var issueId = ObjectId.GenerateNewId().ToString();
 		var command = new DeleteIssueCommand { Id = issueId };
 
 		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
-			.Returns((Issue?)null);
+			.Returns((IssueDto?)null);
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
@@ -77,17 +77,16 @@ public class DeleteIssueHandlerTests
 	public async Task Handle_AlreadyArchivedIssue_IsIdempotent()
 	{
 		// Arrange
-		var issueId = Guid.NewGuid().ToString();
-		var archivedIssue = new Issue(
-			Id: issueId,
-			Title: "Already Archived",
-			Description: "Already archived",
-			Status: IssueStatus.Open,
-			CreatedAt: DateTime.UtcNow.AddDays(-1),
-			UpdatedAt: DateTime.UtcNow.AddHours(-1))
-		{
-			IsArchived = true
-		};
+		var issueId = ObjectId.GenerateNewId().ToString();
+		var archivedIssue = new IssueDto(
+			ObjectId.Parse(issueId),
+			"Already Archived",
+			"Already archived",
+			DateTime.UtcNow.AddDays(-1),
+			UserDto.Empty,
+			CategoryDto.Empty,
+			StatusDto.Empty,
+			Archived: true);
 
 		var command = new DeleteIssueCommand { Id = issueId };
 
@@ -106,17 +105,16 @@ public class DeleteIssueHandlerTests
 	public async Task Handle_ValidIssue_CallsArchive()
 	{
 		// Arrange
-		var issueId = Guid.NewGuid().ToString();
-		var existingIssue = new Issue(
-			Id: issueId,
-			Title: "Issue to Delete",
-			Description: "This will be archived",
-			Status: IssueStatus.Open,
-			CreatedAt: DateTime.UtcNow.AddDays(-1),
-			UpdatedAt: DateTime.UtcNow.AddHours(-2))
-		{
-			IsArchived = false
-		};
+		var issueId = ObjectId.GenerateNewId().ToString();
+		var existingIssue = new IssueDto(
+			ObjectId.Parse(issueId),
+			"Issue to Delete",
+			"This will be archived",
+			DateTime.UtcNow.AddDays(-1),
+			UserDto.Empty,
+			CategoryDto.Empty,
+			StatusDto.Empty,
+			Archived: false);
 
 		var command = new DeleteIssueCommand { Id = issueId };
 

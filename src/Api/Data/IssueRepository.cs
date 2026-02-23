@@ -1,9 +1,17 @@
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Driver;
-using MongoDB.Entities;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     IssueRepository.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Api
+// =======================================================
 
-using Shared.Domain;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using Shared.DTOs;
+using Shared.Mappers;
+using Shared.Models;
 
 namespace IssueManager.Api.Data;
 
@@ -12,7 +20,7 @@ namespace IssueManager.Api.Data;
 /// </summary>
 public class IssueRepository : IIssueRepository
 {
-	private readonly IMongoCollection<IssueEntity> _collection;
+	private readonly IMongoCollection<Issue> _collection;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="IssueRepository"/> class.
@@ -21,92 +29,82 @@ public class IssueRepository : IIssueRepository
 	{
 		var client = new MongoClient(connectionString);
 		var database = client.GetDatabase(databaseName);
-		_collection = database.GetCollection<IssueEntity>("issues");
+		_collection = database.GetCollection<Issue>("issues");
 	}
 
 	/// <inheritdoc />
-	public async Task<Issue> CreateAsync(Issue issue, CancellationToken cancellationToken = default)
+	public async Task<IssueDto> CreateAsync(IssueDto dto, CancellationToken cancellationToken = default)
 	{
-		var entity = IssueEntity.FromDomain(issue);
-		await _collection.InsertOneAsync(entity, cancellationToken: cancellationToken);
-		return entity.ToDomain();
+		var model = dto.ToModel();
+		await _collection.InsertOneAsync(model, cancellationToken: cancellationToken);
+		return model.ToDto();
 	}
 
 	/// <inheritdoc />
-	public async Task<Issue?> GetByIdAsync(string issueId, CancellationToken cancellationToken = default)
+	public async Task<IssueDto?> GetByIdAsync(string issueId, CancellationToken cancellationToken = default)
 	{
-		var entity = await _collection
-			.Find(x => x.Id == issueId)
-			.FirstOrDefaultAsync(cancellationToken);
+		if (!ObjectId.TryParse(issueId, out var id))
+			return null;
 
-		return entity?.ToDomain();
+		var entity = await _collection.Find(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
+		return entity?.ToDto();
 	}
 
 	/// <inheritdoc />
-	public async Task<Issue?> UpdateAsync(Issue issue, CancellationToken cancellationToken = default)
+	public async Task<IssueDto?> UpdateAsync(IssueDto dto, CancellationToken cancellationToken = default)
 	{
-		var entity = IssueEntity.FromDomain(issue);
+		var model = dto.ToModel();
 		var result = await _collection.ReplaceOneAsync(
-			x => x.Id == issue.Id,
-			entity,
+			x => x.Id == model.Id,
+			model,
 			cancellationToken: cancellationToken);
 
-		return result.ModifiedCount > 0 ? entity.ToDomain() : null;
+		return result.ModifiedCount > 0 ? model.ToDto() : null;
 	}
 
 	/// <inheritdoc />
 	public async Task<bool> DeleteAsync(string issueId, CancellationToken cancellationToken = default)
 	{
-		var result = await _collection.DeleteOneAsync(
-			x => x.Id == issueId,
-			cancellationToken);
+		if (!ObjectId.TryParse(issueId, out var id))
+			return false;
 
+		var result = await _collection.DeleteOneAsync(x => x.Id == id, cancellationToken);
 		return result.DeletedCount > 0;
 	}
 
 	/// <inheritdoc />
-	public async Task<IReadOnlyList<Issue>> GetAllAsync(CancellationToken cancellationToken = default)
+	public async Task<IReadOnlyList<IssueDto>> GetAllAsync(CancellationToken cancellationToken = default)
 	{
-		var entities = await _collection
-			.Find(_ => true)
-			.SortByDescending(x => x.CreatedAt)
-			.ToListAsync(cancellationToken);
-
-		return entities.Select(e => e.ToDomain()).ToList();
+		var entities = await _collection.Find(_ => true).ToListAsync(cancellationToken);
+		return entities.Select(x => x.ToDto()).ToList().AsReadOnly();
 	}
 
 	/// <inheritdoc />
-	public async Task<(IReadOnlyList<Issue> Items, long Total)> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+	public async Task<(IReadOnlyList<IssueDto> Items, long Total)> GetAllAsync(
+		int page,
+		int pageSize,
+		CancellationToken cancellationToken = default)
 	{
-		var filter = Builders<IssueEntity>.Filter.Eq(x => x.IsArchived, false);
-		
+		var filter = Builders<Issue>.Filter.Eq(x => x.Archived, false);
 		var total = await _collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
-		
 		var entities = await _collection
 			.Find(filter)
-			.SortByDescending(x => x.CreatedAt)
 			.Skip((page - 1) * pageSize)
 			.Limit(pageSize)
 			.ToListAsync(cancellationToken);
 
-		var items = entities.Select(e => e.ToDomain()).ToList();
-		
-		return (items, total);
+		return (entities.Select(x => x.ToDto()).ToList().AsReadOnly(), total);
 	}
 
 	/// <inheritdoc />
 	public async Task<bool> ArchiveAsync(string issueId, CancellationToken cancellationToken = default)
 	{
-		var update = Builders<IssueEntity>.Update
-			.Set(x => x.IsArchived, true)
-			.Set(x => x.UpdatedAt, DateTime.UtcNow);
-		
-		var result = await _collection.UpdateOneAsync(
-			x => x.Id == issueId,
-			update,
-			cancellationToken: cancellationToken);
+		if (!ObjectId.TryParse(issueId, out var id))
+			return false;
 
-		return result.MatchedCount > 0;
+		var update = Builders<Issue>.Update.Set(x => x.Archived, true);
+		var result = await _collection.UpdateOneAsync(x => x.Id == id, update, cancellationToken: cancellationToken);
+		return result.ModifiedCount > 0;
 	}
 
 	/// <inheritdoc />
@@ -114,93 +112,4 @@ public class IssueRepository : IIssueRepository
 	{
 		return await _collection.CountDocumentsAsync(_ => true, cancellationToken: cancellationToken);
 	}
-}
-
-/// <summary>
-/// MongoDB entity representation of an issue.
-/// </summary>
-internal class IssueEntity
-{
-	[BsonId]
-	[BsonRepresentation(BsonType.String)]
-	public string Id { get; set; } = string.Empty;
-
-	[BsonElement("title")]
-	public string Title { get; set; } = string.Empty;
-
-	[BsonElement("description")]
-	public string? Description { get; set; }
-
-	[BsonElement("status")]
-	public string Status { get; set; } = string.Empty;
-
-	[BsonElement("createdAt")]
-	public DateTime CreatedAt { get; set; }
-
-	[BsonElement("updatedAt")]
-	public DateTime UpdatedAt { get; set; }
-	public bool IsArchived { get; set; }
-	public string? ArchivedBy { get; set; }
-	public DateTime? ArchivedAt { get; set; }
-	public List<LabelEntity>? Labels { get; set; }
-
-	public static IssueEntity FromDomain(Issue issue)
-	{
-		return new IssueEntity
-		{
-			Id = issue.Id,
-			Title = issue.Title,
-			Description = issue.Description,
-			Status = issue.Status.ToString(),
-			CreatedAt = issue.CreatedAt,
-			UpdatedAt = issue.UpdatedAt,
-			IsArchived = issue.IsArchived,
-			ArchivedBy = issue.ArchivedBy,
-			ArchivedAt = issue.ArchivedAt,
-			Labels = issue.Labels?.Select(l => new LabelEntity { Name = l.Name, Color = l.Color }).ToList()
-		};
-	}
-
-	public Issue ToDomain()
-	{
-		// Fall back to Open if the stored value is unknown, empty, has unexpected casing, or is not a defined status.
-		IssueStatus status;
-		if (Enum.TryParse<IssueStatus>(Status, ignoreCase: true, out var parsedStatus)
-		    && Enum.IsDefined(typeof(IssueStatus), parsedStatus))
-		{
-			status = parsedStatus;
-		}
-		else
-		{
-			status = IssueStatus.Open;
-		}
-
-		var issue = new Issue(
-			Id: Id,
-			Title: Title,
-			Description: Description,
-			Status: status,
-			CreatedAt: CreatedAt,
-			UpdatedAt: UpdatedAt,
-			Labels: Labels?.Select(l => new Label(l.Name, l.Color)).ToList()
-		)
-		{
-			IsArchived = IsArchived,
-			ArchivedBy = ArchivedBy,
-			ArchivedAt = ArchivedAt
-		};
-		return issue;
-	}
-}
-
-/// <summary>
-/// MongoDB entity representation of a label.
-/// </summary>
-internal class LabelEntity
-{
-	[BsonElement("name")]
-	public string Name { get; set; } = string.Empty;
-
-	[BsonElement("color")]
-	public string Color { get; set; } = string.Empty;
 }

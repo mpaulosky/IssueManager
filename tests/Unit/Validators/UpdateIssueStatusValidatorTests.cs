@@ -1,6 +1,6 @@
 using FluentAssertions;
 
-using Shared.Domain;
+using Shared.DTOs;
 using Shared.Validators;
 
 namespace IssueManager.Tests.Unit.Validators;
@@ -19,7 +19,7 @@ public class UpdateIssueStatusValidatorTests
 		var command = new UpdateIssueStatusCommand
 		{
 			IssueId = "issue-123",
-			Status = IssueStatus.InProgress
+			Status = new StatusDto("InProgress", "Issue is in progress")
 		};
 
 		// Act
@@ -31,16 +31,16 @@ public class UpdateIssueStatusValidatorTests
 	}
 
 	[Theory]
-	[InlineData(IssueStatus.Open)]
-	[InlineData(IssueStatus.InProgress)]
-	[InlineData(IssueStatus.Closed)]
-	public void UpdateIssueStatusValidator_AllValidStatuses_ReturnsNoErrors(IssueStatus status)
+	[InlineData("Open", "Issue is open")]
+	[InlineData("InProgress", "Issue is in progress")]
+	[InlineData("Closed", "Issue is closed")]
+	public void UpdateIssueStatusValidator_AllValidStatuses_ReturnsNoErrors(string statusName, string statusDesc)
 	{
 		// Arrange
 		var command = new UpdateIssueStatusCommand
 		{
 			IssueId = "issue-456",
-			Status = status
+			Status = new StatusDto(statusName, statusDesc)
 		};
 
 		// Act
@@ -57,7 +57,7 @@ public class UpdateIssueStatusValidatorTests
 		var command = new UpdateIssueStatusCommand
 		{
 			IssueId = "",
-			Status = IssueStatus.Closed
+			Status = new StatusDto("Closed", "Issue is closed")
 		};
 
 		// Act
@@ -71,13 +71,13 @@ public class UpdateIssueStatusValidatorTests
 	}
 
 	[Fact]
-	public void UpdateIssueStatusValidator_InvalidEnumValue_ReturnsValidationError()
+	public void UpdateIssueStatusValidator_EmptyStatusName_ReturnsValidationError()
 	{
 		// Arrange
 		var command = new UpdateIssueStatusCommand
 		{
 			IssueId = "issue-789",
-			Status = (IssueStatus)999
+			Status = new StatusDto("", "some description")
 		};
 
 		// Act
@@ -86,7 +86,7 @@ public class UpdateIssueStatusValidatorTests
 		// Assert
 		result.IsValid.Should().BeFalse();
 		result.Errors.Should().HaveCount(1);
-		result.Errors[0].PropertyName.Should().Be("Status");
-		result.Errors[0].ErrorMessage.Should().Contain("valid IssueStatus value");
+		result.Errors[0].PropertyName.Should().Be("Status.StatusName");
+		result.Errors[0].ErrorMessage.Should().Contain("Status name is required");
 	}
 }

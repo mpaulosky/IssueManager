@@ -1,7 +1,17 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     CreateIssueHandler.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Api
+// =======================================================
+
 using FluentValidation;
 using IssueManager.Api.Data;
-
-using Shared.Domain;
+using Shared.DTOs;
+using Shared.Mappers;
+using Shared.Models;
 using Shared.Validators;
 
 namespace IssueManager.Api.Handlers;
@@ -26,27 +36,22 @@ public class CreateIssueHandler
 	/// <summary>
 	/// Handles the creation of a new issue.
 	/// </summary>
-	public async Task<Issue> Handle(CreateIssueCommand command, CancellationToken cancellationToken = default)
+	public async Task<IssueDto> Handle(CreateIssueCommand command, CancellationToken cancellationToken = default)
 	{
-		// Validate the command
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
 		if (!validationResult.IsValid)
-		{
 			throw new ValidationException(validationResult.Errors);
-		}
 
-		// Create labels if provided
-		var labels = command.Labels?
-			.Select(l => new Label(l, "#000000"))
-			.ToList();
+		var model = new Issue
+		{
+			Title = command.Title,
+			Description = command.Description ?? string.Empty,
+			DateCreated = DateTime.UtcNow,
+			IssueStatus = StatusDto.Empty,
+			Author = UserDto.Empty,
+			Category = CategoryDto.Empty
+		};
 
-		// Create the issue
-		var issue = Issue.Create(
-			title: command.Title,
-			description: command.Description,
-			labels: labels);
-
-		// Persist to database
-		return await _repository.CreateAsync(issue, cancellationToken);
+		return await _repository.CreateAsync(model.ToDto(), cancellationToken);
 	}
 }

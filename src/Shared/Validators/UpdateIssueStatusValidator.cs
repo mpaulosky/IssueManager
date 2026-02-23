@@ -1,6 +1,14 @@
-using FluentValidation;
+// ============================================
+// Copyright (c) 2023. All rights reserved.
+// File Name :     UpdateIssueStatusValidator.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Shared
+// =============================================
 
-using Shared.Domain;
+using FluentValidation;
+using Shared.DTOs;
 
 namespace Shared.Validators;
 
@@ -17,7 +25,7 @@ public record UpdateIssueStatusCommand
 	/// <summary>
 	/// Gets or sets the new status for the issue.
 	/// </summary>
-	public IssueStatus Status { get; init; }
+	public StatusDto Status { get; init; } = StatusDto.Empty;
 }
 
 /// <summary>
@@ -34,8 +42,8 @@ public class UpdateIssueStatusValidator : AbstractValidator<UpdateIssueStatusCom
 			.NotEmpty()
 			.WithMessage("Issue ID is required.");
 
-		RuleFor(x => x.Status)
-			.IsInEnum()
-			.WithMessage("Status must be a valid IssueStatus value.");
+		RuleFor(x => x.Status.StatusName)
+			.NotEmpty()
+			.WithMessage("Status name is required.");
 	}
 }

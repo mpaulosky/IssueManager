@@ -1,0 +1,236 @@
+Test run for E:\github\IssueManager\tests\Integration\bin\Release\net10.0\Integration.dll (.NETCoreApp,Version=v10.0)
+Test run for E:\github\IssueManager\tests\Architecture\bin\Release\net10.0\Architecture.dll (.NETCoreApp,Version=v10.0)
+Test run for E:\github\IssueManager\tests\Unit\bin\Release\net10.0\Unit.dll (.NETCoreApp,Version=v10.0)
+Test run for E:\github\IssueManager\tests\Aspire\bin\Release\net10.0\Aspire.dll (.NETCoreApp,Version=v10.0)
+Test run for E:\github\IssueManager\tests\BlazorTests\bin\Release\net10.0\BlazorTests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.1 (x64)
+VSTest version 18.0.1 (x64)
+VSTest version 18.0.1 (x64)
+VSTest version 18.0.1 (x64)
+VSTest version 18.0.1 (x64)
+
+
+
+
+
+Starting test execution, please wait...
+Starting test execution, please wait...
+Starting test execution, please wait...
+Starting test execution, please wait...
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+A total of 1 test files matched the specified pattern.A total of 1 test files matched the specified pattern.
+
+A total of 1 test files matched the specified pattern.
+A total of 1 test files matched the specified pattern.
+No test is available in E:\github\IssueManager\tests\Aspire\bin\Release\net10.0\Aspire.dll. Make sure that test discoverer & executors are registered and platform & framework version settings are appropriate and try again.
+
+
+Passed!  - Failed:     0, Passed:    10, Skipped:     0, Total:    10, Duration: 1 s - Architecture.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:    13, Skipped:     0, Total:    13, Duration: 1 s - BlazorTests.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:    60, Skipped:     0, Total:    60, Duration: 1 s - Unit.dll (net10.0)
+[xUnit.net 00:00:37.57]     IssueManager.Integration.Handlers.UpdateIssueStatusHandlerTests.Handle_StatusTransition_OpenToInProgressToClosed_UpdatesCorrectly [FAIL]
+  Failed IssueManager.Integration.Handlers.UpdateIssueStatusHandlerTests.Handle_StatusTransition_OpenToInProgressToClosed_UpdatesCorrectly [332 ms]
+  Error Message:
+   Expected inProgressResult!.Status to be Shared.DTOs.StatusDto
+{
+    Archived = False, 
+    ArchivedBy = Shared.DTOs.UserDto
+    {
+        Email = "", 
+        Id = "", 
+        Name = ""
+    }, 
+    DateCreated = <2026-02-23 01:36:20.5937765>, 
+    DateUpdated = <null>, 
+    Id = 000000000000000000000000, 
+    StatusDescription = "", 
+    StatusName = ""
+}, but found Shared.DTOs.StatusDto
+{
+    Archived = False, 
+    ArchivedBy = Shared.DTOs.UserDto
+    {
+        Email = "", 
+        Id = "", 
+        Name = ""
+    }, 
+    DateCreated = <2026-02-23 01:36:20.479>, 
+    DateUpdated = <null>, 
+    Id = 000000000000000000000000, 
+    StatusDescription = "", 
+    StatusName = ""
+}.
+  Stack Trace:
+     at FluentAssertions.Execution.XUnit2TestFramework.Throw(String message)
+   at FluentAssertions.Execution.TestFrameworkProvider.Throw(String message)
+   at FluentAssertions.Execution.DefaultAssertionStrategy.HandleFailure(String message)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(String message, Object[] args)
+   at FluentAssertions.Primitives.ObjectAssertions`2.Be(TSubject expected, String because, Object[] becauseArgs)
+   at IssueManager.Integration.Handlers.UpdateIssueStatusHandlerTests.Handle_StatusTransition_OpenToInProgressToClosed_UpdatesCorrectly() in E:\github\IssueManager\tests\Integration\Handlers\UpdateIssueStatusHandlerTests.cs:line 129
+--- End of stack trace from previous location ---
+[xUnit.net 00:00:46.94]     IssueManager.Integration.Handlers.CreateIssueHandlerTests.Handle_CreatedIssue_HasCorrectTimestamps [FAIL]
+  Failed IssueManager.Integration.Handlers.CreateIssueHandlerTests.Handle_CreatedIssue_HasCorrectTimestamps [134 ms]
+  Error Message:
+   Expected result.DateUpdated to be after <2026-02-23 01:36:28.8681608>, but found <null>.
+  Stack Trace:
+     at FluentAssertions.Execution.XUnit2TestFramework.Throw(String message)
+   at FluentAssertions.Execution.TestFrameworkProvider.Throw(String message)
+   at FluentAssertions.Execution.DefaultAssertionStrategy.HandleFailure(String message)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(String message, Object[] args)
+   at FluentAssertions.Primitives.DateTimeAssertions`1.BeAfter(DateTime expected, String because, Object[] becauseArgs)
+   at IssueManager.Integration.Handlers.CreateIssueHandlerTests.Handle_CreatedIssue_HasCorrectTimestamps() in E:\github\IssueManager\tests\Integration\Handlers\CreateIssueHandlerTests.cs:line 199
+--- End of stack trace from previous location ---
+[xUnit.net 00:00:48.36]     IssueManager.Integration.Handlers.UpdateIssueStatusHandlerTests.Handle_ValidCommand_UpdatesIssueStatus [FAIL]
+  Failed IssueManager.Integration.Handlers.UpdateIssueStatusHandlerTests.Handle_ValidCommand_UpdatesIssueStatus [126 ms]
+  Error Message:
+   Expected updateResult!.Status to be Shared.DTOs.StatusDto
+{
+    Archived = False, 
+    ArchivedBy = Shared.DTOs.UserDto
+    {
+        Email = "", 
+        Id = "", 
+        Name = ""
+    }, 
+    DateCreated = <2026-02-23 01:36:31.7395173>, 
+    DateUpdated = <null>, 
+    Id = 000000000000000000000000, 
+    StatusDescription = "", 
+    StatusName = ""
+}, but found Shared.DTOs.StatusDto
+{
+    Archived = False, 
+    ArchivedBy = Shared.DTOs.UserDto
+    {
+        Email = "", 
+        Id = "", 
+        Name = ""
+    }, 
+    DateCreated = <2026-02-23 01:36:31.619>, 
+    DateUpdated = <null>, 
+    Id = 000000000000000000000000, 
+    StatusDescription = "", 
+    StatusName = ""
+}.
+  Stack Trace:
+     at FluentAssertions.Execution.XUnit2TestFramework.Throw(String message)
+   at FluentAssertions.Execution.TestFrameworkProvider.Throw(String message)
+   at FluentAssertions.Execution.DefaultAssertionStrategy.HandleFailure(String message)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(String message, Object[] args)
+   at FluentAssertions.Primitives.ObjectAssertions`2.Be(TSubject expected, String because, Object[] becauseArgs)
+   at IssueManager.Integration.Handlers.UpdateIssueStatusHandlerTests.Handle_ValidCommand_UpdatesIssueStatus() in E:\github\IssueManager\tests\Integration\Handlers\UpdateIssueStatusHandlerTests.cs:line 69
+--- End of stack trace from previous location ---
+[xUnit.net 00:00:48.94]     IssueManager.Integration.Handlers.DeleteIssueHandlerIntegrationTests.Handle_NonExistentIssue_ThrowsNotFoundException [FAIL]
+  Failed IssueManager.Integration.Handlers.DeleteIssueHandlerIntegrationTests.Handle_NonExistentIssue_ThrowsNotFoundException [17 ms]
+  Error Message:
+   Expected a <Shared.Exceptions.NotFoundException> to be thrown, but found <System.ArgumentException>:
+System.ArgumentException: Invalid issue ID format. (Parameter 'Id')
+   at Api.Handlers.DeleteIssueHandler.Handle(DeleteIssueCommand command, CancellationToken cancellationToken) in E:\github\IssueManager\src\Api\Handlers\DeleteIssueHandler.cs:line 42
+   at IssueManager.Integration.Handlers.DeleteIssueHandlerIntegrationTests.<>c__DisplayClass10_0.<<Handle_NonExistentIssue_ThrowsNotFoundException>b__0>d.MoveNext() in E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs:line 102
+--- End of stack trace from previous location ---
+   at FluentAssertions.Specialized.AsyncFunctionAssertions`2.InvokeWithInterceptionAsync(Func`1 action).
+  Stack Trace:
+     at FluentAssertions.Execution.XUnit2TestFramework.Throw(String message)
+   at FluentAssertions.Execution.TestFrameworkProvider.Throw(String message)
+   at FluentAssertions.Execution.DefaultAssertionStrategy.HandleFailure(String message)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(String message, Object[] args)
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.ThrowInternal[TException](Exception exception, String because, Object[] becauseArgs)
+   at FluentAssertions.Specialized.AsyncFunctionAssertions`2.ThrowAsync[TException](String because, Object[] becauseArgs)
+   at IssueManager.Integration.Handlers.DeleteIssueHandlerIntegrationTests.Handle_NonExistentIssue_ThrowsNotFoundException() in E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs:line 105
+--- End of stack trace from previous location ---
+[xUnit.net 00:00:55.19]     IssueManager.Integration.Handlers.CreateIssueHandlerTests.Handle_ValidCommand_StoresIssueInDatabase [FAIL]
+  Failed IssueManager.Integration.Handlers.CreateIssueHandlerTests.Handle_ValidCommand_StoresIssueInDatabase [108 ms]
+  Error Message:
+   Expected result.Status to be Shared.DTOs.StatusDto
+{
+    Archived = False, 
+    ArchivedBy = Shared.DTOs.UserDto
+    {
+        Email = "", 
+        Id = "", 
+        Name = ""
+    }, 
+    DateCreated = <2026-02-23 01:36:38.5320384>, 
+    DateUpdated = <null>, 
+    Id = 000000000000000000000000, 
+    StatusDescription = "", 
+    StatusName = ""
+}, but found Shared.DTOs.StatusDto
+{
+    Archived = False, 
+    ArchivedBy = Shared.DTOs.UserDto
+    {
+        Email = "", 
+        Id = "", 
+        Name = ""
+    }, 
+    DateCreated = <2026-02-23 01:36:38.4350157>, 
+    DateUpdated = <null>, 
+    Id = 000000000000000000000000, 
+    StatusDescription = "", 
+    StatusName = ""
+}.
+  Stack Trace:
+     at FluentAssertions.Execution.XUnit2TestFramework.Throw(String message)
+   at FluentAssertions.Execution.TestFrameworkProvider.Throw(String message)
+   at FluentAssertions.Execution.DefaultAssertionStrategy.HandleFailure(String message)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(String message, Object[] args)
+   at FluentAssertions.Primitives.ObjectAssertions`2.Be(TSubject expected, String because, Object[] becauseArgs)
+   at IssueManager.Integration.Handlers.CreateIssueHandlerTests.Handle_ValidCommand_StoresIssueInDatabase() in E:\github\IssueManager\tests\Integration\Handlers\CreateIssueHandlerTests.cs:line 65
+--- End of stack trace from previous location ---
+[xUnit.net 00:01:04.33]     IssueManager.Integration.Handlers.DeleteIssueHandlerIntegrationTests.Handle_ValidIssue_SetsIsArchivedInDatabase [FAIL]
+  Failed IssueManager.Integration.Handlers.DeleteIssueHandlerIntegrationTests.Handle_ValidIssue_SetsIsArchivedInDatabase [83 ms]
+  Error Message:
+   Expected dbResult.Value.DateUpdated to be within 2s from <2026-02-23 01:36:47.7911723>, but found <null>.
+  Stack Trace:
+     at FluentAssertions.Execution.XUnit2TestFramework.Throw(String message)
+   at FluentAssertions.Execution.TestFrameworkProvider.Throw(String message)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(String message)
+   at FluentAssertions.Primitives.DateTimeAssertions`1.BeCloseTo(DateTime nearbyTime, TimeSpan precision, String because, Object[] becauseArgs)
+   at IssueManager.Integration.Handlers.DeleteIssueHandlerIntegrationTests.Handle_ValidIssue_SetsIsArchivedInDatabase() in E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs:line 69
+--- End of stack trace from previous location ---
+[xUnit.net 00:01:10.12]     IssueManager.Integration.Data.IssueRepositoryTests.UpdateAsync_NonExistentIssue_ReturnsNull [FAIL]
+  Failed IssueManager.Integration.Data.IssueRepositoryTests.UpdateAsync_NonExistentIssue_ReturnsNull [21 ms]
+  Error Message:
+   Expected result to be <null>, but found Shared.Abstractions.Result`1[[Shared.DTOs.IssueDto, Shared, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]
+{
+    Details = <null>, 
+    Error = "Issue not found", 
+    ErrorCode = ResultErrorCode.NotFound {value: 2}, 
+    Failure = True, 
+    Success = False, 
+    Value = <null>
+}.
+  Stack Trace:
+     at FluentAssertions.Execution.XUnit2TestFramework.Throw(String message)
+   at FluentAssertions.Execution.TestFrameworkProvider.Throw(String message)
+   at FluentAssertions.Execution.AssertionScope.FailWith(String message, Object[] args)
+   at FluentAssertions.Primitives.ReferenceTypeAssertions`2.BeNull(String because, Object[] becauseArgs)
+   at IssueManager.Integration.Data.IssueRepositoryTests.UpdateAsync_NonExistentIssue_ReturnsNull() in E:\github\IssueManager\tests\Integration\Data\IssueRepositoryTests.cs:line 285
+--- End of stack trace from previous location ---
+[xUnit.net 00:01:25.55]     IssueManager.Integration.Data.IssueRepositoryTests.ArchiveAsync_UpdatesTimestamp [FAIL]
+  Failed IssueManager.Integration.Data.IssueRepositoryTests.ArchiveAsync_UpdatesTimestamp [60 ms]
+  Error Message:
+   Expected dbIssue!.DateUpdated to be within 2s from <2026-02-23 01:37:09.2384412>, but <2026-02-22 23:37:09.183> was off by 2h, 55ms and 441.2┬╡s.
+  Stack Trace:
+     at FluentAssertions.Execution.XUnit2TestFramework.Throw(String message)
+   at FluentAssertions.Execution.TestFrameworkProvider.Throw(String message)
+   at FluentAssertions.Execution.AssertionScope.FailWith(String message, Object[] args)
+   at FluentAssertions.Primitives.DateTimeAssertions`1.BeCloseTo(DateTime nearbyTime, TimeSpan precision, String because, Object[] becauseArgs)
+   at IssueManager.Integration.Data.IssueRepositoryTests.ArchiveAsync_UpdatesTimestamp() in E:\github\IssueManager\tests\Integration\Data\IssueRepositoryTests.cs:line 243
+--- End of stack trace from previous location ---
+MSBUILD : error MSB4166: Child node "9" exited prematurely. Shutting down. Diagnostic information may be found in files in "C:\Users\teqsl\AppData\Local\Temp\MSBuildTemp\" and will be named MSBuild_*.failure.txt. This location can be changed by setting the MSBUILDDEBUGPATH environment variable to a different directory.

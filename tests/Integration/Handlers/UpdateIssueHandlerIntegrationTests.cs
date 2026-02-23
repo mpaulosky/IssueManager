@@ -1,8 +1,9 @@
 using FluentAssertions;
 using IssueManager.Api.Data;
 using IssueManager.Api.Handlers;
-using global::Shared.Domain;
-using global::Shared.Exceptions;
+using MongoDB.Bson;
+using Shared.DTOs;
+using Shared.Exceptions;
 using IssueManager.Shared.Validators;
 using Testcontainers.MongoDb;
 
@@ -47,23 +48,19 @@ await _mongoContainer.StopAsync();
 await _mongoContainer.DisposeAsync();
 }
 
+private static IssueDto CreateTestIssueDto(string title, string description, bool archived = false) =>
+new(ObjectId.GenerateNewId(), title, description, DateTime.UtcNow, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty, archived);
+
 [Fact]
 public async Task Handle_ValidUpdate_UpdatesIssueInDatabase()
 {
 // Arrange - Create an issue first
-var originalIssue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Original Title",
-Description: "Original Description",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow,
-UpdatedAt: DateTime.UtcNow);
-
-await _repository.CreateAsync(originalIssue);
+var originalIssue = CreateTestIssueDto("Original Title", "Original Description");
+var created = await _repository.CreateAsync(originalIssue);
 
 var command = new UpdateIssueCommand
 {
-Id = originalIssue.Id,
+Id = created.Id.ToString(),
 Title = "Updated Title",
 Description = "Updated Description"
 };
@@ -73,68 +70,27 @@ var result = await _handler.Handle(command, CancellationToken.None);
 
 // Assert
 result.Should().NotBeNull();
-result.Id.Should().Be(originalIssue.Id);
+result.Id.Should().Be(created.Id);
 result.Title.Should().Be("Updated Title");
 result.Description.Should().Be("Updated Description");
-result.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
 
 // Verify in database
-var dbIssue = await _repository.GetByIdAsync(originalIssue.Id);
+var dbIssue = await _repository.GetByIdAsync(created.Id.ToString());
 dbIssue.Should().NotBeNull();
 dbIssue!.Title.Should().Be("Updated Title");
 dbIssue.Description.Should().Be("Updated Description");
 }
 
 [Fact]
-public async Task Handle_UpdateTimestamp_SetsToCurrentTime()
-{
-// Arrange
-var originalIssue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Original Title",
-Description: "Original Description",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow.AddDays(-1),
-UpdatedAt: DateTime.UtcNow.AddHours(-5));
-
-await _repository.CreateAsync(originalIssue);
-
-var command = new UpdateIssueCommand
-{
-Id = originalIssue.Id,
-Title = "New Title",
-Description = "New Description"
-};
-
-// Act
-var result = await _handler.Handle(command, CancellationToken.None);
-
-// Assert
-result.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
-result.UpdatedAt.Should().BeAfter(originalIssue.UpdatedAt);
-
-// Verify in database
-var dbIssue = await _repository.GetByIdAsync(originalIssue.Id);
-dbIssue!.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
-}
-
-[Fact]
 public async Task Handle_AtomicUpdate_TitleAndDescriptionBothUpdate()
 {
 // Arrange
-var originalIssue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Original Title",
-Description: "Original Description",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow,
-UpdatedAt: DateTime.UtcNow);
-
-await _repository.CreateAsync(originalIssue);
+var originalIssue = CreateTestIssueDto("Original Title", "Original Description");
+var created = await _repository.CreateAsync(originalIssue);
 
 var command = new UpdateIssueCommand
 {
-Id = originalIssue.Id,
+Id = created.Id.ToString(),
 Title = "New Title",
 Description = "New Description"
 };
@@ -143,7 +99,7 @@ Description = "New Description"
 var result = await _handler.Handle(command, CancellationToken.None);
 
 // Assert - Both fields should be updated atomically
-var dbIssue = await _repository.GetByIdAsync(originalIssue.Id);
+var dbIssue = await _repository.GetByIdAsync(created.Id.ToString());
 dbIssue.Should().NotBeNull();
 dbIssue!.Title.Should().Be("New Title");
 dbIssue.Description.Should().Be("New Description");
@@ -153,7 +109,7 @@ dbIssue.Description.Should().Be("New Description");
 public async Task Handle_NonExistentIssue_ThrowsNotFoundException()
 {
 // Arrange
-var nonExistentId = Guid.NewGuid().ToString();
+var nonExistentId = ObjectId.GenerateNewId().ToString();
 var command = new UpdateIssueCommand
 {
 Id = nonExistentId,
@@ -172,63 +128,45 @@ await act.Should().ThrowAsync<NotFoundException>();
 public async Task Handle_ConcurrentUpdates_LastWriteWins()
 {
 // Arrange - Create an issue
-var issue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Original Title",
-Description: "Original Description",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow,
-UpdatedAt: DateTime.UtcNow);
-
-await _repository.CreateAsync(issue);
+var issue = CreateTestIssueDto("Original Title", "Original Description");
+var created = await _repository.CreateAsync(issue);
 
 var command1 = new UpdateIssueCommand
 {
-Id = issue.Id,
+Id = created.Id.ToString(),
 Title = "First Update",
 Description = "First Description"
 };
 
 var command2 = new UpdateIssueCommand
 {
-Id = issue.Id,
+Id = created.Id.ToString(),
 Title = "Second Update",
 Description = "Second Description"
 };
 
-// Act - Simulate concurrent updates
-var result1 = await _handler.Handle(command1, CancellationToken.None);
-await Task.Delay(100); // Small delay to ensure different timestamp
-var result2 = await _handler.Handle(command2, CancellationToken.None);
+// Act - Simulate sequential updates
+await _handler.Handle(command1, CancellationToken.None);
+await Task.Delay(100); // Small delay to ensure different ordering
+await _handler.Handle(command2, CancellationToken.None);
 
 // Assert - Last write wins
-var dbIssue = await _repository.GetByIdAsync(issue.Id);
+var dbIssue = await _repository.GetByIdAsync(created.Id.ToString());
 dbIssue.Should().NotBeNull();
 dbIssue!.Title.Should().Be("Second Update");
 dbIssue.Description.Should().Be("Second Description");
-dbIssue.UpdatedAt.Should().BeAfter(result1.UpdatedAt);
 }
 
 [Fact]
 public async Task Handle_ArchivedIssue_ThrowsConflictException()
 {
 // Arrange - Create and archive an issue
-var archivedIssue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Archived Issue",
-Description: "This is archived",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow,
-UpdatedAt: DateTime.UtcNow)
-{
-IsArchived = true
-};
-
-await _repository.CreateAsync(archivedIssue);
+var archivedIssue = CreateTestIssueDto("Archived Issue", "This is archived", archived: true);
+var created = await _repository.CreateAsync(archivedIssue);
 
 var command = new UpdateIssueCommand
 {
-Id = archivedIssue.Id,
+Id = created.Id.ToString(),
 Title = "Attempt Update",
 Description = "Should fail"
 };
@@ -240,7 +178,7 @@ Func<Task> act = async () => await _handler.Handle(command, CancellationToken.No
 await act.Should().ThrowAsync<ConflictException>();
 
 // Verify issue wasn't updated
-var dbIssue = await _repository.GetByIdAsync(archivedIssue.Id);
+var dbIssue = await _repository.GetByIdAsync(created.Id.ToString());
 dbIssue!.Title.Should().Be("Archived Issue");
 }
 }

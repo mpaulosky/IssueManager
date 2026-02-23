@@ -1,4 +1,3 @@
-@using global::Shared.Domain
 @namespace IssueManager.Web.Components
 
 <div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm p-6">
@@ -41,9 +40,9 @@
 					Status
 				</label>
 				<InputSelect id="status" @bind-Value="FormModel.Status" class="form-input">
-					<option value="@IssueStatus.Open">Open</option>
-					<option value="@IssueStatus.InProgress">In Progress</option>
-					<option value="@IssueStatus.Closed">Closed</option>
+					<option value="Open">Open</option>
+					<option value="InProgress">In Progress</option>
+					<option value="Closed">Closed</option>
 				</InputSelect>
 				<ValidationMessage For="@(() => FormModel.Status)" class="validation-message" />
 			</div>

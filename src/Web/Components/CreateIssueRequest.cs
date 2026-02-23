@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 
-using Shared.Domain;
-
 namespace IssueManager.Web.Components;
 
 /// <summary>
@@ -25,5 +23,5 @@ public record CreateIssueRequest
 	/// <summary>
 	/// Gets or sets the status of the issue.
 	/// </summary>
-	public IssueStatus Status { get; set; } = IssueStatus.Open;
+	public string Status { get; set; } = "Open";
 }

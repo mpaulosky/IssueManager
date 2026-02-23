@@ -5,8 +5,6 @@ using IssueManager.Tests.BlazorTests.Fixtures;
 using IssueManager.Web.Components;
 using Microsoft.AspNetCore.Components;
 
-using Shared.Domain;
-
 using Xunit;
 
 namespace IssueManager.Tests.BlazorTests.Components;
@@ -114,7 +112,7 @@ public class IssueFormTests : ComponentTestBase
 		submittedRequest.Should().NotBeNull();
 		submittedRequest!.Title.Should().Be("Test Issue Title");
 		submittedRequest.Description.Should().Be("Test description");
-		submittedRequest.Status.Should().Be(IssueStatus.Open);
+		submittedRequest.Status.Should().Be("Open");
 	}
 
 	[Fact]
@@ -144,7 +142,7 @@ public class IssueFormTests : ComponentTestBase
 		{
 			Title = "Initial Title",
 			Description = "Initial Description",
-			Status = IssueStatus.InProgress
+			Status = "InProgress"
 		};
 
 		// Act
@@ -157,7 +155,7 @@ public class IssueFormTests : ComponentTestBase
 		titleInput.GetAttribute("value").Should().Be("Initial Title");
 
 		var statusSelect = component.Find("#status");
-		statusSelect.GetAttribute("value").Should().Be(IssueStatus.InProgress.ToString());
+		statusSelect.GetAttribute("value").Should().Be("InProgress");
 		
 		// Description is bound, verify the textarea element exists
 		component.Find("#description").Should().NotBeNull();
@@ -171,7 +169,7 @@ public class IssueFormTests : ComponentTestBase
 		{
 			Title = "Initial Title",
 			Description = "Initial Description",
-			Status = IssueStatus.Open
+			Status = "Open"
 		};
 
 		var component = TestContext.RenderComponent<IssueForm>(
@@ -183,7 +181,7 @@ public class IssueFormTests : ComponentTestBase
 		{
 			Title = "Updated Title",
 			Description = "Updated Description",
-			Status = IssueStatus.Closed
+			Status = "Closed"
 		};
 
 		component.SetParametersAndRender(
@@ -195,7 +193,7 @@ public class IssueFormTests : ComponentTestBase
 		titleInput.GetAttribute("value").Should().Be("Updated Title");
 
 		var statusSelect = component.Find("#status");
-		statusSelect.GetAttribute("value").Should().Be(IssueStatus.Closed.ToString());
+		statusSelect.GetAttribute("value").Should().Be("Closed");
 	}
 
 	[Fact]
@@ -240,7 +238,7 @@ public class IssueFormTests : ComponentTestBase
 
 		// Assert
 		var statusSelect = component.Find("#status");
-		statusSelect.GetAttribute("value").Should().Be(IssueStatus.Open.ToString());
+		statusSelect.GetAttribute("value").Should().Be("Open");
 	}
 
 	[Fact]
