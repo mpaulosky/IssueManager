@@ -146,6 +146,21 @@ see [CONTRIBUTING.md](../docs/CONTRIBUTING.md).
 - **Require API Versioning:** `true`
 - **Use Semantic Versioning:** `true`
 
+---
+
+## Project Conventions (Required)
+
+### File Placement
+
+- **Generated output files** (build logs, test output, restore logs): Never commit these to the repository; they are
+  covered by `.gitignore` (`*.log`, `*.txt` at root).
+- **Working documents** (plans, summaries, instructions, analysis): Place in the `docs/` folder, not the repository
+  root. Examples: `docs/QUICK_ACTION_PLAN.md`, `docs/WORKFLOW_FIXES_SUMMARY.md`.
+- **Standard root files** that must remain at root: `README.md`, `SECURITY.md`, `LICENSE`, `CONTRIBUTING.md` (symlink
+  or reference only — full content lives in `docs/`).
+- **Any new `.md`, `.txt`, or `.log` file** created during development must be placed in `docs/` (or a sub-folder
+  such as `docs/guides/`, `docs/reviews/`) rather than the repository root.
+
 ### Caching (Required)
 
 - **Require Caching Strategy:** `true`
