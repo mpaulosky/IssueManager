@@ -1,10 +1,11 @@
 using FluentValidation;
+
 using IssueManager.Api.Data;
 
 using Shared.Domain;
 using Shared.Validators;
 
-namespace IssueManager.Api.Handlers;
+namespace IssueManager.Api.Handlers.Issues;
 
 /// <summary>
 /// Handler for updating issue status.
@@ -42,10 +43,11 @@ public class UpdateIssueStatusHandler
 			return null;
 		}
 
-		// Update the status
+		// Update the status using domain method
 		var updatedIssue = existingIssue.UpdateStatus(command.Status);
 
 		// Persist changes
 		return await _repository.UpdateAsync(updatedIssue, cancellationToken);
 	}
 }
+

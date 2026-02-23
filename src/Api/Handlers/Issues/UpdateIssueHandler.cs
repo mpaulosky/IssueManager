@@ -1,10 +1,11 @@
 using FluentValidation;
-using IssueManager.Api.Data;
-using global::Shared.Domain;
-using IssueManager.Shared.Validators;
-using global::Shared.Exceptions;
 
-namespace IssueManager.Api.Handlers;
+using IssueManager.Api.Data;
+using IssueManager.Shared.Validators;
+
+using Shared.Domain;
+
+namespace IssueManager.Api.Handlers.Issues;
 
 /// <summary>
 /// Handler for updating existing issues.
@@ -26,7 +27,7 @@ public class UpdateIssueHandler
 	/// <summary>
 	/// Handles the update of an existing issue.
 	/// </summary>
-	public async Task<Issue> Handle(UpdateIssueCommand command, CancellationToken cancellationToken = default)
+	public async Task<Issue?> Handle(UpdateIssueCommand command, CancellationToken cancellationToken = default)
 	{
 		// Validate the command
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
@@ -39,24 +40,18 @@ public class UpdateIssueHandler
 		var existingIssue = await _repository.GetByIdAsync(command.Id, cancellationToken);
 		if (existingIssue is null)
 		{
-			throw new NotFoundException($"Issue with ID '{command.Id}' was not found.");
+			throw new KeyNotFoundException($"Issue with ID '{command.Id}' was not found.");
 		}
 
 		// Cannot update an archived issue
 		if (existingIssue.IsArchived)
 		{
-			throw new ConflictException($"Issue with ID '{command.Id}' is archived and cannot be updated.");
+			throw new InvalidOperationException($"Issue with ID '{command.Id}' is archived and cannot be updated.");
 		}
 
-		// Update the issue using the domain method
-		var updatedIssue = existingIssue.Update(command.Title, command.Description);
-
-		// Persist the updated issue
-		var result = await _repository.UpdateAsync(updatedIssue, cancellationToken);
-		if (result is null)
-		{
-			throw new NotFoundException($"Issue with ID '{command.Id}' could not be updated.");
-		}
-		return result;
+		// Update the issue with new values using domain method
+		var updatedIssue = existingIssue.Update(command.Title, command.Description ?? existingIssue.Description);
+		return await _repository.UpdateAsync(updatedIssue, cancellationToken);
 	}
 }
+

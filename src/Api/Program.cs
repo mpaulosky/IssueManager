@@ -1,9 +1,11 @@
 using IssueManager.ServiceDefaults;
 using IssueManager.Api.Data;
-using IssueManager.Api.Handlers;
-using IssueManager.Shared.Validators;
+using IssueManager.Api.Handlers.Issues;
 using IssueManager.Shared.Domain.DTOs;
-using static IssueManager.Api.Handlers.GetIssueHandler;
+using IssueManager.Shared.Validators;
+
+using Shared.Domain;
+using Shared.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 

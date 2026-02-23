@@ -2,7 +2,7 @@ using IssueManager.Api.Data;
 
 using Shared.Domain;
 
-namespace IssueManager.Api.Handlers;
+namespace IssueManager.Api.Handlers.Issues;
 
 /// <summary>
 /// Query for retrieving a single issue.
@@ -45,3 +45,4 @@ public class GetIssueHandler
 		return await _repository.GetAllAsync(cancellationToken);
 	}
 }
+
