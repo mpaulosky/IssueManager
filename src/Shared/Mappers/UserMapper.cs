@@ -18,7 +18,7 @@ public static class UserMapper
 	///   Converts a <see cref="Shared.Models.User"/> to a <see cref="UserDto"/>.
 	/// </summary>
 	public static UserDto ToDto(this Shared.Models.User user) =>
-		new(user.Id, user.Name, user.Email, user.DateCreated, user.DateModified);
+		new(user.Id, user.Name, user.Email);
 
 	/// <summary>
 	///   Converts a <see cref="UserDto"/> to a <see cref="Shared.Models.User"/>.
@@ -27,8 +27,6 @@ public static class UserMapper
 		new()
 		{
 			Name = dto.Name,
-			Email = dto.Email,
-			DateCreated = dto.DateCreated,
-			DateModified = dto.DateModified
+			Email = dto.Email
 		};
 }
