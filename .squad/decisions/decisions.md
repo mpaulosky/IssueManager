@@ -146,3 +146,48 @@ Potential future hot files if more branches open:
 5. Maximum branch lifetime: 3 working days.
 
 *— Gandalf, Lead/Architect, 2026-02-23*
+
+---
+
+## Sprint Cadence & Milestone Strategy — IssueManager
+
+**Architect:** Gandalf  
+**Decision Date:** 2026-02-23  
+**Status:** Approved
+
+### Decision
+
+Adopt **GitHub Milestones** for sprint management with **1-week sprint cadence**. Milestones provide time-boxing and sprint structure; squad labels provide ownership tracking. Both are used together.
+
+### Rationale
+
+- Small team (AI agents + 1 human) requires quick iteration cycles
+- 1-week sprints enable fast feedback and context shifts
+- GitHub Milestones are native, simple, and require no setup overhead
+- Compatible with existing squad label system (`squad:member`)
+- Provides visible sprint progress & burndown tracking
+
+### Sprint 1 Details
+
+- **Milestone:** Sprint 1 (milestone #1, due 2026-03-02)
+- **Issues Assigned:**
+  - #39: [Refactor] Test folder and project names need update
+  - #33: [Feature] Add repository and CRUD handlers for Status, Category, and Comment models
+- **Focus:** Foundation cleanup (test structure) + core CRUD handlers
+- **Owner:** Aragorn (Backend)
+
+### Milestone + Label Integration
+
+| Aspect | Squad Labels | Milestones |
+|--------|-------------|-----------|
+| **Purpose** | Ownership & assignment | Time-boxing & sprint planning |
+| **Example** | `squad:aragorn` | `Sprint 1` (due 2026-03-02) |
+| **Use Case** | "Who owns this?" | "What's in this sprint?" |
+
+### Next Steps
+
+1. Create Sprint 2 milestone (due 2026-03-09) after Sprint 1 closes
+2. Triage backlog issues for Sprint 2
+3. Update Ralph work-check to filter by `milestone:"current"` for sprint-aware prioritization
+
+*— Gandalf, Lead/Architect, 2026-02-23*
