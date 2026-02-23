@@ -1,0 +1,61 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     UpdateCommentHandler.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Api
+// =======================================================
+
+using FluentValidation;
+using Api.Data;
+using Shared.DTOs;
+using Shared.Exceptions;
+using Shared.Mappers;
+using Shared.Validators;
+
+namespace Api.Handlers;
+
+/// <summary>
+/// Handler for updating existing comments.
+/// </summary>
+public class UpdateCommentHandler
+{
+	private readonly ICommentRepository _repository;
+	private readonly UpdateCommentValidator _validator;
+
+	/// <summary>
+	/// Initializes a new instance of the <see cref="UpdateCommentHandler"/> class.
+	/// </summary>
+	public UpdateCommentHandler(ICommentRepository repository, UpdateCommentValidator validator)
+	{
+		_repository = repository;
+		_validator = validator;
+	}
+
+	/// <summary>
+	/// Handles the update of an existing comment.
+	/// </summary>
+	public async Task<CommentDto> Handle(UpdateCommentCommand command, CancellationToken cancellationToken = default)
+	{
+		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+		if (!validationResult.IsValid)
+			throw new ValidationException(validationResult.Errors);
+
+		if (!MongoDB.Bson.ObjectId.TryParse(command.Id, out var objectId))
+			throw new NotFoundException($"Comment with ID '{command.Id}' was not found.");
+
+		var getResult = await _repository.GetAsync(objectId);
+		if (getResult.Failure || getResult.Value is null)
+			throw new NotFoundException($"Comment with ID '{command.Id}' was not found.");
+
+		var comment = getResult.Value;
+		comment.Title = command.Title;
+
+		var updateResult = await _repository.UpdateAsync(objectId, comment);
+		if (updateResult.Failure)
+			throw new NotFoundException($"Comment with ID '{command.Id}' could not be updated.");
+
+		return comment.ToDto();
+	}
+}
