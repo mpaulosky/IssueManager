@@ -30,6 +30,3 @@ changelog:
     - title: "🔬 Research & Spikes"
       labels:
         - type:spike
-    - title: "🚀 Infrastructure & DevOps"
-      labels:
-        - priority:p0

@@ -14,7 +14,7 @@ Aragorn implemented GitHub's native auto-generated release notes:
 
 ## Decision Inbox Processed
 
-Merged `aragorn-release-notes-impl.md` into `.squad/decisions/decisions.md`; deleted inbox file.
+Merged `aragorn-release-notes-impl.md` into `.squad/decisions/decisions.md`; inbox file retained in `.squad/decisions/inbox/`.
 
 ## References
 
