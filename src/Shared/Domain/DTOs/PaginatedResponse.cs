@@ -1,4 +1,4 @@
-namespace IssueManager.Shared.Domain.DTOs;
+namespace Shared.DTOs;
 
 /// <summary>
 /// Represents a paginated response containing a list of items.

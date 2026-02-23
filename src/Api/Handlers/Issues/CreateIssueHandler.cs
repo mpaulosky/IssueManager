@@ -1,10 +1,11 @@
 using FluentValidation;
-using IssueManager.Api.Data;
+
+using Api.Data;
 
 using Shared.Domain;
 using Shared.Validators;
 
-namespace IssueManager.Api.Handlers;
+namespace Api.Handlers;
 
 /// <summary>
 /// Handler for creating new issues.
@@ -35,18 +36,14 @@ public class CreateIssueHandler
 			throw new ValidationException(validationResult.Errors);
 		}
 
-		// Create labels if provided
+		// Create label value objects if provided
 		var labels = command.Labels?
 			.Select(l => new Label(l, "#000000"))
 			.ToList();
 
-		// Create the issue
-		var issue = Issue.Create(
-			title: command.Title,
-			description: command.Description,
-			labels: labels);
-
-		// Persist to database
+		// Build the domain entity and persist
+		var issue = Issue.Create(command.Title, command.Description, labels);
 		return await _repository.CreateAsync(issue, cancellationToken);
 	}
 }
+

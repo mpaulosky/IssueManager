@@ -1,10 +1,12 @@
 using FluentValidation;
-using IssueManager.Api.Data;
-using global::Shared.Domain;
-using IssueManager.Shared.Validators;
-using global::Shared.Exceptions;
 
-namespace IssueManager.Api.Handlers;
+using Api.Data;
+using Shared.Validators;
+
+using Shared.Domain;
+using Shared.Exceptions;
+
+namespace Api.Handlers;
 
 /// <summary>
 /// Handler for updating existing issues.
@@ -26,7 +28,7 @@ public class UpdateIssueHandler
 	/// <summary>
 	/// Handles the update of an existing issue.
 	/// </summary>
-	public async Task<Issue> Handle(UpdateIssueCommand command, CancellationToken cancellationToken = default)
+	public async Task<Issue?> Handle(UpdateIssueCommand command, CancellationToken cancellationToken = default)
 	{
 		// Validate the command
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
@@ -48,15 +50,9 @@ public class UpdateIssueHandler
 			throw new ConflictException($"Issue with ID '{command.Id}' is archived and cannot be updated.");
 		}
 
-		// Update the issue using the domain method
-		var updatedIssue = existingIssue.Update(command.Title, command.Description);
-
-		// Persist the updated issue
-		var result = await _repository.UpdateAsync(updatedIssue, cancellationToken);
-		if (result is null)
-		{
-			throw new NotFoundException($"Issue with ID '{command.Id}' could not be updated.");
-		}
-		return result;
+		// Update the issue with new values using domain method
+		var updatedIssue = existingIssue.Update(command.Title, command.Description ?? existingIssue.Description);
+		return await _repository.UpdateAsync(updatedIssue, cancellationToken);
 	}
 }
+

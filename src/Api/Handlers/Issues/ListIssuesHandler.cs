@@ -1,9 +1,10 @@
 using FluentValidation;
-using IssueManager.Api.Data;
-using IssueManager.Shared.Domain.DTOs;
-using IssueManager.Shared.Validators;
 
-namespace IssueManager.Api.Handlers;
+using Api.Data;
+using Shared.DTOs;
+using Shared.Validators;
+
+namespace Api.Handlers;
 
 /// <summary>
 /// Handler for listing issues with pagination.
@@ -37,7 +38,7 @@ public class ListIssuesHandler
 		// Get paginated issues from repository
 		var (items, total) = await _repository.GetAllAsync(query.Page, query.PageSize, cancellationToken);
 
-		// Convert to DTOs
+		// Convert to response DTOs
 		var issueDtos = items.Select(issue => new IssueResponseDto
 		{
 			Id = issue.Id,
@@ -62,3 +63,4 @@ public class ListIssuesHandler
 		};
 	}
 }
+

@@ -2,20 +2,18 @@
 @inherits LayoutComponentBase
 @implements IAsyncDisposable
 
-<div class="page">
-	<div class="sidebar">
-		<NavMenu />
-	</div>
+<div class="min-h-screen flex flex-col bg-[var(--bg-main)] text-[var(--text-main)] transition-colors duration-300">
+	<NavMenu />
 
-	<main>
-		<div class="top-row px-4">
-			<a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-		</div>
-
-		<article class="content px-4">
-			@Body
-		</article>
+	<main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+		@Body
 	</main>
+
+	<footer class="border-t border-[var(--border-color)] bg-[var(--bg-surface)] py-4">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-[var(--text-muted)]">
+			&copy; @DateTime.Now.Year IssueManager — Built with .NET 10 &amp; Blazor
+		</div>
+	</footer>
 </div>
 
 @code {

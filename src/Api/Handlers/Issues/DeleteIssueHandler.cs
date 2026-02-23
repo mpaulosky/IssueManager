@@ -1,9 +1,11 @@
 using FluentValidation;
-using IssueManager.Api.Data;
-using IssueManager.Shared.Validators;
-using global::Shared.Exceptions;
 
-namespace IssueManager.Api.Handlers;
+using Api.Data;
+using Shared.Validators;
+
+using Shared.Exceptions;
+
+namespace Api.Handlers;
 
 /// <summary>
 /// Handler for deleting (soft-deleting/archiving) issues.
@@ -34,7 +36,7 @@ public class DeleteIssueHandler
 			throw new ValidationException(validationResult.Errors);
 		}
 
-		// Get the existing issue
+		// Get the existing issue to check it exists and its archive state
 		var existingIssue = await _repository.GetByIdAsync(command.Id, cancellationToken);
 		if (existingIssue is null)
 		{
@@ -48,7 +50,7 @@ public class DeleteIssueHandler
 		}
 
 		// Archive the issue via the dedicated archive operation
-		await _repository.ArchiveAsync(command.Id, cancellationToken);
-		return true;
+		return await _repository.ArchiveAsync(command.Id, cancellationToken);
 	}
 }
+

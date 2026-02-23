@@ -1,0 +1,79 @@
+@namespace IssueManager.Web.Layout
+@inject IJSRuntime JS
+
+<div class="relative" @onfocusout="HandleFocusOut">
+	<button
+		@onclick="ToggleDropdown"
+		class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-[var(--text-muted)] hover:bg-[var(--bg-hover)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+		title="Change color theme"
+		aria-label="Change color theme"
+		aria-haspopup="true"
+		aria-expanded="@_open">
+		<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+				d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+		</svg>
+	</button>
+
+	@if (_open)
+	{
+		<div
+			class="absolute right-0 mt-2 w-44 rounded-xl shadow-lg bg-[var(--bg-surface)] border border-[var(--border-color)] py-2 z-50"
+			role="menu"
+			aria-label="Color theme options">
+			@foreach (var theme in _themes)
+			{
+				<button
+					@onclick="() => SelectTheme(theme.Key)"
+					class="w-full flex items-center gap-3 px-4 py-2 text-sm text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors @(_activeTheme == theme.Key ? "font-semibold" : "")"
+					role="menuitem"
+					aria-current="@(_activeTheme == theme.Key ? "true" : "false")">
+					<span class="w-4 h-4 rounded-full border border-white/30 shadow-sm" style="background-color: @theme.Value.Swatch;" aria-hidden="true"></span>
+					@theme.Value.Label
+					@if (_activeTheme == theme.Key)
+					{
+						<svg class="w-4 h-4 ml-auto text-[var(--color-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+						</svg>
+					}
+				</button>
+			}
+		</div>
+	}
+</div>
+
+@code {
+	private bool _open = false;
+	private string _activeTheme = "blue";
+
+	private static readonly Dictionary<string, (string Label, string Swatch)> _themes = new()
+	{
+		["blue"]   = ("Blue",   "#3b82f6"),
+		["green"]  = ("Green",  "#22c55e"),
+		["red"]    = ("Red",    "#ef4444"),
+		["yellow"] = ("Yellow", "#eab308"),
+	};
+
+	/// <summary>
+	/// Loads the persisted theme preference on first render.
+	/// </summary>
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			_activeTheme = await JS.InvokeAsync<string>("themeHelpers.getColorTheme") ?? "blue";
+			StateHasChanged();
+		}
+	}
+
+	private void ToggleDropdown() => _open = !_open;
+
+	private void HandleFocusOut() => _open = false;
+
+	private async Task SelectTheme(string themeKey)
+	{
+		_activeTheme = themeKey;
+		_open = false;
+		await JS.InvokeVoidAsync("themeHelpers.setColorTheme", themeKey);
+	}
+}

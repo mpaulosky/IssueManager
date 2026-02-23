@@ -1,44 +1,78 @@
 @using global::Shared.Domain
 @namespace IssueManager.Web.Components
 
-<div class="form-container">
+<div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm p-6">
 	<EditForm Model="@FormModel" OnValidSubmit="@OnFormSubmit">
 		<DataAnnotationsValidator />
-		<ValidationSummary />
+		<ValidationSummary class="mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 p-3 text-sm text-red-700 dark:text-red-400" />
 
-		<div class="form-group mb-3">
-			<label for="title" class="form-label">Title</label>
-			<InputText id="title" @bind-Value="FormModel.Title" class="form-control" placeholder="Enter issue title" />
-			<ValidationMessage For="@(() => FormModel.Title)" />
+		<div class="space-y-5">
+			<!-- Title -->
+			<div>
+				<label for="title" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">
+					Title <span class="text-red-500" aria-hidden="true">*</span>
+				</label>
+				<InputText
+					id="title"
+					@bind-Value="FormModel.Title"
+					class="form-input"
+					placeholder="Enter issue title"
+					aria-required="true" />
+				<ValidationMessage For="@(() => FormModel.Title)" class="validation-message" />
+			</div>
+
+			<!-- Description -->
+			<div>
+				<label for="description" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">
+					Description
+				</label>
+				<InputTextArea
+					id="description"
+					@bind-Value="FormModel.Description"
+					class="form-input resize-y"
+					rows="5"
+					placeholder="Enter issue description (optional)" />
+				<ValidationMessage For="@(() => FormModel.Description)" class="validation-message" />
+			</div>
+
+			<!-- Status -->
+			<div>
+				<label for="status" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">
+					Status
+				</label>
+				<InputSelect id="status" @bind-Value="FormModel.Status" class="form-input">
+					<option value="@IssueStatus.Open">Open</option>
+					<option value="@IssueStatus.InProgress">In Progress</option>
+					<option value="@IssueStatus.Closed">Closed</option>
+				</InputSelect>
+				<ValidationMessage For="@(() => FormModel.Status)" class="validation-message" />
+			</div>
 		</div>
 
-		<div class="form-group mb-3">
-			<label for="description" class="form-label">Description</label>
-			<InputTextArea id="description" @bind-Value="FormModel.Description" class="form-control" rows="5" placeholder="Enter issue description (optional)" />
-			<ValidationMessage For="@(() => FormModel.Description)" />
-		</div>
-
-		<div class="form-group mb-3">
-			<label for="status" class="form-label">Status</label>
-			<InputSelect id="status" @bind-Value="FormModel.Status" class="form-select">
-				<option value="@IssueStatus.Open">Open</option>
-				<option value="@IssueStatus.InProgress">In Progress</option>
-				<option value="@IssueStatus.Closed">Closed</option>
-			</InputSelect>
-			<ValidationMessage For="@(() => FormModel.Status)" />
-		</div>
-
-		<div class="form-actions">
-			<button type="submit" class="btn btn-primary" disabled="@IsSubmitting">
+		<!-- Actions -->
+		<div class="mt-6 flex items-center gap-3">
+			<button
+				type="submit"
+				class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
+				disabled="@IsSubmitting"
+				aria-busy="@IsSubmitting">
 				@if (IsSubmitting)
 				{
-					<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+					<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+					</svg>
 				}
 				@(IsEditMode ? "Update Issue" : "Create Issue")
 			</button>
+
 			@if (OnCancel.HasDelegate)
 			{
-				<button type="button" class="btn btn-secondary ms-2" @onclick="HandleCancel" disabled="@IsSubmitting">
+				<button
+					type="button"
+					class="inline-flex items-center px-5 py-2.5 rounded-lg bg-[var(--bg-hover)] hover:bg-[var(--border-color)] text-[var(--text-main)] text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
+					@onclick="HandleCancel"
+					disabled="@IsSubmitting">
 					Cancel
 				</button>
 			}
