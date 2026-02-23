@@ -1,7 +1,7 @@
 using FluentAssertions;
 using FluentValidation;
-using IssueManager.Api.Data;
-using IssueManager.Api.Handlers;
+using Api.Data;
+using Api.Handlers;
 using Shared.DTOs;
 using Shared.Exceptions;
 using IssueManager.Shared.Validators;

@@ -2,8 +2,8 @@ using FluentAssertions;
 
 using FluentValidation;
 
-using IssueManager.Api.Data;
-using IssueManager.Api.Handlers;
+using Api.Data;
+using Api.Handlers;
 using IssueManager.Shared.Validators;
 using MongoDB.Bson;
 using NSubstitute;

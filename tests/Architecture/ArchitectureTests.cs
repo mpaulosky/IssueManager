@@ -15,7 +15,7 @@ namespace IssueManager.Tests.Architecture;
 public class ArchitectureTests
 {
 	private const string SharedNamespace = "IssueManager.Shared";
-	private const string ApiNamespace = "IssueManager.Api";
+	private const string ApiNamespace = "Api";
 	private const string WebNamespace = "IssueManager.Web";
 	private const string ServiceDefaultsNamespace = "IssueManager.ServiceDefaults";
 	private const string ModelsNamespace = "Shared.Models";

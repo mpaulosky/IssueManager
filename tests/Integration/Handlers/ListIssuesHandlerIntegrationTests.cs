@@ -1,6 +1,6 @@
 using FluentAssertions;
-using IssueManager.Api.Data;
-using IssueManager.Api.Handlers;
+using Api.Data;
+using Api.Handlers;
 using MongoDB.Bson;
 using Shared.DTOs;
 using IssueManager.Shared.Validators;

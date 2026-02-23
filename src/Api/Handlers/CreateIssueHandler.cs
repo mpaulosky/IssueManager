@@ -8,13 +8,13 @@
 // =======================================================
 
 using FluentValidation;
-using IssueManager.Api.Data;
+using Api.Data;
 using Shared.DTOs;
 using Shared.Mappers;
 using Shared.Models;
 using Shared.Validators;
 
-namespace IssueManager.Api.Handlers;
+namespace Api.Handlers;
 
 /// <summary>
 /// Handler for creating new issues.

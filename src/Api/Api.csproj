@@ -4,7 +4,7 @@
 		<LangVersion>14.0</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<RootNamespace>IssueManager.Api</RootNamespace>
+		<RootNamespace>Api</RootNamespace>
 		<InvariantGlobalization>false</InvariantGlobalization>
 	</PropertyGroup>
 

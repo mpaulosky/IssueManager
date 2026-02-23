@@ -1,5 +1,5 @@
 using FluentAssertions;
-using IssueManager.Api.Data;
+using Api.Data;
 using MongoDB.Bson;
 using Shared.DTOs;
 using Testcontainers.MongoDb;

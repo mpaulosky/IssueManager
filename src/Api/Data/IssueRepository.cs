@@ -13,7 +13,7 @@ using Shared.DTOs;
 using Shared.Mappers;
 using Shared.Models;
 
-namespace IssueManager.Api.Data;
+namespace Api.Data;
 
 /// <summary>
 /// MongoDB implementation of the issue repository.

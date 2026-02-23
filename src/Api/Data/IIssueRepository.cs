@@ -9,7 +9,7 @@
 
 using Shared.DTOs;
 
-namespace IssueManager.Api.Data;
+namespace Api.Data;
 
 /// <summary>
 /// Repository interface for issue persistence operations.
