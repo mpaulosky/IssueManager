@@ -4,6 +4,7 @@ using IssueManager.Api.Data;
 using IssueManager.Shared.Validators;
 
 using Shared.Domain;
+using Shared.Exceptions;
 
 namespace IssueManager.Api.Handlers.Issues;
 
@@ -40,13 +41,13 @@ public class UpdateIssueHandler
 		var existingIssue = await _repository.GetByIdAsync(command.Id, cancellationToken);
 		if (existingIssue is null)
 		{
-			throw new KeyNotFoundException($"Issue with ID '{command.Id}' was not found.");
+			throw new NotFoundException($"Issue with ID '{command.Id}' was not found.");
 		}
 
 		// Cannot update an archived issue
 		if (existingIssue.IsArchived)
 		{
-			throw new InvalidOperationException($"Issue with ID '{command.Id}' is archived and cannot be updated.");
+			throw new ConflictException($"Issue with ID '{command.Id}' is archived and cannot be updated.");
 		}
 
 		// Update the issue with new values using domain method
