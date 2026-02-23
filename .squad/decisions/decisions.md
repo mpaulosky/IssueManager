@@ -191,3 +191,373 @@ Adopt **GitHub Milestones** for sprint management with **1-week sprint cadence**
 3. Update Ralph work-check to filter by `milestone:"current"` for sprint-aware prioritization
 
 *— Gandalf, Lead/Architect, 2026-02-23*
+
+---
+
+# Release Notes Automation Recommendation for IssueManager
+
+**From:** Gandalf (Lead Architect)  
+**To:** Matthew Paulosky  
+**Date:** December 2024  
+**Status:** Ready for Implementation  
+
+---
+
+## Executive Summary
+
+IssueManager needs automated release notes generation integrated into the existing release workflow. After analyzing the current setup, I recommend **GitHub's Native Auto-Generated Release Notes** (Option A) as the primary solution, with optional integration of **Release Drafter** (Option B) for enhanced customization.
+
+**Why this approach?**
+- Zero external dependencies — GitHub native feature
+- Works seamlessly with existing label-based triage system
+- Compatible with current manual versioning (v0.0.x tags)
+- Minimal configuration (one `.github/release.yml` file)
+- Integrates naturally with squad label workflow
+
+---
+
+## Current State Assessment
+
+### Existing Infrastructure ✅
+- **Releases:** 5 releases exist (v0.0.1–v0.0.5), manually created
+- **Versioning:** Manual semantic versioning via git tags (`v0.x.y`)
+- **Commit Messages:** Mixed patterns (some conventional commits, some PR title-based)
+- **Labels:** 38 labels active, including:
+  - Type labels: `type:feature`, `type:bug`, `type:chore`, `type:docs`, `type:spike`
+  - Priority labels: `priority:p0`, `priority:p1`, `priority:p2`
+  - Release targeting: `release:v0.4.0`, `release:v0.5.0`, `release:v0.6.0`, `release:v1.0.0`
+  - Squad labels: `squad:gandalf`, `squad:aragorn`, etc.
+- **Release Workflow:** `squad-promote.yml` (dev→preview→main) with validation
+- **Current Release Notes:** Empty (v0.0.5 shows only "Full Changelog" link)
+
+### Gaps Identified ⚠️
+- No `.github/release.yml` configuration file
+- No automated categorization of PRs into release notes sections
+- No milestone integration in release notes
+- Release notes generation not integrated into `squad-release.yml`
+
+---
+
+## Recommended Approach: GitHub Native Auto-Generated Release Notes
+
+### What It Does
+GitHub's native feature automatically categorizes merged PRs into release notes sections based on:
+- PR labels (`type:feature`, `type:bug`, `type:chore`, etc.)
+- PR titles and descriptions
+- Contributor associations
+
+### Configuration Files Required
+
+#### 1. `.github/release.yml` (NEW)
+Create this file at the repository root:
+
+```yaml
+# GitHub Auto-Generated Release Notes Configuration
+# Docs: https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes
+
+changelog:
+  exclude:
+    labels:
+      - duplicate
+      - invalid
+      - wontfix
+      - question
+    authors:
+      - dependabot
+  categories:
+    - title: 🎉 Major Features & Enhancements
+      labels:
+        - type:feature
+        - enhancement
+    - title: 🔧 Improvements
+      labels:
+        - type:chore
+        - refactor
+    - title: 📚 Documentation
+      labels:
+        - type:docs
+        - documentation
+    - title: 🐛 Bug Fixes
+      labels:
+        - type:bug
+        - bug
+    - title: 🔬 Research & Spikes
+      labels:
+        - type:spike
+    - title: 🚀 Infrastructure & DevOps
+      labels:
+        - priority:p0
+```
+
+#### 2. Update `.github/workflows/squad-release.yml` (MODIFIED)
+Replace the TODO placeholder with actual release logic:
+
+```yaml
+name: Squad Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.100'
+
+      - name: Build and test
+        run: dotnet test --configuration Release --no-restore
+
+      - name: Get version from git tag
+        id: tag
+        run: |
+          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check if version is new (not already released)
+        id: check_release
+        run: |
+          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          RELEASE_EXISTS=$(gh release view "$VERSION" 2>/dev/null && echo "true" || echo "false")
+          echo "release_exists=$RELEASE_EXISTS" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create release with auto-generated notes
+        if: steps.check_release.outputs.release_exists == 'false'
+        run: |
+          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          gh release create "$VERSION" \
+            --title "$VERSION" \
+            --generate-notes \
+            --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release already exists
+        if: steps.check_release.outputs.release_exists == 'true'
+        run: echo "✅ Release ${{ steps.tag.outputs.version }} already published"
+```
+
+---
+
+## How It Works: The Flow
+
+### Current Flow (Status Quo)
+```
+dev ────────────────────┐
+                        ├─→ preview ──────┐
+                                          ├─→ main (squad-release.yml runs)
+                                          │   → creates empty release
+                                          └─→ tag created manually
+```
+
+### Recommended Flow (With Release Notes)
+```
+1. PR merged to main (with labels: type:feature, type:bug, etc.)
+   ↓
+2. Git tag pushed to main (v0.0.x)
+   ↓
+3. squad-release.yml triggered
+   ├─ Runs dotnet test
+   ├─ Detects new tag (not already released)
+   └─ Creates release with AUTO-GENERATED notes
+      ├─ Categorizes PRs by label
+      ├─ Groups into sections (Features, Bugs, Chores, etc.)
+      ├─ Links to contributors
+      └─ Embeds milestone info (if PR references a milestone)
+```
+
+---
+
+## Label Strategy → Release Notes Mapping
+
+The `.github/release.yml` config maps labels to release notes sections:
+
+| Label | Section | Example Output |
+|-------|---------|---|
+| `type:feature` | 🎉 Major Features & Enhancements | Redesign Web UI: Tailwindcss, top navigation (#36) |
+| `type:bug` | 🐛 Bug Fixes | Fix: use domain exceptions NotFoundException (#32) |
+| `type:chore` | 🔧 Improvements | Bump all-actions group with 3 updates (#35) |
+| `type:docs` | 📚 Documentation | Add test coverage strategy (#8) |
+| `type:spike` | 🔬 Research & Spikes | MongoDB integration spike (#42) |
+| `priority:p0` | 🚀 Infrastructure & DevOps | Emergency patches, infrastructure work |
+
+**Unlabeled PRs:** Automatically appear under "Other Changes" (GitHub default)
+
+---
+
+## Integration with Sprint Milestones
+
+GitHub's auto-generated release notes **do not** directly include milestone info in categorization, but:
+
+1. **PR authors** can reference milestones in their PR description
+2. **Release notes** can reference milestone manually post-generation
+3. **Future enhancement:** Use Release Drafter (Option B) to include milestone in the title
+
+For now: Keep milestones as organizational tools; they don't affect release notes generation.
+
+---
+
+## Semver Strategy
+
+### Current State
+- Manual semver: `v0.0.x` increments
+- No automatic version bumping
+
+### Recommendation: Keep Manual Versioning (For Now)
+1. **Lead (Gandalf)** determines version bump based on:
+   - Feature PRs → minor version bump (v0.1.0)
+   - Bug fixes only → patch version bump (v0.0.x)
+   - Major breaking changes → major version bump (v1.0.0)
+
+2. **Developer** creates git tag:
+   ```bash
+   git tag v0.1.0
+   git push origin v0.1.0
+   ```
+
+3. **squad-release.yml** detects tag and auto-generates release notes
+
+### Future Enhancement (Not Recommended Yet)
+If the team wants fully automated semver, integrate **Release Please** (Google) to:
+- Parse conventional commits
+- Automatically bump versions
+- Auto-generate changelog
+- Create release PRs
+
+**This requires enforcing conventional commit format across all PRs.**
+
+---
+
+## Files to Create/Modify
+
+### Files to Create
+1. **`.github/release.yml`** — Auto-release notes config (79 lines, provided above)
+
+### Files to Modify
+1. **`.github/workflows/squad-release.yml`** — Replace TODO stubs with actual release logic (provided above)
+
+### No Changes Needed
+- No CHANGELOG.md needed (GitHub uses auto-generated notes instead)
+- No GitVersion.yml needed (manual versioning continues)
+- No release-please config (keeping manual semver)
+
+---
+
+## Implementation Steps
+
+### Step 1: Create Release Configuration
+```bash
+# Create .github/release.yml with the config provided above
+# This tells GitHub how to categorize PRs into release notes sections
+```
+
+### Step 2: Update Release Workflow
+```bash
+# Replace .github/workflows/squad-release.yml with the updated version
+# Key changes:
+#   - Add dotnet test validation
+#   - Detect new git tags
+#   - Create release with --generate-notes flag
+```
+
+### Step 3: Test Release Notes Generation
+```bash
+# Option A: Manual test (no actual release)
+gh release create v0.0.6-test \
+  --draft \
+  --generate-notes \
+  --repo mpaulosky/IssueManager
+
+# Option B: Real test on next patch
+# Merge a PR with type:feature label → push tag v0.1.0 → observe auto-generated notes
+```
+
+### Step 4: Communicate to Team
+- Document the label → release notes mapping in CONTRIBUTING.md
+- Remind team to use appropriate labels on PRs
+- Show example of release notes format
+
+---
+
+## Advantages of This Approach
+
+✅ **Zero external dependencies** — GitHub native feature  
+✅ **Minimal config** — Single YAML file  
+✅ **Works with existing labels** — No label migration needed  
+✅ **Automatic contributor attribution** — GitHub extracts from PR authors  
+✅ **Beautiful formatted output** — HTML-rendered in GitHub UI  
+✅ **Backward compatible** — Old releases unaffected  
+✅ **Low maintenance** — No third-party service updates required  
+✅ **Integrates with squad labels** — Type labels control categorization  
+
+---
+
+## Disadvantages & Trade-offs
+
+⚠️ **Limited customization** compared to Release Drafter  
+⚠️ **No automatic semver bumping** (requires manual tag creation)  
+⚠️ **Milestone info not auto-included** (can be added manually)  
+⚠️ **Requires proper PR labeling discipline** (team must label all PRs)  
+
+---
+
+## Optional Enhancement: Release Drafter (Phase 2)
+
+If the team wants **real-time release draft creation** as PRs merge, add Release Drafter:
+
+### Files to Add
+1. **`.github/workflows/release-drafter.yml`** — Creates draft on PR merge
+2. **`.github/release-drafter.yml`** — Customization rules
+
+**Benefits:**
+- Draft release automatically updated as PRs merge
+- More granular customization (templates, custom sections)
+- Milestone-aware categorization (with extra config)
+
+**Drawback:** Adds complexity; recommend after Phase 1 is stable.
+
+---
+
+## Decision Required
+
+### Question for Matthew:
+**Implement Phase 1 (GitHub Native Auto-Generated Release Notes)?**
+
+- **Yes** → Proceed with `.github/release.yml` + update `squad-release.yml`
+- **Also Interested in Phase 2?** → Can add Release Drafter later (no rework needed)
+
+---
+
+## References & Documentation
+
+- [GitHub Auto-Generated Release Notes](https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes)
+- [GitHub Release Best Practices](https://docs.github.com/en/repositories/releasing-projects-on-github)
+- [Release Drafter (Optional Phase 2)](https://github.com/release-drafter/release-drafter)
+- [Conventional Commits (For Future Semver)](https://www.conventionalcommits.org/)
+
+---
+
+## Sign-Off
+
+This recommendation aligns with IssueManager's:
+- ✅ GitHub-native-first philosophy
+- ✅ Squad-based label workflow
+- ✅ Small team (low maintenance)
+- ✅ .NET 10 + Aspire modern stack
+- ✅ Sprint milestone structure
+
+**Ready to implement when Matthew approves.**
+
+*— Gandalf, Lead/Architect, December 2024*
