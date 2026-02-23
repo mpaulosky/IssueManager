@@ -13,13 +13,23 @@ namespace Shared.DTOs;
 ///   StatusDto record
 /// </summary>
 [Serializable]
-public record StatusDto(string StatusName, string StatusDescription, string? Id = null)
+public record StatusDto(
+	string StatusName,
+	string StatusDescription,
+	string? Id = null,
+	DateTime DateCreated = default,
+	DateTime? DateModified = null)
 {
 	/// <summary>
 	///   Initializes a new instance of the <see cref="Shared.DTOs.StatusDto" /> record.
 	/// </summary>
 	/// <param name="status">The status.</param>
-	public StatusDto(Status status) : this(status.StatusName, status.StatusDescription, status.Id.ToString())
+	public StatusDto(Status status) : this(
+		status.StatusName,
+		status.StatusDescription,
+		status.Id.ToString(),
+		status.DateCreated,
+		status.DateModified)
 	{
 	}
 

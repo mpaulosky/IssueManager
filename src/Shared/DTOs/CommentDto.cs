@@ -19,7 +19,8 @@ public record CommentDto(
 	string Description,
 	DateTime DateCreated,
 	IssueDto Issue,
-	UserDto Author)
+	UserDto Author,
+	DateTime? DateModified = null)
 {
 	/// <summary>
 	///   Initializes a new instance of the <see cref="CommentDto" /> record.
@@ -31,7 +32,8 @@ public record CommentDto(
 		comment.Description,
 		comment.DateCreated,
 		comment.Issue,
-		comment.Author)
+		comment.Author,
+		comment.DateModified)
 	{
 	}
 

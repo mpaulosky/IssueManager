@@ -13,13 +13,18 @@ namespace Shared.DTOs;
 ///   UserDto record
 /// </summary>
 [Serializable]
-public record UserDto(string Id, string Name, string Email)
+public record UserDto(
+	string Id,
+	string Name,
+	string Email,
+	DateTime DateCreated = default,
+	DateTime? DateModified = null)
 {
 	/// <summary>
 	///   Initializes a new instance of the <see cref="Shared.DTOs.UserDto" /> record.
 	/// </summary>
 	/// <param name="user">The user.</param>
-	public UserDto(User user) : this(user.Id, user.Name, user.Email)
+	public UserDto(User user) : this(user.Id, user.Name, user.Email, user.DateCreated, user.DateModified)
 	{
 	}
 

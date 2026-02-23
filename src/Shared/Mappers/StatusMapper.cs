@@ -18,7 +18,12 @@ public static class StatusMapper
 	///   Converts a <see cref="Shared.Models.Status"/> to a <see cref="StatusDto"/>.
 	/// </summary>
 	public static StatusDto ToDto(this Shared.Models.Status status) =>
-		new(status.StatusName, status.StatusDescription, status.Id.ToString());
+		new(
+			status.StatusName,
+			status.StatusDescription,
+			status.Id.ToString(),
+			status.DateCreated,
+			status.DateModified);
 
 	/// <summary>
 	///   Converts a <see cref="StatusDto"/> to a <see cref="Shared.Models.Status"/>.
@@ -27,6 +32,8 @@ public static class StatusMapper
 		new()
 		{
 			StatusName = dto.StatusName,
-			StatusDescription = dto.StatusDescription
+			StatusDescription = dto.StatusDescription,
+			DateCreated = dto.DateCreated,
+			DateModified = dto.DateModified
 		};
 }

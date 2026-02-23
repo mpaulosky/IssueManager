@@ -18,7 +18,14 @@ public static class CommentMapper
 	///   Converts a <see cref="Shared.Models.Comment"/> to a <see cref="CommentDto"/>.
 	/// </summary>
 	public static CommentDto ToDto(this Shared.Models.Comment comment) =>
-		new(comment.Id.ToString(), comment.Title, comment.Description, comment.DateCreated, comment.Issue, comment.Author);
+		new(
+			comment.Id.ToString(),
+			comment.Title,
+			comment.Description,
+			comment.DateCreated,
+			comment.Issue,
+			comment.Author,
+			comment.DateModified);
 
 	/// <summary>
 	///   Converts a <see cref="CommentDto"/> to a <see cref="Shared.Models.Comment"/>.
@@ -30,6 +37,7 @@ public static class CommentMapper
 			Description = dto.Description,
 			Issue = dto.Issue,
 			Author = dto.Author,
-			DateCreated = dto.DateCreated
+			DateCreated = dto.DateCreated,
+			DateModified = dto.DateModified
 		};
 }

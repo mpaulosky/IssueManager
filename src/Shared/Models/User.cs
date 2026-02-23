@@ -39,4 +39,20 @@ public class User
 	/// </value>
 	public string Email { get; set; } = string.Empty;
 
+	/// <summary>
+	///   Gets or sets the date created.
+	/// </summary>
+	/// <value>
+	///   The date created.
+	/// </value>
+	public DateTime DateCreated { get; init; } = DateTime.UtcNow;
+
+	/// <summary>
+	///   Gets or sets the date modified.
+	/// </summary>
+	/// <value>
+	///   The date modified.
+	/// </value>
+	public DateTime? DateModified { get; set; }
+
 }

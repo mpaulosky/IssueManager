@@ -27,7 +27,8 @@ public static class IssueMapper
 			issue.Category,
 			issue.IssueStatus,
 			issue.Archived,
-			issue.ArchivedBy);
+			issue.ArchivedBy,
+			issue.DateModified);
 
 	/// <summary>
 	///   Converts an <see cref="IssueDto"/> to a <see cref="Shared.Models.Issue"/>.
@@ -43,6 +44,7 @@ public static class IssueMapper
 			Category = dto.Category,
 			IssueStatus = dto.Status,
 			Archived = dto.Archived,
-			ArchivedBy = dto.ArchivedBy ?? UserDto.Empty
+			ArchivedBy = dto.ArchivedBy ?? UserDto.Empty,
+			DateModified = dto.DateModified
 		};
 }
