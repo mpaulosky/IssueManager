@@ -1,4 +1,4 @@
-namespace IssueManager.Tests.Integration.Fixtures;
+namespace Tests.Integration.Fixtures;
 
 /// <summary>
 /// Shared MongoDB TestContainer fixture for integration tests.

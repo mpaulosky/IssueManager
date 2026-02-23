@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace IssueManager.Web.Components;
+namespace Web.Components;
 
 /// <summary>
 /// Request model for creating or updating an issue.

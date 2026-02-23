@@ -2,7 +2,7 @@ using FluentAssertions;
 
 using Shared.Validators;
 
-namespace IssueManager.Tests.Unit.Validators;
+namespace Tests.Unit.Validators;
 
 /// <summary>
 /// Unit tests for <see cref="CreateIssueValidator"/>.

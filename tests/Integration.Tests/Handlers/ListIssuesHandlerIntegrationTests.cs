@@ -6,7 +6,7 @@ using Shared.DTOs;
 using Shared.Validators;
 using Testcontainers.MongoDb;
 
-namespace IssueManager.Tests.Integration.Handlers;
+namespace Tests.Integration.Handlers;
 
 /// <summary>
 /// Integration tests for ListIssuesHandler with pagination and real MongoDB database.

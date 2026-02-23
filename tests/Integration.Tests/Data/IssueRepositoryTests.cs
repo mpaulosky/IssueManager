@@ -4,7 +4,7 @@ using MongoDB.Bson;
 using Shared.DTOs;
 using Testcontainers.MongoDb;
 
-namespace IssueManager.Tests.Integration.Data;
+namespace Tests.Integration.Data;
 
 /// <summary>
 /// Integration tests for IssueRepository with pagination, filtering, and soft-delete.

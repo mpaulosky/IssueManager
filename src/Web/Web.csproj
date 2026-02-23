@@ -4,7 +4,7 @@
 		<LangVersion>14.0</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<RootNamespace>IssueManager.Web</RootNamespace>
+		<RootNamespace>Web</RootNamespace>
 		<InvariantGlobalization>false</InvariantGlobalization>
 	</PropertyGroup>
 

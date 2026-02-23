@@ -1,4 +1,4 @@
-namespace IssueManager.ServiceDefaults;
+namespace ServiceDefaults;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;

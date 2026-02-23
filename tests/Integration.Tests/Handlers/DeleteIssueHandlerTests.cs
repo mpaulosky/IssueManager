@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using Shared.DTOs;
 
-namespace IssueManager.Tests.Integration.Handlers;
+namespace Tests.Integration.Handlers;
 
 /// <summary>
 /// Integration tests for IssueRepository.ArchiveAsync (soft-delete).

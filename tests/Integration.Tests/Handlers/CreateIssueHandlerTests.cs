@@ -1,9 +1,9 @@
-using IssueManager.Tests.Integration.Fixtures;
+using Tests.Integration.Fixtures;
 
 using Shared.DTOs;
 using Shared.Validators;
 
-namespace IssueManager.Tests.Integration.Handlers;
+namespace Tests.Integration.Handlers;
 
 /// <summary>
 /// Integration tests for CreateIssueHandler with real MongoDB database.

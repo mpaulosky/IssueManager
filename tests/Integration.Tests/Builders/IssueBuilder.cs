@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using Shared.DTOs;
 
-namespace IssueManager.Integration.Builders;
+namespace Integration.Builders;
 
 /// <summary>
 /// Builder for creating IssueDto test data with fluent API.

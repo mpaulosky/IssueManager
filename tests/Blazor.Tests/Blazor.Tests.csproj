@@ -6,7 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
-		<RootNamespace>IssueManager.BlazorTests</RootNamespace>
+		<RootNamespace>BlazorTests</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>

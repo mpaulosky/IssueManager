@@ -2,7 +2,7 @@ using MongoDB.Bson;
 using Shared.DTOs;
 using Shared.Validators;
 
-namespace IssueManager.Tests.Integration.Handlers;
+namespace Tests.Integration.Handlers;
 
 /// <summary>
 /// Integration tests for UpdateIssueStatusHandler with real MongoDB database.

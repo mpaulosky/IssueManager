@@ -1,5 +1,5 @@
-using IssueManager.ServiceDefaults;
-using IssueManager.Web;
+using ServiceDefaults;
+using Web;
 
 var builder = WebApplication.CreateBuilder(args);
 

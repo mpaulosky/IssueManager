@@ -1,4 +1,4 @@
-using IssueManager.ServiceDefaults;
+using ServiceDefaults;
 using Api.Data;
 using Api.Handlers;
 using Shared.Validators;

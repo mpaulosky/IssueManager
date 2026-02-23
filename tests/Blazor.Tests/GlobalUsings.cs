@@ -3,4 +3,4 @@ global using FluentAssertions;
 global using Bunit;
 global using NSubstitute;
 
-global using IssueManager.Web.Components;
+global using Web.Components;
