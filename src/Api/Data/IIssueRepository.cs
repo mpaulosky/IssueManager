@@ -1,12 +1,10 @@
-// =======================================================
-// Copyright (c) 2026. All rights reserved.
+// ================================================// Copyright (c) 2026. All rights reserved.
 // File Name :     IIssueRepository.cs
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
 // Project Name :  Api
-// =======================================================
-
+// ================================================
 using Shared.DTOs;
 
 namespace Api.Data;

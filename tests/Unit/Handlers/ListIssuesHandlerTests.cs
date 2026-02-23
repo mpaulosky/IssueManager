@@ -4,7 +4,7 @@ using FluentValidation;
 
 using Api.Data;
 using Api.Handlers;
-using IssueManager.Shared.Validators;
+using Shared.Validators;
 using MongoDB.Bson;
 using NSubstitute;
 using Shared.DTOs;

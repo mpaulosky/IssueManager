@@ -3,7 +3,7 @@ using Api.Data;
 using Api.Handlers;
 using MongoDB.Bson;
 using Shared.DTOs;
-using IssueManager.Shared.Validators;
+using Shared.Validators;
 using Testcontainers.MongoDb;
 
 namespace IssueManager.Tests.Integration.Handlers;

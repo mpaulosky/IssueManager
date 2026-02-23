@@ -226,7 +226,7 @@ public class IssueFormTests : ComponentTestBase
 		);
 
 		// Assert
-		var spinner = component.Find(".spinner-border");
+		var spinner = component.Find(".animate-spin");
 		spinner.Should().NotBeNull();
 	}
 

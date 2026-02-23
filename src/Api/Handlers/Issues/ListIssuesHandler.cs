@@ -9,7 +9,7 @@
 
 using FluentValidation;
 using Api.Data;
-using IssueManager.Shared.Validators;
+using Shared.Validators;
 using Shared.DTOs;
 
 namespace Api.Handlers;

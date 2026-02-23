@@ -3,7 +3,7 @@ using Api.Data;
 using Api.Handlers;
 using Shared.DTOs;
 using Shared.Exceptions;
-using IssueManager.Shared.Validators;
+using Shared.Validators;
 using MongoDB.Bson;
 using NSubstitute;
 

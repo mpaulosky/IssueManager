@@ -1,4 +1,4 @@
-namespace IssueManager.Shared.Validators;
+namespace Shared.Validators;
 
 /// <summary>
 /// Command for soft-deleting (archiving) an issue.

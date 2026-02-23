@@ -1,6 +1,6 @@
 // =======================================================
 // Copyright (c) 2026. All rights reserved.
-// File Name :     UpdateIssueHandler.cs
+// File Name :     DeleteIssueHandler.cs
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
@@ -9,33 +9,32 @@
 
 using FluentValidation;
 using Api.Data;
-using IssueManager.Shared.Validators;
-using Shared.DTOs;
+using Shared.Validators;
 using Shared.Exceptions;
 
 namespace Api.Handlers;
 
 /// <summary>
-/// Handler for updating existing issues.
+/// Handler for deleting (soft-deleting/archiving) issues.
 /// </summary>
-public class UpdateIssueHandler
+public class DeleteIssueHandler
 {
 	private readonly IIssueRepository _repository;
-	private readonly UpdateIssueValidator _validator;
+	private readonly DeleteIssueValidator _validator;
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="UpdateIssueHandler"/> class.
+	/// Initializes a new instance of the <see cref="DeleteIssueHandler"/> class.
 	/// </summary>
-	public UpdateIssueHandler(IIssueRepository repository, UpdateIssueValidator validator)
+	public DeleteIssueHandler(IIssueRepository repository, DeleteIssueValidator validator)
 	{
 		_repository = repository;
 		_validator = validator;
 	}
 
 	/// <summary>
-	/// Handles the update of an existing issue.
+	/// Handles the soft-deletion (archiving) of an issue.
 	/// </summary>
-	public async Task<IssueDto> Handle(UpdateIssueCommand command, CancellationToken cancellationToken = default)
+	public async Task<bool> Handle(DeleteIssueCommand command, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
 		if (!validationResult.IsValid)
@@ -46,18 +45,8 @@ public class UpdateIssueHandler
 			throw new NotFoundException($"Issue with ID '{command.Id}' was not found.");
 
 		if (existingIssue.Archived)
-			throw new ConflictException($"Issue with ID '{command.Id}' is archived and cannot be updated.");
+			return true;
 
-		var updatedIssue = existingIssue with
-		{
-			Title = command.Title,
-			Description = command.Description ?? string.Empty
-		};
-
-		var result = await _repository.UpdateAsync(updatedIssue, cancellationToken);
-		if (result is null)
-			throw new NotFoundException($"Issue with ID '{command.Id}' could not be updated.");
-
-		return result;
+		return await _repository.ArchiveAsync(command.Id, cancellationToken);
 	}
 }
