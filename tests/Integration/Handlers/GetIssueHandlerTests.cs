@@ -1,4 +1,5 @@
-using Shared.Domain;
+using MongoDB.Bson;
+using Shared.DTOs;
 
 namespace IssueManager.Tests.Integration.Handlers;
 
@@ -41,20 +42,23 @@ public class GetIssueHandlerTests : IAsyncLifetime
 		await _mongoContainer.DisposeAsync();
 	}
 
+	private static IssueDto CreateTestIssueDto(string title, string description) =>
+		new(ObjectId.GenerateNewId(), title, description, DateTime.UtcNow, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty);
+
 	[Fact]
 	public async Task Handle_ExistingIssueId_ReturnsIssue()
 	{
 		// Arrange
-		var issue = Issue.Create("Test Issue", "Test Description");
-		await _repository.CreateAsync(issue);
-		var query = new GetIssueQuery(issue.Id);
+		var issue = CreateTestIssueDto("Test Issue", "Test Description");
+		var created = await _repository.CreateAsync(issue);
+		var query = new GetIssueQuery(created.Id.ToString());
 
 		// Act
 		var result = await _handler.Handle(query);
 
 		// Assert
 		result.Should().NotBeNull();
-		result!.Id.Should().Be(issue.Id);
+		result!.Id.Should().Be(created.Id);
 		result.Title.Should().Be("Test Issue");
 		result.Description.Should().Be("Test Description");
 	}
@@ -63,7 +67,7 @@ public class GetIssueHandlerTests : IAsyncLifetime
 	public async Task Handle_NonExistingIssueId_ReturnsNull()
 	{
 		// Arrange
-		var query = new GetIssueQuery("non-existing-id");
+		var query = new GetIssueQuery(ObjectId.GenerateNewId().ToString());
 
 		// Act
 		var result = await _handler.Handle(query);
@@ -86,9 +90,9 @@ public class GetIssueHandlerTests : IAsyncLifetime
 	public async Task HandleGetAll_MultipleIssues_ReturnsAllIssues()
 	{
 		// Arrange
-		var issue1 = Issue.Create("Issue 1", "Description 1");
-		var issue2 = Issue.Create("Issue 2", "Description 2");
-		var issue3 = Issue.Create("Issue 3", "Description 3");
+		var issue1 = CreateTestIssueDto("Issue 1", "Description 1");
+		var issue2 = CreateTestIssueDto("Issue 2", "Description 2");
+		var issue3 = CreateTestIssueDto("Issue 3", "Description 3");
 
 		await _repository.CreateAsync(issue1);
 		await _repository.CreateAsync(issue2);

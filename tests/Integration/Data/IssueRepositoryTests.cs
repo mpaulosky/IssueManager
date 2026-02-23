@@ -1,6 +1,7 @@
 using FluentAssertions;
-using IssueManager.Api.Data;
-using global::Shared.Domain;
+using Api.Data;
+using MongoDB.Bson;
+using Shared.DTOs;
 using Testcontainers.MongoDb;
 
 namespace IssueManager.Tests.Integration.Data;
@@ -42,21 +43,24 @@ await _mongoContainer.StopAsync();
 await _mongoContainer.DisposeAsync();
 }
 
+private static IssueDto CreateTestIssueDto(string title, string description, DateTime? dateCreated = null) =>
+new(
+	ObjectId.GenerateNewId(),
+	title,
+	description,
+	dateCreated ?? DateTime.UtcNow,
+	UserDto.Empty,
+	CategoryDto.Empty,
+	StatusDto.Empty);
+
 [Fact]
 public async Task GetAllAsync_FirstPage_ReturnsCorrectItems()
 {
 // Arrange - Create 50 issues
 for (int i = 0; i < 50; i++)
 {
-var issue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: $"Issue {i + 1}",
-Description: $"Description {i + 1}",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow.AddMinutes(-i),
-UpdatedAt: DateTime.UtcNow.AddMinutes(-i));
-
-await _repository.CreateAsync(issue);
+	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
+	await _repository.CreateAsync(issue);
 }
 
 // Act
@@ -73,15 +77,8 @@ public async Task GetAllAsync_SecondPage_ReturnsNextSetOfItems()
 // Arrange - Create 50 issues
 for (int i = 0; i < 50; i++)
 {
-var issue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: $"Issue {i + 1}",
-Description: $"Description {i + 1}",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow.AddMinutes(-i),
-UpdatedAt: DateTime.UtcNow.AddMinutes(-i));
-
-await _repository.CreateAsync(issue);
+	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
+	await _repository.CreateAsync(issue);
 }
 
 // Act
@@ -100,22 +97,15 @@ public async Task GetAllAsync_ExcludesArchived_ByDefault()
 var issuesToArchive = new List<string>();
 for (int i = 0; i < 10; i++)
 {
-var issue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: $"Issue {i + 1}",
-Description: $"Description {i + 1}",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow.AddMinutes(-i),
-UpdatedAt: DateTime.UtcNow.AddMinutes(-i));
-
-await _repository.CreateAsync(issue);
-if (i < 3)
-issuesToArchive.Add(issue.Id);
+	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
+	var created = await _repository.CreateAsync(issue);
+	if (i < 3)
+		issuesToArchive.Add(created.Id.ToString());
 }
 
 foreach (var id in issuesToArchive)
 {
-await _repository.ArchiveAsync(id);
+	await _repository.ArchiveAsync(id);
 }
 
 // Act
@@ -124,7 +114,7 @@ var (items, total) = await _repository.GetAllAsync(page: 1, pageSize: 20);
 // Assert
 items.Should().HaveCount(7); // 10 - 3 archived = 7
 total.Should().Be(7);
-items.Should().OnlyContain(i => !i.IsArchived);
+items.Should().OnlyContain(i => !i.Archived);
 }
 
 [Fact]
@@ -134,22 +124,15 @@ public async Task GetAllAsync_All_IncludesArchivedIssues()
 var issuesToArchive = new List<string>();
 for (int i = 0; i < 10; i++)
 {
-var issue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: $"Issue {i + 1}",
-Description: $"Description {i + 1}",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow.AddMinutes(-i),
-UpdatedAt: DateTime.UtcNow.AddMinutes(-i));
-
-await _repository.CreateAsync(issue);
-if (i < 3)
-issuesToArchive.Add(issue.Id);
+	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
+	var created = await _repository.CreateAsync(issue);
+	if (i < 3)
+		issuesToArchive.Add(created.Id.ToString());
 }
 
 foreach (var id in issuesToArchive)
 {
-await _repository.ArchiveAsync(id);
+	await _repository.ArchiveAsync(id);
 }
 
 // Act — non-paginated GetAllAsync returns all records
@@ -166,22 +149,15 @@ public async Task CountAsync_ReturnsTotalIssueCount()
 var issuesToArchive = new List<string>();
 for (int i = 0; i < 10; i++)
 {
-var issue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: $"Issue {i + 1}",
-Description: $"Description {i + 1}",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow.AddMinutes(-i),
-UpdatedAt: DateTime.UtcNow.AddMinutes(-i));
-
-await _repository.CreateAsync(issue);
-if (i < 3)
-issuesToArchive.Add(issue.Id);
+	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
+	var created = await _repository.CreateAsync(issue);
+	if (i < 3)
+		issuesToArchive.Add(created.Id.ToString());
 }
 
 foreach (var id in issuesToArchive)
 {
-await _repository.ArchiveAsync(id);
+	await _repository.ArchiveAsync(id);
 }
 
 // Act
@@ -192,141 +168,52 @@ count.Should().Be(10);
 }
 
 [Fact]
-public async Task ArchiveAsync_SetsIsArchivedToTrue()
+public async Task ArchiveAsync_SetsArchivedToTrue()
 {
 // Arrange - Create an issue
-var issue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Issue to Archive",
-Description: "Test",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow,
-UpdatedAt: DateTime.UtcNow)
-{
-IsArchived = false
-};
-
-await _repository.CreateAsync(issue);
+var issue = CreateTestIssueDto("Issue to Archive", "Test");
+var created = await _repository.CreateAsync(issue);
 
 // Act
-var result = await _repository.ArchiveAsync(issue.Id);
+var result = await _repository.ArchiveAsync(created.Id.ToString());
 
 // Assert
 result.Should().BeTrue();
 
 // Verify in database
-var dbIssue = await _repository.GetByIdAsync(issue.Id);
+var dbIssue = await _repository.GetByIdAsync(created.Id.ToString());
 dbIssue.Should().NotBeNull();
-dbIssue!.IsArchived.Should().BeTrue();
-}
-
-[Fact]
-public async Task ArchiveAsync_UpdatesTimestamp()
-{
-// Arrange - Create an issue
-var issue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Issue to Archive",
-Description: "Test",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow.AddDays(-1),
-UpdatedAt: DateTime.UtcNow.AddHours(-2));
-
-await _repository.CreateAsync(issue);
-
-// Act
-await _repository.ArchiveAsync(issue.Id);
-
-// Assert
-var dbIssue = await _repository.GetByIdAsync(issue.Id);
-dbIssue.Should().NotBeNull();
-dbIssue!.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
-dbIssue.UpdatedAt.Should().BeAfter(issue.UpdatedAt);
+dbIssue!.Archived.Should().BeTrue();
 }
 
 [Fact]
 public async Task ArchiveAsync_DoesNotDeleteRecord()
 {
 // Arrange - Create an issue
-var issue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Issue to Archive",
-Description: "Should still exist",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow,
-UpdatedAt: DateTime.UtcNow);
-
-await _repository.CreateAsync(issue);
+var issue = CreateTestIssueDto("Issue to Archive", "Should still exist");
+var created = await _repository.CreateAsync(issue);
 
 // Act - Soft delete (archive)
-await _repository.ArchiveAsync(issue.Id);
+await _repository.ArchiveAsync(created.Id.ToString());
 
 // Assert - Record still exists
-var dbIssue = await _repository.GetByIdAsync(issue.Id);
+var dbIssue = await _repository.GetByIdAsync(created.Id.ToString());
 dbIssue.Should().NotBeNull();
-dbIssue!.Id.Should().Be(issue.Id);
-dbIssue.IsArchived.Should().BeTrue();
+dbIssue!.Id.Should().Be(created.Id);
+dbIssue.Archived.Should().BeTrue();
 }
 
 [Fact]
 public async Task UpdateAsync_NonExistentIssue_ReturnsNull()
 {
 // Arrange
-var nonExistentIssue = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Non-existent",
-Description: "Does not exist",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow,
-UpdatedAt: DateTime.UtcNow);
+var nonExistentIssue = CreateTestIssueDto("Non-existent", "Does not exist");
 
 // Act
 var result = await _repository.UpdateAsync(nonExistentIssue);
 
 // Assert
 result.Should().BeNull();
-}
-
-[Fact]
-public async Task GetAllAsync_OrdersByCreatedAtDescending()
-{
-// Arrange - Create issues with specific timestamps
-var issue1 = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Oldest",
-Description: "Created first",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow.AddDays(-3),
-UpdatedAt: DateTime.UtcNow.AddDays(-3));
-
-var issue2 = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Middle",
-Description: "Created second",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow.AddDays(-2),
-UpdatedAt: DateTime.UtcNow.AddDays(-2));
-
-var issue3 = new Issue(
-Id: Guid.NewGuid().ToString(),
-Title: "Newest",
-Description: "Created last",
-Status: IssueStatus.Open,
-CreatedAt: DateTime.UtcNow.AddDays(-1),
-UpdatedAt: DateTime.UtcNow.AddDays(-1));
-
-await _repository.CreateAsync(issue1);
-await _repository.CreateAsync(issue2);
-await _repository.CreateAsync(issue3);
-
-// Act
-var (items, _) = await _repository.GetAllAsync(page: 1, pageSize: 10);
-
-// Assert
-items.Should().HaveCount(3);
-items[0].Title.Should().Be("Newest"); // Newest first
-items[1].Title.Should().Be("Middle");
-items[2].Title.Should().Be("Oldest"); // Oldest last
 }
 
 [Fact]

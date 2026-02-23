@@ -1,0 +1,122 @@
+E:\github\IssueManager\src\AppHost\AppHost.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\src\AppHost\AppHost.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\Unit\Unit.csproj : warning NU1603: Unit depends on NSubstitute (>= 5.2.0) but NSubstitute 5.2.0 was not found. NSubstitute 5.3.0 was resolved instead.
+E:\github\IssueManager\tests\Unit\Unit.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\Unit\Unit.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\Architecture\Architecture.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\Architecture\Architecture.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\src\ServiceDefaults\ServiceDefaults.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\src\ServiceDefaults\ServiceDefaults.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\Aspire\Aspire.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\Aspire\Aspire.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\src\Api\Api.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\src\Api\Api.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\Integration\Integration.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\Integration\Integration.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\src\Web\Web.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\src\Web\Web.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj : warning NU1603: BlazorTests depends on bunit (>= 1.29.1) but bunit 1.29.1 was not found. bunit 1.29.5 was resolved instead.
+E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj : warning NU1603: BlazorTests depends on NSubstitute (>= 5.2.0) but NSubstitute 5.2.0 was not found. NSubstitute 5.3.0 was resolved instead.
+E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+  ServiceDefaults -> E:\github\IssueManager\src\ServiceDefaults\bin\Release\net10.0\ServiceDefaults.dll
+  Shared -> E:\github\IssueManager\src\Shared\bin\Release\net10.0\Shared.dll
+  AppHost -> E:\github\IssueManager\src\AppHost\bin\Release\net10.0\AppHost.dll
+  Aspire -> E:\github\IssueManager\tests\Aspire\bin\Release\net10.0\Aspire.dll
+E:\github\IssueManager\src\Api\Handlers\UpdateIssueStatusHandler.cs(58,22): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\src\Api\Api.csproj]
+E:\github\IssueManager\src\Api\Handlers\DeleteIssueHandler.cs(55,7): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\src\Api\Api.csproj]
+E:\github\IssueManager\src\Api\Handlers\GetIssueHandler.cs(55,10): warning CS8603: Possible null reference return. [E:\github\IssueManager\src\Api\Api.csproj]
+E:\github\IssueManager\src\Api\Handlers\UpdateIssueHandler.cs(55,7): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\src\Api\Api.csproj]
+E:\github\IssueManager\src\Api\Handlers\UpdateIssueHandler.cs(75,10): warning CS8603: Possible null reference return. [E:\github\IssueManager\src\Api\Api.csproj]
+E:\github\IssueManager\src\Api\Handlers\CreateIssueHandler.cs(67,10): warning CS8603: Possible null reference return. [E:\github\IssueManager\src\Api\Api.csproj]
+E:\github\IssueManager\src\Api\Program.cs(42,17): warning ASPDEPR002: 'OpenApiEndpointConventionBuilderExtensions.WithOpenApi<TBuilder>(TBuilder)' is obsolete: 'WithOpenApi is deprecated and will be removed in a future release. For more information, visit https://aka.ms/aspnet/deprecate/002.' (https://aka.ms/aspnet/deprecate/002) [E:\github\IssueManager\src\Api\Api.csproj]
+  Api -> E:\github\IssueManager\src\Api\bin\Release\net10.0\Api.dll
+  Web -> E:\github\IssueManager\src\Web\bin\Release\net10.0\Web.dll
+  Architecture -> E:\github\IssueManager\tests\Architecture\bin\Release\net10.0\Architecture.dll
+E:\github\IssueManager\tests\Integration\Handlers\UpdateIssueStatusHandlerTests.cs(60,14): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(60,45): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(68,1): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\CreateIssueHandlerTests.cs(70,3): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\UpdateIssueHandlerIntegrationTests.cs(76,9): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\GetIssueHandlerTests.cs(71,33): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(84,45): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\UpdateIssueHandlerIntegrationTests.cs(122,9): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\CreateIssueHandlerTests.cs(96,3): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\UpdateIssueStatusHandlerTests.cs(122,14): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(120,45): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(128,1): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\UpdateIssueHandlerIntegrationTests.cs(165,9): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\ListIssuesHandlerIntegrationTests.cs(148,25): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\UpdateIssueHandlerIntegrationTests.cs(223,9): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\UpdateIssueHandlerIntegrationTests.cs(275,9): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(145,45): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(153,1): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(175,45): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(182,48): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(184,1): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(185,1): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\CreateIssueHandlerTests.cs(179,3): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+  Unit -> E:\github\IssueManager\tests\Unit\bin\Release\net10.0\Unit.dll
+E:\github\IssueManager\tests\BlazorTests\Components\IssueFormTests.cs(156,57): error CS0117: 'Status' does not contain a definition for 'InProgress' [E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj]
+E:\github\IssueManager\tests\BlazorTests\Components\IssueFormTests.cs(194,57): error CS0117: 'Status' does not contain a definition for 'Closed' [E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj]
+  Integration -> E:\github\IssueManager\tests\Integration\bin\Release\net10.0\Integration.dll
+
+Build FAILED.
+
+E:\github\IssueManager\src\AppHost\AppHost.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\src\AppHost\AppHost.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\Unit\Unit.csproj : warning NU1603: Unit depends on NSubstitute (>= 5.2.0) but NSubstitute 5.2.0 was not found. NSubstitute 5.3.0 was resolved instead.
+E:\github\IssueManager\tests\Unit\Unit.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\Unit\Unit.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\Architecture\Architecture.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\Architecture\Architecture.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\src\ServiceDefaults\ServiceDefaults.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\src\ServiceDefaults\ServiceDefaults.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\Aspire\Aspire.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\Aspire\Aspire.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\src\Api\Api.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\src\Api\Api.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\Integration\Integration.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\Integration\Integration.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\src\Web\Web.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\src\Web\Web.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj : warning NU1603: BlazorTests depends on bunit (>= 1.29.1) but bunit 1.29.1 was not found. bunit 1.29.5 was resolved instead.
+E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj : warning NU1603: BlazorTests depends on NSubstitute (>= 5.2.0) but NSubstitute 5.2.0 was not found. NSubstitute 5.3.0 was resolved instead.
+E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj : warning NU1902: Package 'KubernetesClient' 15.0.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w7r3-mgwf-4mqq
+E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.10.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6
+E:\github\IssueManager\src\Api\Handlers\UpdateIssueStatusHandler.cs(58,22): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\src\Api\Api.csproj]
+E:\github\IssueManager\src\Api\Handlers\DeleteIssueHandler.cs(55,7): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\src\Api\Api.csproj]
+E:\github\IssueManager\src\Api\Handlers\GetIssueHandler.cs(55,10): warning CS8603: Possible null reference return. [E:\github\IssueManager\src\Api\Api.csproj]
+E:\github\IssueManager\src\Api\Handlers\UpdateIssueHandler.cs(55,7): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\src\Api\Api.csproj]
+E:\github\IssueManager\src\Api\Handlers\UpdateIssueHandler.cs(75,10): warning CS8603: Possible null reference return. [E:\github\IssueManager\src\Api\Api.csproj]
+E:\github\IssueManager\src\Api\Handlers\CreateIssueHandler.cs(67,10): warning CS8603: Possible null reference return. [E:\github\IssueManager\src\Api\Api.csproj]
+E:\github\IssueManager\src\Api\Program.cs(42,17): warning ASPDEPR002: 'OpenApiEndpointConventionBuilderExtensions.WithOpenApi<TBuilder>(TBuilder)' is obsolete: 'WithOpenApi is deprecated and will be removed in a future release. For more information, visit https://aka.ms/aspnet/deprecate/002.' (https://aka.ms/aspnet/deprecate/002) [E:\github\IssueManager\src\Api\Api.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\UpdateIssueStatusHandlerTests.cs(60,14): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(60,45): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(68,1): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\CreateIssueHandlerTests.cs(70,3): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\UpdateIssueHandlerIntegrationTests.cs(76,9): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\GetIssueHandlerTests.cs(71,33): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(84,45): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\UpdateIssueHandlerIntegrationTests.cs(122,9): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\CreateIssueHandlerTests.cs(96,3): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\UpdateIssueStatusHandlerTests.cs(122,14): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(120,45): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(128,1): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\UpdateIssueHandlerIntegrationTests.cs(165,9): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\ListIssuesHandlerIntegrationTests.cs(148,25): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\UpdateIssueHandlerIntegrationTests.cs(223,9): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\UpdateIssueHandlerIntegrationTests.cs(275,9): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(145,45): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(153,1): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(175,45): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(182,48): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(184,1): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\DeleteIssueHandlerIntegrationTests.cs(185,1): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\Integration\Handlers\CreateIssueHandlerTests.cs(179,3): warning CS8602: Dereference of a possibly null reference. [E:\github\IssueManager\tests\Integration\Integration.csproj]
+E:\github\IssueManager\tests\BlazorTests\Components\IssueFormTests.cs(156,57): error CS0117: 'Status' does not contain a definition for 'InProgress' [E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj]
+E:\github\IssueManager\tests\BlazorTests\Components\IssueFormTests.cs(194,57): error CS0117: 'Status' does not contain a definition for 'Closed' [E:\github\IssueManager\tests\BlazorTests\BlazorTests.csproj]
+    51 Warning(s)
+    2 Error(s)
+
+Time Elapsed 00:00:04.20

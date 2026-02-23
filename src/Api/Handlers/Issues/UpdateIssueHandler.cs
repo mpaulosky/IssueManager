@@ -1,9 +1,16 @@
-using FluentValidation;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     UpdateIssueHandler.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Api
+// =======================================================
 
+using FluentValidation;
 using Api.Data;
 using Shared.Validators;
-
-using Shared.Domain;
+using Shared.DTOs;
 using Shared.Exceptions;
 
 namespace Api.Handlers;
@@ -28,31 +35,29 @@ public class UpdateIssueHandler
 	/// <summary>
 	/// Handles the update of an existing issue.
 	/// </summary>
-	public async Task<Issue?> Handle(UpdateIssueCommand command, CancellationToken cancellationToken = default)
+	public async Task<IssueDto> Handle(UpdateIssueCommand command, CancellationToken cancellationToken = default)
 	{
-		// Validate the command
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
 		if (!validationResult.IsValid)
-		{
 			throw new ValidationException(validationResult.Errors);
-		}
 
-		// Get the existing issue
 		var existingIssue = await _repository.GetByIdAsync(command.Id, cancellationToken);
 		if (existingIssue is null)
-		{
 			throw new NotFoundException($"Issue with ID '{command.Id}' was not found.");
-		}
 
-		// Cannot update an archived issue
-		if (existingIssue.IsArchived)
-		{
+		if (existingIssue.Archived)
 			throw new ConflictException($"Issue with ID '{command.Id}' is archived and cannot be updated.");
-		}
 
-		// Update the issue with new values using domain method
-		var updatedIssue = existingIssue.Update(command.Title, command.Description ?? existingIssue.Description);
-		return await _repository.UpdateAsync(updatedIssue, cancellationToken);
+		var updatedIssue = existingIssue with
+		{
+			Title = command.Title,
+			Description = command.Description ?? string.Empty
+		};
+
+		var result = await _repository.UpdateAsync(updatedIssue, cancellationToken);
+		if (result is null)
+			throw new NotFoundException($"Issue with ID '{command.Id}' could not be updated.");
+
+		return result;
 	}
 }
-

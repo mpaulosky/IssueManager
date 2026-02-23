@@ -1,8 +1,15 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     UpdateIssueStatusHandler.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Api
+// =======================================================
+
 using FluentValidation;
-
 using Api.Data;
-
-using Shared.Domain;
+using Shared.DTOs;
 using Shared.Validators;
 
 namespace Api.Handlers;
@@ -27,27 +34,17 @@ public class UpdateIssueStatusHandler
 	/// <summary>
 	/// Handles the update of issue status.
 	/// </summary>
-	public async Task<Issue?> Handle(UpdateIssueStatusCommand command, CancellationToken cancellationToken = default)
+	public async Task<IssueDto?> Handle(UpdateIssueStatusCommand command, CancellationToken cancellationToken = default)
 	{
-		// Validate the command
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
 		if (!validationResult.IsValid)
-		{
 			throw new ValidationException(validationResult.Errors);
-		}
 
-		// Retrieve the existing issue
 		var existingIssue = await _repository.GetByIdAsync(command.IssueId, cancellationToken);
 		if (existingIssue is null)
-		{
 			return null;
-		}
 
-		// Update the status using domain method
-		var updatedIssue = existingIssue.UpdateStatus(command.Status);
-
-		// Persist changes
+		var updatedIssue = existingIssue with { Status = command.Status };
 		return await _repository.UpdateAsync(updatedIssue, cancellationToken);
 	}
 }
-

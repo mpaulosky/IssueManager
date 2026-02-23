@@ -15,15 +15,14 @@ name: "CodeQL"
 on:
   push:
     branches:
-      - "**"
+      - main
     paths:
       - "**.cs"
       - "**.csproj"
 
   pull_request:
-    # Trigger on PRs targeting main from any branch
     branches:
-      - main
+      - "**"
     paths:
       - "**.cs"
       - "**.csproj"

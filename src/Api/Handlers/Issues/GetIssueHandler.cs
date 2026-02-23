@@ -1,6 +1,14 @@
-using Api.Data;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     GetIssueHandler.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Api
+// =======================================================
 
-using Shared.Domain;
+using Api.Data;
+using Shared.DTOs;
 
 namespace Api.Handlers;
 
@@ -27,12 +35,10 @@ public class GetIssueHandler
 	/// <summary>
 	/// Handles the retrieval of a single issue.
 	/// </summary>
-	public async Task<Issue?> Handle(GetIssueQuery query, CancellationToken cancellationToken = default)
+	public async Task<IssueDto?> Handle(GetIssueQuery query, CancellationToken cancellationToken = default)
 	{
 		if (string.IsNullOrWhiteSpace(query.IssueId))
-		{
 			throw new ArgumentException("Issue ID cannot be empty.", nameof(query.IssueId));
-		}
 
 		return await _repository.GetByIdAsync(query.IssueId, cancellationToken);
 	}
@@ -40,9 +46,8 @@ public class GetIssueHandler
 	/// <summary>
 	/// Handles the retrieval of all issues.
 	/// </summary>
-	public async Task<IReadOnlyList<Issue>> HandleGetAll(CancellationToken cancellationToken = default)
+	public async Task<IReadOnlyList<IssueDto>> HandleGetAll(CancellationToken cancellationToken = default)
 	{
 		return await _repository.GetAllAsync(cancellationToken);
 	}
 }
-

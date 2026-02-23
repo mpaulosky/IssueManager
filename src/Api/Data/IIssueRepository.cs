@@ -1,4 +1,11 @@
-using Shared.Domain;
+// ================================================// Copyright (c) 2026. All rights reserved.
+// File Name :     IIssueRepository.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Api
+// ================================================
+using Shared.DTOs;
 
 namespace Api.Data;
 
@@ -10,17 +17,17 @@ public interface IIssueRepository
 	/// <summary>
 	/// Creates a new issue in the database.
 	/// </summary>
-	Task<Issue> CreateAsync(Issue issue, CancellationToken cancellationToken = default);
+	Task<IssueDto> CreateAsync(IssueDto issue, CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Gets an issue by its unique identifier.
 	/// </summary>
-	Task<Issue?> GetByIdAsync(string issueId, CancellationToken cancellationToken = default);
+	Task<IssueDto?> GetByIdAsync(string issueId, CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Updates an existing issue in the database.
 	/// </summary>
-	Task<Issue?> UpdateAsync(Issue issue, CancellationToken cancellationToken = default);
+	Task<IssueDto?> UpdateAsync(IssueDto issue, CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Deletes an issue from the database.
@@ -30,12 +37,12 @@ public interface IIssueRepository
 	/// <summary>
 	/// Gets all issues from the database.
 	/// </summary>
-	Task<IReadOnlyList<Issue>> GetAllAsync(CancellationToken cancellationToken = default);
+	Task<IReadOnlyList<IssueDto>> GetAllAsync(CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Gets paginated issues from the database, excluding archived issues by default.
 	/// </summary>
-	Task<(IReadOnlyList<Issue> Items, long Total)> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken = default);
+	Task<(IReadOnlyList<IssueDto> Items, long Total)> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Soft-deletes an issue by setting IsArchived to true.
