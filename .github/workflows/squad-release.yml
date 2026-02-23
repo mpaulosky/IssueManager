@@ -1,9 +1,9 @@
 name: Squad Release
+# dotnet project — configure build, test, and release commands below
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches: [main]
 
 permissions:
   contents: write
@@ -12,46 +12,23 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
+      - name: Build and test
+        run: |
+          # TODO: Add your dotnet build/test commands here
+          # Go:            go test ./...
+          # Python:        pip install -r requirements.txt && pytest
+          # .NET:          dotnet test
+          # Java (Maven):  mvn test
+          # Java (Gradle): ./gradlew test
+          echo "No build commands configured — update squad-release.yml"
 
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Test
-        run: dotnet test --configuration Release --no-restore --no-build
-
-      - name: Check if release already exists
-        id: check_release
+      - name: Create release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="${{ github.ref_name }}"
-          if gh release view "$TAG" --repo "${{ github.repository }}" > /dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Create release with auto-generated notes
-        if: steps.check_release.outputs.exists == 'false'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create "${{ github.ref_name }}" \
-            --title "${{ github.ref_name }}" \
-            --generate-notes \
-            --repo "${{ github.repository }}"
-
-      - name: Release already exists
-        if: steps.check_release.outputs.exists == 'true'
-        run: echo "✅ Release ${{ github.ref_name }} already published — skipping."
+          # TODO: Add your release commands here (e.g., git tag, gh release create)
+          echo "No release commands configured — update squad-release.yml"
