@@ -1,4 +1,4 @@
-namespace IssueManager.Shared.Domain.DTOs;
+namespace Shared.DTOs;
 
 /// <summary>
 /// Simplified data transfer object for Issue (for list and single responses).

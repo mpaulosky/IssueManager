@@ -1,10 +1,10 @@
 using FluentValidation;
 
-using IssueManager.Api.Data;
-using IssueManager.Shared.Domain.DTOs;
-using IssueManager.Shared.Validators;
+using Api.Data;
+using Shared.DTOs;
+using Shared.Validators;
 
-namespace IssueManager.Api.Handlers.Issues;
+namespace Api.Handlers;
 
 /// <summary>
 /// Handler for listing issues with pagination.
