@@ -7,8 +7,10 @@
 // Project Name :  Api
 // =======================================================
 
-using FluentValidation;
 using Api.Data;
+
+using FluentValidation;
+
 using Shared.Exceptions;
 using Shared.Validators;
 
@@ -19,12 +21,21 @@ namespace Api.Handlers;
 /// </summary>
 public class DeleteStatusHandler
 {
+	/// <summary>
+	/// The repository for status data access operations.
+	/// </summary>
 	private readonly IStatusRepository _repository;
+
+	/// <summary>
+	/// The validator for status deletion commands.
+	/// </summary>
 	private readonly DeleteStatusValidator _validator;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="DeleteStatusHandler"/> class.
 	/// </summary>
+	/// <param name="repository">The repository for status data access operations.</param>
+	/// <param name="validator">The validator for status deletion commands.</param>
 	public DeleteStatusHandler(IStatusRepository repository, DeleteStatusValidator validator)
 	{
 		_repository = repository;
@@ -34,6 +45,11 @@ public class DeleteStatusHandler
 	/// <summary>
 	/// Handles the soft-deletion (archiving) of a status.
 	/// </summary>
+	/// <param name="command">The command containing the status ID to delete.</param>
+	/// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
+	/// <returns><see langword="true"/> if the status was successfully archived; otherwise, <see langword="false"/>.</returns>
+	/// <exception cref="ValidationException">Thrown when the command fails validation.</exception>
+	/// <exception cref="NotFoundException">Thrown when the status is not found.</exception>
 	public async Task<bool> Handle(DeleteStatusCommand command, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);

@@ -7,8 +7,10 @@
 // Project Name :  Api
 // =======================================================
 
-using FluentValidation;
 using Api.Data;
+
+using FluentValidation;
+
 using Shared.DTOs;
 using Shared.Exceptions;
 using Shared.Mappers;
@@ -21,12 +23,21 @@ namespace Api.Handlers;
 /// </summary>
 public class UpdateCommentHandler
 {
+	/// <summary>
+	/// The repository for comment data access operations.
+	/// </summary>
 	private readonly ICommentRepository _repository;
+
+	/// <summary>
+	/// The validator for comment update commands.
+	/// </summary>
 	private readonly UpdateCommentValidator _validator;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="UpdateCommentHandler"/> class.
 	/// </summary>
+	/// <param name="repository">The repository for comment data access operations.</param>
+	/// <param name="validator">The validator for comment update commands.</param>
 	public UpdateCommentHandler(ICommentRepository repository, UpdateCommentValidator validator)
 	{
 		_repository = repository;
@@ -36,6 +47,11 @@ public class UpdateCommentHandler
 	/// <summary>
 	/// Handles the update of an existing comment.
 	/// </summary>
+	/// <param name="command">The command containing the updated comment information.</param>
+	/// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
+	/// <returns>A task that represents the asynchronous operation. The task result contains the updated comment as a <see cref="CommentDto"/>.</returns>
+	/// <exception cref="ValidationException">Thrown when the command fails validation.</exception>
+	/// <exception cref="NotFoundException">Thrown when the comment is not found or cannot be updated.</exception>
 	public async Task<CommentDto> Handle(UpdateCommentCommand command, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);

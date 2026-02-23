@@ -7,8 +7,10 @@
 // Project Name :  Api
 // =======================================================
 
-using FluentValidation;
 using Api.Data;
+
+using FluentValidation;
+
 using Shared.DTOs;
 using Shared.Exceptions;
 using Shared.Mappers;
@@ -21,12 +23,21 @@ namespace Api.Handlers;
 /// </summary>
 public class UpdateStatusHandler
 {
+	/// <summary>
+	/// The repository for status data access operations.
+	/// </summary>
 	private readonly IStatusRepository _repository;
+
+	/// <summary>
+	/// The validator for status update commands.
+	/// </summary>
 	private readonly UpdateStatusValidator _validator;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="UpdateStatusHandler"/> class.
 	/// </summary>
+	/// <param name="repository">The repository for status data access operations.</param>
+	/// <param name="validator">The validator for status update commands.</param>
 	public UpdateStatusHandler(IStatusRepository repository, UpdateStatusValidator validator)
 	{
 		_repository = repository;
@@ -36,6 +47,11 @@ public class UpdateStatusHandler
 	/// <summary>
 	/// Handles the update of an existing status.
 	/// </summary>
+	/// <param name="command">The command containing the updated status information.</param>
+	/// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
+	/// <returns>A task that represents the asynchronous operation. The task result contains the updated status as a <see cref="StatusDto"/>.</returns>
+	/// <exception cref="ValidationException">Thrown when the command fails validation.</exception>
+	/// <exception cref="NotFoundException">Thrown when the status is not found or cannot be updated.</exception>
 	public async Task<StatusDto> Handle(UpdateStatusCommand command, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);

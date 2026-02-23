@@ -8,6 +8,7 @@
 // =======================================================
 
 using Api.Data;
+
 using Shared.DTOs;
 using Shared.Mappers;
 
@@ -18,11 +19,15 @@ namespace Api.Handlers;
 /// </summary>
 public class ListStatusesHandler
 {
+	/// <summary>
+	/// The repository for status data access operations.
+	/// </summary>
 	private readonly IStatusRepository _repository;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="ListStatusesHandler"/> class.
 	/// </summary>
+	/// <param name="repository">The repository for status data access operations.</param>
 	public ListStatusesHandler(IStatusRepository repository)
 	{
 		_repository = repository;
@@ -31,6 +36,8 @@ public class ListStatusesHandler
 	/// <summary>
 	/// Handles the retrieval of all statuses.
 	/// </summary>
+	/// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
+	/// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of all statuses as <see cref="StatusDto"/> objects.</returns>
 	public async Task<IEnumerable<StatusDto>> Handle(CancellationToken cancellationToken = default)
 	{
 		var result = await _repository.GetAllAsync();

@@ -7,8 +7,10 @@
 // Project Name :  Api
 // =======================================================
 
-using FluentValidation;
 using Api.Data;
+
+using FluentValidation;
+
 using Shared.DTOs;
 using Shared.Mappers;
 using Shared.Models;
@@ -21,12 +23,21 @@ namespace Api.Handlers;
 /// </summary>
 public class CreateCategoryHandler
 {
+	/// <summary>
+	/// The repository for category data access operations.
+	/// </summary>
 	private readonly ICategoryRepository _repository;
+
+	/// <summary>
+	/// The validator for category creation commands.
+	/// </summary>
 	private readonly CreateCategoryValidator _validator;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="CreateCategoryHandler"/> class.
 	/// </summary>
+	/// <param name="repository">The repository for category data access operations.</param>
+	/// <param name="validator">The validator for category creation commands.</param>
 	public CreateCategoryHandler(ICategoryRepository repository, CreateCategoryValidator validator)
 	{
 		_repository = repository;
@@ -36,6 +47,11 @@ public class CreateCategoryHandler
 	/// <summary>
 	/// Handles the creation of a new category.
 	/// </summary>
+	/// <param name="command">The command containing the category information to create.</param>
+	/// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
+	/// <returns>A task that represents the asynchronous operation. The task result contains the created category as a <see cref="CategoryDto"/>.</returns>
+	/// <exception cref="ValidationException">Thrown when the command fails validation.</exception>
+	/// <exception cref="InvalidOperationException">Thrown when the category cannot be created in the repository.</exception>
 	public async Task<CategoryDto> Handle(CreateCategoryCommand command, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);

@@ -8,6 +8,7 @@
 // =======================================================
 
 using Api.Data;
+
 using Shared.DTOs;
 using Shared.Mappers;
 
@@ -16,6 +17,7 @@ namespace Api.Handlers;
 /// <summary>
 /// Query for retrieving a single status.
 /// </summary>
+/// <param name="StatusId">The unique identifier of the status to retrieve.</param>
 public record GetStatusQuery(string StatusId);
 
 /// <summary>
@@ -23,11 +25,15 @@ public record GetStatusQuery(string StatusId);
 /// </summary>
 public class GetStatusHandler
 {
+	/// <summary>
+	/// The repository for status data access operations.
+	/// </summary>
 	private readonly IStatusRepository _repository;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="GetStatusHandler"/> class.
 	/// </summary>
+	/// <param name="repository">The repository for status data access operations.</param>
 	public GetStatusHandler(IStatusRepository repository)
 	{
 		_repository = repository;
@@ -36,6 +42,10 @@ public class GetStatusHandler
 	/// <summary>
 	/// Handles the retrieval of a single status by ID.
 	/// </summary>
+	/// <param name="query">The query containing the status ID to retrieve.</param>
+	/// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
+	/// <returns>A task that represents the asynchronous operation. The task result contains the status as a <see cref="StatusDto"/>, or <see langword="null"/> if not found.</returns>
+	/// <exception cref="ArgumentException">Thrown when the status ID is null or empty.</exception>
 	public async Task<StatusDto?> Handle(GetStatusQuery query, CancellationToken cancellationToken = default)
 	{
 		if (string.IsNullOrWhiteSpace(query.StatusId))

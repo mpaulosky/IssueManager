@@ -7,8 +7,10 @@
 // Project Name :  Api
 // =======================================================
 
-using FluentValidation;
 using Api.Data;
+
+using FluentValidation;
+
 using Shared.DTOs;
 using Shared.Exceptions;
 using Shared.Mappers;
@@ -21,12 +23,21 @@ namespace Api.Handlers;
 /// </summary>
 public class UpdateCategoryHandler
 {
+	/// <summary>
+	/// The repository for category data access operations.
+	/// </summary>
 	private readonly ICategoryRepository _repository;
+
+	/// <summary>
+	/// The validator for category update commands.
+	/// </summary>
 	private readonly UpdateCategoryValidator _validator;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="UpdateCategoryHandler"/> class.
 	/// </summary>
+	/// <param name="repository">The repository for category data access operations.</param>
+	/// <param name="validator">The validator for category update commands.</param>
 	public UpdateCategoryHandler(ICategoryRepository repository, UpdateCategoryValidator validator)
 	{
 		_repository = repository;
@@ -36,6 +47,11 @@ public class UpdateCategoryHandler
 	/// <summary>
 	/// Handles the update of an existing category.
 	/// </summary>
+	/// <param name="command">The command containing the updated category information.</param>
+	/// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
+	/// <returns>A task that represents the asynchronous operation. The task result contains the updated category as a <see cref="CategoryDto"/>.</returns>
+	/// <exception cref="ValidationException">Thrown when the command fails validation.</exception>
+	/// <exception cref="NotFoundException">Thrown when the category is not found or cannot be updated.</exception>
 	public async Task<CategoryDto> Handle(UpdateCategoryCommand command, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
