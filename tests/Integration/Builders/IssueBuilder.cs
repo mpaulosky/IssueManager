@@ -102,7 +102,8 @@ public class IssueBuilder
 			DateCreated: _dateCreated,
 			Author: UserDto.Empty,
 			Category: CategoryDto.Empty,
-			Status: StatusDto.Empty);
+			Status: StatusDto.Empty,
+			Archived: _archived);
 	}
 
 	/// <summary>

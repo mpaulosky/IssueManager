@@ -585,3 +585,35 @@ This recommendation aligns with IssueManager's:
 **Ready to implement when Matthew approves.**
 
 *— Gandalf, Lead/Architect, December 2024*
+
+---
+
+## Release Notes Automation Implementation — IssueManager
+
+**Date:** 2026-02-23  
+**Agent:** Aragorn (Backend Dev)  
+**Status:** ✅ Implemented  
+
+### Decision
+
+Implemented automated release notes generation using GitHub's native feature:
+- Created `.github/release.yml` with label→section mapping for 6 categories
+- Updated `.github/workflows/squad-release.yml` to trigger on tag push
+- Integrated `dotnet test` validation and `--generate-notes` flag
+- **Zero external dependencies** — GitHub native feature
+
+### Implementation Details
+
+**Files Created/Modified:**
+1. `.github/release.yml` — Label mapping config (6 categories: Features, Improvements, Docs, Bug Fixes, Research, Infrastructure)
+2. `.github/workflows/squad-release.yml` — Updated to detect new tags, run tests, and create releases with auto-generated notes
+
+**Why this approach:**
+- Matthew approved Gandalf's recommendation
+- Works seamlessly with existing label-based triage system
+- Minimal configuration required
+- Backward compatible with existing releases
+
+**Commit:** 406ec6d (pushed to origin/main)
+
+*— Aragorn, Backend Dev, 2026-02-23*

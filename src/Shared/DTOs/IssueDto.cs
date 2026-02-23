@@ -22,7 +22,8 @@ public record IssueDto(
 	CategoryDto Category,
 	StatusDto Status,
 	bool Archived = false,
-	UserDto? ArchivedBy = null)
+	UserDto? ArchivedBy = null,
+	DateTime? DateModified = null)
 {
 	public static IssueDto Empty => new(
 		ObjectId.Empty,

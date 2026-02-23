@@ -56,6 +56,16 @@ public class Issue
 	public DateTime DateCreated { get; init; } = DateTime.UtcNow;
 
 	/// <summary>
+	///   Gets or sets the date modified.
+	/// </summary>
+	/// <value>
+	///   The date modified.
+	/// </value>
+	[BsonElement("date_modified")]
+	[BsonRepresentation(BsonType.DateTime)]
+	public DateTime? DateModified { get; set; }
+
+	/// <summary>
 	///   Gets or sets the category.
 	/// </summary>
 	/// <value>
