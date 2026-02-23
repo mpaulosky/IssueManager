@@ -6,7 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
-		<RootNamespace>IssueManager.Integration</RootNamespace>
+		<RootNamespace>Integration</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>

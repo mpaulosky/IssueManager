@@ -6,7 +6,7 @@ using Shared.Validators;
 
 using Xunit;
 
-namespace IssueManager.Tests.Architecture;
+namespace Tests.Architecture;
 
 /// <summary>
 /// Architecture tests that enforce project structure and dependencies.
@@ -14,12 +14,12 @@ namespace IssueManager.Tests.Architecture;
 /// </summary>
 public class ArchitectureTests
 {
-	private const string SharedNamespace = "IssueManager.Shared";
+	private const string SharedNamespace = "Shared";
 	private const string ApiNamespace = "Api";
-	private const string WebNamespace = "IssueManager.Web";
-	private const string ServiceDefaultsNamespace = "IssueManager.ServiceDefaults";
+	private const string WebNamespace = "Web";
+	private const string ServiceDefaultsNamespace = "ServiceDefaults";
 	private const string ModelsNamespace = "Shared.Models";
-	private const string ValidatorsNamespace = "IssueManager.Shared.Validators";
+	private const string ValidatorsNamespace = "Shared.Validators";
 
 	/// <summary>
 	/// Ensures that the Shared layer has no dependencies on higher layers (Api, Web).
@@ -211,7 +211,7 @@ public class ArchitectureTests
 	public void ServiceDefaults_ShouldHaveMinimalDependencies()
 	{
 		// Arrange
-		var serviceDefaultsAssembly = typeof(IssueManager.ServiceDefaults.Extensions).Assembly;
+		var serviceDefaultsAssembly = typeof(ServiceDefaults.Extensions).Assembly;
 
 		// Act
 		var result = Types.InAssembly(serviceDefaultsAssembly)

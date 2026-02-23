@@ -10,7 +10,7 @@
 using MongoDB.Bson;
 using Shared.DTOs;
 
-namespace IssueManager.Tests.Unit.Builders;
+namespace Tests.Unit.Builders;
 
 /// <summary>
 /// Builder for creating IssueDto test data with fluent API.

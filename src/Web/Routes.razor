@@ -1,12 +1,12 @@
-@namespace IssueManager.Web
+@namespace Web
 
 <Router AppAssembly="typeof(App).Assembly">
 	<Found Context="routeData">
-		<RouteView RouteData="@routeData" DefaultLayout="typeof(IssueManager.Web.Layout.MainLayout)" />
+		<RouteView RouteData="@routeData" DefaultLayout="typeof(Web.Layout.MainLayout)" />
 	</Found>
 	<NotFound>
 		<PageTitle>Not found</PageTitle>
-		<LayoutView Layout="typeof(IssueManager.Web.Layout.MainLayout)">
+		<LayoutView Layout="typeof(Web.Layout.MainLayout)">
 			<p role="alert">Sorry, there's nothing at this address.</p>
 		</LayoutView>
 	</NotFound>

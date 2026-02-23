@@ -1,6 +1,6 @@
 using Bunit;
 
-namespace IssueManager.Tests.BlazorTests.Fixtures;
+namespace Tests.BlazorTests.Fixtures;
 
 /// <summary>
 /// Base class for Blazor component tests providing common bUnit setup and utilities.

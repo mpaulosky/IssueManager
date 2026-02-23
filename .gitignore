@@ -37,6 +37,7 @@ user-secrets/
 # Logs & Artifacts
 logs/
 *.log
+*.txt
 .mongo/
 mongodb-data/
 

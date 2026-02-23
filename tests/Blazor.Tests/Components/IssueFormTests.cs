@@ -1,13 +1,13 @@
 using Bunit;
 using FluentAssertions;
 
-using IssueManager.Tests.BlazorTests.Fixtures;
-using IssueManager.Web.Components;
+using Tests.BlazorTests.Fixtures;
+using Web.Components;
 using Microsoft.AspNetCore.Components;
 
 using Xunit;
 
-namespace IssueManager.Tests.BlazorTests.Components;
+namespace Tests.BlazorTests.Components;
 
 /// <summary>
 /// Tests for the IssueForm Blazor component.

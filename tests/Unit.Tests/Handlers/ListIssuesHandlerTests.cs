@@ -9,7 +9,7 @@ using MongoDB.Bson;
 using NSubstitute;
 using Shared.DTOs;
 
-namespace IssueManager.Tests.Unit.Handlers;
+namespace Tests.Unit.Handlers;
 
 /// <summary>
 /// Unit tests for ListIssuesHandler with pagination.
