@@ -18,4 +18,10 @@
 - ObjectId validation done in repositories (IssueRepository.GetByIdAsync checks ObjectId.TryParse)
 - Repository unit-testable logic: ObjectId validation (Issue), null checks (all), userId validation (Comment)
 
+### Aspire Connection String Convention
+
+- Aspire connection string keys must exactly match the resource name in `AddDatabase("name")` — case-sensitive
+- AppHost defines `AddDatabase("issuemanager")` → Api must use `GetConnectionString("issuemanager")`
+- Previously Api used `"IssueManagerDb"` which didn't match, causing silent connection failure under Aspire
+
 <!-- Append new learnings below. -->

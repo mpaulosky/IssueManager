@@ -371,4 +371,32 @@ Executed full unit test coverage audit as requested by Copilot (Ralph coverage r
 
 ---
 
-*Last Updated: 2026-02-23*
+## PR #52 Scope Creep Fix (2026-02-24)
+
+### Task: Remove out-of-scope package additions from PR #52
+
+Fixed scope creep in PR #52 by reverting unrelated Directory.Packages.props changes.
+
+**Work Completed:**
+- Checked out branch `squad/51-test-fixes-phase-1`
+- Removed 2 unrelated package additions:
+  - `Aspire.Hosting.Aspire v13.1.1` (out of scope)
+  - `Aspire.Hosting.Redis v13.1.1` (out of scope)
+- Reverted Directory.Packages.props to original state
+- Committed with message: `"test: Phase 1 test compilation fixes - revert unrelated package changes"`
+- Pushed to the PR branch
+
+**Result:**
+- PR #52 now contains only the Phase 1 verification documentation (gimli-issue-51-phase1-findings.md)
+- PR is ready for re-review with proper scope (testing documentation only, no package changes)
+- Commit hash: `28948f0`
+
+**Key Actions:**
+1. ✅ Removed Directory.Packages.props scope creep
+2. ✅ Kept Phase 1 verification documentation intact
+3. ✅ Pushed update to PR #52 branch
+4. ✅ PR will auto-update to reflect changes
+
+---
+
+*Last Updated: 2026-02-24*
