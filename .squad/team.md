@@ -13,7 +13,11 @@
 | Name | Role | Charter | Status |
 |------|------|---------|--------|
 | Aragorn | Lead Developer | `.squad/agents/aragorn/charter.md` | ✅ Active |
+| Legolas | Blazor Frontend Developer | `.squad/agents/legolas/charter.md` | ✅ Active |
+| Sam | Backend Data Engineer | `.squad/agents/sam/charter.md` | ✅ Active |
 | Gimli | Tester | `.squad/agents/gimli/charter.md` | ✅ Active |
+| Boromir | DevOps / Infrastructure Engineer | `.squad/agents/boromir/charter.md` | ✅ Active |
+| Frodo | Technical Writer / DevRel | `.squad/agents/frodo/charter.md` | ✅ Active |
 | Scribe | Session Logger | `.squad/agents/scribe/charter.md` | 📋 Silent |
 | Ralph | Work Monitor | — | 🔄 Monitor |
 

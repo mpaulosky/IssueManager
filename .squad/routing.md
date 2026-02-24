@@ -7,12 +7,13 @@ How to decide who handles what.
 | Work Type | Route To | Examples |
 |-----------|----------|----------|
 | Architecture, API design, scope decisions | Aragorn | CQRS handlers, vertical slice design, PR reviews, tech decisions |
-| Backend implementation | Aragorn | Handlers, repositories, validators, mappers, MongoDB queries |
-| Blazor UI / frontend | Aragorn | Blazor components, pages, Tailwind CSS, server-side rendering |
-| CI/CD, build workflows | Aragorn | GitHub Actions, dotnet build/test scripts, release automation |
+| Backend implementation (handlers, validators, mappers) | Aragorn | CQRS handlers, FluentValidation validators, DTO mappers |
+| MongoDB data access / repositories | Sam | Repository implementations, DbContext, entity config, data models |
+| Blazor UI / frontend | Legolas | Blazor components, pages, Tailwind CSS, server-side rendering, bUnit |
+| CI/CD, build workflows | Boromir | GitHub Actions, dotnet build/test scripts, release automation, Aspire |
+| Documentation, README, XML docs | Frodo | README, docs/, CONTRIBUTING, Scalar/OpenAPI descriptions, XML comments |
 | Code review | Aragorn | Review PRs, check quality, enforce patterns |
-| Unit testing, integration testing | Gimli | xUnit tests, FluentAssertions, NSubstitute mocks, bUnit component tests |
-| Coverage audits | Gimli | Identify gaps, coverage reports, phase-based test roadmaps |
+| Unit testing, integration testing | Gimli | xUnit tests, FluentAssertions, NSubstitute mocks, coverage audits |
 | Test scaffolding & builders | Gimli | Builder classes, test fixtures, TestContainers MongoDB setup |
 | Async issue work (bugs, tests, small features) | @copilot 🤖 | Well-defined tasks matching capability profile |
 | Session logging | Scribe | Automatic — never needs routing |
@@ -23,7 +24,11 @@ How to decide who handles what.
 |-------|--------|-----|
 | `squad` | Triage: analyze issue, evaluate @copilot fit, assign `squad:{member}` label | Aragorn (Lead) |
 | `squad:aragorn` | Pick up issue and complete the work | Aragorn |
+| `squad:legolas` | Pick up issue and complete the work | Legolas |
+| `squad:sam` | Pick up issue and complete the work | Sam |
 | `squad:gimli` | Pick up issue and complete the work | Gimli |
+| `squad:boromir` | Pick up issue and complete the work | Boromir |
+| `squad:frodo` | Pick up issue and complete the work | Frodo |
 | `squad:copilot` | Assign to @copilot for autonomous work (if enabled) | @copilot 🤖 |
 
 ### How Issue Assignment Works
