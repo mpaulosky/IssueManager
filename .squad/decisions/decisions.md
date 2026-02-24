@@ -617,3 +617,295 @@ Implemented automated release notes generation using GitHub's native feature:
 **Commit:** 406ec6d (pushed to origin/main)
 
 *— Aragorn, Backend Dev, 2026-02-23*
+
+---
+
+## Test Folder Rename to `.Tests` Convention — IssueManager
+
+**Issue:** #39
+**Branch:** `squad/39-rename-test-folders`
+**PR:** https://github.com/mpaulosky/IssueManager/pull/44
+**Date:** 2025
+**Author:** Aragorn (Lead Developer)
+
+### Decision
+
+Rename all test folders and projects under `tests/` to consistently end in `.Tests`, matching standard .NET test project naming conventions.
+
+### Changes Made
+
+| Old | New |
+|-----|-----|
+| `tests/Architecture/Architecture.csproj` | `tests/Architecture.Tests/Architecture.Tests.csproj` |
+| `tests/BlazorTests/BlazorTests.csproj` | `tests/Blazor.Tests/Blazor.Tests.csproj` |
+| `tests/Integration/Integration.csproj` | `tests/Integration.Tests/Integration.Tests.csproj` |
+| `tests/Unit/Unit.csproj` | `tests/Unit.Tests/Unit.Tests.csproj` |
+
+`IssueManager.sln` updated with corrected project names and paths for all 4 projects.
+
+### Rationale
+
+- Consistency: all test projects now follow the `<ProjectName>.Tests` convention.
+- Discoverability: IDEs and CI tooling can identify test projects by name suffix.
+- `Aspire` test project was left unchanged as it was not in scope for this issue.
+
+### Notes
+
+- `RootNamespace` values in `.csproj` files were intentionally left unchanged to avoid breaking existing `using` statements.
+- On Windows, `Rename-Item` may fail with "Access Denied" for directories; `Move-Item` is a reliable alternative.
+- Integration tests require Docker (TestContainers + MongoDB 8.0); excluded from local verification run.
+
+### Outcome
+
+Build: 0 errors, 0 warnings. 84 tests passing (Unit: 62, Architecture: 9, Blazor: 13).
+
+*— Aragorn, Lead Developer, 2025*
+
+---
+
+## docs/ Folder Convention for .md, .txt, .log Files — IssueManager
+
+**Date:** 2026-02-23
+**Requested by:** User (Ralph session)
+**Status:** Accepted
+
+### Decision
+
+All `.md`, `.txt`, and `.log` files created during development must be placed in the `docs/` folder
+(or a sub-folder such as `docs/guides/`, `docs/reviews/`) — not in the repository root.
+
+### Rationale
+
+Accumulated build artifacts and working documents at the repository root create clutter and confusion.
+Centralising them in `docs/` keeps the root clean and makes it easier to find reference material.
+
+### Rules
+
+- **Generated output** (build logs, test results, restore logs): Never committed; covered by `.gitignore` (`*.log`, `*.txt`).
+- **Working documents** (plans, summaries, instructions, analysis): Place in `docs/` or `docs/guides/`.
+- **Standard root files** (README.md, SECURITY.md, LICENSE): Remain at root per GitHub/OSS convention.
+
+### Actions Taken
+
+- Added `*.txt` to `.gitignore` (alongside existing `*.log` rule).
+- Moved `PR_CREATION_INSTRUCTIONS.md`, `QUICK_ACTION_PLAN.md`, `WORKFLOW_FIXES_SUMMARY.md` → `docs/`.
+- Removed committed build artifact `.txt` files from tracking.
+- Added "File Placement" section to `.github/copilot-instructions.md`.
+
+*— Ralph (User session), 2026-02-23*
+
+---
+
+## Build Repair Results — IssueManager
+
+**Date:** 2026-02-23
+**Requested by:** Matthew
+
+### Decision / Notable Finding
+
+The full IssueManager.sln build-repair skill ran successfully with zero issues. Nothing needed fixing.
+
+**Key observation:** Integration tests use Docker/TestContainers to spin up MongoDB 8.0. If Docker is not running, the integration test run hangs indefinitely (does not fail gracefully). This is a risk for CI environments without Docker available.
+
+### Results
+
+| Step | Result |
+|------|--------|
+| Restore | ✅ SUCCESS |
+| Build (Release) | ✅ 0 warnings, 0 errors |
+| Unit Tests (62) | ✅ All passed |
+| Architecture Tests (9) | ✅ All passed |
+| Blazor Tests (13) | ✅ All passed |
+| Integration Tests (46) | ✅ All passed (~105s, requires Docker) |
+| **TOTAL** | **130/130 passed** |
+
+### Recommendation
+
+- Ensure Docker is running before executing the full test suite locally.
+- Consider adding a CI check to verify Docker availability before integration tests.
+- Integration tests should be run last or in a separate step due to their ~105s runtime.
+
+*— Aragorn, Backend Dev, 2026-02-23*
+
+---
+
+## Status, Category, Comment Repositories and Handlers — IssueManager (Issue #33)
+
+**Date:** 2026
+**Author:** Aragorn (Lead Developer)
+**Branch:** `squad/33-status-category-comment-handlers`
+**PR:** https://github.com/mpaulosky/IssueManager/pull/45
+
+### Context
+
+Issue #33 required adding concrete MongoDB repository implementations and full CRUD handler stacks for the Status, Category, and Comment models. Interface definitions already existed in `src/Api/Data/` but had no implementations.
+
+### Decisions
+
+#### 1. Repository Pattern — Result<T> not DTO-based
+
+The existing `IStatusRepository`, `ICategoryRepository`, and `ICommentRepository` interfaces use the `Result<T>` pattern from `Shared.Abstractions`. The `IssueRepository` uses a DTO-based pattern. We matched the interfaces as specified, using `Result<T>` in the new repositories.
+
+#### 2. Handler Error Propagation
+
+Handlers convert `Result.Failure` into typed exceptions (`NotFoundException`, `ValidationException`) to integrate with the HTTP layer — matching the Issues handler pattern.
+
+#### 3. CommentRepository.GetByUserAsync
+
+Filtered by `x.Author.Id` (UserDto field is `Id`, not `UserId`). Confirmed by inspecting `UserDto.cs`.
+
+#### 4. Category.DateCreated is init-only
+
+`Category.DateCreated` is declared as `init`, so it cannot be mutated after construction. Handlers set it at creation time only.
+
+#### 5. Endpoints
+
+- `GET/POST /api/v1/statuses` — list / create
+- `GET/PATCH/DELETE /api/v1/statuses/{id}` — get / update / archive
+- Same pattern for `/api/v1/categories` and `/api/v1/comments`
+
+### Result
+
+- 30 files changed, 1810 insertions
+- Build: 0 errors, 0 warnings
+- Tests: 84/84 passing
+
+*— Aragorn, Lead Developer, 2026*
+
+---
+
+## Coverage Audit — February 23, 2026
+
+**Author:** Gimli (Tester)
+**Date:** 2026-02-23
+
+### Current Coverage (ReportGenerator Summary)
+
+**Overall Line Coverage: 11.0%** (254 of 2302 lines covered)
+
+| Metric | Coverage | Detail |
+|--------|----------|--------|
+| **Line Coverage** | **11.0%** | 254 / 2302 coverable lines |
+| **Branch Coverage** | **2.7%** | 17 / 616 branches |
+| **Method Coverage** | **17.6%** | 72 / 407 methods |
+| **Full Method Coverage** | **17.4%** | 71 / 407 methods |
+
+**Assembly Breakdown:**
+
+| Assembly | Coverage | Status |
+|----------|----------|--------|
+| **Shared** | 47.7% | ✅ Best coverage (validators + DTOs) |
+| **Api** | 4.7% | ❌ Critical gap (handlers + repos) |
+| **ServiceDefaults** | 0% | ⚠️ Untested |
+| **Unit.Tests** | 0% | ℹ️ (Test code itself — not coverage target) |
+
+### Gap Analysis — Missing Coverage
+
+#### 🔴 Priority 1: Critical Handlers (Api.Handlers) — 0% Coverage
+
+- Issues: `CreateIssueHandler`, `GetIssueHandler`, `UpdateIssueStatusHandler` (3 handlers)
+- Categories: 5 handlers (Create/Delete/Get/List/Update)
+- Comments: 5 handlers (Create/Delete/Get/List/Update)
+- Statuses: 5 handlers (Create/Delete/Get/List/Update)
+
+**Total Missing: 18 handler classes**
+
+#### 🔴 Priority 2: Repository Layer (Api.Data) — 0% Coverage
+
+All 4 repository implementations: `CategoryRepository`, `CommentRepository`, `IssueRepository`, `StatusRepository`.
+Note: Covered by integration tests (MongoDB + TestContainers); unit tests add value for business logic within repositories.
+
+#### 🔴 Priority 3: Mappers (Shared.Mappers) — 0% Coverage
+
+All 5 mapper classes: `CategoryMapper`, `CommentMapper`, `IssueMapper`, `StatusMapper`, `UserMapper`.
+High-value target — data transformation bugs are silent (no exceptions, just corrupt data).
+
+### Recommended Priority Order (To Reach 90%)
+
+| Phase | New Tests | Estimated Coverage |
+|-------|-----------|-------------------|
+| Baseline | 0 | 11% |
+| Phase 1 (Handlers — 18 files) | 18 | ~60% |
+| Phase 2 (Mappers — 5 files) | 5 | ~75% |
+| Phase 3 (Repos — 4 files) | 4 | ~85% |
+| Phase 4 (Abstractions — 2 files) | 2 | ~90% ✅ |
+
+### Next Steps
+
+1. Assign handler tests to Aragorn (backend dev)
+2. Create `tests/Unit.Tests/Mappers/` directory
+3. Create builder classes for Category, Status, Comment
+4. Start with Phase 1 tests in Sprint 1
+
+*— Gimli, Tester, 2026-02-23*
+
+---
+
+## Handler Test Patterns — Phase 1 Coverage Push
+
+**Author:** Gimli (Tester)
+**Date:** 2026-02-23
+**Status:** Implemented — PR #48
+
+### Decision: Standardized Handler Test Patterns
+
+Phase 1 of the coverage push to 90% (issue #46) is complete. All 21 handler tests have been written following consistent patterns.
+
+**Results:**
+- ✅ **226 tests total** (115 existing + 111 new)
+- ✅ **All tests passing**
+- ✅ **Zero build warnings**
+- ✅ **Test execution time: ~950ms**
+
+All handler tests follow a consistent 6-pattern structure:
+
+1. **Happy path:** Valid input returns expected result
+2. **Validation failures:** Empty fields, too long, too short, invalid formats
+3. **Not found scenarios:** Returns null or throws `NotFoundException`
+4. **Repository failures:** Throws appropriate exceptions with error messages
+5. **Idempotent operations:** Repeated calls (e.g., archiving archived entity) succeed without side effects
+6. **Cancellation token:** Token is passed correctly to repository methods
+
+### Tooling Stack
+
+| Tool | Purpose |
+|------|---------|
+| **xUnit** | Test framework |
+| **NSubstitute** | Mocking repositories |
+| **FluentAssertions** | Assertions |
+| **ObjectId.GenerateNewId()** | Test data generation |
+| **Builder pattern** | Test data creation |
+
+### Entity-Specific Patterns
+
+- **Issue Handlers:** Repository returns `IssueDto` directly (no `Result<T>` wrapper).
+- **Category/Status/Comment Handlers:** Repositories return `Result<T>` (where T = model); handlers map to DTO via `.ToDto()`.
+
+### Key Lessons Learned
+
+1. **Result<T> vs. Direct DTO Patterns** — Issue handlers use direct DTO returns; all other handlers use `Result<T>`. Consider standardizing on `Result<T>` for consistency.
+2. **Validation Rule Discrepancies** — Always check actual validator rules before writing tests (Issue.Title max is 200, not 256).
+3. **ObjectId Validation** — Category/Status/Comment handlers perform `ObjectId.TryParse()` checks before repository calls; must test invalid ObjectId returns null without calling repository.
+4. **Idempotent Delete** — All delete handlers check `entity.Archived` and return true if already archived.
+
+### Directory Structure Established
+
+```
+tests/Unit.Tests/Handlers/
+├── Issues/    (6 test files)
+├── Categories/ (5 test files)
+├── Statuses/   (5 test files)
+└── Comments/   (5 test files)
+tests/Unit.Tests/Builders/
+├── CategoryBuilder.cs (new)
+├── StatusBuilder.cs (new)
+└── CommentBuilder.cs (new)
+```
+
+### Next Steps (Phase 2-4)
+
+- **Phase 2:** 5 mapper tests (+15% → 75%)
+- **Phase 3:** 4 repository unit tests (+10% → 85%)
+- **Phase 4:** Result/Result<T> abstractions (+5% → 90%)
+
+*— Gimli, Tester, 2026-02-23*
