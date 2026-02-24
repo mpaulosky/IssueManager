@@ -2,6 +2,23 @@
 
 ## Learnings
 
+### PR #52 Review: Phase 1 Test Compilation Fixes (2026-02-24)
+
+**Status:** ❌ REJECTED (Scope Creep)  
+**Reason:** PR mixes test compilation verification documentation with unrelated infrastructure changes (Aspire package additions).
+
+**What was correct:** Gimli's Phase 1 verification is accurate — no test compilation errors exist. Tests already use correct DTO constructors (.UserDto, CategoryDto, StatusDto), correct property naming (.Archived, not .IsArchived), and aligned repository APIs.
+
+**What failed:** Directory.Packages.props additions of `Aspire.Hosting.Aspire` and `Aspire.Hosting.Redis` are:
+1. Out of scope for Issue #51 (test fixes, not infrastructure)
+2. Unused in codebase (no matches in /src or /tests)
+3. Lack documented justification
+4. Violate single-concern vertical slice principle
+
+**Decision:** Route back to Gimli to remove package changes and keep documentation-only. If Aspire packages are needed, create separate issue with rationale.
+
+**Architectural principle enforced:** PR scope = single concern. Infrastructure changes require separate justification and PR.
+
 ### Test Migration Plan Analysis (Issue #51, 2026)
 
 Analyzed 130+ failing tests due to domain model refactoring. Discovered compilation failures grouped into 7 categories:
