@@ -8,7 +8,7 @@ using Shared.Validators;
 using MongoDB.Bson;
 using NSubstitute;
 
-namespace Tests.Unit.Handlers;
+namespace Tests.Unit.Handlers.Issues;
 
 /// <summary>
 /// Unit tests for DeleteIssueHandler (soft-delete via Archived).

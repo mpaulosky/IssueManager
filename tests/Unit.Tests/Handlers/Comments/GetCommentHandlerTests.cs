@@ -1,0 +1,143 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     GetCommentHandlerTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Unit Tests
+// =======================================================
+
+using Api.Data;
+using Api.Handlers;
+using MongoDB.Bson;
+using Shared.Abstractions;
+using Shared.Models;
+
+namespace Tests.Unit.Handlers.Comments;
+
+/// <summary>
+/// Unit tests for GetCommentHandler.
+/// </summary>
+public class GetCommentHandlerTests
+{
+	private readonly ICommentRepository _repository;
+	private readonly GetCommentHandler _handler;
+
+	public GetCommentHandlerTests()
+	{
+		_repository = Substitute.For<ICommentRepository>();
+		_handler = new GetCommentHandler(_repository);
+	}
+
+	[Fact]
+	public async Task Handle_ValidCommentId_ReturnsComment()
+	{
+		// Arrange
+		var commentId = ObjectId.GenerateNewId();
+		var comment = new Comment
+		{
+			Id = commentId,
+			Title = "Test Comment",
+			Description = "This is a test comment.",
+			DateCreated = DateTime.UtcNow
+		};
+
+		_repository.GetAsync(commentId)
+			.Returns(Result<Comment>.Ok(comment));
+
+		var query = new GetCommentQuery(commentId.ToString());
+
+		// Act
+		var result = await _handler.Handle(query, CancellationToken.None);
+
+		// Assert
+		result.Should().NotBeNull();
+		result!.Title.Should().Be("Test Comment");
+		result.Description.Should().Be("This is a test comment.");
+		await _repository.Received(1).GetAsync(commentId);
+	}
+
+	[Fact]
+	public async Task Handle_NonExistentCommentId_ReturnsNull()
+	{
+		// Arrange
+		var commentId = ObjectId.GenerateNewId();
+		_repository.GetAsync(commentId)
+			.Returns(Result<Comment>.Fail("Not found"));
+
+		var query = new GetCommentQuery(commentId.ToString());
+
+		// Act
+		var result = await _handler.Handle(query, CancellationToken.None);
+
+		// Assert
+		result.Should().BeNull();
+	}
+
+	[Fact]
+	public async Task Handle_EmptyCommentId_ThrowsArgumentException()
+	{
+		// Arrange
+		var query = new GetCommentQuery("");
+
+		// Act
+		Func<Task> act = async () => await _handler.Handle(query, CancellationToken.None);
+
+		// Assert
+		await act.Should().ThrowAsync<ArgumentException>()
+			.WithMessage("*Comment ID cannot be empty*");
+	}
+
+	[Fact]
+	public async Task Handle_WhitespaceCommentId_ThrowsArgumentException()
+	{
+		// Arrange
+		var query = new GetCommentQuery("   ");
+
+		// Act
+		Func<Task> act = async () => await _handler.Handle(query, CancellationToken.None);
+
+		// Assert
+		await act.Should().ThrowAsync<ArgumentException>()
+			.WithMessage("*Comment ID cannot be empty*");
+	}
+
+	[Fact]
+	public async Task Handle_InvalidObjectId_ReturnsNull()
+	{
+		// Arrange
+		var query = new GetCommentQuery("invalid-object-id");
+
+		// Act
+		var result = await _handler.Handle(query, CancellationToken.None);
+
+		// Assert
+		result.Should().BeNull();
+		await _repository.DidNotReceive().GetAsync(Arg.Any<ObjectId>());
+	}
+
+	[Fact]
+	public async Task Handle_ValidCommentId_PassesCancellationToken()
+	{
+		// Arrange
+		var commentId = ObjectId.GenerateNewId();
+		var cancellationToken = new CancellationToken();
+		var comment = new Comment
+		{
+			Id = commentId,
+			Title = "Test Comment",
+			Description = "This is a test comment."
+		};
+
+		_repository.GetAsync(commentId)
+			.Returns(Result<Comment>.Ok(comment));
+
+		var query = new GetCommentQuery(commentId.ToString());
+
+		// Act
+		await _handler.Handle(query, cancellationToken);
+
+		// Assert
+		await _repository.Received(1).GetAsync(commentId);
+	}
+}
