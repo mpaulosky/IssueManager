@@ -12,7 +12,7 @@ builder.Services.AddServiceDefaults();
 builder.Services.AddOpenApi();
 
 // Register repository
-var connectionString = builder.Configuration.GetConnectionString("IssueManagerDb") 
+var connectionString = builder.Configuration.GetConnectionString("issuemanager") 
 	?? "mongodb://localhost:27017";
 builder.Services.AddSingleton<IIssueRepository>(sp => 
 	new IssueRepository(connectionString, "IssueManagerDb"));

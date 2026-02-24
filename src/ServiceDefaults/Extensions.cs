@@ -14,6 +14,7 @@ public static class Extensions
 	public static IServiceCollection AddServiceDefaults(this IServiceCollection services)
 	{
 		services.AddServiceDiscovery();
+		services.AddHealthChecks();
 		return services;
 	}
 
