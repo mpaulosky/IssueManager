@@ -2,6 +2,22 @@
 
 ## Learnings
 
+### Test Migration Plan Analysis (Issue #51, 2026)
+
+Analyzed 130+ failing tests due to domain model refactoring. Discovered compilation failures grouped into 7 categories:
+
+1. **Entity Constructor Parameter Mismatch** (~15 files): Tests pass `AuthorId`, `CategoryId`, `StatusId` scalar IDs; current Issue entity expects `UserDto author`, `CategoryDto category`, `StatusDto status` objects.
+2. **Property Renaming** (~10 files): `.IsArchived` property renamed to `.Archived` on Issue entity.
+3. **IssueStatus Enum Removal** (~8 files): Tests reference `IssueStatus` enum that no longer exists; replaced with `Status` class and `StatusDto` DTOs.
+4. **Missing Result<T> Namespace** (~5 files): Tests use bare `Result` type without importing `Shared.Abstractions.Result`.
+5. **Missing Exception Imports** (~3 files): `NotFoundException` and `ConflictException` used without `using Shared.Exceptions;`.
+6. **Handler Constructor Changes** (~4 files): Handlers now require explicit validator instances in constructor (e.g., `DeleteIssueHandler(repo, new DeleteIssueValidator())`).
+7. **FluentAssertions & Response API Changes** (~5 files): `DateTimeAssertions.NotBeNull()` removed; `PaginatedResponse.TotalCount` renamed to `Total`.
+
+Created detailed fix plan (.squad/decisions/inbox/aragorn-test-migration-plan.md) with 3-phase implementation strategy (Groups 1-2 blocking, Groups 3-5 independent, Groups 6-7 dependent). Routed to Gimli for execution. Issue #51: https://github.com/mpaulosky/IssueManager/issues/51
+
+**Key Insight**: Domain model refactoring was thorough and correct; tests were stale reference implementations. Compilation fixes are mechanical, not logical. No behavior changes needed.
+
 ### Test Folder Rename (Issue #39, 2025)
 
 Renamed all test folders and projects under `tests/` to consistently end in `.Tests`:
