@@ -13,13 +13,17 @@
 		<PackageReference Include="Aspire.Hosting" />
 		<PackageReference Include="Aspire.Hosting.AppHost" />
 		<PackageReference Include="Aspire.Hosting.MongoDB" />
+		<PackageReference Include="Aspire.Hosting.Redis" />
 	</ItemGroup>
-	
+
 	<ItemGroup>
 		<ProjectCapability Include="CanEvaluateItemsWithTargetFramework" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" IsAspireProjectResource="false" />
+		<ProjectReference Include="..\Shared\Shared.csproj" IsAspireProjectResource="false"/>
+		<ProjectReference Include="..\Api\Api.csproj" />
+		<ProjectReference Include="..\Web\Web.csproj" />
 	</ItemGroup>
 </Project>

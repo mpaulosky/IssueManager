@@ -1,15 +1,21 @@
+using AppHost;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
-var mongodb = builder
-	.AddMongoDB("mongodb")
-	.AddDatabase("issuemanager");
+// Configure resources
+var redisCache = builder.AddRedisServices();
+var mongoDb = builder.AddMongoDbServices();
 
 var api = builder
-	.AddProject("api", "../Api/Api.csproj")
-	.WithReference(mongodb);
+	.AddProject<Projects.Api>("api")
+	.WithReference(mongoDb).WaitFor(mongoDb);
 
-builder
-	.AddProject("web", "../Web/Web.csproj")
-	.WithReference(api);
+// Web project with health check and resource dependencies
+builder.AddProject<Projects.Web>("web")
+		.WithExternalHttpEndpoints()
+		.WithHttpHealthCheck("/health")
+		.WithReference(redisCache).WaitFor(redisCache)
+		.WithReference(api).WaitFor(api)
+		;
 
 builder.Build().Run();
