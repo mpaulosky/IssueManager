@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# pre-push hook — runs Unit.Tests before any push.
+# Blocks the push if tests fail so broken code never reaches GitHub.
+#
+# Install: bash scripts/hooks/install-hooks.sh
+
+set -euo pipefail
+
+echo "🔎 pre-push: running Unit.Tests…"
+
+if dotnet test tests/Unit.Tests --configuration Release --verbosity quiet 2>&1; then
+  echo "✅ pre-push: tests passed — push allowed."
+else
+  echo ""
+  echo "❌ pre-push: Unit tests FAILED. Push aborted."
+  echo "   Fix the failures locally before pushing."
+  exit 1
+fi
