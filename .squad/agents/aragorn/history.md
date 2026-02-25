@@ -11,6 +11,21 @@ Closure Comment: "Phase 1 verification complete - all tests compile successfully
 
 ## Learnings
 
+### DI Registration Refactor: ServiceCollectionExtensions (2026)
+
+Extracted all DI registrations from `src/Api/Program.cs` into a single extension file `src/Api/Extensions/ServiceCollectionExtensions.cs` with three focused methods:
+
+- `AddRepositories(IConfiguration)` — reads connection string, registers 4 MongoDB repositories
+- `AddValidators()` — registers 14 FluentValidation validators as singletons
+- `AddHandlers()` — registers 21 CQRS handler classes as singletons
+
+**Key gotcha:** All handlers (Issues, Statuses, Categories, Comments) share a single namespace `Api.Handlers` (not feature-specific sub-namespaces like `Api.Handlers.Issues`). This is different from the endpoint extension classes which live in `Api.Handlers.{Feature}`.
+
+**Program.cs result:** Reduced from ~80 lines to 32 lines. The `using ServiceDefaults;` directive is still required directly in `Program.cs` because `AddServiceDefaults()` is an extension on `WebApplicationBuilder`, not `IServiceCollection`.
+
+**Build result:** 0 errors, 0 warnings.
+
+
 ### PR #52: Phase 1 Test Compilation Fixes - APPROVED & MERGED (2026-02-24)
 
 **Status:** ✅ APPROVED & MERGED  
