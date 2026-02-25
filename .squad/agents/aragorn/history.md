@@ -79,3 +79,30 @@ PR #44 CI was failing. Root cause: `.github/workflows/squad-test.yml` still refe
 - `tests/Integration` → fixed to `tests/Integration.Tests`
 
 Local build post-fix: 0 errors, 0 warnings. All 130 tests passed. Committed and pushed `aa23d02` to trigger new CI run.
+
+### Vertical Slice Architecture: Endpoint Registration Refactoring (2026-02-24)
+
+Refactored API endpoint registration to align with Vertical Slice Architecture principles. Each feature slice now owns its endpoint registration via a static extension method.
+
+**Pattern applied:**
+- Created `{Feature}Endpoints.cs` in each handler folder (`src/Api/Handlers/{Feature}/`)
+- Each file contains a `Map{Feature}Endpoints(this IEndpointRouteBuilder app)` extension method
+- Groups endpoints under `/api/v1/{feature}` with appropriate tags
+- Preserved all `.WithName()`, `.WithSummary()`, `.Produces<>()` attributes
+
+**Files created:**
+- `src/Api/Handlers/Issues/IssueEndpoints.cs` — 5 endpoints (List, Get, Create, Update, Delete)
+- `src/Api/Handlers/Statuses/StatusEndpoints.cs` — 5 endpoints
+- `src/Api/Handlers/Categories/CategoryEndpoints.cs` — 5 endpoints
+- `src/Api/Handlers/Comments/CommentEndpoints.cs` — 5 endpoints
+
+**Program.cs changes:**
+- Removed ~230 lines of inline endpoint registration (lines 71–302)
+- Added namespace imports: `Api.Handlers.Issues`, `Api.Handlers.Statuses`, `Api.Handlers.Categories`, `Api.Handlers.Comments`
+- Removed `using static Api.Handlers.GetIssueHandler;` — types now in scope via feature namespace
+- Replaced inline groups with extension method calls: `app.MapIssueEndpoints();` etc.
+- Final Program.cs: 80 lines (down from ~305)
+
+**Build verification:** Solution compiled successfully with 0 errors, 0 warnings.
+
+**Key insight:** VSA endpoint registration eliminates Program.cs bloat, improves feature cohesion, and makes it trivial to locate all endpoints for a given feature. Each slice is now self-contained (handlers, validators, endpoints).

@@ -19,6 +19,56 @@
 
 <!-- Append new learnings below. -->
 
+### 2026-02-24: Aspire AppHost Full Build + Run Verification
+
+**Task:** Restore, build, and run the Aspire AppHost to verify clean startup.
+
+**Issue Found — Shared Environment File Lock:**
+- `dotnet restore IssueManager.sln` fails immediately with:
+  `Access to the path 'Aspire.Hosting.Tasks.dll' is denied.`
+- Root cause: Shared server environment — other dotnet processes (18+ running) hold the default NuGet package cache (`~/.nuget/packages`) read-locked on `Aspire.Hosting.Tasks.dll`.
+- This is a known issue in shared/multi-user environments where multiple Aspire builds compete over the same package cache.
+
+**Fix — Alternate NuGet Packages Directory:**
+- Set `$env:NUGET_PACKAGES = "$env:USERPROFILE\.nuget\packages_aspire"` before any dotnet command.
+- This directs restore to a user-isolated cache, avoiding the lock contention.
+- Restore completes successfully in ~5s with this env var set.
+
+**Build Result:**
+- `dotnet build IssueManager.sln --no-restore` → **Build succeeded. 0 Error(s). 0 Warning(s).**
+- All 9 projects compile cleanly.
+
+**AppHost Run Result:**
+- `dotnet run --project src/AppHost/AppHost.csproj --no-build` → **Starts successfully**
+- Aspire version: `13.1.1`
+- Dashboard URL: `https://issuetracker.dev.localhost:17270`
+- Login token generated correctly.
+- Process stays running (does not crash on startup).
+
+**Required Env Var for All dotnet Commands in This Repo:**
+```powershell
+$env:NUGET_PACKAGES = "$env:USERPROFILE\.nuget\packages_aspire"
+dotnet restore IssueManager.sln
+dotnet build IssueManager.sln --no-restore
+```
+
+**No code changes were needed** — the codebase was already clean from prior fixes. The only issue is operational (shared environment file locking).
+
+**NuGet.config Fix Applied:**
+The existing `NuGet.config` had `globalPackagesFolder` set to `$env:USERPROFILE\.nuget\packages_aspire` — this is PowerShell syntax, which NuGet.config does **not** expand. Changed to `%USERPROFILE%\.nuget\packages_aspire` (Windows env var syntax). NuGet now correctly resolves the user-specific package cache path without any env var workaround. `dotnet restore` and `dotnet build` both work without any env var setup.
+
+### 2026-02-24: Created launchSettings.json for Api and Web
+
+**Task:** Created missing `Properties/launchSettings.json` files for Api and Web projects.
+
+**Files created:**
+- `src/Api/Properties/launchSettings.json` — https (7194/5194) and http (5194) profiles, `launchBrowser: false`, opens `/openapi/v1.json`
+- `src/Web/Properties/launchSettings.json` — https (7080/5080) and http (5080) profiles, `launchBrowser: true`
+
+**Why:** Both projects had no standalone run profiles. Without launchSettings.json, `dotnet run` and Visual Studio/Rider cannot offer named profiles. Aspire AppHost has its own ports (17270/15177) for orchestrated startup — these standalone profiles are for running Api or Web independently outside Aspire for debugging and development.
+
+**Port choices follow convention:** Api on 7194/5194, Web on 7080/5080 — no conflicts with AppHost ports.
+
 ### 2026-02-24: Aspire Service Startup Investigation
 
 **Task:** Diagnosed Aspire AppHost service failures for Api and Web projects.

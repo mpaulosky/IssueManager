@@ -1,0 +1,70 @@
+using Api.Handlers;
+using Shared.DTOs;
+using Shared.Validators;
+using static Api.Handlers.GetCategoryHandler;
+
+namespace Api.Handlers.Categories;
+
+/// <summary>Registers Category endpoints on the route builder.</summary>
+public static class CategoryEndpoints
+{
+	public static IEndpointRouteBuilder MapCategoryEndpoints(this IEndpointRouteBuilder app)
+	{
+		var group = app.MapGroup("/api/v1/categories").WithTags("Categories");
+
+		group.MapGet("", async (ListCategoriesHandler handler) =>
+		{
+			var result = await handler.Handle();
+			return Results.Ok(result);
+		})
+		.WithName("ListCategories")
+		.WithSummary("Get all categories")
+		.Produces<IEnumerable<CategoryDto>>(StatusCodes.Status200OK);
+
+		group.MapGet("{id}", async (string id, GetCategoryHandler handler) =>
+		{
+			var query = new GetCategoryQuery(id);
+			var category = await handler.Handle(query);
+			return category is not null ? Results.Ok(category) : Results.NotFound();
+		})
+		.WithName("GetCategory")
+		.WithSummary("Get a category by ID")
+		.Produces<CategoryDto>(StatusCodes.Status200OK)
+		.Produces(StatusCodes.Status404NotFound);
+
+		group.MapPost("", async (CreateCategoryCommand command, CreateCategoryHandler handler) =>
+		{
+			var category = await handler.Handle(command);
+			return Results.Created($"/api/v1/categories/{category.Id}", category);
+		})
+		.WithName("CreateCategory")
+		.WithSummary("Create a new category")
+		.Produces<CategoryDto>(StatusCodes.Status201Created)
+		.Produces(StatusCodes.Status400BadRequest);
+
+		group.MapPatch("{id}", async (string id, UpdateCategoryCommand command, UpdateCategoryHandler handler) =>
+		{
+			var commandWithId = command with { Id = id };
+			var result = await handler.Handle(commandWithId);
+			return result is not null ? Results.Ok(result) : Results.NotFound();
+		})
+		.WithName("UpdateCategory")
+		.WithSummary("Update an existing category")
+		.Produces<CategoryDto>(StatusCodes.Status200OK)
+		.Produces(StatusCodes.Status400BadRequest)
+		.Produces(StatusCodes.Status404NotFound);
+
+		group.MapDelete("{id}", async (string id, DeleteCategoryHandler handler) =>
+		{
+			var command = new DeleteCategoryCommand { Id = id };
+			var result = await handler.Handle(command);
+			return result ? Results.NoContent() : Results.NotFound();
+		})
+		.WithName("DeleteCategory")
+		.WithSummary("Delete (archive) a category")
+		.Produces(StatusCodes.Status204NoContent)
+		.Produces(StatusCodes.Status404NotFound);
+
+		return app;
+	}
+}

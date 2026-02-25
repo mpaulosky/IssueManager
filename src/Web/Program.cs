@@ -3,10 +3,14 @@ using Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddServiceDefaults();
+builder.AddServiceDefaults();
 
 builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents();
+
+builder.Services.AddHttpClient("api", client =>
+	client.BaseAddress = new Uri("https+http://api"))
+	.AddServiceDiscovery();
 
 var app = builder.Build();
 
@@ -23,6 +27,6 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>()
 	.AddInteractiveServerRenderMode();
 
-app.MapHealthChecks("/health");
+app.MapDefaultEndpoints();
 
 app.Run();

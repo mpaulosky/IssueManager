@@ -28,14 +28,14 @@ public static class DatabaseService
 		var databaseName = builder.AddParameter("mongoDb-database", secret: true);
 
 		// Use a valid resource name, not the connection string
-		var server = builder.AddMongoDB(Server)
+		var server = builder.AddMongoDB("mongodb")
 				.WithLifetime(ContainerLifetime.Persistent)
-				.WithDataVolume($"{Server}-data", isReadOnly: false)
+				.WithDataVolume("mongodb-data", isReadOnly: false)
 				.WithEnvironment("MONGODB-CONNECTION-STRING", mongoDbConnection)
 				.WithEnvironment("MONGODB-DATABASE-NAME", databaseName)
 				.WithMongoExpress();
 
-		var database = server.AddDatabase(DatabaseName);
+		var database = server.AddDatabase("issuemanager");
 
 		return database;
 	}

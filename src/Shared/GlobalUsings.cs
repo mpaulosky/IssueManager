@@ -7,6 +7,8 @@
 // Project Name :  Shared
 // =======================================================
 
+global using System.Text.RegularExpressions;
+
 global using MongoDB.Bson;
 global using MongoDB.Bson.Serialization.Attributes;
 

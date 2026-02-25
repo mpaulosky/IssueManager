@@ -959,4 +959,235 @@ Any service consuming an Aspire resource must use the exact resource name (case-
 
 ---
 
+### Vertical Slice Architecture — Endpoint Registration Pattern
+
+# Decision: Vertical Slice Architecture — Endpoint Registration Pattern
+
+**Date:** 2026-02-24  
+**By:** Aragorn (Lead Developer)  
+**Context:** Refactor API endpoint registration from centralized Program.cs to feature-owned extension methods
+
+---
+
+## Decision
+
+Each feature slice owns its endpoint registration via a static `MapXxxEndpoints(this IEndpointRouteBuilder app)` extension method.
+
+## Location Pattern
+
+```
+src/Api/Handlers/{Feature}/{Feature}Endpoints.cs
+```
+
+**Example:**
+- `src/Api/Handlers/Issues/IssueEndpoints.cs` — contains `MapIssueEndpoints()`
+- `src/Api/Handlers/Statuses/StatusEndpoints.cs` — contains `MapStatusEndpoints()`
+- `src/Api/Handlers/Categories/CategoryEndpoints.cs` — contains `MapCategoryEndpoints()`
+- `src/Api/Handlers/Comments/CommentEndpoints.cs` — contains `MapCommentEndpoints()`
+
+## Implementation Pattern
+
+```csharp
+namespace Api.Handlers.Issues;
+
+/// <summary>Registers Issue endpoints on the route builder.</summary>
+public static class IssueEndpoints
+{
+	public static IEndpointRouteBuilder MapIssueEndpoints(this IEndpointRouteBuilder app)
+	{
+		var group = app.MapGroup("/api/v1/issues").WithTags("Issues");
+
+		// MapGet, MapPost, MapPatch, MapDelete calls with full metadata
+		// .WithName(), .WithSummary(), .Produces<>()
+
+		return app;
+	}
+}
+```
+
+## Program.cs Usage
+
+```csharp
+using Api.Handlers.Issues;
+using Api.Handlers.Statuses;
+using Api.Handlers.Categories;
+using Api.Handlers.Comments;
+
+// ... service registration ...
+
+var app = builder.Build();
+
+app.UseHttpsRedirection();
+app.MapOpenApi();
+
+app.MapIssueEndpoints();
+app.MapStatusEndpoints();
+app.MapCategoryEndpoints();
+app.MapCommentEndpoints();
+
+app.MapDefaultEndpoints();
+app.Run();
+```
+
+## Benefits
+
+1. **Feature Cohesion:** Each slice now fully owns its endpoints, handlers, validators, and DTOs
+2. **Reduced Coupling:** Program.cs no longer needs `using static` imports or direct knowledge of query/command types
+3. **Scalability:** Adding a new feature requires zero Program.cs changes (just call the extension method)
+4. **Discoverability:** All endpoints for a feature are co-located with handlers in the feature folder
+5. **Maintainability:** Program.cs reduced from ~305 lines to 80 lines
+
+## Impact
+
+- Program.cs: Removed ~230 lines of inline endpoint registration
+- Created 4 new `*Endpoints.cs` files (Issues, Statuses, Categories, Comments)
+- Build: 0 errors, 0 warnings
+- No behavior changes — all endpoint metadata, routes, and attributes preserved
+
+## Rationale
+
+Vertical Slice Architecture emphasizes feature-centric organization over layer-centric. Centralizing endpoint registration in Program.cs violates this principle by coupling the application entry point to every feature's implementation details. Moving registration into the slice reduces Program.cs bloat, improves feature autonomy, and aligns with VSA best practices.
+
+---
+
+**Status:** Implemented  
+**Verification:** Build succeeded, all endpoints preserved with original metadata
+[1..-1] -join '### Decision'
+
+---
+
+### Aspire AppHost Run Status
+
+# Aspire AppHost Run Status
+
+**Author:** Boromir (DevOps / Infrastructure Engineer)
+**Date:** 2026-02-24
+**Status:** ✅ RUNNING CLEAN
+
+---
+
+ 
+
+The Aspire AppHost builds and starts successfully. No code changes were required — all prior fixes
+(ServiceDefaults rewrite, package reference cleanup) are correct. The only operational issue is a
+**shared environment file lock** on the NuGet package cache.
+
+---
+
+## Current State
+
+| Step | Result |
+|------|--------|
+| `dotnet restore IssueManager.sln` | ✅ Succeeds (no env var needed after fix) |
+| `dotnet build IssueManager.sln --no-restore` | ✅ 0 errors, 0 warnings |
+| `dotnet run --project src/AppHost/AppHost.csproj` | ✅ Starts, stays running |
+| Dashboard accessible | ✅ `https://issuetracker.dev.localhost:17270` |
+
+---
+
+## Root Cause Fixed — NuGet.config Syntax Error
+
+The `NuGet.config` already had a `globalPackagesFolder` pointing to a user-isolated cache to avoid
+shared-environment lock contention — but the value used **PowerShell syntax** (`$env:USERPROFILE`)
+which NuGet.config does not expand. Changed to **Windows env var syntax** (`%USERPROFILE%`):
+
+```xml
+<!-- Before (broken) -->
+<add key="globalPackagesFolder" value="$env:USERPROFILE\.nuget\packages_aspire" />
+
+<!-- After (fixed) -->
+<add key="globalPackagesFolder" value="%USERPROFILE%\.nuget\packages_aspire" />
+```
+
+With this fix, `dotnet restore` and `dotnet build` work correctly without any env var workaround.
+
+---
+
+## Blocking Issue (Operational, Not Code)
+
+**Problem:** Default restore fails with:
+```
+Access to the path 'Aspire.Hosting.Tasks.dll' is denied.
+```
+
+**Cause:** Shared server environment. 18+ other dotnet processes hold the default NuGet package
+cache (`~/.nuget/packages`) locked on `Aspire.Hosting.Tasks.dll`. This is a NuGet package
+extraction race condition in multi-user environments.
+
+**Workaround (Required):** Set this env var before any dotnet command:
+```powershell
+$env:NUGET_PACKAGES = "$env:USERPROFILE\.nuget\packages_aspire"
+```
+
+This uses a user-isolated package cache directory, bypassing the lock contention.
+
+---
+
+## AppHost Startup Output (Confirmed)
+
+```
+Using launch settings from src\AppHost\Properties\launchSettings.json...
+info: Aspire version: 13.1.1+6c6cd23e4d6e647d17a9689c3104dcbd21f42fb5
+info: Distributed application starting.
+info: Application host directory is: E:\github\IssueManager\src\AppHost
+info: Distributed application started. Press Ctrl+C to shut down.
+info: Now listening on: https://issuetracker.dev.localhost:17270
+info: Login to the dashboard at https://issuetracker.dev.localhost:17270/login?t=<token>
+```
+
+---
+
+## Known Runtime Dependencies (Not Blocking Build/Start)
+
+- **Docker required** for MongoDB container (`Aspire.Hosting.MongoDB`) to launch successfully.
+  If Docker is not running when AppHost starts, MongoDB resource will enter an error state
+  but AppHost itself will still start (dashboard remains accessible).
+- Integration tests require Docker + MongoDB 8.0 (TestContainers).
+
+---
+
+## Recommendations
+
+1. ~~**Add `$env:NUGET_PACKAGES` to all CI/CD scripts**~~ — **Fixed** via NuGet.config correction.
+2. **Verify Api and Web services start** inside the Aspire dashboard once Docker is confirmed running.
+3. **Docker must be running** for MongoDB container to start — AppHost itself starts fine without it
+   but the MongoDB resource will show an error state in the dashboard.
+[1..-1] -join '## Summary'
+
+---
+
+### Launch Profiles: Api and Web Projects
+
+# Decision Inbox: boromir-launch-profiles
+
+**From:** Boromir (DevOps / Infrastructure Engineer)
+**Date:** 2026-02-24
+**Status:** Pending merge
+
+ 
+
+Created `Properties/launchSettings.json` for both the **Api** and **Web** projects:
+
+- `src/Api/Properties/launchSettings.json`
+  - `https` profile: `https://localhost:7194;http://localhost:5194`, `launchBrowser: false`, opens `/openapi/v1.json`
+  - `http` profile: `http://localhost:5194`, `launchBrowser: false`
+  - Both profiles: `ASPNETCORE_ENVIRONMENT: Development`, `DOTNET_ENVIRONMENT: Development`
+
+- `src/Web/Properties/launchSettings.json`
+  - `https` profile: `https://localhost:7080;http://localhost:5080`, `launchBrowser: true`
+  - `http` profile: `http://localhost:5080`, `launchBrowser: true`
+  - Both profiles: `ASPNETCORE_ENVIRONMENT: Development`, `DOTNET_ENVIRONMENT: Development`
+
+## Why
+
+Neither project had a `launchSettings.json`. Without it, `dotnet run`, Visual Studio, and Rider cannot offer named launch profiles for standalone execution. The Aspire AppHost orchestrates services on its own ports (17270/15177) — these profiles serve independent debugging and development outside Aspire.
+
+## Port Rationale
+
+- Api: 7194 (https) / 5194 (http) — conventional .NET API ports, no conflict with AppHost
+- Web: 7080 (https) / 5080 (http) — conventional Blazor ports, no conflict with AppHost
+[1..-1] -join '## What'
+
+---
+
 **End of Decisions Log**
