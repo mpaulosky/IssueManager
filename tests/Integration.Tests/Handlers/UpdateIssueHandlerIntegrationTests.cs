@@ -12,6 +12,7 @@ namespace Tests.Integration.Handlers;
 /// <summary>
 /// Integration tests for UpdateIssueHandler with real MongoDB database.
 /// </summary>
+[Collection("Integration")]
 public class UpdateIssueHandlerIntegrationTests : IAsyncLifetime
 {
 private const string MONGODB_IMAGE = "mongo:8.0";
