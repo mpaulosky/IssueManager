@@ -11,6 +11,22 @@ Closure Comment: "Phase 1 verification complete - all tests compile successfully
 
 ## Learnings
 
+### Build Repair Run (2026-02-25) — Requested by Matthew Paulosky
+
+Full build-repair cycle executed against IssueManager.sln. All three steps passed cleanly with zero issues:
+
+- **Restore:** SUCCESS (~7.7s)
+- **Build (Release):** 0 warnings, 0 errors — BUILD SUCCEEDED
+- **Non-integration tests:** 332/332 passed (Unit + Architecture + Blazor) in ~3.1s
+- **Integration tests:** 46/46 passed (~244.7s, requires Docker with MongoDB 8.0)
+- **Total:** 378/378 tests passing
+
+**No errors, no warnings, no fixes required.** The codebase was already clean.
+
+**Pattern observed:** Integration tests hang (not fail) when Docker is unavailable. Always run them separately or verify Docker is running before executing `dotnet test` on the full solution. Use `--filter "FullyQualifiedName!~Integration"` for fast local checks without Docker.
+
+**Documentation:** Created `docs/build-repair-log.md` as the canonical build repair record (per skill spec). No code changes → no branch/PR required.
+
 ### DI Registration Refactor: ServiceCollectionExtensions (2026)
 
 Extracted all DI registrations from `src/Api/Program.cs` into a single extension file `src/Api/Extensions/ServiceCollectionExtensions.cs` with three focused methods:

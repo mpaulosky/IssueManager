@@ -11,6 +11,7 @@ namespace Tests.Integration.Handlers;
 /// <summary>
 /// Integration tests for ListIssuesHandler with pagination and real MongoDB database.
 /// </summary>
+[Collection("Integration")]
 public class ListIssuesHandlerIntegrationTests : IAsyncLifetime
 {
 private const string MONGODB_IMAGE = "mongo:8.0";

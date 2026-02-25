@@ -7,6 +7,7 @@ namespace Tests.Integration.Handlers;
 /// Integration tests for IssueRepository.ArchiveAsync (soft-delete).
 /// Verifies correct behavior when archiving existing, already-archived, and non-existent issues.
 /// </summary>
+[Collection("Integration")]
 public class DeleteIssueHandlerTests : IAsyncLifetime
 {
 	private const string MONGODB_IMAGE = "mongo:8.0";
