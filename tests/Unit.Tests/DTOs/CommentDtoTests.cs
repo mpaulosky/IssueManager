@@ -27,7 +27,13 @@ public sealed class CommentDtoTests
 		dto.Title.Should().BeEmpty();
 		dto.Description.Should().BeEmpty();
 		dto.DateCreated.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-		dto.Issue.Should().Be(IssueDto.Empty);
+		// IssueDto.Empty creates a new instance each call (DateCreated = UtcNow), so compare fields not by reference/value equality
+		dto.Issue.Id.Should().Be(ObjectId.Empty);
+		dto.Issue.Title.Should().BeEmpty();
+		dto.Issue.Description.Should().BeEmpty();
+		dto.Issue.Author.Should().Be(UserDto.Empty);
+		dto.Issue.Archived.Should().BeFalse();
+		dto.Issue.DateModified.Should().BeNull();
 		dto.Author.Should().Be(UserDto.Empty);
 		dto.DateModified.Should().BeNull();
 	}
