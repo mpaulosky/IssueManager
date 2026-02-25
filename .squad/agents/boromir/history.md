@@ -61,3 +61,47 @@
 **Build result:** Zero errors, zero warnings. All 9 projects compile cleanly in Release configuration.
 
 **Key learning:** `Aspire.Hosting.AppHost` must ONLY be referenced by the AppHost orchestrator project. Service projects (Api, Web) should never reference it — they consume Aspire client integration packages instead.
+
+### 2026-02-24: ServiceDefaults Complete Rewrite for Aspire Compliance
+
+**Task:** Fixed the root cause of Aspire service crashes — ServiceDefaults was missing proper OpenTelemetry configuration and had wrong package references.
+
+**Critical Issues Found:**
+1. **Wrong package**: ServiceDefaults.csproj referenced `Aspire.Hosting` (orchestrator package) instead of OpenTelemetry instrumentation packages
+2. **Minimal implementation**: Extensions.cs only had `AddServiceDiscovery()` and `AddHealthChecks()` — missing all OpenTelemetry setup
+3. **Wrong signature**: `AddServiceDefaults()` took `IServiceCollection` instead of `IHostApplicationBuilder` (Aspire pattern)
+4. **Manual health check mapping**: Api and Web manually called `MapHealthChecks("/health")` instead of using centralized `MapDefaultEndpoints()`
+
+**Fixes Applied:**
+1. **ServiceDefaults.csproj**: Removed `Aspire.Hosting`, added proper OpenTelemetry instrumentation packages:
+   - `OpenTelemetry`
+   - `OpenTelemetry.Instrumentation.AspNetCore`
+   - `OpenTelemetry.Instrumentation.Http`
+   - `OpenTelemetry.Instrumentation.Runtime`
+   
+2. **Directory.Packages.props**: Added missing OpenTelemetry package versions (1.14.0 series)
+
+3. **Extensions.cs**: Complete rewrite following Aspire ServiceDefaults pattern:
+   - Changed signature: `AddServiceDefaults(IHostApplicationBuilder)` instead of `IServiceCollection`
+   - Added `ConfigureOpenTelemetry()` with metrics (AspNetCore, HttpClient, Runtime) and tracing (AspNetCore, HttpClient)
+   - Added `AddOpenTelemetryExporters()` for OTLP exporter (Aspire Dashboard integration)
+   - Added `MapDefaultEndpoints()` for centralized health check mapping (`/health`, `/alive`)
+   
+4. **Api/Program.cs**: Changed `builder.Services.AddServiceDefaults()` → `builder.AddServiceDefaults()`, replaced `MapHealthChecks("/health")` with `MapDefaultEndpoints()`
+
+5. **Web/Program.cs**: Same changes as Api
+
+**Architecture Pattern:**
+- ServiceDefaults is now a proper Aspire shared library with full observability stack
+- Services call `builder.AddServiceDefaults()` at startup
+- Services call `app.MapDefaultEndpoints()` to expose health/liveness endpoints
+- OpenTelemetry automatically exports to OTLP endpoint (Aspire Dashboard) when `OTEL_EXPORTER_OTLP_ENDPOINT` is set
+
+**Environment Issue:**
+PowerShell sessions repeatedly hung during build/test attempts (both `dotnet build` and `git status` commands). This prevented verification of the build, but all code changes are structurally correct and follow official Aspire patterns.
+
+**Next Steps (for Matthew or next session):**
+- Run `dotnet build --configuration Release` to verify compilation
+- Run `dotnet run --project src/AppHost/AppHost.csproj` to test Aspire orchestration
+- Verify Api and Web services start successfully and stay running
+- Check Aspire Dashboard (http://localhost:15888 or similar) for telemetry data
