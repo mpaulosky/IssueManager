@@ -1191,3 +1191,36 @@ Neither project had a `launchSettings.json`. Without it, `dotnet run`, Visual St
 ---
 
 **End of Decisions Log**
+
+
+# Decision: DI Registration Extension Methods in Api project
+
+**Date:** 2026  
+**Author:** Aragorn (Lead Developer)  
+**Scope:** `src/Api/`
+
+## Decision
+
+Moved all DI registrations from `Program.cs` into `src/Api/Extensions/ServiceCollectionExtensions.cs` with three extension methods:
+
+- `AddRepositories(this IServiceCollection, IConfiguration)` — 4 MongoDB repositories
+- `AddValidators(this IServiceCollection)` — 14 FluentValidation validators
+- `AddHandlers(this IServiceCollection)` — 21 CQRS handlers
+
+## Rationale
+
+Program.cs had 40+ consecutive `AddSingleton<>` calls with no structure. Grouping them into named extension methods makes the bootstrapping intent self-documenting and each group independently testable/readable.
+
+## Namespace
+
+`Api.Extensions` — placed in `src/Api/Extensions/ServiceCollectionExtensions.cs`.
+
+## Key Facts
+
+- All handler classes are in the `Api.Handlers` namespace regardless of their sub-folder (`Issues/`, `Statuses/`, etc.).
+- The `using ServiceDefaults;` directive must remain directly in `Program.cs` since `AddServiceDefaults()` extends `WebApplicationBuilder`, not `IServiceCollection`.
+
+## Build Verification
+
+`dotnet build src/Api --no-restore -c Release` → 0 errors, 0 warnings.
+
