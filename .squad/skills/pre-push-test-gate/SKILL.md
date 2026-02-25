@@ -2,9 +2,10 @@
 name: pre-push-test-gate
 confidence: high
 description: >
-  Enforces local test execution before any git push by installing a pre-push hook.
-  Prevents agents and developers from pushing failing tests to the remote.
-  Established after the Shared project test batch (04714a4) shipped two broken tests.
+  Enforces build cleanliness and test passage before any git push.
+  Delegates to the build-repair prompt (.github/prompts/build-repair.prompt.md)
+  as the authoritative gate. Established after the Shared project test batch
+  (04714a4) shipped two broken tests directly to main.
 ---
 
 ## Pre-Push Test Gate
@@ -12,41 +13,50 @@ description: >
 ### Why This Exists
 
 On 2026-02-25, two unit tests were pushed directly to `main` without local verification.
-Both tests had wrong expectations and failed in CI. This skill codifies the guard that
+Both tests had wrong expectations and failed in CI. This skill enforces the gate that
 prevents that from recurring.
 
-### When to Apply
+### The Gate
 
-- After writing a new batch of tests
-- After any code change that could affect test outcomes
-- When setting up a fresh clone of this repo
-- When an agent is about to push to main (or any branch feeding main)
+Before any `git push`, an agent MUST run the **Build Repair Skill**:
 
-### Rule
+> **`.github/prompts/build-repair.prompt.md`**
 
-> **Always run `dotnet test tests/Unit.Tests` locally before pushing. If it fails, fix before pushing.**
+That prompt already defines the full gate:
+1. Restore dependencies (`dotnet restore`)
+2. Build the solution (`dotnet build --no-restore`) — zero errors, zero warnings
+3. Fix any build errors before continuing
+4. Run unit tests — all must pass
+5. Fix test failures before continuing
 
-### Hook Installation
+Only push when the build-repair prompt reports **"Build succeeded"** with **zero warnings**
+and **all tests pass**.
 
-Install the pre-push hook once per machine/clone. The hook content is below — write it to
-`.git/hooks/pre-push` and mark it executable.
+### Agent Checklist
 
-**Shell (Linux/macOS/Git Bash):**
+Before any `git push`, an agent MUST:
+
+- [ ] Open `.github/prompts/build-repair.prompt.md` and execute it fully
+- [ ] Confirm final output: `Build succeeded. 0 Warning(s). 0 Error(s).`
+- [ ] Confirm final test output: `Passed! Failed: 0`
+- [ ] Only then execute `git push`
+
+Do NOT push if either check reports failures. Fix first.
+
+### Hook (Local Enforcement)
+
+The `.git/hooks/pre-push` hook runs `dotnet test tests/Unit.Tests` as a local tripwire.
+Install once per clone — **Shell (Linux/macOS/Git Bash)**:
 
 ```bash
 cat > .git/hooks/pre-push << 'EOF'
 #!/usr/bin/env bash
-# pre-push hook — enforces Unit.Tests pass before any push.
 set -euo pipefail
-
-echo "🔎 pre-push: running Unit.Tests…"
-
+echo "🔎 pre-push: running build-repair gate (Unit.Tests)…"
 if dotnet test tests/Unit.Tests --configuration Release --verbosity quiet 2>&1; then
-  echo "✅ pre-push: tests passed — push allowed."
+  echo "✅ Gate passed — push allowed."
 else
-  echo ""
-  echo "❌ pre-push: Unit tests FAILED. Push aborted."
-  echo "   Fix the failures locally before pushing."
+  echo "❌ Gate FAILED. Run .github/prompts/build-repair.prompt.md and fix before pushing."
   exit 1
 fi
 EOF
@@ -54,45 +64,27 @@ chmod +x .git/hooks/pre-push
 ```
 
 **PowerShell (Windows):**
-
 ```powershell
-$hook = @'
+@'
 #!/usr/bin/env bash
-# pre-push hook — enforces Unit.Tests pass before any push.
 set -euo pipefail
-
-echo "🔎 pre-push: running Unit.Tests…"
-
+echo "🔎 pre-push: running build-repair gate (Unit.Tests)…"
 if dotnet test tests/Unit.Tests --configuration Release --verbosity quiet 2>&1; then
-  echo "✅ pre-push: tests passed — push allowed."
+  echo "✅ Gate passed — push allowed."
 else
-  echo ""
-  echo "❌ pre-push: Unit tests FAILED. Push aborted."
-  echo "   Fix the failures locally before pushing."
+  echo "❌ Gate FAILED. Run .github/prompts/build-repair.prompt.md and fix before pushing."
   exit 1
 fi
-'@
-$hook | Set-Content -NoNewline .git/hooks/pre-push
+'@ | Set-Content -NoNewline .git/hooks/pre-push
 ```
 
-> Git hooks live in `.git/hooks/` which is not committed. Every agent or developer who
-> clones this repo must run the installation step above once.
-
-### Agent Checklist
-
-Before any `git push`, an agent MUST:
-
-1. Run `dotnet test tests/Unit.Tests --configuration Release --verbosity quiet`
-2. Confirm the output contains `Passed!` and `Failed: 0`
-3. Only then execute the push
-
-If the hook is already installed (`.git/hooks/pre-push` exists and is executable), step 1
-is enforced automatically by git.
+> The hook is not committed — install on every fresh clone. The build-repair prompt
+> is the authoritative process; the hook is a fast local tripwire.
 
 ### Failure Taxonomy (known patterns)
 
 | Symptom | Root Cause | Fix |
 |---------|-----------|-----|
-| `DateTime` equality failure in `*.Empty` tests | `Empty` static property calls `DateTime.UtcNow` each time — two calls diverge | Assert individual fields, not whole-record equality |
-| Unexpected trailing `_` in slug tests | `GenerateSlug` adds trailing `_` when string ends with punctuation AND has internal punctuation | Check actual slug output against implementation rules before asserting |
-| Record equality fails on nested DTO | Nested DTO `Empty` also uses `UtcNow` — same issue | Flatten assertions to field-level |
+| `DateTime` equality failure in `*.Empty` tests | `Empty` property calls `DateTime.UtcNow` each time — two calls produce different values | Assert individual fields, not whole-record equality |
+| Unexpected trailing `_` in slug tests | `GenerateSlug` appends `_` when string ends with punctuation AND has internal punctuation | Verify actual output against implementation before asserting |
+| Record equality fails on nested DTO | Nested DTO `Empty` also uses `UtcNow` — same root cause | Flatten assertions to field-level |
