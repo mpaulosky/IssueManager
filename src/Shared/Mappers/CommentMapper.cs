@@ -17,27 +17,41 @@ public static class CommentMapper
 	/// <summary>
 	///   Converts a <see cref="Shared.Models.Comment"/> to a <see cref="CommentDto"/>.
 	/// </summary>
-	public static CommentDto ToDto(this Shared.Models.Comment comment) =>
+	public static CommentDto ToDto(this Comment comment) =>
 		new(
-			comment.Id.ToString(),
+			comment.Id,
 			comment.Title,
 			comment.Description,
 			comment.DateCreated,
+			comment.DateModified,
 			comment.Issue,
 			comment.Author,
-			comment.DateModified);
+			comment.UserVotes,
+			comment.Archived,
+			comment.ArchivedBy,
+			comment.IsAnswer,
+			comment.AnswerSelectedBy
+
+
+			);
 
 	/// <summary>
 	///   Converts a <see cref="CommentDto"/> to a <see cref="Shared.Models.Comment"/>.
 	/// </summary>
-	public static Shared.Models.Comment ToModel(this CommentDto dto) =>
+	public static Comment ToModel(this CommentDto dto) =>
 		new()
 		{
+				Id = dto.Id,
 			Title = dto.Title,
 			Description = dto.Description,
+			DateCreated = dto.DateCreated,
+			DateModified = dto.DateModified,
 			Issue = dto.Issue,
 			Author = dto.Author,
-			DateCreated = dto.DateCreated,
-			DateModified = dto.DateModified
+			UserVotes = dto.UserVotes,
+			Archived = dto.Archived,
+			ArchivedBy = dto.ArchivedBy,
+			IsAnswer = dto.IsAnswer,
+			AnswerSelectedBy = dto.AnswerSelectedBy
 		};
 }
