@@ -68,12 +68,17 @@ jobs:
               }
             }
 
-            // Exempt squad/* branches — they intentionally carry .squad/ agent state
+            // Exempt squad/* branches and direct pushes to main
+            // .squad/ files live on main by design; guard only prevents leakage via feature/* PRs
             const sourceBranch = context.eventName === 'pull_request'
               ? context.payload.pull_request.head.ref
               : (context.ref || '').replace('refs/heads/', '');
             if (sourceBranch.startsWith('squad/')) {
               core.info(`✅ squad/* branch (${sourceBranch}) — .squad/ files are expected here, skipping guard.`);
+              return;
+            }
+            if (context.eventName === 'push' && sourceBranch === 'main') {
+              core.info(`✅ Direct push to main — .squad/ files live on main by design, skipping guard.`);
               return;
             }
 
@@ -101,13 +106,13 @@ jobs:
 
             // Build a clear, actionable error message
             const lines = [
-              '## ≡ƒÜ½ Forbidden files detected in PR to main',
+              '## 🚫 Forbidden files detected in PR',
               '',
-              'The following files must NOT be merged into `main`.',
-              '`.ai-team/` and `.squad/` are runtime team state ΓÇö they belong on dev branches only.',
-              '`.ai-team-templates/` is Squad\'s internal planning ΓÇö it belongs on dev branches only.',
-              '`team-docs/` is internal team content ΓÇö it belongs on dev branches only.',
-              '`docs/proposals/` is internal design proposals ΓÇö it belongs on dev branches only.',
+              'The following files must NOT be included in a PR from a `feature/*` branch.',
+              '`.squad/` changes must come via a `squad/*` branch (direct main commits are allowed for ops).',
+              '`.ai-team/` and `.ai-team-templates/` belong on dev/squad branches only.',
+              '`team-docs/` is internal team content — it belongs on dev branches only.',
+              '`docs/proposals/` is internal design proposals — it belongs on dev branches only.',
               '',
               '### Forbidden files found:',
               '',
