@@ -10,6 +10,7 @@
 | Tests, quality, edge cases, test failures, test review | Gimli | Tester |
 | CI/CD, GitHub Actions, NuGet, deployment, Aspire infra, protected branch | Boromir | DevOps |
 | Docs, README, XML docs, comments, CONTRIBUTING | Frodo | Docs |
+| Auth0, authentication, authorization, JWT, RBAC, security audit, vulnerabilities, injection, XSS, CSRF, secrets, HTTPS, CORS, security headers, security review | Gandalf | Security |
 | GitHub board, issues, PRs, backlog, work queue | Ralph | Work Monitor |
 | Untriaged issues (squad label, no squad:* sub-label) | Aragorn | Lead triages |
 | squad:aragorn | Aragorn | — |
@@ -18,6 +19,7 @@
 | squad:gimli | Gimli | — |
 | squad:boromir | Boromir | — |
 | squad:frodo | Frodo | — |
+| squad:gandalf | Gandalf | — |
 | squad:copilot | @copilot | Auto-assign: false |
 
 ## Branching Policy

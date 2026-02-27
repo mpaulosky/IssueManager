@@ -18,6 +18,7 @@
 | Gimli | Tester | squad:gimli | 🧪 Tester |
 | Boromir | DevOps | squad:boromir | ⚙️ DevOps |
 | Frodo | Tech Writer | squad:frodo | 📝 Docs |
+| Gandalf | Security Officer | squad:gandalf | 🔒 Security |
 | Scribe | (silent) | — | 📋 Scribe |
 | Ralph | Work Monitor | — | 🔄 Monitor |
 
