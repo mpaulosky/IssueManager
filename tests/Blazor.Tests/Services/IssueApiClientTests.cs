@@ -204,7 +204,7 @@ public class IssueApiClientTests
 		// Assert
 		handler.LastRequest.Should().NotBeNull();
 		handler.LastRequest!.RequestUri.Should().NotBeNull();
-		handler.LastRequest.RequestUri!.Query.Should().Contain("searchTerm=bug+fix");
+		handler.LastRequest.RequestUri!.Query.Should().Contain("searchTerm=bug%20fix");
 	}
 
 	[Fact]
