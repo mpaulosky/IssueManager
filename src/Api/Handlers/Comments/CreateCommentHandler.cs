@@ -7,6 +7,8 @@
 // Project Name :  Api
 // =======================================================
 
+using Api.Services;
+
 namespace Api.Handlers.Comments;
 
 /// <summary>
@@ -25,14 +27,21 @@ public class CreateCommentHandler
 	private readonly CreateCommentValidator _validator;
 
 	/// <summary>
+	/// The current user service for accessing authenticated user details.
+	/// </summary>
+	private readonly ICurrentUserService _currentUserService;
+
+	/// <summary>
 	/// Initializes a new instance of the <see cref="CreateCommentHandler"/> class.
 	/// </summary>
 	/// <param name="repository">The repository for comment data access operations.</param>
 	/// <param name="validator">The validator for comment creation commands.</param>
-	public CreateCommentHandler(ICommentRepository repository, CreateCommentValidator validator)
+	/// <param name="currentUserService">The current user service for accessing authenticated user details.</param>
+	public CreateCommentHandler(ICommentRepository repository, CreateCommentValidator validator, ICurrentUserService currentUserService)
 	{
 		_repository = repository;
 		_validator = validator;
+		_currentUserService = currentUserService;
 	}
 
 	/// <summary>
@@ -49,6 +58,10 @@ public class CreateCommentHandler
 		if (!validationResult.IsValid)
 			throw new ValidationException(validationResult.Errors);
 
+		var author = _currentUserService.IsAuthenticated
+			? new UserDto(_currentUserService.UserId ?? string.Empty, _currentUserService.Name ?? string.Empty, _currentUserService.Email ?? string.Empty)
+			: UserDto.Empty;
+
 		var dto = new CommentDto(
 			ObjectId.Empty,
 			command.Title,
@@ -56,7 +69,7 @@ public class CreateCommentHandler
 			DateTime.UtcNow,
 			null,
 			IssueDto.Empty,
-			UserDto.Empty,
+			author,
 			new HashSet<string>(),
 			false,
 			UserDto.Empty,

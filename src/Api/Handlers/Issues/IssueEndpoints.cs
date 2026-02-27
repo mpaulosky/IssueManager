@@ -50,7 +50,8 @@ public static class IssueEndpoints
 		.WithName("CreateIssue")
 		.WithSummary("Create a new issue")
 		.Produces(StatusCodes.Status201Created)
-		.Produces(StatusCodes.Status400BadRequest);
+		.Produces(StatusCodes.Status400BadRequest)
+		.RequireAuthorization();
 
 		// Update Issue
 		group.MapPatch("{id}", async (string id, UpdateIssueCommand command, UpdateIssueHandler handler) =>
@@ -63,7 +64,8 @@ public static class IssueEndpoints
 		.WithSummary("Update an existing issue")
 		.Produces(StatusCodes.Status200OK)
 		.Produces(StatusCodes.Status400BadRequest)
-		.Produces(StatusCodes.Status404NotFound);
+		.Produces(StatusCodes.Status404NotFound)
+		.RequireAuthorization();
 
 		// Delete Issue (soft-delete)
 		group.MapDelete("{id}", async (string id, DeleteIssueHandler handler) =>
@@ -75,7 +77,8 @@ public static class IssueEndpoints
 		.WithName("DeleteIssue")
 		.WithSummary("Delete (archive) an issue")
 		.Produces(StatusCodes.Status204NoContent)
-		.Produces(StatusCodes.Status404NotFound);
+		.Produces(StatusCodes.Status404NotFound)
+		.RequireAuthorization();
 
 		return app;
 	}

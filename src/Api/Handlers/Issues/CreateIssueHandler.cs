@@ -7,6 +7,8 @@
 // Project Name :  Api
 // =======================================================
 
+using Api.Services;
+
 namespace Api.Handlers.Issues;
 
 /// <summary>
@@ -16,14 +18,16 @@ public class CreateIssueHandler
 {
 	private readonly IIssueRepository _repository;
 	private readonly CreateIssueValidator _validator;
+	private readonly ICurrentUserService _currentUserService;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="CreateIssueHandler"/> class.
 	/// </summary>
-	public CreateIssueHandler(IIssueRepository repository, CreateIssueValidator validator)
+	public CreateIssueHandler(IIssueRepository repository, CreateIssueValidator validator, ICurrentUserService currentUserService)
 	{
 		_repository = repository;
 		_validator = validator;
+		_currentUserService = currentUserService;
 	}
 
 	/// <summary>
@@ -35,13 +39,17 @@ public class CreateIssueHandler
 		if (!validationResult.IsValid)
 			throw new ValidationException(validationResult.Errors);
 
+		var author = _currentUserService.IsAuthenticated
+			? new UserDto(_currentUserService.UserId ?? string.Empty, _currentUserService.Name ?? string.Empty, _currentUserService.Email ?? string.Empty)
+			: UserDto.Empty;
+
 		var model = new Issue
 		{
 			Title = command.Title,
 			Description = command.Description ?? string.Empty,
 			DateCreated = DateTime.UtcNow,
 			Status = StatusDto.Empty,
-			Author = UserDto.Empty,
+			Author = author,
 			Category = CategoryDto.Empty
 		};
 

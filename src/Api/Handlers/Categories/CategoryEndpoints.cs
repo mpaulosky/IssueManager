@@ -39,7 +39,8 @@ public static class CategoryEndpoints
 		.WithName("CreateCategory")
 		.WithSummary("Create a new category")
 		.Produces<CategoryDto>(StatusCodes.Status201Created)
-		.Produces(StatusCodes.Status400BadRequest);
+		.Produces(StatusCodes.Status400BadRequest)
+		.RequireAuthorization();
 
 		group.MapPatch("{id}", async (string id, UpdateCategoryCommand command, UpdateCategoryHandler handler) =>
 		{
@@ -51,7 +52,8 @@ public static class CategoryEndpoints
 		.WithSummary("Update an existing category")
 		.Produces<CategoryDto>(StatusCodes.Status200OK)
 		.Produces(StatusCodes.Status400BadRequest)
-		.Produces(StatusCodes.Status404NotFound);
+		.Produces(StatusCodes.Status404NotFound)
+		.RequireAuthorization();
 
 		group.MapDelete("{id}", async (string id, DeleteCategoryHandler handler) =>
 		{
@@ -62,7 +64,8 @@ public static class CategoryEndpoints
 		.WithName("DeleteCategory")
 		.WithSummary("Delete (archive) a category")
 		.Produces(StatusCodes.Status204NoContent)
-		.Produces(StatusCodes.Status404NotFound);
+		.Produces(StatusCodes.Status404NotFound)
+		.RequireAuthorization();
 
 		return app;
 	}

@@ -1,6 +1,7 @@
 @* Copyright (c) 2026. All rights reserved. *@
 @namespace Web.Pages.Issues
 @page "/issues/{Id}/edit"
+@attribute [Authorize]
 @inject IIssueApiClient IssueClient
 @inject NavigationManager Nav
 
