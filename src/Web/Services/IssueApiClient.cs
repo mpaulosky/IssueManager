@@ -18,7 +18,12 @@ namespace Web.Services;
 public interface IIssueApiClient
 {
 	/// <summary>Gets a paginated list of issues.</summary>
-	Task<PaginatedResponse<IssueDto>> GetAllAsync(int page = 1, int pageSize = 20, CancellationToken cancellationToken = default);
+	/// <param name="page">The page number (1-indexed).</param>
+	/// <param name="pageSize">The number of items per page.</param>
+	/// <param name="searchTerm">Optional search term to filter by title or description.</param>
+	/// <param name="authorName">Optional author name to filter by.</param>
+	/// <param name="cancellationToken">Cancellation token.</param>
+	Task<PaginatedResponse<IssueDto>> GetAllAsync(int page = 1, int pageSize = 20, string? searchTerm = null, string? authorName = null, CancellationToken cancellationToken = default);
 
 	/// <summary>Gets an issue by its identifier.</summary>
 	Task<IssueDto?> GetByIdAsync(string id, CancellationToken cancellationToken = default);
@@ -42,12 +47,21 @@ public class IssueApiClient : IIssueApiClient
 	public IssueApiClient(HttpClient httpClient) => _httpClient = httpClient;
 
 	/// <inheritdoc/>
-	public async Task<PaginatedResponse<IssueDto>> GetAllAsync(int page = 1, int pageSize = 20, CancellationToken cancellationToken = default)
+	public async Task<PaginatedResponse<IssueDto>> GetAllAsync(int page = 1, int pageSize = 20, string? searchTerm = null, string? authorName = null, CancellationToken cancellationToken = default)
 	{
 		try
 		{
-			var result = await _httpClient.GetFromJsonAsync<PaginatedResponse<IssueDto>>(
-				$"/api/v1/issues?page={page}&pageSize={pageSize}", cancellationToken).ConfigureAwait(false);
+			var url = $"/api/v1/issues?page={page}&pageSize={pageSize}";
+			if (!string.IsNullOrWhiteSpace(searchTerm))
+			{
+				url += $"&searchTerm={Uri.EscapeDataString(searchTerm)}";
+			}
+			if (!string.IsNullOrWhiteSpace(authorName))
+			{
+				url += $"&authorName={Uri.EscapeDataString(authorName)}";
+			}
+
+			var result = await _httpClient.GetFromJsonAsync<PaginatedResponse<IssueDto>>(url, cancellationToken).ConfigureAwait(false);
 			return result ?? PaginatedResponse<IssueDto>.Empty;
 		}
 		catch (HttpRequestException)

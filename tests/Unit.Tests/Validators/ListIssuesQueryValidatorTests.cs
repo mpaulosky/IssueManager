@@ -160,4 +160,104 @@ public class ListIssuesQueryValidatorTests
 		result.Errors.Should().Contain(e => e.PropertyName == "Page");
 		result.Errors.Should().Contain(e => e.PropertyName == "PageSize");
 	}
+
+	[Fact]
+	public void Validate_WithSearchTerm_ReturnsValid()
+	{
+		// Arrange
+		var query = new ListIssuesQuery
+		{
+			Page = 1,
+			PageSize = 10,
+			SearchTerm = "bug fix"
+		};
+
+		// Act
+		var result = _validator.Validate(query);
+
+		// Assert
+		result.IsValid.Should().BeTrue();
+		result.Errors.Should().BeEmpty();
+	}
+
+	[Fact]
+	public void Validate_WithAuthorName_ReturnsValid()
+	{
+		// Arrange
+		var query = new ListIssuesQuery
+		{
+			Page = 1,
+			PageSize = 10,
+			AuthorName = "John"
+		};
+
+		// Act
+		var result = _validator.Validate(query);
+
+		// Assert
+		result.IsValid.Should().BeTrue();
+		result.Errors.Should().BeEmpty();
+	}
+
+	[Fact]
+	public void Validate_WithBothFilters_ReturnsValid()
+	{
+		// Arrange
+		var query = new ListIssuesQuery
+		{
+			Page = 1,
+			PageSize = 10,
+			SearchTerm = "bug",
+			AuthorName = "Alice"
+		};
+
+		// Act
+		var result = _validator.Validate(query);
+
+		// Assert
+		result.IsValid.Should().BeTrue();
+		result.Errors.Should().BeEmpty();
+	}
+
+	[Fact]
+	public void Validate_WithSearchTermTooLong_ReturnsInvalid()
+	{
+		// Arrange
+		var query = new ListIssuesQuery
+		{
+			Page = 1,
+			PageSize = 10,
+			SearchTerm = new string('a', 201) // 201 characters
+		};
+
+		// Act
+		var result = _validator.Validate(query);
+
+		// Assert
+		result.IsValid.Should().BeFalse();
+		result.Errors.Should().HaveCount(1);
+		result.Errors[0].PropertyName.Should().Be("SearchTerm");
+		result.Errors[0].ErrorMessage.Should().Contain("200");
+	}
+
+	[Fact]
+	public void Validate_WithAuthorNameTooLong_ReturnsInvalid()
+	{
+		// Arrange
+		var query = new ListIssuesQuery
+		{
+			Page = 1,
+			PageSize = 10,
+			AuthorName = new string('b', 201) // 201 characters
+		};
+
+		// Act
+		var result = _validator.Validate(query);
+
+		// Assert
+		result.IsValid.Should().BeFalse();
+		result.Errors.Should().HaveCount(1);
+		result.Errors[0].PropertyName.Should().Be("AuthorName");
+		result.Errors[0].ErrorMessage.Should().Contain("200");
+	}
 }

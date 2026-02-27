@@ -12,9 +12,15 @@ public static class IssueEndpoints
 		var group = app.MapGroup("/api/v1/issues").WithTags("Issues");
 
 		// List Issues (paginated)
-		group.MapGet("", async (int? page, int? pageSize, ListIssuesHandler handler) =>
+		group.MapGet("", async (int? page, int? pageSize, string? searchTerm, string? authorName, ListIssuesHandler handler) =>
 		{
-			var query = new ListIssuesQuery { Page = page ?? 1, PageSize = pageSize ?? 20 };
+			var query = new ListIssuesQuery 
+			{ 
+				Page = page ?? 1, 
+				PageSize = pageSize ?? 20,
+				SearchTerm = searchTerm,
+				AuthorName = authorName
+			};
 			var result = await handler.Handle(query);
 			return Results.Ok(result);
 		})

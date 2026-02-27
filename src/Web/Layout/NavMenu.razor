@@ -1,85 +1,97 @@
 @namespace Web.Layout
 
 <nav class="bg-[var(--bg-surface)] border-b border-[var(--border-color)] shadow-sm" aria-label="Main navigation">
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-		<div class="flex items-center justify-between h-16">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-between h-16">
 
-			<!-- Brand -->
-			<div class="flex items-center gap-3">
-				<a href="/" class="flex items-center gap-2 text-xl font-bold text-[var(--color-primary)] hover:opacity-80 transition-opacity" aria-label="IssueManager home">
-					<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-							d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-					</svg>
-					IssueManager
-				</a>
-			</div>
+<!-- Brand -->
+<div class="flex items-center gap-3">
+<a href="/" class="flex items-center gap-2 text-xl font-bold text-[var(--color-primary)] hover:opacity-80 transition-opacity" aria-label="IssueManager home">
+<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+</svg>
+IssueManager
+</a>
+</div>
 
-			<!-- Desktop nav links -->
-			<div class="hidden md:flex items-center gap-1">
-				<a href="/" class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
-					Home
-				</a>
-				<a href="/issues" class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
-					Issues
-				</a>
-				<a href="/issues/create" class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
-					New Issue
-				</a>
-			</div>
+<!-- Desktop nav links -->
+<div class="hidden md:flex items-center gap-1">
+<a href="/" class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+Home
+</a>
+<a href="/issues" class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+Issues
+</a>
+<a href="/issues/create" class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+New Issue
+</a>
+<a href="/categories" class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+Categories
+</a>
+<a href="/statuses" class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+Statuses
+</a>
+</div>
 
-			<!-- Right side: theme controls + hamburger -->
-			<div class="flex items-center gap-2">
-				<ThemeToggle />
-				<ThemeColorSelector />
+<!-- Right side: theme controls + hamburger -->
+<div class="flex items-center gap-2">
+<ThemeToggle />
+<ThemeColorSelector />
 
-				<!-- Mobile hamburger button -->
-				<button
-					@onclick="ToggleMobileMenu"
-					class="md:hidden inline-flex items-center justify-center p-2 rounded-lg text-[var(--text-muted)] hover:bg-[var(--bg-hover)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
-					aria-expanded="@_mobileMenuOpen"
-					aria-controls="mobile-menu"
-					aria-label="Toggle navigation menu">
-					@if (_mobileMenuOpen)
-					{
-						<!-- X icon -->
-						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-						</svg>
-					}
-					else
-					{
-						<!-- Hamburger icon -->
-						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-						</svg>
-					}
-				</button>
-			</div>
-		</div>
-	</div>
+<!-- Mobile hamburger button -->
+<button
+@onclick="ToggleMobileMenu"
+class="md:hidden inline-flex items-center justify-center p-2 rounded-lg text-[var(--text-muted)] hover:bg-[var(--bg-hover)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+aria-expanded="@_mobileMenuOpen"
+aria-controls="mobile-menu"
+aria-label="Toggle navigation menu">
+@if (_mobileMenuOpen)
+{
+<!-- X icon -->
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+</svg>
+}
+else
+{
+<!-- Hamburger icon -->
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+</svg>
+}
+</button>
+</div>
+</div>
+</div>
 
-	<!-- Mobile menu -->
-	@if (_mobileMenuOpen)
-	{
-		<div id="mobile-menu" class="md:hidden border-t border-[var(--border-color)] bg-[var(--bg-surface)] px-4 py-3 space-y-1">
-			<a href="/" @onclick="CloseMobileMenu" class="block px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
-				Home
-			</a>
-			<a href="/issues" @onclick="CloseMobileMenu" class="block px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
-				Issues
-			</a>
-			<a href="/issues/create" @onclick="CloseMobileMenu" class="block px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
-				New Issue
-			</a>
-		</div>
-	}
+<!-- Mobile menu -->
+@if (_mobileMenuOpen)
+{
+<div id="mobile-menu" class="md:hidden border-t border-[var(--border-color)] bg-[var(--bg-surface)] px-4 py-3 space-y-1">
+<a href="/" @onclick="CloseMobileMenu" class="block px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+Home
+</a>
+<a href="/issues" @onclick="CloseMobileMenu" class="block px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+Issues
+</a>
+<a href="/issues/create" @onclick="CloseMobileMenu" class="block px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+New Issue
+</a>
+<a href="/categories" @onclick="CloseMobileMenu" class="block px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+Categories
+</a>
+<a href="/statuses" @onclick="CloseMobileMenu" class="block px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+Statuses
+</a>
+</div>
+}
 </nav>
 
 @code {
-	private bool _mobileMenuOpen = false;
+private bool _mobileMenuOpen = false;
 
-	private void ToggleMobileMenu() => _mobileMenuOpen = !_mobileMenuOpen;
+private void ToggleMobileMenu() => _mobileMenuOpen = !_mobileMenuOpen;
 
-	private void CloseMobileMenu() => _mobileMenuOpen = false;
+private void CloseMobileMenu() => _mobileMenuOpen = false;
 }

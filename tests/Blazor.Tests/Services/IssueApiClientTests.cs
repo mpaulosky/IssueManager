@@ -30,12 +30,23 @@ public class IssueApiClientTests
 		return new HttpClient(handler) { BaseAddress = new Uri(baseUrl) };
 	}
 
+	private static (HttpClient client, MockHandler handler) CreateMockClientWithHandler(HttpResponseMessage response, string baseUrl = "https://api.test")
+	{
+		var handler = new MockHandler(response);
+		var client = new HttpClient(handler) { BaseAddress = new Uri(baseUrl) };
+		return (client, handler);
+	}
+
 	private sealed class MockHandler : HttpMessageHandler
 	{
 		private readonly HttpResponseMessage _response;
+		public HttpRequestMessage? LastRequest { get; private set; }
 		public MockHandler(HttpResponseMessage response) => _response = response;
 		protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-			=> Task.FromResult(_response);
+		{
+			LastRequest = request;
+			return Task.FromResult(_response);
+		}
 	}
 
 	private static IssueDto MakeIssue(string title = "Test Issue") => new(
@@ -175,5 +186,85 @@ public class IssueApiClientTests
 
 		// Assert
 		result.Should().BeFalse();
+	}
+
+	[Fact]
+	public async Task GetAllAsync_WithSearchTerm_IncludesSearchTermInUrl()
+	{
+		// Arrange
+		var issue = MakeIssue();
+		var expected = new PaginatedResponse<IssueDto>([issue], 1, 1, 20);
+		var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(expected) };
+		var (httpClient, handler) = CreateMockClientWithHandler(response);
+		var client = new IssueApiClient(httpClient);
+
+		// Act
+		var result = await client.GetAllAsync(searchTerm: "bug fix");
+
+		// Assert
+		handler.LastRequest.Should().NotBeNull();
+		handler.LastRequest!.RequestUri.Should().NotBeNull();
+		handler.LastRequest.RequestUri!.Query.Should().Contain("searchTerm=bug+fix");
+	}
+
+	[Fact]
+	public async Task GetAllAsync_WithAuthorName_IncludesAuthorNameInUrl()
+	{
+		// Arrange
+		var issue = MakeIssue();
+		var expected = new PaginatedResponse<IssueDto>([issue], 1, 1, 20);
+		var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(expected) };
+		var (httpClient, handler) = CreateMockClientWithHandler(response);
+		var client = new IssueApiClient(httpClient);
+
+		// Act
+		var result = await client.GetAllAsync(authorName: "John");
+
+		// Assert
+		handler.LastRequest.Should().NotBeNull();
+		handler.LastRequest!.RequestUri.Should().NotBeNull();
+		handler.LastRequest.RequestUri!.Query.Should().Contain("authorName=John");
+	}
+
+	[Fact]
+	public async Task GetAllAsync_WithBothFilters_IncludesBothInUrl()
+	{
+		// Arrange
+		var issue = MakeIssue();
+		var expected = new PaginatedResponse<IssueDto>([issue], 1, 1, 20);
+		var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(expected) };
+		var (httpClient, handler) = CreateMockClientWithHandler(response);
+		var client = new IssueApiClient(httpClient);
+
+		// Act
+		var result = await client.GetAllAsync(searchTerm: "bug", authorName: "Alice");
+
+		// Assert
+		handler.LastRequest.Should().NotBeNull();
+		handler.LastRequest!.RequestUri.Should().NotBeNull();
+		var query = handler.LastRequest.RequestUri!.Query;
+		query.Should().Contain("searchTerm=bug");
+		query.Should().Contain("authorName=Alice");
+	}
+
+	[Fact]
+	public async Task GetAllAsync_WithNullFilters_DoesNotIncludeFilterParams()
+	{
+		// Arrange
+		var issue = MakeIssue();
+		var expected = new PaginatedResponse<IssueDto>([issue], 1, 1, 20);
+		var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(expected) };
+		var (httpClient, handler) = CreateMockClientWithHandler(response);
+		var client = new IssueApiClient(httpClient);
+
+		// Act
+		var result = await client.GetAllAsync();
+
+		// Assert
+		handler.LastRequest.Should().NotBeNull();
+		handler.LastRequest!.RequestUri.Should().NotBeNull();
+		var query = handler.LastRequest.RequestUri!.Query;
+		query.Should().NotContain("searchTerm");
+		query.Should().NotContain("authorName");
 	}
 }

@@ -1,0 +1,104 @@
+@* Copyright (c) 2026. All rights reserved. *@
+@namespace Web.Pages.Statuses
+@page "/statuses/create"
+@using System.ComponentModel.DataAnnotations
+@inject IStatusApiClient StatusClient
+@inject NavigationManager Nav
+
+<PageTitle>Create Status — IssueManager</PageTitle>
+
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+	<div class="mb-6">
+		<h1 class="text-2xl font-bold text-[var(--text-main)] mb-2">Create Status</h1>
+		<p class="text-[var(--text-muted)] text-sm">Fill in the details below to create a new status.</p>
+	</div>
+
+<div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm p-6">
+	<EditForm Model="@_formModel" OnValidSubmit="@HandleSubmit">
+		<DataAnnotationsValidator />
+		<ValidationSummary class="mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 p-3 text-sm text-red-700 dark:text-red-400" />
+
+		<div class="space-y-5">
+			<!-- Name -->
+			<div>
+				<label for="status-name" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">
+					Status Name <span class="text-red-500" aria-hidden="true">*</span>
+				</label>
+				<InputText
+					id="status-name"
+					@bind-Value="_formModel.StatusName"
+					class="form-input"
+					placeholder="Enter status name"
+					aria-required="true" />
+				<ValidationMessage For="@(() => _formModel.StatusName)" class="validation-message" />
+			</div>
+
+			<!-- Description -->
+			<div>
+				<label for="status-description" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">
+					Description
+				</label>
+				<InputTextArea
+					id="status-description"
+					@bind-Value="_formModel.StatusDescription"
+					class="form-input resize-y"
+					rows="3"
+					placeholder="Enter status description (optional)" />
+				<ValidationMessage For="@(() => _formModel.StatusDescription)" class="validation-message" />
+			</div>
+		</div>
+
+		<!-- Actions -->
+		<div class="mt-6 flex items-center gap-3">
+			<button
+				type="submit"
+				class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
+				disabled="@_isSubmitting">
+				@(_isSubmitting ? "Creating..." : "Create Status")
+			</button>
+			<a
+				href="/statuses"
+				class="inline-flex items-center px-5 py-2.5 rounded-lg bg-[var(--bg-hover)] hover:bg-[var(--border-color)] text-[var(--text-main)] text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2">
+				Cancel
+			</a>
+		</div>
+	</EditForm>
+</div>
+</div>
+
+@code {
+	private StatusFormModel _formModel = new();
+	private bool _isSubmitting = false;
+
+	private class StatusFormModel
+	{
+		[Required(ErrorMessage = "Status name is required.")]
+		[StringLength(100, MinimumLength = 2, ErrorMessage = "Status name must be between 2 and 100 characters.")]
+		public string StatusName { get; set; } = string.Empty;
+
+		[StringLength(500, ErrorMessage = "Status description cannot exceed 500 characters.")]
+		public string? StatusDescription { get; set; }
+	}
+
+	/// <summary>
+	/// Handles the form submission by creating a new status and navigating to the statuses list.
+	/// </summary>
+	private async Task HandleSubmit()
+	{
+		_isSubmitting = true;
+		try
+		{
+			var command = new CreateStatusCommand
+			{
+				StatusName = _formModel.StatusName,
+				StatusDescription = _formModel.StatusDescription
+			};
+			await StatusClient.CreateAsync(command);
+			Nav.NavigateTo("/statuses");
+		}
+		finally
+		{
+			_isSubmitting = false;
+		}
+	}
+}
