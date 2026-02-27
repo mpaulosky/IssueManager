@@ -65,6 +65,6 @@ public class UpdateCommentHandler
 		if (updateResult.Failure)
 			throw new NotFoundException($"Comment with ID '{command.Id}' could not be updated.");
 
-		return updateResult.Value;
+		return updateResult.Value!;
 	}
 }

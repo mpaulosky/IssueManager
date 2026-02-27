@@ -66,6 +66,6 @@ public class UpdateStatusHandler
 		if (updateResult.Failure)
 			throw new NotFoundException($"Status with ID '{command.Id}' could not be updated.");
 
-		return updateResult.Value;
+		return updateResult.Value!;
 	}
 }

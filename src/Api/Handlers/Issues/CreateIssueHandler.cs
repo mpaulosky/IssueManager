@@ -45,6 +45,7 @@ public class CreateIssueHandler
 			Category = CategoryDto.Empty
 		};
 
-		return await _repository.CreateAsync(model.ToDto(), cancellationToken);
+		var result = await _repository.CreateAsync(model.ToDto(), cancellationToken);
+		return result.Success ? result.Value! : throw new InvalidOperationException("Failed to create issue.");
 	}
 }

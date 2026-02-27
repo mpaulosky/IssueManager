@@ -14,6 +14,8 @@ global using FluentValidation;
 global using MongoDB.Bson;
 global using MongoDB.Driver;
 
+global using Scalar.AspNetCore;
+
 global using Shared.Abstractions;
 global using Shared.DTOs;
 global using Shared.Exceptions;

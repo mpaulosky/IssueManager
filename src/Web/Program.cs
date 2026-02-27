@@ -1,10 +1,12 @@
 using ServiceDefaults;
 using Web;
+using Web.Extensions;
 using Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.AddAuth0();
 
 builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents();

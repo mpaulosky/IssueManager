@@ -31,11 +31,12 @@ public class ListCommentsHandler
 	/// <summary>
 	/// Handles the retrieval of all comments.
 	/// </summary>
+	/// <param name="issueId">Optional issue ID to filter comments by specific issue.</param>
 	/// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
 	/// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of all comments as <see cref="CommentDto"/> objects.</returns>
-	public async Task<IEnumerable<CommentDto>> Handle(CancellationToken cancellationToken = default)
+	public async Task<IEnumerable<CommentDto>> Handle(string? issueId = null, CancellationToken cancellationToken = default)
 	{
-		var result = await _repository.GetAllAsync(cancellationToken);
+		var result = await _repository.GetAllAsync(issueId, cancellationToken);
 		if (result.Failure)
 			return Enumerable.Empty<CommentDto>();
 

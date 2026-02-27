@@ -33,7 +33,7 @@ public class IssueDetailPageTests : ComponentTestBase
 
 		_mockCommentClient = Substitute.For<ICommentApiClient>();
 		_mockCommentClient
-			.GetAllAsync(Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IEnumerable<CommentDto>>([]));
 		TestContext.Services.AddSingleton<ICommentApiClient>(_mockCommentClient);
 	}
@@ -153,7 +153,7 @@ public class IssueDetailPageTests : ComponentTestBase
 		var comment = MakeComment(issue);
 		_mockIssueClient.GetByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IssueDto?>(issue));
-		_mockCommentClient.GetAllAsync(Arg.Any<CancellationToken>())
+		_mockCommentClient.GetAllAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IEnumerable<CommentDto>>(new[] { comment }));
 
 		// Act

@@ -23,3 +23,14 @@ Frontend Developer on IssueManager (.NET 10, Blazor Interactive Server Rendering
 - NavMenu: Desktop and mobile sections must be updated separately when adding new links
 - UserDto property: Uses `Name` not `DisplayName`
 - Error handling: `StateHasChanged()` requires `await InvokeAsync(StateHasChanged)` in async contexts
+
+### Sprint 3 Comment Edit/Delete Features (2026-02-27)
+- Enhanced IssueDetailPage with inline comment editing: Click "Edit" shows textarea with Save/Cancel buttons
+- Delete confirmation: Integrated existing ConfirmDialog component for comment deletion with proper state management
+- Comment filtering: Implemented client-side filtering by IssueId using LINQ `.Where()` clause (API doesn't support server-side filtering yet)
+- Edit state management: Track `_editingCommentId`, `_editCommentText`, and `_isSavingComment` for inline editing
+- Delete state management: Track `_showDeleteDialog` and `_commentToDeleteId` for confirmation flow
+- API methods: Used `UpdateAsync(id, UpdateCommentCommand)` and `DeleteAsync(id)` from ICommentApiClient
+- UpdateCommentCommand: Requires `Id`, `Title`, and `CommentText` properties
+- Lambda expressions in Razor: Use `() => StartEditComment(comment)` for passing parameters in event handlers
+- TODO comment: Added reminder to restrict edit/delete buttons to comment owner when auth is implemented

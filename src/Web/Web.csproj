@@ -9,6 +9,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Auth0.AspNetCore.Authentication" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectCapability Include="CanEvaluateItemsWithTargetFramework" />
 	</ItemGroup>
 

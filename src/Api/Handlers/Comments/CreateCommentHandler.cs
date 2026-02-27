@@ -55,18 +55,18 @@ public class CreateCommentHandler
 			command.CommentText,
 			DateTime.UtcNow,
 			null,
-			null,
-			null,
+			IssueDto.Empty,
+			UserDto.Empty,
 			new HashSet<string>(),
 			false,
-			null,
+			UserDto.Empty,
 			false,
-			null);
+			UserDto.Empty);
 
 		var result = await _repository.CreateAsync(dto, cancellationToken);
 		if (result.Failure)
 			throw new InvalidOperationException(result.Error);
 
-		return result.Value;
+		return result.Value!;
 	}
 }

@@ -56,12 +56,12 @@ public class CreateCategoryHandler
 			DateTime.UtcNow,
 			null,
 			false,
-			null);
+			UserDto.Empty);
 
 		var result = await _repository.CreateAsync(dto, cancellationToken);
 		if (result.Failure)
 			throw new InvalidOperationException(result.Error);
 
-		return result.Value;
+		return result.Value!;
 	}
 }
