@@ -1,6 +1,8 @@
 using FluentAssertions;
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Issues;
+
 using Shared.DTOs;
 using Shared.Exceptions;
 using Shared.Validators;
@@ -68,8 +70,8 @@ public class UpdateIssueHandlerTests
 
 		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
 		await _repository.Received(1).UpdateAsync(Arg.Is<IssueDto>(i =>
-			i.Title == command.Title &&
-			i.Description == command.Description), Arg.Any<CancellationToken>());
+				i.Title == command.Title &&
+				i.Description == command.Description), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]

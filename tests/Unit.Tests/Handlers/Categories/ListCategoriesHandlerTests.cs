@@ -10,6 +10,8 @@
 using FluentAssertions;
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Categories;
+
 using Shared.Abstractions;
 using Shared.Models;
 using MongoDB.Bson;

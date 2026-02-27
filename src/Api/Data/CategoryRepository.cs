@@ -7,11 +7,6 @@
 // Project Name :  Api
 // =======================================================
 
-using MongoDB.Bson;
-using MongoDB.Driver;
-using Shared.Abstractions;
-using Shared.Models;
-
 namespace Api.Data;
 
 /// <summary>
@@ -32,54 +27,76 @@ public class CategoryRepository : ICategoryRepository
 	}
 
 	/// <inheritdoc />
-	public async Task<Result> ArchiveAsync(Category category)
+	public async Task<Result> ArchiveAsync(ObjectId categoryId, CancellationToken cancellationToken = default)
 	{
-		if (category is null) return Result.Fail("Category cannot be null.");
-
-		category.Archived = true;
-		category.DateModified = DateTime.UtcNow;
-
-		var result = await _collection.ReplaceOneAsync(x => x.Id == category.Id, category);
-		return result.ModifiedCount > 0
-			? Result.Ok()
-			: Result.Fail("Category not found or could not be archived.", ResultErrorCode.NotFound);
+		var update = Builders<Category>.Update.Set(x => x.Archived, true);
+		var result = await _collection.UpdateOneAsync(x => x.Id == categoryId, update, cancellationToken: cancellationToken);
+		return result.ModifiedCount > 0 ? Result.Ok() : Result.Fail("Category not found or already archived.");
 	}
 
 	/// <inheritdoc />
-	public async Task<Result> CreateAsync(Category category)
+	public async Task<Result<CategoryDto>> CreateAsync(CategoryDto category, CancellationToken cancellationToken = default)
 	{
-		if (category is null) return Result.Fail("Category cannot be null.");
-
-		await _collection.InsertOneAsync(category);
-		return Result.Ok();
+		var model = category.ToModel();
+		await _collection.InsertOneAsync(model, cancellationToken: cancellationToken);
+		return Result.Ok(model.ToDto());
 	}
 
 	/// <inheritdoc />
-	public async Task<Result<Category>> GetAsync(ObjectId itemId)
+	public async Task<Result<CategoryDto>> GetByIdAsync(ObjectId categoryId, CancellationToken cancellationToken = default)
 	{
-		var entity = await _collection.Find(x => x.Id == itemId).FirstOrDefaultAsync();
-		return entity is not null
-			? Result.Ok(entity)
-			: Result.Fail<Category>("Category not found.", ResultErrorCode.NotFound);
+		if (!ObjectId.TryParse(categoryId.ToString(), out var id))
+			return Result.Fail<CategoryDto>("Invalid category ID format.");
+
+		var entity = await _collection.Find(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
+
+		return entity is not null ? Result.Ok(entity.ToDto()) : Result.Fail<CategoryDto>("Category not found.");
 	}
 
 	/// <inheritdoc />
-	public async Task<Result<IEnumerable<Category>>> GetAllAsync()
+	public async Task<Result<IReadOnlyList<CategoryDto>>> GetAllAsync(CancellationToken cancellationToken = default)
 	{
-		var entities = await _collection.Find(_ => true).ToListAsync();
-		return Result.Ok<IEnumerable<Category>>(entities);
+		var entities = await _collection.Find(_ => true).ToListAsync(cancellationToken);
+		return Result.Ok<IReadOnlyList<CategoryDto>>(entities.Select(x => x.ToDto()).ToList().AsReadOnly());
 	}
 
 	/// <inheritdoc />
-	public async Task<Result> UpdateAsync(ObjectId itemId, Category category)
+	public async Task<Result<(IReadOnlyList<CategoryDto> Items, long Total)>> GetAllAsync(
+			int page,
+			int pageSize,
+			CancellationToken cancellationToken = default)
 	{
-		if (category is null) return Result.Fail("Category cannot be null.");
+		var filter = Builders<Category>.Filter.Eq(x => x.Archived, false);
+		var total = await _collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
+		var entities = await _collection
+			.Find(filter)
+			.Skip((page - 1) * pageSize)
+			.Limit(pageSize)
+			.ToListAsync(cancellationToken);
 
-		category.DateModified = DateTime.UtcNow;
-
-		var result = await _collection.ReplaceOneAsync(x => x.Id == itemId, category);
-		return result.ModifiedCount > 0
-			? Result.Ok()
-			: Result.Fail("Category not found or could not be updated.", ResultErrorCode.NotFound);
+		return (Result<(IReadOnlyList<CategoryDto> Items, long Total)>)(entities.Count > 0
+				? Result.Ok((entities.Select(x => x.ToDto()).ToList().AsReadOnly(), total))
+				: Result.Fail("Issues not found."));
 	}
+
+	/// <inheritdoc />
+	public async Task<Result<CategoryDto>> UpdateAsync(CategoryDto dto, CancellationToken cancellationToken = default)
+	{
+		var model = dto.ToModel();
+
+		var result = await _collection.ReplaceOneAsync(
+				x => x.Id == model.Id,
+				model,
+				cancellationToken: cancellationToken);
+
+		return result.ModifiedCount > 0 ? Result.Ok(model.ToDto()) :
+				Result.Fail<CategoryDto>("Category not found or update failed.");
+	}
+
+	/// <inheritdoc />
+	public async Task<Result<long>> CountAsync(CancellationToken cancellationToken = default)
+	{
+		return Result.Ok(await _collection.CountDocumentsAsync(_ => true, cancellationToken: cancellationToken));
+	}
+
 }

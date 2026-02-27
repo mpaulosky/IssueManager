@@ -1,7 +1,6 @@
 using Api.Handlers;
-using Shared.DTOs;
-using Shared.Validators;
-using static Api.Handlers.GetStatusHandler;
+
+using static Api.Handlers.Statuses.GetStatusHandler;
 
 namespace Api.Handlers.Statuses;
 

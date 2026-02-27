@@ -7,13 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using FluentValidation;
-using Api.Data;
-using Shared.Validators;
-using Shared.DTOs;
-using Shared.Exceptions;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Issues;
 
 /// <summary>
 /// Handler for updating existing issues.
@@ -41,23 +35,26 @@ public class UpdateIssueHandler
 		if (!validationResult.IsValid)
 			throw new ValidationException(validationResult.Errors);
 
-		var existingIssue = await _repository.GetByIdAsync(command.Id, cancellationToken);
-		if (existingIssue is null)
+		if (!ObjectId.TryParse(command.Id, out var issueId))
+			throw new NotFoundException($"Issue with ID '{command.Id}' has invalid format.");
+
+		var getResult = await _repository.GetByIdAsync(issueId, cancellationToken);
+		if (!getResult.Success || getResult.Value is null)
 			throw new NotFoundException($"Issue with ID '{command.Id}' was not found.");
 
-		if (existingIssue.Archived)
+		if (getResult.Value.Archived)
 			throw new ConflictException($"Issue with ID '{command.Id}' is archived and cannot be updated.");
 
-		var updatedIssue = existingIssue with
+		var updatedIssue = getResult.Value with
 		{
 			Title = command.Title,
 			Description = command.Description ?? string.Empty
 		};
 
-		var result = await _repository.UpdateAsync(updatedIssue, cancellationToken);
-		if (result is null)
+		var updateResult = await _repository.UpdateAsync(updatedIssue, cancellationToken);
+		if (!updateResult.Success || updateResult.Value is null)
 			throw new NotFoundException($"Issue with ID '{command.Id}' could not be updated.");
 
-		return result;
+		return updateResult.Value;
 	}
 }

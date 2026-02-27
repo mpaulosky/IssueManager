@@ -1,4 +1,4 @@
-namespace Tests.Integration.Fixtures;
+namespace Integration.Fixtures;
 
 /// <summary>
 /// Defines an xUnit collection that serializes all integration tests to prevent

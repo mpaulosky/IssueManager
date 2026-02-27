@@ -7,16 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using Api.Data;
-
-using FluentValidation;
-
-using Shared.DTOs;
-using Shared.Mappers;
-using Shared.Models;
-using Shared.Validators;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Comments;
 
 /// <summary>
 /// Handler for creating new comments.
@@ -58,17 +49,24 @@ public class CreateCommentHandler
 		if (!validationResult.IsValid)
 			throw new ValidationException(validationResult.Errors);
 
-		var model = new Comment
-		{
-			Title = command.Title,
-			Description = command.CommentText,
-			DateCreated = DateTime.UtcNow
-		};
+		var dto = new CommentDto(
+			ObjectId.Empty,
+			command.Title,
+			command.CommentText,
+			DateTime.UtcNow,
+			null,
+			null,
+			null,
+			new HashSet<string>(),
+			false,
+			null,
+			false,
+			null);
 
-		var result = await _repository.CreateAsync(model);
+		var result = await _repository.CreateAsync(dto, cancellationToken);
 		if (result.Failure)
 			throw new InvalidOperationException(result.Error);
 
-		return model.ToDto();
+		return result.Value;
 	}
 }

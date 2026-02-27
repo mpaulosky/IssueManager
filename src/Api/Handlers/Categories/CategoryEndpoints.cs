@@ -1,7 +1,6 @@
 using Api.Handlers;
-using Shared.DTOs;
-using Shared.Validators;
-using static Api.Handlers.GetCategoryHandler;
+
+using static Api.Handlers.Categories.GetCategoryHandler;
 
 namespace Api.Handlers.Categories;
 

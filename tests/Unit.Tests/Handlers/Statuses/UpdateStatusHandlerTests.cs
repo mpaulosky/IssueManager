@@ -11,6 +11,8 @@ using FluentAssertions;
 using FluentValidation;
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Statuses;
+
 using Shared.Abstractions;
 using Shared.Exceptions;
 using Shared.Models;
@@ -69,8 +71,8 @@ public class UpdateStatusHandlerTests
 		result.StatusName.Should().Be("Updated Name");
 		result.StatusDescription.Should().Be("Updated Description");
 		await _repository.Received(1).UpdateAsync(statusId, Arg.Is<Status>(s =>
-			s.StatusName == command.StatusName &&
-			s.StatusDescription == command.StatusDescription));
+				s.StatusName == command.StatusName &&
+				s.StatusDescription == command.StatusDescription));
 	}
 
 	[Fact]

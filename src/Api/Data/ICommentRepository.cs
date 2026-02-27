@@ -7,11 +7,6 @@
 // Project Name :  Shared
 // =============================================
 
-using MongoDB.Bson;
-using Shared.Abstractions;
-using Shared.DTOs;
-using Shared.Models;
-
 namespace Api.Data;
 
 /// <summary>
@@ -21,80 +16,69 @@ public interface ICommentRepository
 {
 
 	/// <summary>
-	/// Archives a comment by marking it as inactive in the data store.
+	/// Soft-deletes a comment by setting Archived to true.
 	/// </summary>
-	/// <param name="comment">The comment to archive.</param>
-	/// <returns>A task representing the asynchronous operation.</returns>
-	/// <exception cref="ArgumentNullException">Thrown when <paramref name="comment"/> is null.</exception>
-	Task<Result> ArchiveAsync(Comment comment);
+	Task<Result> ArchiveAsync(ObjectId commentId, CancellationToken cancellationToken = default);
 
 	/// <summary>
-	/// Creates a new comment in the data store.
+	/// Creates a new comment in the database.
 	/// </summary>
-	/// <param name="comment">The comment to create.</param>
-	/// <returns>A task representing the asynchronous operation.</returns>
-	/// <exception cref="ArgumentNullException">Thrown when <paramref name="comment"/> is null.</exception>
-	Task<Result> CreateAsync(Comment comment);
+	Task<Result<CommentDto>> CreateAsync(CommentDto comment, CancellationToken cancellationToken = default);
 
 	/// <summary>
-	/// Retrieves a specific comment from the data store by its unique identifier.
+	/// Gets a comment by its unique identifier.
 	/// </summary>
-	/// <param name="itemId">The unique identifier of the comment.</param>
-	/// <returns>
-	/// A task that represents the asynchronous operation.
-	/// The task result contains the requested <see cref="Comment"/>.
-	/// </returns>
-	/// <exception cref="ArgumentException">Thrown when <paramref name="itemId"/> is null or empty.</exception>
-	Task<Result<Comment>> GetAsync(ObjectId itemId);
+	Task<Result<CommentDto>> GetByIdAsync(ObjectId commentId, CancellationToken cancellationToken = default);
 
 	/// <summary>
-	/// Retrieves all comments from the data store.
+	/// Gets all comments from the database.
 	/// </summary>
-	/// <returns>
-	/// A task that represents the asynchronous operation.
-	/// The task result contains an enumerable collection of all <see cref="Comment"/> instances,
-	/// or null if no comments exist.
-	/// </returns>
-	Task<Result<IEnumerable<Comment>>> GetAllAsync();
+	Task<Result<IReadOnlyList<CommentDto>>> GetAllAsync(CancellationToken cancellationToken = default);
+
+	/// <summary>
+	/// Gets paginated comments from the database, excluding archived comments by default.
+	/// </summary>
+	Task<Result<(IReadOnlyList<CommentDto> Items, long Total)>> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Retrieves all comments created by a specific user.
 	/// </summary>
-	/// <param name="userId">The unique identifier of the user.</param>
+	/// <param name="userId"></param>
+	/// <param name="cancellationToken"></param>
 	/// <returns>
 	/// A task that represents the asynchronous operation.
-	/// The task result contains an enumerable collection of <see cref="Comment"/> instances for the specified user.
+	/// The task result contains an enumerable collection of <see cref="CommentDto"/> instances for the specified user.
 	/// </returns>
-	/// <exception cref="ArgumentException">Thrown when <paramref name="userId"/> is null or empty.</exception>
-	Task<Result<IEnumerable<Comment>>> GetByUserAsync(string userId);
+	Task<Result<IEnumerable<CommentDto>>> GetByUserAsync(string userId, CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Retrieves all comments associated with a specific issue.
 	/// </summary>
 	/// <param name="issue">The issue to retrieve comments for.</param>
+	/// <param name="cancellationToken"></param>
 	/// <returns>
 	/// A task that represents the asynchronous operation.
-	/// The task result contains an enumerable collection of <see cref="Comment"/> instances for the specified issue.
+	/// The task result contains an enumerable collection of <see cref="CommentDto"/> instances for the specified issue.
 	/// </returns>
-	/// <exception cref="ArgumentNullException">Thrown when <paramref name="issue"/> is null.</exception>
-	Task<Result<IEnumerable<Comment>>> GetByIssueAsync(IssueDto issue);
+	Task<Result<IEnumerable<CommentDto>>> GetByIssueAsync(IssueDto issue, CancellationToken cancellationToken = default);
 
 	/// <summary>
-	/// Updates an existing comment in the data store.
+	/// Updates an existing comment in the database.
 	/// </summary>
-	/// <param name="itemId">The unique identifier of the comment to update.</param>
-	/// <param name="comment">The updated comment data.</param>
-	/// <returns>A task representing the asynchronous operation.</returns>
-	/// <exception cref="ArgumentException">Thrown when <paramref name="itemId"/> is null or empty.</exception>
-	/// <exception cref="ArgumentNullException">Thrown when <paramref name="comment"/> is null.</exception>
-	Task<Result> UpdateAsync(ObjectId itemId, Comment comment);
+	Task<Result<CommentDto>> UpdateAsync(  CommentDto comment, CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Registers an upvote for a comment by a specific user.
 	/// </summary>
 	/// <param name="itemId">The unique identifier of the comment.</param>
-	/// <param name="userId">The unique identifier of the user upvoting.</param>
+	/// <param name="userId"></param>
+	/// <param name="cancellationToken"></param>
 	/// <returns>A task representing the asynchronous operation.</returns>
-	/// <exception cref="ArgumentException">Thrown when <paramref name="itemId"/> or <paramref name="userId"/> is null or empty.</exception>
-	Task<Result> UpVoteAsync(ObjectId itemId, string userId);
+	Task<Result> UpVoteAsync(ObjectId itemId, string userId, CancellationToken cancellationToken = default);
+
+	/// <summary>
+	/// Counts the total number of comments in the database.
+	/// </summary>
+	Task<Result<long>> CountAsync(CancellationToken cancellationToken = default);
+
 }

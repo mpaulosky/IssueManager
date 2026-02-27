@@ -10,6 +10,11 @@
 using Api.Data;
 using Api.Extensions;
 using Api.Handlers;
+using Api.Handlers.Categories;
+using Api.Handlers.Comments;
+using Api.Handlers.Issues;
+using Api.Handlers.Statuses;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Validators;

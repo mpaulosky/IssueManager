@@ -7,12 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using Api.Data;
-
-using Shared.DTOs;
-using Shared.Mappers;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Comments;
 
 /// <summary>
 /// Handler for listing all comments.
@@ -40,10 +35,10 @@ public class ListCommentsHandler
 	/// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of all comments as <see cref="CommentDto"/> objects.</returns>
 	public async Task<IEnumerable<CommentDto>> Handle(CancellationToken cancellationToken = default)
 	{
-		var result = await _repository.GetAllAsync();
+		var result = await _repository.GetAllAsync(cancellationToken);
 		if (result.Failure)
 			return Enumerable.Empty<CommentDto>();
 
-		return result.Value?.Select(c => c.ToDto()) ?? Enumerable.Empty<CommentDto>();
+		return result.Value ?? Enumerable.Empty<CommentDto>();
 	}
 }

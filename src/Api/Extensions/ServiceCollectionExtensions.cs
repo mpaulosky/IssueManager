@@ -7,9 +7,11 @@
 // Project Name :  Api
 // =======================================================
 
-using Api.Data;
 using Api.Handlers;
-using Shared.Validators;
+using Api.Handlers.Categories;
+using Api.Handlers.Comments;
+using Api.Handlers.Issues;
+using Api.Handlers.Statuses;
 
 namespace Api.Extensions;
 

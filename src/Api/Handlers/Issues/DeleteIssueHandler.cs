@@ -7,12 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using FluentValidation;
-using Api.Data;
-using Shared.Validators;
-using Shared.Exceptions;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Issues;
 
 /// <summary>
 /// Handler for deleting (soft-deleting/archiving) issues.
@@ -40,13 +35,17 @@ public class DeleteIssueHandler
 		if (!validationResult.IsValid)
 			throw new ValidationException(validationResult.Errors);
 
-		var existingIssue = await _repository.GetByIdAsync(command.Id, cancellationToken);
-		if (existingIssue is null)
+		if (!MongoDB.Bson.ObjectId.TryParse(command.Id, out var objectId))
 			throw new NotFoundException($"Issue with ID '{command.Id}' was not found.");
 
-		if (existingIssue.Archived)
+		var getResult = await _repository.GetByIdAsync(objectId, cancellationToken);
+		if (getResult.Failure || getResult.Value is null)
+			throw new NotFoundException($"Issue with ID '{command.Id}' was not found.");
+
+		if (getResult.Value.Archived)
 			return true;
 
-		return await _repository.ArchiveAsync(command.Id, cancellationToken);
+		var archiveResult = await _repository.ArchiveAsync(objectId, cancellationToken);
+		return archiveResult.Success;
 	}
 }

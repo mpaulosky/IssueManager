@@ -1,28 +1,17 @@
-using FluentAssertions;
-using Api.Data;
-using MongoDB.Bson;
-using Shared.DTOs;
-using Testcontainers.MongoDb;
-
-namespace Tests.Integration.Data;
+namespace Integration.Data;
 
 /// <summary>
 /// Integration tests for IssueRepository with pagination, filtering, and soft-delete.
 /// </summary>
 public class IssueRepositoryTests : IAsyncLifetime
 {
-private const string MONGODB_IMAGE = "mongo:8.0";
-private const string TEST_DATABASE = "IssueManagerTestDb";
-private readonly MongoDbContainer _mongoContainer;
+private const string MongodbImage = "mongo:8.2";
+private const string TestDatabase = "IssueManagerTestDb";
+private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder()
+		.WithImage(MongodbImage)
+		.Build();
 
 private IIssueRepository _repository = null!;
-
-public IssueRepositoryTests()
-{
-_mongoContainer = new MongoDbBuilder()
-.WithImage(MONGODB_IMAGE)
-.Build();
-}
 
 /// <summary>
 /// Initializes the test container and repository.
@@ -31,7 +20,7 @@ public async Task InitializeAsync()
 {
 await _mongoContainer.StartAsync();
 var connectionString = _mongoContainer.GetConnectionString();
-_repository = new IssueRepository(connectionString, TEST_DATABASE);
+_repository = new IssueRepository(connectionString, TestDatabase);
 }
 
 /// <summary>
@@ -49,9 +38,14 @@ new(
 	title,
 	description,
 	dateCreated ?? DateTime.UtcNow,
+	null,
 	UserDto.Empty,
 	CategoryDto.Empty,
-	StatusDto.Empty);
+	StatusDto.Empty,
+	false,
+	UserDto.Empty,
+	false,
+	false);
 
 [Fact]
 public async Task GetAllAsync_FirstPage_ReturnsCorrectItems()
@@ -64,7 +58,9 @@ for (int i = 0; i < 50; i++)
 }
 
 // Act
-var (items, total) = await _repository.GetAllAsync(page: 1, pageSize: 20);
+var result = await _repository.GetAllAsync(page: 1, pageSize: 20);
+var items = result.Value.Items;
+var total = result.Value.Total;
 
 // Assert
 items.Should().HaveCount(20);
@@ -82,8 +78,10 @@ for (int i = 0; i < 50; i++)
 }
 
 // Act
-var (page1Items, _) = await _repository.GetAllAsync(page: 1, pageSize: 20);
-var (page2Items, _) = await _repository.GetAllAsync(page: 2, pageSize: 20);
+var result1 = await _repository.GetAllAsync(page: 1, pageSize: 20);
+var page1Items = result1.Value.Items;
+var result2 = await _repository.GetAllAsync(page: 2, pageSize: 20);
+var page2Items = result2.Value.Items;
 
 // Assert
 page2Items.Should().HaveCount(20);
@@ -100,16 +98,18 @@ for (int i = 0; i < 10; i++)
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
 	var created = await _repository.CreateAsync(issue);
 	if (i < 3)
-		issuesToArchive.Add(created.Id.ToString());
+		issuesToArchive.Add(created.Value.Id.ToString());
 }
 
 foreach (var id in issuesToArchive)
 {
-	await _repository.ArchiveAsync(id);
+	await _repository.ArchiveAsync(ObjectId.Parse(id));
 }
 
 // Act
-var (items, total) = await _repository.GetAllAsync(page: 1, pageSize: 20);
+var result = await _repository.GetAllAsync(page: 1, pageSize: 20);
+var items = result.Value.Items;
+var total = result.Value.Total;
 
 // Assert
 items.Should().HaveCount(7); // 10 - 3 archived = 7
@@ -127,16 +127,17 @@ for (int i = 0; i < 10; i++)
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
 	var created = await _repository.CreateAsync(issue);
 	if (i < 3)
-		issuesToArchive.Add(created.Id.ToString());
+		issuesToArchive.Add(created.Value.Id.ToString());
 }
 
 foreach (var id in issuesToArchive)
 {
-	await _repository.ArchiveAsync(id);
+	await _repository.ArchiveAsync(ObjectId.Parse(id));
 }
 
 // Act — non-paginated GetAllAsync returns all records
-var allIssues = await _repository.GetAllAsync();
+var allIssuesResult = await _repository.GetAllAsync();
+var allIssues = allIssuesResult.Value;
 
 // Assert
 allIssues.Should().HaveCount(10); // All issues including archived
@@ -152,19 +153,19 @@ for (int i = 0; i < 10; i++)
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
 	var created = await _repository.CreateAsync(issue);
 	if (i < 3)
-		issuesToArchive.Add(created.Id.ToString());
+		issuesToArchive.Add(created.Value.Id.ToString());
 }
 
 foreach (var id in issuesToArchive)
 {
-	await _repository.ArchiveAsync(id);
+	await _repository.ArchiveAsync(ObjectId.Parse(id));
 }
 
 // Act
-var count = await _repository.CountAsync();
+var countResult = await _repository.CountAsync();
 
 // Assert — CountAsync counts all issues regardless of archive status
-count.Should().Be(10);
+countResult.Value.Should().Be(10);
 }
 
 [Fact]
@@ -175,13 +176,14 @@ var issue = CreateTestIssueDto("Issue to Archive", "Test");
 var created = await _repository.CreateAsync(issue);
 
 // Act
-var result = await _repository.ArchiveAsync(created.Id.ToString());
+var archiveResult = await _repository.ArchiveAsync(created.Value.Id);
 
 // Assert
-result.Should().BeTrue();
+archiveResult.Success.Should().BeTrue();
 
 // Verify in database
-var dbIssue = await _repository.GetByIdAsync(created.Id.ToString());
+var getResult = await _repository.GetByIdAsync(created.Value.Id);
+var dbIssue = getResult.Value;
 dbIssue.Should().NotBeNull();
 dbIssue!.Archived.Should().BeTrue();
 }
@@ -194,12 +196,13 @@ var issue = CreateTestIssueDto("Issue to Archive", "Should still exist");
 var created = await _repository.CreateAsync(issue);
 
 // Act - Soft delete (archive)
-await _repository.ArchiveAsync(created.Id.ToString());
+await _repository.ArchiveAsync(created.Value.Id);
 
 // Assert - Record still exists
-var dbIssue = await _repository.GetByIdAsync(created.Id.ToString());
+var getResult = await _repository.GetByIdAsync(created.Value.Id);
+var dbIssue = getResult.Value;
 dbIssue.Should().NotBeNull();
-dbIssue!.Id.Should().Be(created.Id);
+dbIssue!.Id.Should().Be(created.Value.Id);
 dbIssue.Archived.Should().BeTrue();
 }
 
@@ -220,7 +223,9 @@ result.Should().BeNull();
 public async Task GetAllAsync_EmptyDatabase_ReturnsEmptyList()
 {
 // Act
-var (items, total) = await _repository.GetAllAsync(page: 1, pageSize: 20);
+var result = await _repository.GetAllAsync(page: 1, pageSize: 20);
+var items = result.Value.Items;
+var total = result.Value.Total;
 
 // Assert
 items.Should().BeEmpty();

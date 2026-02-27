@@ -7,12 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using FluentValidation;
-using Api.Data;
-using Shared.DTOs;
-using Shared.Validators;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Issues;
 
 /// <summary>
 /// Handler for updating issue status.
@@ -40,11 +35,15 @@ public class UpdateIssueStatusHandler
 		if (!validationResult.IsValid)
 			throw new ValidationException(validationResult.Errors);
 
-		var existingIssue = await _repository.GetByIdAsync(command.IssueId, cancellationToken);
-		if (existingIssue is null)
+		if (!ObjectId.TryParse(command.IssueId, out var issueId))
 			return null;
 
-		var updatedIssue = existingIssue with { Status = command.Status };
-		return await _repository.UpdateAsync(updatedIssue, cancellationToken);
+		var result = await _repository.GetByIdAsync(issueId, cancellationToken);
+		if (!result.Success || result.Value is null)
+			return null;
+
+		var updatedIssue = result.Value with { Status = command.Status };
+		var updateResult = await _repository.UpdateAsync(updatedIssue, cancellationToken);
+		return updateResult.Value;
 	}
 }

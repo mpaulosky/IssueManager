@@ -10,6 +10,8 @@
 using FluentAssertions;
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Issues;
+
 using Shared.DTOs;
 using MongoDB.Bson;
 using NSubstitute;

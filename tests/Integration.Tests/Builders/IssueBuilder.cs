@@ -1,6 +1,3 @@
-using MongoDB.Bson;
-using Shared.DTOs;
-
 namespace Integration.Builders;
 
 /// <summary>
@@ -100,10 +97,14 @@ public class IssueBuilder
 			Title: _title,
 			Description: _description,
 			DateCreated: _dateCreated,
+			DateModified: _dateUpdated,
 			Author: UserDto.Empty,
 			Category: CategoryDto.Empty,
 			Status: StatusDto.Empty,
-			Archived: _archived);
+			Archived: _archived,
+			ArchivedBy: UserDto.Empty,
+			ApprovedForRelease: false,
+			Rejected: false);
 	}
 
 	/// <summary>

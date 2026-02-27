@@ -9,6 +9,8 @@
 
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Comments;
+
 using MongoDB.Bson;
 using Shared.Abstractions;
 using Shared.Exceptions;

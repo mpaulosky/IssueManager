@@ -1,7 +1,4 @@
-using MongoDB.Bson;
-using Shared.DTOs;
-
-namespace Tests.Integration.Handlers;
+namespace Integration.Handlers;
 
 /// <summary>
 /// Integration tests for IssueRepository.ArchiveAsync (soft-delete).
@@ -10,18 +7,13 @@ namespace Tests.Integration.Handlers;
 [Collection("Integration")]
 public class DeleteIssueHandlerTests : IAsyncLifetime
 {
-	private const string MONGODB_IMAGE = "mongo:8.0";
-	private const string TEST_DATABASE = "IssueManagerTestDb";
-	private readonly MongoDbContainer _mongoContainer;
+	private const string MongodbImage = "mongo:8.2";
+	private const string TestDatabase = "IssueManagerTestDb";
+	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder()
+			.WithImage(MongodbImage)
+			.Build();
 
 	private IIssueRepository _repository = null!;
-
-	public DeleteIssueHandlerTests()
-	{
-		_mongoContainer = new MongoDbBuilder()
-			.WithImage(MONGODB_IMAGE)
-			.Build();
-	}
 
 	/// <summary>
 	/// Initializes the test container and repository.
@@ -30,7 +22,7 @@ public class DeleteIssueHandlerTests : IAsyncLifetime
 	{
 		await _mongoContainer.StartAsync();
 		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new IssueRepository(connectionString, TEST_DATABASE);
+		_repository = new IssueRepository(connectionString, TestDatabase);
 	}
 
 	/// <summary>
@@ -43,7 +35,7 @@ public class DeleteIssueHandlerTests : IAsyncLifetime
 	}
 
 	private static IssueDto CreateTestIssueDto(string title, string description) =>
-		new(ObjectId.GenerateNewId(), title, description, DateTime.UtcNow, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty);
+		new(ObjectId.GenerateNewId(), title, description, DateTime.UtcNow, null, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty, false, UserDto.Empty, false, false);
 
 	[Fact]
 	public async Task ArchiveAsync_ExistingUnarchivedIssue_ReturnsTrue()
@@ -53,13 +45,15 @@ public class DeleteIssueHandlerTests : IAsyncLifetime
 		var created = await _repository.CreateAsync(issue);
 
 		// Act
-		var result = await _repository.ArchiveAsync(created.Id.ToString());
+		var result = await _repository.ArchiveAsync(created.Value.Id);
 
 		// Assert
-		result.Should().BeTrue();
+		result.Success.Should().BeTrue();
 
-		var retrieved = await _repository.GetByIdAsync(created.Id.ToString());
-		retrieved!.Archived.Should().BeTrue();
+		var retrievedResult = await _repository.GetByIdAsync(created.Value.Id);
+		retrievedResult.Should().NotBeNull();
+		var retrieved = retrievedResult.Value;
+		retrieved.Archived.Should().BeTrue();
 	}
 
 	[Fact]
@@ -68,22 +62,22 @@ public class DeleteIssueHandlerTests : IAsyncLifetime
 		// Arrange
 		var issue = CreateTestIssueDto("Already Archived Issue", "Description");
 		var created = await _repository.CreateAsync(issue);
-		await _repository.ArchiveAsync(created.Id.ToString());
+		await _repository.ArchiveAsync(created.Value.Id);
 
 		// Act - archive again (already archived, ModifiedCount = 0)
-		var result = await _repository.ArchiveAsync(created.Id.ToString());
+		var result = await _repository.ArchiveAsync(created.Value.Id);
 
 		// Assert - should return false since no modification was made
-		result.Should().BeFalse();
+		result.Success.Should().BeFalse();
 	}
 
 	[Fact]
 	public async Task ArchiveAsync_NonExistentIssue_ReturnsFalse()
 	{
 		// Act
-		var result = await _repository.ArchiveAsync(ObjectId.GenerateNewId().ToString());
+		var result = await _repository.ArchiveAsync(ObjectId.GenerateNewId());
 
 		// Assert
-		result.Should().BeFalse();
+		result.Success.Should().BeFalse();
 	}
 }

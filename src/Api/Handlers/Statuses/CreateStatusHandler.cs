@@ -7,16 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using Api.Data;
-
-using FluentValidation;
-
-using Shared.DTOs;
-using Shared.Mappers;
-using Shared.Models;
-using Shared.Validators;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Statuses;
 
 /// <summary>
 /// Handler for creating new statuses.
@@ -58,17 +49,19 @@ public class CreateStatusHandler
 		if (!validationResult.IsValid)
 			throw new ValidationException(validationResult.Errors);
 
-		var model = new Status
-		{
-			StatusName = command.StatusName,
-			StatusDescription = command.StatusDescription ?? string.Empty,
-			DateCreated = DateTime.UtcNow
-		};
+		var dto = new StatusDto(
+			ObjectId.Empty,
+			command.StatusName,
+			command.StatusDescription ?? string.Empty,
+			DateTime.UtcNow,
+			null,
+			false,
+			null);
 
-		var result = await _repository.CreateAsync(model);
+		var result = await _repository.CreateAsync(dto, cancellationToken);
 		if (result.Failure)
 			throw new InvalidOperationException(result.Error);
 
-		return model.ToDto();
+		return result.Value;
 	}
 }

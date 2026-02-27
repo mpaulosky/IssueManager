@@ -7,14 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using FluentValidation;
-using Api.Data;
-using Shared.DTOs;
-using Shared.Mappers;
-using Shared.Models;
-using Shared.Validators;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Issues;
 
 /// <summary>
 /// Handler for creating new issues.
@@ -47,7 +40,7 @@ public class CreateIssueHandler
 			Title = command.Title,
 			Description = command.Description ?? string.Empty,
 			DateCreated = DateTime.UtcNow,
-			IssueStatus = StatusDto.Empty,
+			Status = StatusDto.Empty,
 			Author = UserDto.Empty,
 			Category = CategoryDto.Empty
 		};

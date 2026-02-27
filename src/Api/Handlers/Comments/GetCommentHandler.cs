@@ -7,12 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using Api.Data;
-
-using Shared.DTOs;
-using Shared.Mappers;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Comments;
 
 /// <summary>
 /// Query for retrieving a single comment.
@@ -54,7 +49,7 @@ public class GetCommentHandler
 		if (!MongoDB.Bson.ObjectId.TryParse(query.CommentId, out var objectId))
 			return null;
 
-		var result = await _repository.GetAsync(objectId);
-		return result.Success ? result.Value?.ToDto() : null;
+		var result = await _repository.GetByIdAsync(objectId, cancellationToken);
+		return result.Success ? result.Value : null;
 	}
 }
