@@ -13,7 +13,7 @@ using Api.Handlers;
 using Api.Handlers.Statuses;
 
 using Shared.Abstractions;
-using Shared.Models;
+using Shared.DTOs;
 using MongoDB.Bson;
 using NSubstitute;
 
@@ -37,15 +37,15 @@ public class ListStatusesHandlerTests
 	public async Task Handle_ReturnsAllStatuses()
 	{
 		// Arrange
-		IEnumerable<Status> statuses = new List<Status>
+		IReadOnlyList<StatusDto> statuses = new List<StatusDto>
 		{
-			new() { Id = ObjectId.GenerateNewId(), StatusName = "Open", StatusDescription = "Issue is open" },
-			new() { Id = ObjectId.GenerateNewId(), StatusName = "Closed", StatusDescription = "Issue is closed" },
-			new() { Id = ObjectId.GenerateNewId(), StatusName = "In Progress", StatusDescription = "Work in progress" }
+			new(ObjectId.GenerateNewId(), "Open", "Issue is open", DateTime.UtcNow, null, false, UserDto.Empty),
+			new(ObjectId.GenerateNewId(), "Closed", "Issue is closed", DateTime.UtcNow, null, false, UserDto.Empty),
+			new(ObjectId.GenerateNewId(), "In Progress", "Work in progress", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
 		_repository.GetAllAsync()
-			.Returns(Result<IEnumerable<Status>>.Ok(statuses));
+			.Returns(Result<IReadOnlyList<StatusDto>>.Ok(statuses));
 
 		// Act
 		var result = await _handler.Handle(CancellationToken.None);
@@ -62,7 +62,7 @@ public class ListStatusesHandlerTests
 	{
 		// Arrange
 		_repository.GetAllAsync()
-			.Returns(Result<IEnumerable<Status>>.Ok((IEnumerable<Status>)new List<Status>()));
+			.Returns(Result<IReadOnlyList<StatusDto>>.Ok((IReadOnlyList<StatusDto>)new List<StatusDto>()));
 
 		// Act
 		var result = await _handler.Handle(CancellationToken.None);
@@ -76,7 +76,7 @@ public class ListStatusesHandlerTests
 	{
 		// Arrange
 		_repository.GetAllAsync()
-			.Returns(Result<IEnumerable<Status>>.Fail("Database error"));
+			.Returns(Result<IReadOnlyList<StatusDto>>.Fail("Database error"));
 
 		// Act
 		var result = await _handler.Handle(CancellationToken.None);
@@ -90,7 +90,7 @@ public class ListStatusesHandlerTests
 	{
 		// Arrange
 		_repository.GetAllAsync()
-			.Returns(Result<IEnumerable<Status>>.Ok((IEnumerable<Status>?)null!));
+			.Returns(Result<IReadOnlyList<StatusDto>>.Ok((IReadOnlyList<StatusDto>)null!));
 
 		// Act
 		var result = await _handler.Handle(CancellationToken.None);
@@ -104,13 +104,13 @@ public class ListStatusesHandlerTests
 	{
 		// Arrange
 		var cancellationToken = new CancellationToken();
-		IEnumerable<Status> statuses = new List<Status>
+		IReadOnlyList<StatusDto> statuses = new List<StatusDto>
 		{
-			new() { Id = ObjectId.GenerateNewId(), StatusName = "Test" }
+			new(ObjectId.GenerateNewId(), "Test", string.Empty, DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
 		_repository.GetAllAsync()
-			.Returns(Result<IEnumerable<Status>>.Ok(statuses));
+			.Returns(Result<IReadOnlyList<StatusDto>>.Ok(statuses));
 
 		// Act
 		await _handler.Handle(cancellationToken);

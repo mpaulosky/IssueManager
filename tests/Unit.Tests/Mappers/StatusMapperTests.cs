@@ -39,7 +39,7 @@ public class StatusMapperTests
 		dto.Should().NotBeNull();
 		dto.StatusName.Should().Be(status.StatusName);
 		dto.StatusDescription.Should().Be(status.StatusDescription);
-		dto.Id.Should().Be(status.Id.ToString());
+		dto.Id.Should().Be(status.Id);
 		dto.DateCreated.Should().Be(status.DateCreated);
 		dto.DateModified.Should().Be(status.DateModified);
 	}
@@ -61,7 +61,7 @@ public class StatusMapperTests
 		var dto = status.ToDto();
 
 		// Assert
-		dto.Id.Should().Be(statusId.ToString());
+		dto.Id.Should().Be(statusId);
 	}
 
 	[Fact]
@@ -90,11 +90,13 @@ public class StatusMapperTests
 	{
 		// Arrange
 		var dto = new StatusDto(
+			ObjectId.GenerateNewId(),
 			"Done",
 			"Task is complete",
-			ObjectId.GenerateNewId().ToString(),
 			new DateTime(2026, 1, 15, 0, 0, 0, DateTimeKind.Utc),
-			new DateTime(2026, 2, 15, 0, 0, 0, DateTimeKind.Utc));
+			new DateTime(2026, 2, 15, 0, 0, 0, DateTimeKind.Utc),
+			false,
+			UserDto.Empty);
 
 		// Act
 		var model = dto.ToModel();
@@ -112,11 +114,13 @@ public class StatusMapperTests
 	{
 		// Arrange
 		var dto = new StatusDto(
+			ObjectId.GenerateNewId(),
 			"Pending",
 			"Waiting for approval",
-			ObjectId.GenerateNewId().ToString(),
 			DateTime.UtcNow,
-			null);
+			null,
+			false,
+			UserDto.Empty);
 
 		// Act
 		var model = dto.ToModel();
@@ -157,11 +161,13 @@ public class StatusMapperTests
 		// Arrange
 		var statusId = ObjectId.GenerateNewId();
 		var original = new StatusDto(
+			statusId,
 			"Review",
 			"Under review",
-			statusId.ToString(),
 			new DateTime(2026, 4, 1, 0, 0, 0, DateTimeKind.Utc),
-			new DateTime(2026, 4, 5, 0, 0, 0, DateTimeKind.Utc));
+			new DateTime(2026, 4, 5, 0, 0, 0, DateTimeKind.Utc),
+			false,
+			UserDto.Empty);
 
 		// Act
 		var model = original.ToModel();

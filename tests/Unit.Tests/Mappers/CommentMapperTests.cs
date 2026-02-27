@@ -41,7 +41,7 @@ public class CommentMapperTests
 
 		// Assert
 		dto.Should().NotBeNull();
-		dto.Id.Should().Be(comment.Id.ToString());
+		dto.Id.Should().Be(comment.Id);
 		dto.Title.Should().Be(comment.Title);
 		dto.Description.Should().Be(comment.Description);
 		dto.DateCreated.Should().Be(comment.DateCreated);
@@ -92,7 +92,7 @@ public class CommentMapperTests
 		var dto = comment.ToDto();
 
 		// Assert
-		dto.Id.Should().Be(commentId.ToString());
+		dto.Id.Should().Be(commentId);
 	}
 
 	[Fact]
@@ -102,13 +102,18 @@ public class CommentMapperTests
 		var author = new UserDto("507f1f77bcf86cd799439011", "Jane Smith", "jane@example.com");
 		var issue = IssueDto.Empty;
 		var dto = new CommentDto(
-			ObjectId.GenerateNewId().ToString(),
+			ObjectId.GenerateNewId(),
 			"DTO Comment",
 			"DTO description",
 			new DateTime(2026, 1, 15, 0, 0, 0, DateTimeKind.Utc),
+			new DateTime(2026, 2, 15, 0, 0, 0, DateTimeKind.Utc),
 			issue,
 			author,
-			new DateTime(2026, 2, 15, 0, 0, 0, DateTimeKind.Utc));
+			[],
+			false,
+			UserDto.Empty,
+			false,
+			UserDto.Empty);
 
 		// Act
 		var model = dto.ToModel();
@@ -128,13 +133,18 @@ public class CommentMapperTests
 	{
 		// Arrange
 		var dto = new CommentDto(
-			ObjectId.GenerateNewId().ToString(),
+			ObjectId.GenerateNewId(),
 			"Test Title",
 			"Test Description",
 			DateTime.UtcNow,
+			null,
 			IssueDto.Empty,
 			UserDto.Empty,
-			null);
+			[],
+			false,
+			UserDto.Empty,
+			false,
+			UserDto.Empty);
 
 		// Act
 		var model = dto.ToModel();
@@ -183,13 +193,18 @@ public class CommentMapperTests
 		var issue = IssueDto.Empty;
 		var commentId = ObjectId.GenerateNewId();
 		var original = new CommentDto(
-			commentId.ToString(),
+			commentId,
 			"Original DTO",
 			"Original DTO description",
 			new DateTime(2026, 4, 1, 0, 0, 0, DateTimeKind.Utc),
+			new DateTime(2026, 4, 5, 0, 0, 0, DateTimeKind.Utc),
 			issue,
 			author,
-			new DateTime(2026, 4, 5, 0, 0, 0, DateTimeKind.Utc));
+			[],
+			false,
+			UserDto.Empty,
+			false,
+			UserDto.Empty);
 
 		// Act
 		var model = original.ToModel();

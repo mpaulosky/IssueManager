@@ -69,13 +69,18 @@ public class CommentBuilder
 
 	public CommentDto Build() =>
 		new(
-			_id,
+			ObjectId.Parse(_id),
 			_title,
 			_description,
 			_dateCreated,
+			_dateModified,
 			_issue,
 			_author,
-			_dateModified);
+			[],
+			false,
+			UserDto.Empty,
+			false,
+			UserDto.Empty);
 
 	public static CommentBuilder Default() => new();
 }

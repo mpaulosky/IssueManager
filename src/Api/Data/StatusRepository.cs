@@ -29,6 +29,9 @@ public class StatusRepository : IStatusRepository
 	/// <inheritdoc />
 	public async Task<Result> ArchiveAsync(ObjectId statusId, CancellationToken cancellationToken = default)
 	{
+		if (statusId == ObjectId.Empty)
+			return Result.Fail("Status cannot be null.");
+
 		var update = Builders<Status>.Update.Set(x => x.Archived, true);
 		var result = await _collection.UpdateOneAsync(x => x.Id == statusId, update, cancellationToken: cancellationToken);
 		return result.ModifiedCount > 0 ? Result.Ok() : Result.Fail("Status not found or already archived.");
@@ -37,6 +40,9 @@ public class StatusRepository : IStatusRepository
 	/// <inheritdoc />
 	public async Task<Result<StatusDto>> CreateAsync(StatusDto dto, CancellationToken cancellationToken = default)
 	{
+		if (dto is null)
+			return Result.Fail<StatusDto>("Status cannot be null.");
+
 		var model = dto.ToModel();
 		await _collection.InsertOneAsync(model, cancellationToken: cancellationToken);
 		return Result.Ok(model.ToDto());
@@ -82,6 +88,9 @@ public class StatusRepository : IStatusRepository
 	/// <inheritdoc />
 	public async Task<Result<StatusDto>> UpdateAsync(StatusDto dto, CancellationToken cancellationToken = default)
 	{
+		if (dto is null)
+			return Result.Fail<StatusDto>("Status cannot be null.");
+
 		var model = dto.ToModel();
 
 		var result = await _collection.ReplaceOneAsync(

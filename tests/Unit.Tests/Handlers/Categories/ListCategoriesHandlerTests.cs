@@ -9,11 +9,10 @@
 
 using FluentAssertions;
 using Api.Data;
-using Api.Handlers;
 using Api.Handlers.Categories;
 
 using Shared.Abstractions;
-using Shared.Models;
+using Shared.DTOs;
 using MongoDB.Bson;
 using NSubstitute;
 
@@ -37,15 +36,15 @@ public class ListCategoriesHandlerTests
 	public async Task Handle_ReturnsAllCategories()
 	{
 		// Arrange
-		IEnumerable<Category> categories = new List<Category>
+		IReadOnlyList<CategoryDto> categories = new List<CategoryDto>
 		{
-			new() { Id = ObjectId.GenerateNewId(), CategoryName = "Bug", CategoryDescription = "Bug reports" },
-			new() { Id = ObjectId.GenerateNewId(), CategoryName = "Feature", CategoryDescription = "Feature requests" },
-			new() { Id = ObjectId.GenerateNewId(), CategoryName = "Enhancement", CategoryDescription = "Enhancements" }
+			new(ObjectId.GenerateNewId(), "Bug", "Bug reports", DateTime.UtcNow, null, false, UserDto.Empty),
+			new(ObjectId.GenerateNewId(), "Feature", "Feature requests", DateTime.UtcNow, null, false, UserDto.Empty),
+			new(ObjectId.GenerateNewId(), "Enhancement", "Enhancements", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
 		_repository.GetAllAsync()
-			.Returns(Result<IEnumerable<Category>>.Ok(categories));
+			.Returns(Result<IReadOnlyList<CategoryDto>>.Ok(categories));
 
 		// Act
 		var result = await _handler.Handle(CancellationToken.None);
@@ -62,7 +61,7 @@ public class ListCategoriesHandlerTests
 	{
 		// Arrange
 		_repository.GetAllAsync()
-			.Returns(Result<IEnumerable<Category>>.Ok((IEnumerable<Category>)new List<Category>()));
+			.Returns(Result<IReadOnlyList<CategoryDto>>.Ok((IReadOnlyList<CategoryDto>)new List<CategoryDto>()));
 
 		// Act
 		var result = await _handler.Handle(CancellationToken.None);
@@ -76,7 +75,7 @@ public class ListCategoriesHandlerTests
 	{
 		// Arrange
 		_repository.GetAllAsync()
-			.Returns(Result<IEnumerable<Category>>.Fail("Database error"));
+			.Returns(Result<IReadOnlyList<CategoryDto>>.Fail("Database error"));
 
 		// Act
 		var result = await _handler.Handle(CancellationToken.None);
@@ -90,7 +89,7 @@ public class ListCategoriesHandlerTests
 	{
 		// Arrange
 		_repository.GetAllAsync()
-			.Returns(Result<IEnumerable<Category>>.Ok((IEnumerable<Category>?)null!));
+			.Returns(Result<IReadOnlyList<CategoryDto>>.Ok((IReadOnlyList<CategoryDto>)null!));
 
 		// Act
 		var result = await _handler.Handle(CancellationToken.None);
@@ -104,13 +103,13 @@ public class ListCategoriesHandlerTests
 	{
 		// Arrange
 		var cancellationToken = new CancellationToken();
-		IEnumerable<Category> categories = new List<Category>
+		IReadOnlyList<CategoryDto> categories = new List<CategoryDto>
 		{
-			new() { Id = ObjectId.GenerateNewId(), CategoryName = "Test" }
+			new(ObjectId.GenerateNewId(), "Test", "", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
 		_repository.GetAllAsync()
-			.Returns(Result<IEnumerable<Category>>.Ok(categories));
+			.Returns(Result<IReadOnlyList<CategoryDto>>.Ok(categories));
 
 		// Act
 		await _handler.Handle(cancellationToken);

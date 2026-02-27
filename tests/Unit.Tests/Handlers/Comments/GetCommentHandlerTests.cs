@@ -13,7 +13,7 @@ using Api.Handlers.Comments;
 
 using MongoDB.Bson;
 using Shared.Abstractions;
-using Shared.Models;
+using Shared.DTOs;
 
 namespace Tests.Unit.Handlers.Comments;
 
@@ -36,16 +36,22 @@ public class GetCommentHandlerTests
 	{
 		// Arrange
 		var commentId = ObjectId.GenerateNewId();
-		var comment = new Comment
-		{
-			Id = commentId,
-			Title = "Test Comment",
-			Description = "This is a test comment.",
-			DateCreated = DateTime.UtcNow
-		};
+		var comment = new CommentDto(
+			commentId,
+			"Test Comment",
+			"This is a test comment.",
+			DateTime.UtcNow,
+			null,
+			IssueDto.Empty,
+			UserDto.Empty,
+			[],
+			false,
+			UserDto.Empty,
+			false,
+			UserDto.Empty);
 
-		_repository.GetAsync(commentId)
-			.Returns(Result<Comment>.Ok(comment));
+		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
+			.Returns(Result<CommentDto>.Ok(comment));
 
 		var query = new GetCommentQuery(commentId.ToString());
 
@@ -56,7 +62,7 @@ public class GetCommentHandlerTests
 		result.Should().NotBeNull();
 		result!.Title.Should().Be("Test Comment");
 		result.Description.Should().Be("This is a test comment.");
-		await _repository.Received(1).GetAsync(commentId);
+		await _repository.Received(1).GetByIdAsync(commentId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -64,8 +70,8 @@ public class GetCommentHandlerTests
 	{
 		// Arrange
 		var commentId = ObjectId.GenerateNewId();
-		_repository.GetAsync(commentId)
-			.Returns(Result<Comment>.Fail("Not found"));
+		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
+			.Returns(Result<CommentDto>.Fail("Not found"));
 
 		var query = new GetCommentQuery(commentId.ToString());
 
@@ -115,7 +121,7 @@ public class GetCommentHandlerTests
 
 		// Assert
 		result.Should().BeNull();
-		await _repository.DidNotReceive().GetAsync(Arg.Any<ObjectId>());
+		await _repository.DidNotReceive().GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -124,15 +130,22 @@ public class GetCommentHandlerTests
 		// Arrange
 		var commentId = ObjectId.GenerateNewId();
 		var cancellationToken = new CancellationToken();
-		var comment = new Comment
-		{
-			Id = commentId,
-			Title = "Test Comment",
-			Description = "This is a test comment."
-		};
+		var comment = new CommentDto(
+			commentId,
+			"Test Comment",
+			"This is a test comment.",
+			DateTime.UtcNow,
+			null,
+			IssueDto.Empty,
+			UserDto.Empty,
+			[],
+			false,
+			UserDto.Empty,
+			false,
+			UserDto.Empty);
 
-		_repository.GetAsync(commentId)
-			.Returns(Result<Comment>.Ok(comment));
+		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
+			.Returns(Result<CommentDto>.Ok(comment));
 
 		var query = new GetCommentQuery(commentId.ToString());
 
@@ -140,6 +153,6 @@ public class GetCommentHandlerTests
 		await _handler.Handle(query, cancellationToken);
 
 		// Assert
-		await _repository.Received(1).GetAsync(commentId);
+		await _repository.Received(1).GetByIdAsync(commentId, Arg.Any<CancellationToken>());
 	}
 }

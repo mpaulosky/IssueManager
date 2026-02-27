@@ -13,6 +13,7 @@ using Api.Data;
 using Api.Handlers;
 using Api.Handlers.Issues;
 
+using Shared.Abstractions;
 using Shared.DTOs;
 using Shared.Validators;
 using MongoDB.Bson;
@@ -44,22 +45,22 @@ public class UpdateIssueStatusHandlerTests
 		var issueId = ObjectId.GenerateNewId().ToString();
 		var existingIssue = IssueBuilder.Default()
 			.WithId(issueId)
-			.WithStatus(new StatusDto("Open", "Issue is open"))
+			.WithStatus(new StatusDto(ObjectId.GenerateNewId(), "Open", "Issue is open", DateTime.UtcNow, null, false, UserDto.Empty))
 			.Build();
 
-		var newStatus = new StatusDto("Closed", "Issue is closed");
+		var newStatus = new StatusDto(ObjectId.GenerateNewId(), "Closed", "Issue is closed", DateTime.UtcNow, null, false, UserDto.Empty);
 		var command = new UpdateIssueStatusCommand
 		{
 			IssueId = issueId,
 			Status = newStatus
 		};
 
-		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
-			.Returns(existingIssue);
+		_repository.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
+			.Returns(Result.Ok(existingIssue));
 
 		var updatedIssue = existingIssue with { Status = newStatus };
 		_repository.UpdateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>())
-			.Returns(updatedIssue);
+			.Returns(Result.Ok(updatedIssue));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
@@ -67,7 +68,7 @@ public class UpdateIssueStatusHandlerTests
 		// Assert
 		result.Should().NotBeNull();
 		result!.Status.StatusName.Should().Be("Closed");
-		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
+		await _repository.Received(1).GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
 		await _repository.Received(1).UpdateAsync(Arg.Is<IssueDto>(i => i.Status.StatusName == "Closed"), Arg.Any<CancellationToken>());
 	}
 
@@ -79,18 +80,18 @@ public class UpdateIssueStatusHandlerTests
 		var command = new UpdateIssueStatusCommand
 		{
 			IssueId = issueId,
-			Status = new StatusDto("Closed", "Issue is closed")
+			Status = new StatusDto(ObjectId.GenerateNewId(), "Closed", "Issue is closed", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
-		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
-			.Returns((IssueDto?)null);
+		_repository.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
+			.Returns(Result.Fail<IssueDto>("Not found"));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
 		result.Should().BeNull();
-		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
+		await _repository.Received(1).GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
 		await _repository.DidNotReceive().UpdateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>());
 	}
 
@@ -101,7 +102,7 @@ public class UpdateIssueStatusHandlerTests
 		var command = new UpdateIssueStatusCommand
 		{
 			IssueId = "",
-			Status = new StatusDto("Closed", "Issue is closed")
+			Status = new StatusDto(ObjectId.GenerateNewId(), "Closed", "Issue is closed", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
 		// Act
@@ -119,7 +120,7 @@ public class UpdateIssueStatusHandlerTests
 		var command = new UpdateIssueStatusCommand
 		{
 			IssueId = ObjectId.GenerateNewId().ToString(),
-			Status = new StatusDto("", "Description")
+			Status = new StatusDto(ObjectId.GenerateNewId(), "", "Description", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
 		// Act
@@ -137,7 +138,7 @@ public class UpdateIssueStatusHandlerTests
 		var issueId = ObjectId.GenerateNewId().ToString();
 		var cancellationToken = new CancellationToken();
 		var existingIssue = IssueBuilder.Default().WithId(issueId).Build();
-		var newStatus = new StatusDto("In Progress", "Work in progress");
+		var newStatus = new StatusDto(ObjectId.GenerateNewId(), "In Progress", "Work in progress", DateTime.UtcNow, null, false, UserDto.Empty);
 
 		var command = new UpdateIssueStatusCommand
 		{
@@ -145,18 +146,18 @@ public class UpdateIssueStatusHandlerTests
 			Status = newStatus
 		};
 
-		_repository.GetByIdAsync(issueId, cancellationToken)
-			.Returns(existingIssue);
+		_repository.GetByIdAsync(Arg.Any<ObjectId>(), cancellationToken)
+			.Returns(Result.Ok(existingIssue));
 
 		var updatedIssue = existingIssue with { Status = newStatus };
 		_repository.UpdateAsync(Arg.Any<IssueDto>(), cancellationToken)
-			.Returns(updatedIssue);
+			.Returns(Result.Ok(updatedIssue));
 
 		// Act
 		await _handler.Handle(command, cancellationToken);
 
 		// Assert
-		await _repository.Received(1).GetByIdAsync(issueId, cancellationToken);
+		await _repository.Received(1).GetByIdAsync(Arg.Any<ObjectId>(), cancellationToken);
 		await _repository.Received(1).UpdateAsync(Arg.Any<IssueDto>(), cancellationToken);
 	}
 }

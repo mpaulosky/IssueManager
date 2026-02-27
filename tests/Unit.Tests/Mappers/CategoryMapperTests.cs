@@ -74,7 +74,9 @@ public class CategoryMapperTests
 			"Enhancement",
 			"Improvements to existing features",
 			new DateTime(2026, 1, 15, 0, 0, 0, DateTimeKind.Utc),
-			new DateTime(2026, 2, 15, 0, 0, 0, DateTimeKind.Utc));
+			new DateTime(2026, 2, 15, 0, 0, 0, DateTimeKind.Utc),
+			false,
+			UserDto.Empty);
 
 		// Act
 		var model = dto.ToModel();
@@ -97,7 +99,9 @@ public class CategoryMapperTests
 			"Documentation",
 			"Documentation updates",
 			DateTime.UtcNow,
-			null);
+			null,
+			false,
+			UserDto.Empty);
 
 		// Act
 		var model = dto.ToModel();
@@ -142,7 +146,9 @@ public class CategoryMapperTests
 			"Security",
 			"Security vulnerabilities",
 			new DateTime(2026, 4, 1, 0, 0, 0, DateTimeKind.Utc),
-			new DateTime(2026, 4, 5, 0, 0, 0, DateTimeKind.Utc));
+			new DateTime(2026, 4, 5, 0, 0, 0, DateTimeKind.Utc),
+			false,
+			UserDto.Empty);
 
 		// Act
 		var model = original.ToModel();

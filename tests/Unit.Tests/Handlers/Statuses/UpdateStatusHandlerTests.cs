@@ -14,8 +14,8 @@ using Api.Handlers;
 using Api.Handlers.Statuses;
 
 using Shared.Abstractions;
+using Shared.DTOs;
 using Shared.Exceptions;
-using Shared.Models;
 using Shared.Validators;
 using MongoDB.Bson;
 using NSubstitute;
@@ -43,11 +43,19 @@ public class UpdateStatusHandlerTests
 	{
 		// Arrange
 		var statusId = ObjectId.GenerateNewId();
-		var existingStatus = new Status
+		var existingStatus = new StatusDto(
+			statusId,
+			"Old Name",
+			"Old Description",
+			DateTime.UtcNow,
+			null,
+			false,
+			UserDto.Empty);
+
+		var updatedStatus = existingStatus with
 		{
-			Id = statusId,
-			StatusName = "Old Name",
-			StatusDescription = "Old Description"
+			StatusName = "Updated Name",
+			StatusDescription = "Updated Description"
 		};
 
 		var command = new UpdateStatusCommand
@@ -57,11 +65,11 @@ public class UpdateStatusHandlerTests
 			StatusDescription = "Updated Description"
 		};
 
-		_repository.GetAsync(statusId)
-			.Returns(Result<Status>.Ok(existingStatus));
+		_repository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
+			.Returns(Result<StatusDto>.Ok(existingStatus));
 
-		_repository.UpdateAsync(statusId, Arg.Any<Status>())
-			.Returns(Result.Ok());
+		_repository.UpdateAsync(Arg.Any<StatusDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result<StatusDto>.Ok(updatedStatus));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
@@ -70,9 +78,9 @@ public class UpdateStatusHandlerTests
 		result.Should().NotBeNull();
 		result.StatusName.Should().Be("Updated Name");
 		result.StatusDescription.Should().Be("Updated Description");
-		await _repository.Received(1).UpdateAsync(statusId, Arg.Is<Status>(s =>
+		await _repository.Received(1).UpdateAsync(Arg.Is<StatusDto>(s =>
 				s.StatusName == command.StatusName &&
-				s.StatusDescription == command.StatusDescription));
+				s.StatusDescription == command.StatusDescription), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -125,8 +133,8 @@ public class UpdateStatusHandlerTests
 			StatusDescription = "Updated Description"
 		};
 
-		_repository.GetAsync(statusId)
-			.Returns(Result<Status>.Fail("Not found"));
+		_repository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
+			.Returns(Result<StatusDto>.Fail("Not found"));
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
@@ -159,11 +167,14 @@ public class UpdateStatusHandlerTests
 	{
 		// Arrange
 		var statusId = ObjectId.GenerateNewId();
-		var existingStatus = new Status
-		{
-			Id = statusId,
-			StatusName = "Old Name"
-		};
+		var existingStatus = new StatusDto(
+			statusId,
+			"Old Name",
+			string.Empty,
+			DateTime.UtcNow,
+			null,
+			false,
+			UserDto.Empty);
 
 		var command = new UpdateStatusCommand
 		{
@@ -172,11 +183,11 @@ public class UpdateStatusHandlerTests
 			StatusDescription = "Updated Description"
 		};
 
-		_repository.GetAsync(statusId)
-			.Returns(Result<Status>.Ok(existingStatus));
+		_repository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
+			.Returns(Result<StatusDto>.Ok(existingStatus));
 
-		_repository.UpdateAsync(statusId, Arg.Any<Status>())
-			.Returns(Result.Fail("Update failed"));
+		_repository.UpdateAsync(Arg.Any<StatusDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result<StatusDto>.Fail("Update failed"));
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
@@ -191,10 +202,19 @@ public class UpdateStatusHandlerTests
 	{
 		// Arrange
 		var statusId = ObjectId.GenerateNewId();
-		var existingStatus = new Status
+		var existingStatus = new StatusDto(
+			statusId,
+			"Old Name",
+			string.Empty,
+			DateTime.UtcNow,
+			null,
+			false,
+			UserDto.Empty);
+
+		var updatedStatus = existingStatus with
 		{
-			Id = statusId,
-			StatusName = "Old Name"
+			StatusName = "Updated Name",
+			StatusDescription = string.Empty
 		};
 
 		var command = new UpdateStatusCommand
@@ -204,11 +224,11 @@ public class UpdateStatusHandlerTests
 			StatusDescription = null
 		};
 
-		_repository.GetAsync(statusId)
-			.Returns(Result<Status>.Ok(existingStatus));
+		_repository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
+			.Returns(Result<StatusDto>.Ok(existingStatus));
 
-		_repository.UpdateAsync(statusId, Arg.Any<Status>())
-			.Returns(Result.Ok());
+		_repository.UpdateAsync(Arg.Any<StatusDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result<StatusDto>.Ok(updatedStatus));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);

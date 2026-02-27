@@ -29,6 +29,9 @@ public class CommentRepository : ICommentRepository
 	/// <inheritdoc />
 	public async Task<Result> ArchiveAsync(ObjectId commentId, CancellationToken cancellationToken = default)
 	{
+		if (commentId == ObjectId.Empty)
+			return Result.Fail("Comment cannot be null.");
+
 		var update = Builders<Comment>.Update.Set(x => x.Archived, true);
 		var result = await _collection.UpdateOneAsync(x => x.Id == commentId, update, cancellationToken: cancellationToken);
 		return result.ModifiedCount > 0 ? Result.Ok() : Result.Fail("Comment not found or already archived.");
@@ -37,6 +40,9 @@ public class CommentRepository : ICommentRepository
 	/// <inheritdoc />
 	public async Task<Result<CommentDto>> CreateAsync(CommentDto comment, CancellationToken cancellationToken = default)
 	{
+		if (comment is null)
+			return Result.Fail<CommentDto>("Comment cannot be null.");
+
 		var model = comment.ToModel();
 		await _collection.InsertOneAsync(model, cancellationToken: cancellationToken);
 		return Result.Ok(model.ToDto());
@@ -109,6 +115,9 @@ public class CommentRepository : ICommentRepository
 	/// <inheritdoc />
 	public async Task<Result<CommentDto>> UpdateAsync(CommentDto dto, CancellationToken cancellationToken = default)
 	{
+		if (dto is null)
+			return Result.Fail<CommentDto>("Comment cannot be null.");
+
 		var model = dto.ToModel();
 
 		var result = await _collection.ReplaceOneAsync(

@@ -13,7 +13,7 @@ using Api.Handlers.Comments;
 
 using MongoDB.Bson;
 using Shared.Abstractions;
-using Shared.Models;
+using Shared.DTOs;
 
 namespace Tests.Unit.Handlers.Comments;
 
@@ -35,15 +35,15 @@ public class ListCommentsHandlerTests
 	public async Task Handle_ReturnsAllComments()
 	{
 		// Arrange
-		IEnumerable<Comment> comments = new List<Comment>
+		IReadOnlyList<CommentDto> comments = new List<CommentDto>
 		{
-			new() { Id = ObjectId.GenerateNewId(), Title = "First Comment", Description = "First comment text." },
-			new() { Id = ObjectId.GenerateNewId(), Title = "Second Comment", Description = "Second comment text." },
-			new() { Id = ObjectId.GenerateNewId(), Title = "Third Comment", Description = "Third comment text." }
+			new(ObjectId.GenerateNewId(), "First Comment", "First comment text.", DateTime.UtcNow, null, IssueDto.Empty, UserDto.Empty, [], false, UserDto.Empty, false, UserDto.Empty),
+			new(ObjectId.GenerateNewId(), "Second Comment", "Second comment text.", DateTime.UtcNow, null, IssueDto.Empty, UserDto.Empty, [], false, UserDto.Empty, false, UserDto.Empty),
+			new(ObjectId.GenerateNewId(), "Third Comment", "Third comment text.", DateTime.UtcNow, null, IssueDto.Empty, UserDto.Empty, [], false, UserDto.Empty, false, UserDto.Empty)
 		};
 
 		_repository.GetAllAsync()
-			.Returns(Result<IEnumerable<Comment>>.Ok(comments));
+			.Returns(Result<IReadOnlyList<CommentDto>>.Ok(comments));
 
 		// Act
 		var result = await _handler.Handle(CancellationToken.None);
@@ -60,7 +60,7 @@ public class ListCommentsHandlerTests
 	{
 		// Arrange
 		_repository.GetAllAsync()
-			.Returns(Result<IEnumerable<Comment>>.Ok((IEnumerable<Comment>)new List<Comment>()));
+			.Returns(Result<IReadOnlyList<CommentDto>>.Ok((IReadOnlyList<CommentDto>)new List<CommentDto>()));
 
 		// Act
 		var result = await _handler.Handle(CancellationToken.None);
@@ -74,7 +74,7 @@ public class ListCommentsHandlerTests
 	{
 		// Arrange
 		_repository.GetAllAsync()
-			.Returns(Result<IEnumerable<Comment>>.Fail("Database error"));
+			.Returns(Result<IReadOnlyList<CommentDto>>.Fail("Database error"));
 
 		// Act
 		var result = await _handler.Handle(CancellationToken.None);
@@ -88,7 +88,7 @@ public class ListCommentsHandlerTests
 	{
 		// Arrange
 		_repository.GetAllAsync()
-			.Returns(Result<IEnumerable<Comment>>.Ok((IEnumerable<Comment>?)null!));
+			.Returns(Result<IReadOnlyList<CommentDto>>.Ok((IReadOnlyList<CommentDto>)null!));
 
 		// Act
 		var result = await _handler.Handle(CancellationToken.None);
@@ -102,13 +102,13 @@ public class ListCommentsHandlerTests
 	{
 		// Arrange
 		var cancellationToken = new CancellationToken();
-		IEnumerable<Comment> comments = new List<Comment>
+		IReadOnlyList<CommentDto> comments = new List<CommentDto>
 		{
-			new() { Id = ObjectId.GenerateNewId(), Title = "Test Comment" }
+			new(ObjectId.GenerateNewId(), "Test Comment", string.Empty, DateTime.UtcNow, null, IssueDto.Empty, UserDto.Empty, [], false, UserDto.Empty, false, UserDto.Empty)
 		};
 
 		_repository.GetAllAsync()
-			.Returns(Result<IEnumerable<Comment>>.Ok(comments));
+			.Returns(Result<IReadOnlyList<CommentDto>>.Ok(comments));
 
 		// Act
 		await _handler.Handle(cancellationToken);

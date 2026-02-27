@@ -14,7 +14,9 @@ using Api.Handlers;
 using Api.Handlers.Categories;
 
 using Shared.Abstractions;
+using Shared.DTOs;
 using Shared.Validators;
+using MongoDB.Bson;
 using NSubstitute;
 
 namespace Tests.Unit.Handlers.Categories;
@@ -45,8 +47,10 @@ public class CreateCategoryHandlerTests
 			CategoryDescription = "Bug reports"
 		};
 
-		_repository.CreateAsync(Arg.Any<Shared.Models.Category>())
-			.Returns(Result.Ok());
+		var createdCategory = new CategoryDto(ObjectId.GenerateNewId(), command.CategoryName, command.CategoryDescription!, DateTime.UtcNow, null, false, UserDto.Empty);
+
+		_repository.CreateAsync(Arg.Any<CategoryDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Ok(createdCategory));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
@@ -55,9 +59,9 @@ public class CreateCategoryHandlerTests
 		result.Should().NotBeNull();
 		result.CategoryName.Should().Be(command.CategoryName);
 		result.CategoryDescription.Should().Be(command.CategoryDescription);
-		await _repository.Received(1).CreateAsync(Arg.Is<Shared.Models.Category>(c =>
+		await _repository.Received(1).CreateAsync(Arg.Is<CategoryDto>(c =>
 			c.CategoryName == command.CategoryName &&
-			c.CategoryDescription == command.CategoryDescription));
+			c.CategoryDescription == command.CategoryDescription), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -142,8 +146,10 @@ public class CreateCategoryHandlerTests
 			CategoryDescription = null
 		};
 
-		_repository.CreateAsync(Arg.Any<Shared.Models.Category>())
-			.Returns(Result.Ok());
+		var returnedCategory = new CategoryDto(ObjectId.GenerateNewId(), command.CategoryName, string.Empty, DateTime.UtcNow, null, false, UserDto.Empty);
+
+		_repository.CreateAsync(Arg.Any<CategoryDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Ok(returnedCategory));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
@@ -162,8 +168,8 @@ public class CreateCategoryHandlerTests
 			CategoryDescription = "Description"
 		};
 
-		_repository.CreateAsync(Arg.Any<Shared.Models.Category>())
-			.Returns(Result.Fail("Database error"));
+		_repository.CreateAsync(Arg.Any<CategoryDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Fail("Database error"));
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);

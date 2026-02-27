@@ -27,10 +27,12 @@ public sealed class IssueDtoTests
 		dto.Description.Should().BeEmpty();
 		dto.DateCreated.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
 		dto.Author.Should().Be(UserDto.Empty);
-		dto.Category.Should().Be(CategoryDto.Empty);
-		dto.Status.Should().Be(StatusDto.Empty);
+		dto.Category.Id.Should().Be(ObjectId.Empty);
+		dto.Category.CategoryName.Should().BeEmpty();
+		dto.Status.Id.Should().Be(ObjectId.Empty);
+		dto.Status.StatusName.Should().BeEmpty();
 		dto.Archived.Should().BeFalse();
-		dto.ArchivedBy.Should().BeNull();
+		dto.ArchivedBy.Should().Be(UserDto.Empty);
 		dto.DateModified.Should().BeNull();
 	}
 
@@ -43,14 +45,14 @@ public sealed class IssueDtoTests
 		var description = "Test Description";
 		var dateCreated = DateTime.UtcNow;
 		var author = new UserDto("user1", "John Doe", "john@example.com");
-		var category = new CategoryDto(ObjectId.GenerateNewId(), "Bug", "Bug reports");
-		var status = new StatusDto("Open", "Open status");
+		var category = new CategoryDto(ObjectId.GenerateNewId(), "Bug", "Bug reports", default, null, false, UserDto.Empty);
+		var status = new StatusDto(ObjectId.Empty, "Open", "Open status", default, null, false, UserDto.Empty);
 		var archived = true;
 		var archivedBy = new UserDto("user2", "Jane Doe", "jane@example.com");
 		var dateModified = DateTime.UtcNow.AddDays(1);
 
 		// Act
-		var dto = new IssueDto(id, title, description, dateCreated, author, category, status, archived, archivedBy, dateModified);
+		var dto = new IssueDto(id, title, description, dateCreated, dateModified, author, category, status, archived, archivedBy, false, false);
 
 		// Assert
 		dto.Id.Should().Be(id);
@@ -74,15 +76,15 @@ public sealed class IssueDtoTests
 		var description = "Test Description";
 		var dateCreated = DateTime.UtcNow;
 		var author = new UserDto("user1", "John Doe", "john@example.com");
-		var category = new CategoryDto(ObjectId.GenerateNewId(), "Bug", "Bug reports");
-		var status = new StatusDto("Open", "Open status");
+		var category = new CategoryDto(ObjectId.GenerateNewId(), "Bug", "Bug reports", default, null, false, UserDto.Empty);
+		var status = new StatusDto(ObjectId.Empty, "Open", "Open status", default, null, false, UserDto.Empty);
 
 		// Act
-		var dto = new IssueDto(id, title, description, dateCreated, author, category, status);
+		var dto = new IssueDto(id, title, description, dateCreated, null, author, category, status, false, UserDto.Empty, false, false);
 
 		// Assert
 		dto.Archived.Should().BeFalse();
-		dto.ArchivedBy.Should().BeNull();
+		dto.ArchivedBy.Should().Be(UserDto.Empty);
 		dto.DateModified.Should().BeNull();
 	}
 
@@ -95,12 +97,12 @@ public sealed class IssueDtoTests
 		var description = "Test Description";
 		var dateCreated = DateTime.UtcNow;
 		var author = new UserDto("user1", "John Doe", "john@example.com");
-		var category = new CategoryDto(ObjectId.GenerateNewId(), "Bug", "Bug reports");
-		var status = new StatusDto("Open", "Open status");
+		var category = new CategoryDto(ObjectId.GenerateNewId(), "Bug", "Bug reports", default, null, false, UserDto.Empty);
+		var status = new StatusDto(ObjectId.Empty, "Open", "Open status", default, null, false, UserDto.Empty);
 
 		// Act
-		var dto1 = new IssueDto(id, title, description, dateCreated, author, category, status);
-		var dto2 = new IssueDto(id, title, description, dateCreated, author, category, status);
+		var dto1 = new IssueDto(id, title, description, dateCreated, null, author, category, status, false, UserDto.Empty, false, false);
+		var dto2 = new IssueDto(id, title, description, dateCreated, null, author, category, status, false, UserDto.Empty, false, false);
 
 		// Assert
 		dto1.Should().Be(dto2);
@@ -115,12 +117,12 @@ public sealed class IssueDtoTests
 		var description = "Test Description";
 		var dateCreated = DateTime.UtcNow;
 		var author = new UserDto("user1", "John Doe", "john@example.com");
-		var category = new CategoryDto(ObjectId.GenerateNewId(), "Bug", "Bug reports");
-		var status = new StatusDto("Open", "Open status");
+		var category = new CategoryDto(ObjectId.GenerateNewId(), "Bug", "Bug reports", default, null, false, UserDto.Empty);
+		var status = new StatusDto(ObjectId.Empty, "Open", "Open status", default, null, false, UserDto.Empty);
 
 		// Act
-		var dto1 = new IssueDto(id, title, description, dateCreated, author, category, status);
-		var dto2 = new IssueDto(id, title, description, dateCreated, author, category, status);
+		var dto1 = new IssueDto(id, title, description, dateCreated, null, author, category, status, false, UserDto.Empty, false, false);
+		var dto2 = new IssueDto(id, title, description, dateCreated, null, author, category, status, false, UserDto.Empty, false, false);
 
 		// Assert
 		dto1.Should().NotBeSameAs(dto2);

@@ -1,5 +1,7 @@
 using FluentAssertions;
 
+using MongoDB.Bson;
+
 using Shared.DTOs;
 using Shared.Validators;
 
@@ -19,7 +21,7 @@ public class UpdateIssueStatusValidatorTests
 		var command = new UpdateIssueStatusCommand
 		{
 			IssueId = "issue-123",
-			Status = new StatusDto("InProgress", "Issue is in progress")
+			Status = new StatusDto(ObjectId.GenerateNewId(), "InProgress", "Issue is in progress", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
 		// Act
@@ -40,7 +42,7 @@ public class UpdateIssueStatusValidatorTests
 		var command = new UpdateIssueStatusCommand
 		{
 			IssueId = "issue-456",
-			Status = new StatusDto(statusName, statusDesc)
+			Status = new StatusDto(ObjectId.GenerateNewId(), statusName, statusDesc, DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
 		// Act
@@ -57,7 +59,7 @@ public class UpdateIssueStatusValidatorTests
 		var command = new UpdateIssueStatusCommand
 		{
 			IssueId = "",
-			Status = new StatusDto("Closed", "Issue is closed")
+			Status = new StatusDto(ObjectId.GenerateNewId(), "Closed", "Issue is closed", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
 		// Act
@@ -77,7 +79,7 @@ public class UpdateIssueStatusValidatorTests
 		var command = new UpdateIssueStatusCommand
 		{
 			IssueId = "issue-789",
-			Status = new StatusDto("", "some description")
+			Status = new StatusDto(ObjectId.GenerateNewId(), "", "some description", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
 		// Act

@@ -26,7 +26,7 @@ public sealed class CategoryDtoTests
 		dto.Id.Should().Be(ObjectId.Empty);
 		dto.CategoryName.Should().BeEmpty();
 		dto.CategoryDescription.Should().BeEmpty();
-		dto.DateCreated.Should().Be(default);
+		dto.DateCreated.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
 		dto.DateModified.Should().BeNull();
 	}
 
@@ -41,7 +41,7 @@ public sealed class CategoryDtoTests
 		var dateModified = DateTime.UtcNow.AddDays(1);
 
 		// Act
-		var dto = new CategoryDto(id, categoryName, categoryDescription, dateCreated, dateModified);
+		var dto = new CategoryDto(id, categoryName, categoryDescription, dateCreated, dateModified, false, UserDto.Empty);
 
 		// Assert
 		dto.Id.Should().Be(id);
@@ -60,7 +60,7 @@ public sealed class CategoryDtoTests
 		var categoryDescription = "Bug reports";
 
 		// Act
-		var dto = new CategoryDto(id, categoryName, categoryDescription);
+		var dto = new CategoryDto(id, categoryName, categoryDescription, default, null, false, UserDto.Empty);
 
 		// Assert
 		dto.DateCreated.Should().Be(default);
@@ -102,8 +102,8 @@ public sealed class CategoryDtoTests
 		var dateModified = DateTime.UtcNow.AddDays(1);
 
 		// Act
-		var dto1 = new CategoryDto(id, categoryName, categoryDescription, dateCreated, dateModified);
-		var dto2 = new CategoryDto(id, categoryName, categoryDescription, dateCreated, dateModified);
+		var dto1 = new CategoryDto(id, categoryName, categoryDescription, dateCreated, dateModified, false, UserDto.Empty);
+		var dto2 = new CategoryDto(id, categoryName, categoryDescription, dateCreated, dateModified, false, UserDto.Empty);
 
 		// Assert
 		dto1.Should().Be(dto2);
@@ -118,8 +118,8 @@ public sealed class CategoryDtoTests
 		var categoryDescription = "Bug reports";
 
 		// Act
-		var dto1 = new CategoryDto(id, categoryName, categoryDescription);
-		var dto2 = new CategoryDto(id, categoryName, categoryDescription);
+		var dto1 = new CategoryDto(id, categoryName, categoryDescription, default, null, false, UserDto.Empty);
+		var dto2 = new CategoryDto(id, categoryName, categoryDescription, default, null, false, UserDto.Empty);
 
 		// Assert
 		dto1.Should().NotBeSameAs(dto2);

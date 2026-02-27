@@ -29,6 +29,9 @@ public class CategoryRepository : ICategoryRepository
 	/// <inheritdoc />
 	public async Task<Result> ArchiveAsync(ObjectId categoryId, CancellationToken cancellationToken = default)
 	{
+		if (categoryId == ObjectId.Empty)
+			return Result.Fail("Category cannot be null.");
+
 		var update = Builders<Category>.Update.Set(x => x.Archived, true);
 		var result = await _collection.UpdateOneAsync(x => x.Id == categoryId, update, cancellationToken: cancellationToken);
 		return result.ModifiedCount > 0 ? Result.Ok() : Result.Fail("Category not found or already archived.");
@@ -37,6 +40,9 @@ public class CategoryRepository : ICategoryRepository
 	/// <inheritdoc />
 	public async Task<Result<CategoryDto>> CreateAsync(CategoryDto category, CancellationToken cancellationToken = default)
 	{
+		if (category is null)
+			return Result.Fail<CategoryDto>("Category cannot be null.");
+
 		var model = category.ToModel();
 		await _collection.InsertOneAsync(model, cancellationToken: cancellationToken);
 		return Result.Ok(model.ToDto());
@@ -82,6 +88,9 @@ public class CategoryRepository : ICategoryRepository
 	/// <inheritdoc />
 	public async Task<Result<CategoryDto>> UpdateAsync(CategoryDto dto, CancellationToken cancellationToken = default)
 	{
+		if (dto is null)
+			return Result.Fail<CategoryDto>("Category cannot be null.");
+
 		var model = dto.ToModel();
 
 		var result = await _collection.ReplaceOneAsync(

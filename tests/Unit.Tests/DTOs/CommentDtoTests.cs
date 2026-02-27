@@ -23,7 +23,7 @@ public sealed class CommentDtoTests
 		var dto = CommentDto.Empty;
 
 		// Assert
-		dto.Id.Should().BeEmpty();
+		dto.Id.Should().Be(ObjectId.Empty);
 		dto.Title.Should().BeEmpty();
 		dto.Description.Should().BeEmpty();
 		dto.DateCreated.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
@@ -42,17 +42,17 @@ public sealed class CommentDtoTests
 	public void Constructor_StoresAllParameters()
 	{
 		// Arrange
-		var id = ObjectId.GenerateNewId().ToString();
+		var id = ObjectId.GenerateNewId();
 		var title = "Test Comment";
 		var description = "Comment description";
 		var dateCreated = DateTime.UtcNow;
 		var issue = new IssueDto(ObjectId.GenerateNewId(), "Issue", "Description", DateTime.UtcNow,
-			UserDto.Empty, CategoryDto.Empty, StatusDto.Empty);
+			null, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty, false, UserDto.Empty, false, false);
 		var author = new UserDto("user1", "John Doe", "john@example.com");
 		var dateModified = DateTime.UtcNow.AddDays(1);
 
 		// Act
-		var dto = new CommentDto(id, title, description, dateCreated, issue, author, dateModified);
+		var dto = new CommentDto(id, title, description, dateCreated, dateModified, issue, author, [], false, UserDto.Empty, false, UserDto.Empty);
 
 		// Assert
 		dto.Id.Should().Be(id);
@@ -68,16 +68,16 @@ public sealed class CommentDtoTests
 	public void Constructor_DefaultsOptionalParameters()
 	{
 		// Arrange
-		var id = ObjectId.GenerateNewId().ToString();
+		var id = ObjectId.GenerateNewId();
 		var title = "Test Comment";
 		var description = "Comment description";
 		var dateCreated = DateTime.UtcNow;
 		var issue = new IssueDto(ObjectId.GenerateNewId(), "Issue", "Description", DateTime.UtcNow,
-			UserDto.Empty, CategoryDto.Empty, StatusDto.Empty);
+			null, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty, false, UserDto.Empty, false, false);
 		var author = new UserDto("user1", "John Doe", "john@example.com");
 
 		// Act
-		var dto = new CommentDto(id, title, description, dateCreated, issue, author);
+		var dto = new CommentDto(id, title, description, dateCreated, null, issue, author, [], false, UserDto.Empty, false, UserDto.Empty);
 
 		// Assert
 		dto.DateModified.Should().BeNull();
@@ -88,7 +88,7 @@ public sealed class CommentDtoTests
 	{
 		// Arrange
 		var issueDto = new IssueDto(ObjectId.GenerateNewId(), "Issue", "Description", DateTime.UtcNow,
-			UserDto.Empty, CategoryDto.Empty, StatusDto.Empty);
+			null, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty, false, UserDto.Empty, false, false);
 		var authorDto = new UserDto("user1", "John Doe", "john@example.com");
 
 		var comment = new Comment
@@ -106,7 +106,7 @@ public sealed class CommentDtoTests
 		var dto = new CommentDto(comment);
 
 		// Assert
-		dto.Id.Should().Be(comment.Id.ToString());
+		dto.Id.Should().Be(comment.Id);
 		dto.Title.Should().Be(comment.Title);
 		dto.Description.Should().Be(comment.Description);
 		dto.DateCreated.Should().Be(comment.DateCreated);
@@ -119,18 +119,19 @@ public sealed class CommentDtoTests
 	public void RecordValueEquality_TwoInstancesWithSameValues_AreEqual()
 	{
 		// Arrange
-		var id = ObjectId.GenerateNewId().ToString();
+		var id = ObjectId.GenerateNewId();
 		var title = "Test Comment";
 		var description = "Comment description";
 		var dateCreated = DateTime.UtcNow;
 		var issue = new IssueDto(ObjectId.GenerateNewId(), "Issue", "Description", DateTime.UtcNow,
-			UserDto.Empty, CategoryDto.Empty, StatusDto.Empty);
+			null, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty, false, UserDto.Empty, false, false);
 		var author = new UserDto("user1", "John Doe", "john@example.com");
 		var dateModified = DateTime.UtcNow.AddDays(1);
+		var userVotes = new HashSet<string>();
 
 		// Act
-		var dto1 = new CommentDto(id, title, description, dateCreated, issue, author, dateModified);
-		var dto2 = new CommentDto(id, title, description, dateCreated, issue, author, dateModified);
+		var dto1 = new CommentDto(id, title, description, dateCreated, dateModified, issue, author, userVotes, false, UserDto.Empty, false, UserDto.Empty);
+		var dto2 = new CommentDto(id, title, description, dateCreated, dateModified, issue, author, userVotes, false, UserDto.Empty, false, UserDto.Empty);
 
 		// Assert
 		dto1.Should().Be(dto2);
@@ -140,17 +141,17 @@ public sealed class CommentDtoTests
 	public void RecordReferenceInequality_TwoInstancesWithSameValues_AreNotSameReference()
 	{
 		// Arrange
-		var id = ObjectId.GenerateNewId().ToString();
+		var id = ObjectId.GenerateNewId();
 		var title = "Test Comment";
 		var description = "Comment description";
 		var dateCreated = DateTime.UtcNow;
 		var issue = new IssueDto(ObjectId.GenerateNewId(), "Issue", "Description", DateTime.UtcNow,
-			UserDto.Empty, CategoryDto.Empty, StatusDto.Empty);
+			null, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty, false, UserDto.Empty, false, false);
 		var author = new UserDto("user1", "John Doe", "john@example.com");
 
 		// Act
-		var dto1 = new CommentDto(id, title, description, dateCreated, issue, author);
-		var dto2 = new CommentDto(id, title, description, dateCreated, issue, author);
+		var dto1 = new CommentDto(id, title, description, dateCreated, null, issue, author, [], false, UserDto.Empty, false, UserDto.Empty);
+		var dto2 = new CommentDto(id, title, description, dateCreated, null, issue, author, [], false, UserDto.Empty, false, UserDto.Empty);
 
 		// Assert
 		dto1.Should().NotBeSameAs(dto2);

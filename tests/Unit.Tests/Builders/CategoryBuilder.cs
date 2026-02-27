@@ -59,7 +59,9 @@ public class CategoryBuilder
 			_categoryName,
 			_categoryDescription,
 			_dateCreated,
-			_dateModified);
+			_dateModified,
+			false,
+			UserDto.Empty);
 
 	public static CategoryBuilder Default() => new();
 }
