@@ -13,6 +13,7 @@ namespace Shared.DTOs;
 ///   StatusDto record
 /// </summary>
 [Serializable]
+[method: JsonConstructor]
 public record StatusDto(
 	ObjectId Id,
 	string StatusName,

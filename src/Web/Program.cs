@@ -1,5 +1,6 @@
 using ServiceDefaults;
 using Web;
+using Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +9,19 @@ builder.AddServiceDefaults();
 builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents();
 
-builder.Services.AddHttpClient("api", client =>
+builder.Services.AddHttpClient<IIssueApiClient, IssueApiClient>(client =>
+	client.BaseAddress = new Uri("https+http://api"))
+	.AddServiceDiscovery();
+
+builder.Services.AddHttpClient<ICategoryApiClient, CategoryApiClient>(client =>
+	client.BaseAddress = new Uri("https+http://api"))
+	.AddServiceDiscovery();
+
+builder.Services.AddHttpClient<IStatusApiClient, StatusApiClient>(client =>
+	client.BaseAddress = new Uri("https+http://api"))
+	.AddServiceDiscovery();
+
+builder.Services.AddHttpClient<ICommentApiClient, CommentApiClient>(client =>
 	client.BaseAddress = new Uri("https+http://api"))
 	.AddServiceDiscovery();
 

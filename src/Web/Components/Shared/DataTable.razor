@@ -1,0 +1,63 @@
+@namespace Web.Components.Shared
+@typeparam TItem
+
+@if (IsLoading)
+{
+	<LoadingSpinner />
+}
+else if (!Items.Any())
+{
+	<div class="text-center py-12 text-[var(--text-muted)]">
+		@(EmptyMessage ?? "No items found.")
+	</div>
+}
+else
+{
+	<div class="overflow-x-auto rounded-xl border border-[var(--border-color)]">
+		<table class="w-full text-sm text-left text-[var(--text-main)]">
+			<thead class="bg-[var(--bg-hover)] text-xs uppercase text-[var(--text-muted)]">
+				<tr>
+					@HeaderContent
+				</tr>
+			</thead>
+			<tbody class="divide-y divide-[var(--border-color)]">
+				@foreach (var item in Items)
+				{
+					@RowContent!(item)
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+@code {
+	/// <summary>
+	/// The collection of items to display in the table.
+	/// </summary>
+	[Parameter]
+	public IEnumerable<TItem> Items { get; set; } = [];
+
+	/// <summary>
+	/// The render fragment used to render the table header row cells (&lt;th&gt; elements).
+	/// </summary>
+	[Parameter]
+	public RenderFragment? HeaderContent { get; set; }
+
+	/// <summary>
+	/// The render fragment used to render each table row for an item.
+	/// </summary>
+	[Parameter]
+	public RenderFragment<TItem>? RowContent { get; set; }
+
+	/// <summary>
+	/// When true, displays a loading spinner instead of the table content.
+	/// </summary>
+	[Parameter]
+	public bool IsLoading { get; set; }
+
+	/// <summary>
+	/// Custom message to display when <see cref="Items"/> is empty. Defaults to "No items found.".
+	/// </summary>
+	[Parameter]
+	public string? EmptyMessage { get; set; }
+}

@@ -24,4 +24,14 @@ public record CreateIssueRequest
 	/// Gets or sets the status of the issue.
 	/// </summary>
 	public string Status { get; set; } = "Open";
+
+	/// <summary>
+	/// Gets or sets the category ID for the issue.
+	/// </summary>
+	public string? CategoryId { get; set; }
+
+	/// <summary>
+	/// Gets or sets the status ID for the issue.
+	/// </summary>
+	public string? StatusId { get; set; }
 }

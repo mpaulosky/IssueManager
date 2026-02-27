@@ -1,4 +1,6 @@
 @namespace Web.Components
+@inject ICategoryApiClient CategoryClient
+@inject IStatusApiClient StatusClient
 
 <div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm p-6">
 	<EditForm Model="@FormModel" OnValidSubmit="@OnFormSubmit">
@@ -34,17 +36,48 @@
 				<ValidationMessage For="@(() => FormModel.Description)" class="validation-message" />
 			</div>
 
+			<!-- Category -->
+			<div>
+				<label for="category" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">
+					Category
+				</label>
+				@if (_isLoadingData)
+				{
+					<LoadingSpinner Label="Loading categories..." />
+				}
+				else
+				{
+					<InputSelect id="category" @bind-Value="FormModel.CategoryId" class="form-input">
+						<option value="">— Select a category —</option>
+						@foreach (var cat in _categories)
+						{
+							<option value="@cat.Id.ToString()">@cat.CategoryName</option>
+						}
+					</InputSelect>
+				}
+				<ValidationMessage For="@(() => FormModel.CategoryId)" class="validation-message" />
+			</div>
+
 			<!-- Status -->
 			<div>
 				<label for="status" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">
 					Status
 				</label>
-				<InputSelect id="status" @bind-Value="FormModel.Status" class="form-input">
-					<option value="Open">Open</option>
-					<option value="InProgress">In Progress</option>
-					<option value="Closed">Closed</option>
-				</InputSelect>
-				<ValidationMessage For="@(() => FormModel.Status)" class="validation-message" />
+				@if (_isLoadingData)
+				{
+					<LoadingSpinner Label="Loading statuses..." />
+				}
+				else
+				{
+					<InputSelect id="status" @bind-Value="FormModel.StatusId" class="form-input">
+						<option value="">— Select a status —</option>
+						@foreach (var s in _statuses)
+						{
+							<option value="@s.Id.ToString()">@s.StatusName</option>
+						}
+					</InputSelect>
+				}
+				<ValidationMessage For="@(() => FormModel.StatusId)" class="validation-message" />
 			</div>
 		</div>
 
@@ -112,11 +145,28 @@
 
 	private CreateIssueRequest FormModel = new();
 
+	private IEnumerable<CategoryDto> _categories = [];
+	private IEnumerable<StatusDto> _statuses = [];
+	private bool _isLoadingData = true;
+
 	/// <summary>
-	/// Initializes the form with initial values if provided.
+	/// Initializes the form with initial values if provided and loads categories and statuses.
 	/// </summary>
-	protected override void OnInitialized()
+	protected override async Task OnInitializedAsync()
 	{
+		try
+		{
+			var catTask = CategoryClient.GetAllAsync();
+			var statusTask = StatusClient.GetAllAsync();
+			await Task.WhenAll(catTask, statusTask);
+			_categories = catTask.Result;
+			_statuses = statusTask.Result;
+		}
+		finally
+		{
+			_isLoadingData = false;
+		}
+
 		if (InitialValues != null)
 		{
 			FormModel = InitialValues with { };
