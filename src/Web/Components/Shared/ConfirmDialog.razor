@@ -1,0 +1,83 @@
+@namespace Web.Components.Shared
+
+@if (IsVisible)
+{
+	<div
+		class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="confirm-dialog-title"
+		aria-describedby="confirm-dialog-message">
+
+		<div class="bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
+			<h2 id="confirm-dialog-title" class="text-lg font-semibold text-[var(--text-main)] mb-2">
+				@Title
+			</h2>
+			<p id="confirm-dialog-message" class="text-sm text-[var(--text-muted)] mb-6">
+				@Message
+			</p>
+			<div class="flex items-center justify-end gap-3">
+				<button
+					type="button"
+					class="inline-flex items-center px-5 py-2.5 rounded-lg bg-[var(--bg-hover)] hover:bg-[var(--border-color)] text-[var(--text-main)] text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+					@onclick="HandleCancel">
+					@CancelText
+				</button>
+				<button
+					type="button"
+					class="inline-flex items-center px-5 py-2.5 rounded-lg bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+					@onclick="HandleConfirm">
+					@ConfirmText
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
+@code {
+	/// <summary>
+	/// Controls the visibility of the dialog overlay.
+	/// </summary>
+	[Parameter]
+	public bool IsVisible { get; set; }
+
+	/// <summary>
+	/// The heading text displayed at the top of the dialog.
+	/// </summary>
+	[Parameter]
+	public string Title { get; set; } = string.Empty;
+
+	/// <summary>
+	/// The body text describing the action to confirm.
+	/// </summary>
+	[Parameter]
+	public string Message { get; set; } = string.Empty;
+
+	/// <summary>
+	/// The label for the confirm button. Defaults to "Confirm".
+	/// </summary>
+	[Parameter]
+	public string ConfirmText { get; set; } = "Confirm";
+
+	/// <summary>
+	/// The label for the cancel button. Defaults to "Cancel".
+	/// </summary>
+	[Parameter]
+	public string CancelText { get; set; } = "Cancel";
+
+	/// <summary>
+	/// Event callback invoked when the user clicks the confirm button.
+	/// </summary>
+	[Parameter]
+	public EventCallback OnConfirm { get; set; }
+
+	/// <summary>
+	/// Event callback invoked when the user clicks the cancel button or dismisses the dialog.
+	/// </summary>
+	[Parameter]
+	public EventCallback OnCancel { get; set; }
+
+	private async Task HandleConfirm() => await OnConfirm.InvokeAsync();
+
+	private async Task HandleCancel() => await OnCancel.InvokeAsync();
+}

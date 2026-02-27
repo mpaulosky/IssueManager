@@ -1,4 +1,7 @@
 using Bunit;
+using NSubstitute;
+using Shared.DTOs;
+using Web.Services;
 
 namespace Tests.BlazorTests.Fixtures;
 
@@ -18,9 +21,16 @@ public abstract class ComponentTestBase : IDisposable
 	protected ComponentTestBase()
 	{
 		TestContext = new TestContext();
-		
-		// Add common test services here
-		// Example: TestContext.Services.AddSingleton<IMyService>(NSubstitute.Substitute.For<IMyService>());
+
+		var categoryClient = Substitute.For<ICategoryApiClient>();
+		categoryClient.GetAllAsync(Arg.Any<CancellationToken>())
+			.Returns(Task.FromResult<IEnumerable<CategoryDto>>([]));
+		TestContext.Services.AddSingleton<ICategoryApiClient>(categoryClient);
+
+		var statusClient = Substitute.For<IStatusApiClient>();
+		statusClient.GetAllAsync(Arg.Any<CancellationToken>())
+			.Returns(Task.FromResult<IEnumerable<StatusDto>>([]));
+		TestContext.Services.AddSingleton<IStatusApiClient>(statusClient);
 	}
 
 	/// <summary>

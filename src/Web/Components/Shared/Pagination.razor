@@ -1,0 +1,79 @@
+@namespace Web.Components.Shared
+
+@if (TotalPages > 1)
+{
+	<nav class="flex items-center justify-center gap-1 mt-6" aria-label="Pagination">
+		<!-- Previous -->
+		<button
+			class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] disabled:opacity-40 disabled:cursor-not-allowed"
+			@onclick="() => ChangePage(CurrentPage - 1)"
+			disabled="@(CurrentPage == 1)"
+			aria-label="Previous page">
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+			</svg>
+		</button>
+
+		<!-- Page numbers -->
+		@foreach (var page in GetPageNumbers())
+		{
+			<button
+				class="@(page == CurrentPage
+					? "inline-flex items-center justify-center w-9 h-9 rounded-lg text-sm font-medium bg-[var(--color-primary)] text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+					: "inline-flex items-center justify-center w-9 h-9 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]")"
+				@onclick="() => ChangePage(page)"
+				aria-label="@("Page " + page)"
+				aria-current="@(page == CurrentPage ? "page" : null)">
+				@(page)
+			</button>
+		}
+
+		<!-- Next -->
+		<button
+			class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] disabled:opacity-40 disabled:cursor-not-allowed"
+			@onclick="() => ChangePage(CurrentPage + 1)"
+			disabled="@(CurrentPage == TotalPages)"
+			aria-label="Next page">
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+			</svg>
+		</button>
+
+		<span class="ml-3 text-sm text-[var(--text-muted)]">Page @CurrentPage of @TotalPages</span>
+	</nav>
+}
+
+@code {
+	/// <summary>
+	/// The current active page number (1-based).
+	/// </summary>
+	[Parameter]
+	public int CurrentPage { get; set; } = 1;
+
+	/// <summary>
+	/// The total number of pages available.
+	/// </summary>
+	[Parameter]
+	public int TotalPages { get; set; }
+
+	/// <summary>
+	/// Event callback invoked with the new page number when the user navigates to a different page.
+	/// </summary>
+	[Parameter]
+	public EventCallback<int> OnPageChanged { get; set; }
+
+	private IEnumerable<int> GetPageNumbers()
+	{
+		int start = Math.Max(1, CurrentPage - 2);
+		int end = Math.Min(TotalPages, CurrentPage + 2);
+		return Enumerable.Range(start, end - start + 1);
+	}
+
+	private async Task ChangePage(int page)
+	{
+		if (page >= 1 && page <= TotalPages && page != CurrentPage)
+		{
+			await OnPageChanged.InvokeAsync(page);
+		}
+	}
+}

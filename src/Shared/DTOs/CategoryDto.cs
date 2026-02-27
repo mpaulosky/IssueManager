@@ -13,6 +13,7 @@ namespace Shared.DTOs;
 ///   CategoryDto record
 /// </summary>
 [Serializable]
+[method: JsonConstructor]
 public record CategoryDto(
 	ObjectId Id,
 	string CategoryName,

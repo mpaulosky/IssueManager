@@ -13,6 +13,7 @@ namespace Shared.DTOs;
 ///   IssueDto record
 /// </summary>
 [Serializable]
+[method: JsonConstructor]
 public record IssueDto(
 	ObjectId Id,
 	string Title,

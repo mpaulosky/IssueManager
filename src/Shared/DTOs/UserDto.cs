@@ -13,6 +13,7 @@ namespace Shared.DTOs;
 ///   UserDto record
 /// </summary>
 [Serializable]
+[method: JsonConstructor]
 public record UserDto(string Id, string Name, string Email)
 {
 	/// <summary>

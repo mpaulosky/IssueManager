@@ -55,7 +55,7 @@ and authorization; UserDto integration for logged-in user attribution; theme/col
 
 | # | Item | Route |
 |---|------|-------|
-| 3.1 | Issues list | `/issues` |
+| 3.1 | Issues list + search by author | `/issues` — includes filter bar: search by author name/email, filter by status, filter by category; results paginated |
 | 3.2 | Issue create | `/issues/create` |
 | 3.3 | Issue detail + comments | `/issues/{id}` |
 | 3.4 | Issue edit | `/issues/{id}/edit` |

@@ -13,6 +13,7 @@ namespace Shared.DTOs;
 ///   CommentDto record
 /// </summary>
 [Serializable]
+[method: JsonConstructor]
 public record CommentDto(
 	ObjectId Id,
 	string Title,
