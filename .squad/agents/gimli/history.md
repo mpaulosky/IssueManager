@@ -28,6 +28,18 @@ Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, Te
 - `GenerateSlug("C# Is Great!")` → `"c_is_great_"` (trailing underscore is correct and intentional)
 - Integration tests: always add `[Collection("Integration")]` to prevent Docker port conflicts
 
+### 2026-02-27: Sprint 2 — bUnit CRUD page tests written
+- Wrote 11 test files covering 10 CRUD pages + FooterComponent
+- Target: `tests/Blazor.Tests/Pages/Issues/`, `Pages/Categories/`, `Pages/Statuses/`, `Layout/`
+- Files: `IssuesPageTests`, `CreateIssuePageTests`, `IssueDetailPageTests`, `EditIssuePageTests`, `CategoriesPageTests`, `CreateCategoryPageTests`, `EditCategoryPageTests`, `StatusesPageTests`, `CreateStatusPageTests`, `EditStatusPageTests`, `FooterComponentTests`
+- **`BuildInfo` is `internal` to Web assembly** — test project cannot access it. Use markup assertions (e.g. `Contain("github.com")`) instead of `BuildInfo.Version` / `BuildInfo.Commit`.
+- **Re-registering services**: When a test class inherits `ComponentTestBase` (which pre-registers `ICategoryApiClient`/`IStatusApiClient`), calling `AddSingleton<T>()` again in the subclass constructor AFTER base constructor completes causes the new registration to win in DI. This is the correct pattern for overriding mocks in subclasses.
+- **Category/Status page tests don't need ComponentTestBase** — those pages don't render `IssueForm` (which injects category/status services). Use fresh `new TestContext()` for clean isolation.
+- **Issue pages that render `IssueForm`** (CreateIssuePage, EditIssuePage) DO need `ICategoryApiClient` + `IStatusApiClient` — inherit from `ComponentTestBase`.
+- **IssuesPage** also needs `ICategoryApiClient`/`IStatusApiClient` (for filter dropdowns) — inherit from `ComponentTestBase`.
+- All test classes follow IDisposable pattern (or inherit ComponentTestBase which is IDisposable).
+- Build result: `0 Warning(s). 0 Error(s).`
+
 ### 2026-02-27: Search/filter feature tests written
 - Wrote comprehensive tests for Sam's search/filter feature (SearchTerm, AuthorName parameters)
 - Unit tests: Added 6 new validator tests to `ListIssuesQueryValidatorTests.cs` for SearchTerm/AuthorName validation (200 char limit)
