@@ -4,6 +4,7 @@
 @inject IIssueApiClient IssueClient
 @inject ICommentApiClient CommentClient
 @inject NavigationManager Nav
+@using Web.Components.Shared
 
 <PageTitle>@(_issue?.Title ?? "Issue") — IssueManager</PageTitle>
 
@@ -69,12 +70,62 @@
 					@foreach (var comment in _comments)
 					{
 						<div class="border-l-2 border-[var(--border-color)] pl-4 py-2">
-							<div class="flex items-center gap-2 text-sm text-[var(--text-muted)] mb-1">
-								<strong>@comment.Author.Name</strong>
-								<span>•</span>
-								<span>@comment.DateCreated.ToString("MMM dd, yyyy HH:mm")</span>
+							<div class="flex items-center justify-between gap-2 mb-1">
+								<div class="flex items-center gap-2 text-sm text-[var(--text-muted)]">
+									<strong>@comment.Author.Name</strong>
+									<span>•</span>
+									<span>@comment.DateCreated.ToString("MMM dd, yyyy HH:mm")</span>
+								</div>
+								@if (_editingCommentId != comment.Id)
+								{
+									<!-- TODO: Restrict to comment owner when auth is implemented -->
+									<div class="flex items-center gap-2">
+										<button
+											type="button"
+											@onclick="() => StartEditComment(comment)"
+											class="text-xs text-[var(--color-primary)] hover:underline">
+											Edit
+										</button>
+										<button
+											type="button"
+											@onclick="() => ShowDeleteConfirmDialog(comment.Id)"
+											class="text-xs text-red-600 hover:underline">
+											Delete
+										</button>
+									</div>
+								}
 							</div>
-							<p class="text-[var(--text-main)] whitespace-pre-wrap">@comment.Description</p>
+
+							@if (_editingCommentId == comment.Id)
+							{
+								<!-- Edit mode -->
+								<textarea
+									@bind="_editCommentText"
+									class="form-input resize-y w-full mb-2"
+									rows="4"
+									disabled="@_isSavingComment"></textarea>
+								<div class="flex items-center gap-2">
+									<button
+										type="button"
+										@onclick="SaveEditComment"
+										disabled="@(string.IsNullOrWhiteSpace(_editCommentText) || _isSavingComment)"
+										class="px-3 py-1 bg-[var(--color-primary)] text-white rounded text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed">
+										@(_isSavingComment ? "Saving..." : "Save")
+									</button>
+									<button
+										type="button"
+										@onclick="CancelEditComment"
+										disabled="@_isSavingComment"
+										class="px-3 py-1 border border-[var(--border-color)] text-[var(--text-main)] rounded text-xs font-medium hover:bg-[var(--bg-hover)] transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+										Cancel
+									</button>
+								</div>
+							}
+							else
+							{
+								<!-- View mode -->
+								<p class="text-[var(--text-main)] whitespace-pre-wrap">@comment.Description</p>
+							}
 						</div>
 					}
 				</div>
@@ -106,6 +157,16 @@
 	}
 </div>
 
+<!-- Delete Confirmation Dialog -->
+<ConfirmDialog
+	IsVisible="@_showDeleteDialog"
+	Title="Delete Comment"
+	Message="Are you sure you want to delete this comment? This action cannot be undone."
+	ConfirmText="Delete"
+	CancelText="Cancel"
+	OnConfirm="HandleDeleteConfirm"
+	OnCancel="HandleDeleteCancel" />
+
 @code {
 	/// <summary>
 	/// The ID of the issue to display.
@@ -119,6 +180,15 @@
 	private string _newCommentText = "";
 	private bool _isSubmittingComment = false;
 
+	// Edit comment state
+	private string? _editingCommentId = null;
+	private string _editCommentText = "";
+	private bool _isSavingComment = false;
+
+	// Delete comment state
+	private bool _showDeleteDialog = false;
+	private string? _commentToDeleteId = null;
+
 	/// <summary>
 	/// Loads the issue and its comments on initialization.
 	/// </summary>
@@ -130,8 +200,8 @@
 			_issue = await IssueClient.GetByIdAsync(Id);
 			if (_issue != null)
 			{
-				_comments = await CommentClient.GetAllAsync();
-				// TODO: Filter comments by issue ID when API supports it
+				var allComments = await CommentClient.GetAllAsync();
+				_comments = allComments.Where(c => c.IssueId == Id);
 			}
 		}
 		finally
@@ -167,5 +237,88 @@
 		{
 			_isSubmittingComment = false;
 		}
+	}
+
+	/// <summary>
+	/// Starts editing a comment by entering edit mode.
+	/// </summary>
+	private void StartEditComment(CommentDto comment)
+	{
+		_editingCommentId = comment.Id;
+		_editCommentText = comment.Description;
+	}
+
+	/// <summary>
+	/// Saves the edited comment.
+	/// </summary>
+	private async Task SaveEditComment()
+	{
+		if (string.IsNullOrWhiteSpace(_editCommentText) || string.IsNullOrEmpty(_editingCommentId)) return;
+
+		_isSavingComment = true;
+		try
+		{
+			var command = new UpdateCommentCommand
+			{
+				Id = _editingCommentId,
+				Title = "Comment",
+				CommentText = _editCommentText
+			};
+			var updatedComment = await CommentClient.UpdateAsync(_editingCommentId, command);
+			if (updatedComment != null)
+			{
+				_comments = _comments.Select(c => c.Id == _editingCommentId ? updatedComment : c);
+				_editingCommentId = null;
+				_editCommentText = "";
+			}
+		}
+		finally
+		{
+			_isSavingComment = false;
+		}
+	}
+
+	/// <summary>
+	/// Cancels editing and reverts to view mode.
+	/// </summary>
+	private void CancelEditComment()
+	{
+		_editingCommentId = null;
+		_editCommentText = "";
+	}
+
+	/// <summary>
+	/// Shows the delete confirmation dialog.
+	/// </summary>
+	private void ShowDeleteConfirmDialog(string commentId)
+	{
+		_commentToDeleteId = commentId;
+		_showDeleteDialog = true;
+	}
+
+	/// <summary>
+	/// Handles the delete confirmation.
+	/// </summary>
+	private async Task HandleDeleteConfirm()
+	{
+		_showDeleteDialog = false;
+		if (string.IsNullOrEmpty(_commentToDeleteId)) return;
+
+		var success = await CommentClient.DeleteAsync(_commentToDeleteId);
+		if (success)
+		{
+			_comments = _comments.Where(c => c.Id != _commentToDeleteId);
+			await InvokeAsync(StateHasChanged);
+		}
+		_commentToDeleteId = null;
+	}
+
+	/// <summary>
+	/// Handles the delete cancellation.
+	/// </summary>
+	private void HandleDeleteCancel()
+	{
+		_showDeleteDialog = false;
+		_commentToDeleteId = null;
 	}
 }
