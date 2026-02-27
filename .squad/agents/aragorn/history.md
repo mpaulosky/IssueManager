@@ -126,3 +126,42 @@ dotnet build tests\Unit.Tests --configuration Release --no-restore
 dotnet test tests\Unit.Tests --configuration Release --no-build
 `
 
+---
+
+## 2026-02-27 17:18:38 - copilot-instructions.md Compliance Audit
+
+**Task:** Audit `.github/copilot-instructions.md` for stale or inaccurate references to IssueManager project
+
+**Findings:** 9 stale references corrected
+
+**Key Technical Decisions Confirmed:**
+1. **MongoDB ORM: MongoDB.Entities v25** (NOT EF Core + MongoDB.EntityFrameworkCore as instructions claimed)
+   - Uses raw MongoDB.Driver through repository classes
+   - Intentional choice — instructions must reflect it
+   - Updated: EF Core → false, MongoDB.EntityFrameworkCore → false, DbContext Pooling/Factory/Change Tracking → false
+
+2. **CQRS: Custom handler pattern** (NOT MediatR)
+   - Implements CQRS with plain handler classes injected via DI
+   - No MediatR library used
+   - Updated: Removed MediatR reference, pointed to Api/Handlers/ and Shared/Validators/
+
+3. **P0 Gaps Escalated** (Security blockers):
+   - Auth0 + Authorization: Zero implementation, no auth middleware
+   - CORS: DefaultCorsPolicy defined but never wired
+
+4. **P1 Gaps to Schedule**:
+   - Scalar UI: app.MapScalarApiReference() not called
+   - API Versioning: No versioning implemented
+   - Application Insights: Not configured
+
+5. **Corrections Made**:
+   - "TailwindBlogApp" → "IssueManager" (copy/paste from another project)
+   - Date updated to 2026-02-27 (stale since June 2025)
+   - Persistence.MongoDb/ → src/Api/Data/
+   - CODE_OF_CONDUCT.md path corrected
+   - Tests/Web.Tests.Bunit/ → tests/Blazor.Tests/
+
+**Why:** Instructions that reference wrong project name, wrong libraries, and wrong paths erode developer trust and cause Copilot suggestions to be misaligned with actual codebase. Keeping them accurate is team health requirement.
+
+**Output:** Full gap report at `docs/reviews/copilot-instructions-audit.md`
+

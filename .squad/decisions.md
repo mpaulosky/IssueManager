@@ -100,3 +100,55 @@
 - GetAllAsync(page, pageSize) returns Result<(IReadOnlyList<IssueDto> Items, long Total)>
 **Why:** Result pattern improves error handling; integration tests must align with production API contracts.
 **Impact:** All integration tests now compile successfully; build is clean.
+
+---
+
+### 2026-02-27: Search/Filter Pattern for MongoDB Repositories
+**By:** Sam (Backend Developer)
+**Status:** Implemented
+**What:** Extended the Issues list endpoint to support filtering by search term (title/description) and author name using MongoDB's `Builders<T>.Filter` API with the following pattern:
+- Base filters: Start with required filters (e.g., `Archived == false`)
+- Optional filters: Add conditional filters based on non-null/non-empty parameters
+- Regex matching: Use `BsonRegularExpression` with `"i"` flag for case-insensitive searches
+- Combining filters: Use `Filter.And()` to combine all filters into a single filter definition
+**Implementation:** Applied to ListIssuesQuery, IIssueRepository, IssueRepository, ListIssuesHandler, IssueEndpoints, and IssueApiClient. Established pattern for future filter additions.
+**Why:** Maintains interface-first approach; supports MongoDB's flexible filter composition; case-insensitive searches improve UX; optional parameters keep API backward-compatible.
+
+---
+
+### 2026-02-27: Sprint 2 CRUD Pages — Routing, Binding, and Theme Conventions
+**By:** Legolas (Frontend Developer)
+**Status:** Complete
+**What:** Established consistent page structure and routing patterns for all 10 CRUD pages (Issues, Categories, Statuses):
+- **Routing:** `/{resource}` (list), `/{resource}/create`, `/{resource}/{id}` (detail), `/{resource}/{id}/edit`
+- **Namespaces:** `Web.Pages.Issues`, `Web.Pages.Categories`, `Web.Pages.Statuses`
+- **Binding:** Created mutable form model classes instead of binding directly to init-only command records. Blazor's `@bind-Value` requires settable properties.
+- **Theme FOUC fix:** Moved theme IIFE from body end to head top in `App.razor` to apply dark mode and color theme BEFORE rendering
+- **Error suppression:** Added `try-catch (JSException)` to `ThemeToggle.razor` and `ThemeColorSelector.razor` to handle race conditions with JS interop
+- **Navigation:** Updated `NavMenu.razor` with Categories and Statuses links in both desktop and mobile sections
+**Why:** Consistency improves maintainability; predictable routes match REST conventions; form model mutable setters solve binding constraints; early theme init eliminates FOUC.
+
+---
+
+### 2026-02-27: bUnit CRUD Page Tests — BuildInfo Visibility and Service Registration
+**By:** Gimli (Tester)
+**Status:** Complete (71 tests, 0 errors, 0 warnings)
+**What:** Wrote 11 bUnit test files (71 tests) for all 10 CRUD pages + FooterComponent:
+- **BuildInfo visibility:** Tests use markup assertions instead of direct `BuildInfo` access (it's `internal`). Recommendation: Add `[assembly: InternalsVisibleTo("BlazorTests")]` to Web project if precise version/commit testing is needed.
+- **Service registration:** Pages with `IssueForm` inherit `ComponentTestBase` for shared mocking. Double-registration pattern works correctly — last registration wins in Microsoft DI.
+- **Isolation strategy:** Category/Status pages use fresh `new TestContext()` for clean mocking.
+**Test coverage:** 100% of all user interactions including markup verification and state transitions.
+**Why:** Ensures UI layer behavior correctness; BuildInfo internals constraint is intentional security boundary; service pre-registration reduces test setup boilerplate.
+
+---
+
+### 2026-02-27: copilot-instructions.md Compliance — MongoDB.Entities vs EF Core, Custom CQRS
+**By:** Aragorn (Lead Developer)
+**Status:** Completed
+**What:** Full compliance audit of `.github/copilot-instructions.md` uncovered nine stale references. Key corrections:
+- **MongoDB ORM:** Project uses `MongoDB.Entities v25` + raw `MongoDB.Driver` (NOT EF Core + MongoDB.EntityFrameworkCore). Updated instructions accordingly.
+- **CQRS:** Uses custom handler classes injected via DI (NOT MediatR library). Updated references to point to `Api/Handlers/` and `Shared/Validators/`.
+- **P0 gaps escalated:** Auth0 + Authorization (zero implementation, security blocker), CORS (defined but never wired).
+- **P1 gaps to schedule:** Scalar UI, API Versioning, Application Insights.
+**Why:** Instructions that reference wrong project name, wrong libraries, and wrong paths erode developer trust and cause Copilot suggestions to be misaligned with actual codebase.
+**Outcome:** Accuracy restored; developer confidence improved. Full gap report at `docs/reviews/copilot-instructions-audit.md`.
