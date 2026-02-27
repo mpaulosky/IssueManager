@@ -34,7 +34,7 @@ public class CategoryRepository : ICategoryRepository
 
 		var update = Builders<Category>.Update.Set(x => x.Archived, true);
 		var result = await _collection.UpdateOneAsync(x => x.Id == categoryId, update, cancellationToken: cancellationToken);
-		return result.ModifiedCount > 0 ? Result.Ok() : Result.Fail("Category not found or already archived.");
+		return result.ModifiedCount > 0 ? Result.Ok() : Result.Fail("Category not found or already archived.", ResultErrorCode.NotFound);
 	}
 
 	/// <inheritdoc />
@@ -56,7 +56,7 @@ public class CategoryRepository : ICategoryRepository
 
 		var entity = await _collection.Find(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
 
-		return entity is not null ? Result.Ok(entity.ToDto()) : Result.Fail<CategoryDto>("Category not found.");
+		return entity is not null ? Result.Ok(entity.ToDto()) : Result.Fail<CategoryDto>("Category not found.", ResultErrorCode.NotFound);
 	}
 
 	/// <inheritdoc />
@@ -80,9 +80,8 @@ public class CategoryRepository : ICategoryRepository
 			.Limit(pageSize)
 			.ToListAsync(cancellationToken);
 
-		return (Result<(IReadOnlyList<CategoryDto> Items, long Total)>)(entities.Count > 0
-				? Result.Ok((entities.Select(x => x.ToDto()).ToList().AsReadOnly(), total))
-				: Result.Fail("Issues not found."));
+		IReadOnlyList<CategoryDto> items = entities.Select(x => x.ToDto()).ToList();
+		return Result.Ok((items, total));
 	}
 
 	/// <inheritdoc />
@@ -99,7 +98,7 @@ public class CategoryRepository : ICategoryRepository
 				cancellationToken: cancellationToken);
 
 		return result.ModifiedCount > 0 ? Result.Ok(model.ToDto()) :
-				Result.Fail<CategoryDto>("Category not found or update failed.");
+				Result.Fail<CategoryDto>("Category not found or update failed.", ResultErrorCode.NotFound);
 	}
 
 	/// <inheritdoc />

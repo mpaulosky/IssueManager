@@ -74,9 +74,8 @@ public class IssueRepository : IIssueRepository
 			.Limit(pageSize)
 			.ToListAsync(cancellationToken);
 
-		return (Result<(IReadOnlyList<IssueDto> Items, long Total)>)(entities.Count > 0
-				? Result.Ok((entities.Select(x => x.ToDto()).ToList().AsReadOnly(), total))
-				: Result.Fail("Issues not found."));
+		IReadOnlyList<IssueDto> items = entities.Select(x => x.ToDto()).ToList();
+		return Result.Ok((items, total));
 	}
 
 	/// <inheritdoc />

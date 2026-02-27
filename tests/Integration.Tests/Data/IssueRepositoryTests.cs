@@ -216,7 +216,7 @@ var nonExistentIssue = CreateTestIssueDto("Non-existent", "Does not exist");
 var result = await _repository.UpdateAsync(nonExistentIssue);
 
 // Assert
-result.Should().BeNull();
+result.Success.Should().BeFalse();
 }
 
 [Fact]
