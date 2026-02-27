@@ -37,3 +37,22 @@ Key security concerns to address from day one:
 **Coordination:** Worked in parallel with Sam (API endpoints) and Legolas (UI). Added single line to Program.cs files to minimize merge conflicts.
 **Security Note:** Applications run in "open mode" (no auth enforced) until secrets are configured. This is intentional for staged rollout.
 
+### 2026-02-27: Auth0 Middleware Activation (s4-auth0)
+**Sprint:** Sprint 4
+**Branch:** feat/sprint-4-auth
+**Status:** Complete
+**What:** Activated Auth0 middleware pipeline in both API and Web projects. Wired up UseAuthentication/UseAuthorization middleware, added login/logout endpoints for Web, and created TokenForwardingHandler to attach Bearer tokens to outgoing API requests.
+**Key Implementation:**
+- Added `UseAuthentication()` and `UseAuthorization()` to both Api/Program.cs and Web/Program.cs middleware pipelines
+- Created `/auth/login` and `/auth/logout` endpoints in Web/Program.cs using Auth0's LoginAuthenticationPropertiesBuilder and LogoutAuthenticationPropertiesBuilder
+- Created `Web/Services/TokenForwardingHandler.cs` — a DelegatingHandler that reads the access_token from HttpContext and attaches it as a Bearer token to outgoing API requests
+- Registered TokenForwardingHandler as transient service and added it to all four HttpClient registrations (Issue, Category, Status, Comment)
+- Added necessary using statements: Auth0.AspNetCore.Authentication, Microsoft.AspNetCore.Authentication, Microsoft.AspNetCore.Authentication.Cookies
+**Pipeline Order:**
+- Api: UseHttpsRedirection → UseCors → UseAuthentication → UseAuthorization → endpoints
+- Web: UseHttpsRedirection → UseStaticFiles → UseAuthentication → UseAuthorization → UseAntiforgery → endpoints
+**Why:** The passive Auth0 extensions were in place but the middleware pipeline was not wired up. Without UseAuthentication/UseAuthorization, auth checks don't run. The TokenForwardingHandler ensures that when a user is logged into the Web app, their access token is automatically attached to backend API calls.
+**Build Status:** Build succeeded (45 warnings, 0 errors). Fixed unrelated ApiVersioningExtensions.cs compilation error by removing incompatible AddApiExplorer call.
+**Security Note:** Endpoints still don't enforce authorization (no [Authorize] attributes yet) — that's the next todo (s4-api-policies). This change activates the middleware pipeline so that when policies are added, the infrastructure is ready.
+
+

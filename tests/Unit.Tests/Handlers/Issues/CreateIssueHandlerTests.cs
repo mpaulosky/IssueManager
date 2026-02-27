@@ -12,6 +12,7 @@ using FluentValidation;
 using Api.Data;
 using Api.Handlers;
 using Api.Handlers.Issues;
+using Api.Services;
 
 using Shared.Abstractions;
 using Shared.DTOs;
@@ -28,13 +29,19 @@ public class CreateIssueHandlerTests
 {
 	private readonly IIssueRepository _repository;
 	private readonly CreateIssueValidator _validator;
+	private readonly ICurrentUserService _currentUserService;
 	private readonly CreateIssueHandler _handler;
 
 	public CreateIssueHandlerTests()
 	{
 		_repository = Substitute.For<IIssueRepository>();
 		_validator = new CreateIssueValidator();
-		_handler = new CreateIssueHandler(_repository, _validator);
+		_currentUserService = Substitute.For<ICurrentUserService>();
+		_currentUserService.UserId.Returns("test-user-id");
+		_currentUserService.Name.Returns("Test User");
+		_currentUserService.Email.Returns("test@example.com");
+		_currentUserService.IsAuthenticated.Returns(true);
+		_handler = new CreateIssueHandler(_repository, _validator, _currentUserService);
 	}
 
 	[Fact]

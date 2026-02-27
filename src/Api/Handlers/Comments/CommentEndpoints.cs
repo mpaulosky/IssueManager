@@ -39,7 +39,8 @@ public static class CommentEndpoints
 		.WithName("CreateComment")
 		.WithSummary("Create a new comment")
 		.Produces<CommentDto>(StatusCodes.Status201Created)
-		.Produces(StatusCodes.Status400BadRequest);
+		.Produces(StatusCodes.Status400BadRequest)
+		.RequireAuthorization();
 
 		group.MapPatch("{id}", async (string id, UpdateCommentCommand command, UpdateCommentHandler handler) =>
 		{
@@ -51,7 +52,8 @@ public static class CommentEndpoints
 		.WithSummary("Update an existing comment")
 		.Produces<CommentDto>(StatusCodes.Status200OK)
 		.Produces(StatusCodes.Status400BadRequest)
-		.Produces(StatusCodes.Status404NotFound);
+		.Produces(StatusCodes.Status404NotFound)
+		.RequireAuthorization();
 
 		group.MapDelete("{id}", async (string id, DeleteCommentHandler handler) =>
 		{
@@ -62,7 +64,8 @@ public static class CommentEndpoints
 		.WithName("DeleteComment")
 		.WithSummary("Delete (archive) a comment")
 		.Produces(StatusCodes.Status204NoContent)
-		.Produces(StatusCodes.Status404NotFound);
+		.Produces(StatusCodes.Status404NotFound)
+		.RequireAuthorization();
 
 		return app;
 	}

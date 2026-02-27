@@ -10,6 +10,7 @@
 using Api.Data;
 using Api.Handlers;
 using Api.Handlers.Comments;
+using Api.Services;
 
 using MongoDB.Bson;
 using Shared.Abstractions;
@@ -25,13 +26,19 @@ public class CreateCommentHandlerTests
 {
 	private readonly ICommentRepository _repository;
 	private readonly CreateCommentValidator _validator;
+	private readonly ICurrentUserService _currentUserService;
 	private readonly CreateCommentHandler _handler;
 
 	public CreateCommentHandlerTests()
 	{
 		_repository = Substitute.For<ICommentRepository>();
 		_validator = new CreateCommentValidator();
-		_handler = new CreateCommentHandler(_repository, _validator);
+		_currentUserService = Substitute.For<ICurrentUserService>();
+		_currentUserService.UserId.Returns("test-user-id");
+		_currentUserService.Name.Returns("Test User");
+		_currentUserService.Email.Returns("test@example.com");
+		_currentUserService.IsAuthenticated.Returns(true);
+		_handler = new CreateCommentHandler(_repository, _validator, _currentUserService);
 	}
 
 	[Fact]

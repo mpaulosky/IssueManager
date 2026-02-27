@@ -34,8 +34,26 @@ Statuses
 </a>
 </div>
 
-<!-- Right side: theme controls + hamburger -->
+<!-- Right side: auth + theme controls + hamburger -->
 <div class="flex items-center gap-2">
+<!-- Auth Links (Desktop) -->
+<div class="hidden md:flex items-center gap-2">
+<AuthorizeView>
+<Authorized>
+<div class="px-3 py-2 text-sm text-[var(--text-muted)]">
+Hello, @context.User.Identity?.Name!
+</div>
+<a href="/auth/logout" class="px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+<span class="bi bi-box-arrow-right" aria-hidden="true"></span> Log out
+</a>
+</Authorized>
+<NotAuthorized>
+<a href="/auth/login" class="px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+<span class="bi bi-person-fill" aria-hidden="true"></span> Log in
+</a>
+</NotAuthorized>
+</AuthorizeView>
+</div>
 <ThemeToggle />
 <ThemeColorSelector />
 
@@ -84,6 +102,24 @@ Categories
 <a href="/statuses" @onclick="CloseMobileMenu" class="block px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
 Statuses
 </a>
+<!-- Auth Links (Mobile) -->
+<div class="border-t border-[var(--border-color)] pt-2 mt-2">
+<AuthorizeView>
+<Authorized>
+<div class="px-4 py-2 text-sm text-[var(--text-muted)]">
+Hello, @context.User.Identity?.Name!
+</div>
+<a href="/auth/logout" @onclick="CloseMobileMenu" class="block px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+<span class="bi bi-box-arrow-right" aria-hidden="true"></span> Log out
+</a>
+</Authorized>
+<NotAuthorized>
+<a href="/auth/login" @onclick="CloseMobileMenu" class="block px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+<span class="bi bi-person-fill" aria-hidden="true"></span> Log in
+</a>
+</NotAuthorized>
+</AuthorizeView>
+</div>
 </div>
 }
 </nav>

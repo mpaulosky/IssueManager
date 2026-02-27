@@ -1,6 +1,7 @@
 @* Copyright (c) 2026. All rights reserved. *@
 @namespace Web.Pages.Categories
 @page "/categories/create"
+@attribute [Authorize]
 @using System.ComponentModel.DataAnnotations
 @inject ICategoryApiClient CategoryClient
 @inject NavigationManager Nav

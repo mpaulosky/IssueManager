@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 builder.AddAuth0();
+builder.AddApiVersioning();
 
 builder.Services.AddOpenApi();
 
@@ -27,11 +28,14 @@ builder.Services.AddCors(options =>
 builder.Services.AddRepositories(builder.Configuration);
 builder.Services.AddValidators();
 builder.Services.AddHandlers();
+builder.Services.AddCurrentUser();
 
 var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseCors();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapOpenApi();
 app.MapScalarApiReference();
 

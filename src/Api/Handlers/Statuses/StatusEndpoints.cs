@@ -39,7 +39,8 @@ public static class StatusEndpoints
 		.WithName("CreateStatus")
 		.WithSummary("Create a new status")
 		.Produces<StatusDto>(StatusCodes.Status201Created)
-		.Produces(StatusCodes.Status400BadRequest);
+		.Produces(StatusCodes.Status400BadRequest)
+		.RequireAuthorization();
 
 		group.MapPatch("{id}", async (string id, UpdateStatusCommand command, UpdateStatusHandler handler) =>
 		{
@@ -51,7 +52,8 @@ public static class StatusEndpoints
 		.WithSummary("Update an existing status")
 		.Produces<StatusDto>(StatusCodes.Status200OK)
 		.Produces(StatusCodes.Status400BadRequest)
-		.Produces(StatusCodes.Status404NotFound);
+		.Produces(StatusCodes.Status404NotFound)
+		.RequireAuthorization();
 
 		group.MapDelete("{id}", async (string id, DeleteStatusHandler handler) =>
 		{
@@ -62,7 +64,8 @@ public static class StatusEndpoints
 		.WithName("DeleteStatus")
 		.WithSummary("Delete (archive) a status")
 		.Produces(StatusCodes.Status204NoContent)
-		.Produces(StatusCodes.Status404NotFound);
+		.Produces(StatusCodes.Status404NotFound)
+		.RequireAuthorization();
 
 		return app;
 	}

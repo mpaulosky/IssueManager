@@ -49,3 +49,21 @@ Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, Te
 - MockHandler enhanced to capture LastRequest for URL assertion in API client tests
 - All tests follow AAA pattern, use FluentAssertions `.Should()`, and include proper file headers
 - Integration tests validate: case-insensitive search, description matching, author filtering, combined filters with pagination, empty results
+
+### 2026-02-27: Sprint 4 — Auth0 integration tests written
+- Fixed 3 compilation errors caused by `ICurrentUserService` parameter added to `CreateIssueHandler` and `CreateCommentHandler`
+  - `Integration.Tests/Handlers/CreateIssueHandlerTests.cs` — added `Substitute.For<ICurrentUserService>()` mock with test values
+  - `Unit.Tests/Handlers/Issues/CreateIssueHandlerTests.cs` — added mock with default authenticated user
+  - `Unit.Tests/Handlers/Comments/CreateCommentHandlerTests.cs` — added mock with default authenticated user
+- Created `CurrentUserServiceTests.cs` (14 tests) — validates Auth0 claim reading (sub, name, email, IsAuthenticated)
+  - Tests ClaimTypes.NameIdentifier, "sub", ClaimTypes.Name, "name", ClaimTypes.Email, "email" claims
+  - Tests null HttpContext handling (returns null for properties, false for IsAuthenticated)
+  - Tests unauthenticated user scenario
+- Added `NSubstitute` package reference to `Integration.Tests.csproj` (required for mocking in integration tests)
+- **TokenForwardingHandler tests skipped** — Web.Services not referenced in Unit.Tests or Integration.Tests; requires Auth session APIs hard to mock
+- Final test results: **609 tests, 0 failures, 0 skipped**
+  - Architecture.Tests: 4.6s
+  - Unit.Tests: 6.4s (includes 14 new CurrentUserService tests)
+  - Blazor.Tests: 6.7s
+  - Integration.Tests: 350.0s (includes 1 updated CreateIssueHandlerTests)
+

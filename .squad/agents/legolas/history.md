@@ -34,3 +34,12 @@ Frontend Developer on IssueManager (.NET 10, Blazor Interactive Server Rendering
 - UpdateCommentCommand: Requires `Id`, `Title`, and `CommentText` properties
 - Lambda expressions in Razor: Use `() => StartEditComment(comment)` for passing parameters in event handlers
 - TODO comment: Added reminder to restrict edit/delete buttons to comment owner when auth is implemented
+
+### Sprint 4 Auth Protection (2026-02-27)
+- Added login/logout buttons to NavMenu: AuthorizeView with desktop and mobile sections showing user name when authenticated
+- Protected CRUD pages with [Authorize]: CreateIssuePage, EditIssuePage, CreateCategoryPage, EditCategoryPage, CreateStatusPage, EditStatusPage
+- Created RedirectToLoginPage.razor: Simple redirect to /auth/login for unauthorized access
+- Updated Routes.razor: Changed RouteView to AuthorizeRouteView with NotAuthorized handler
+- Added global usings: Microsoft.AspNetCore.Authorization and Microsoft.AspNetCore.Components.Authorization in _Imports.razor
+- Auth endpoints: /auth/login and /auth/logout already wired by Sam (backend)
+- List/view pages intentionally left public: IssuesPage, IssueDetailPage, CategoriesPage, StatusesPage

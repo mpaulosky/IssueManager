@@ -1,4 +1,6 @@
 using Api.Handlers.Issues;
+using Api.Services;
+using NSubstitute;
 
 using Shared.Validators;
 
@@ -27,7 +29,12 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 		await _mongoContainer.StartAsync();
 		var connectionString = _mongoContainer.GetConnectionString();
 		_repository = new IssueRepository(connectionString, TestDatabase);
-		_handler = new CreateIssueHandler(_repository, new CreateIssueValidator());
+		var currentUserService = Substitute.For<ICurrentUserService>();
+		currentUserService.UserId.Returns("test-user-id");
+		currentUserService.Name.Returns("Test User");
+		currentUserService.Email.Returns("test@example.com");
+		currentUserService.IsAuthenticated.Returns(true);
+		_handler = new CreateIssueHandler(_repository, new CreateIssueValidator(), currentUserService);
 	}
 
 	/// <summary>
