@@ -11,9 +11,11 @@ using FluentAssertions;
 using FluentValidation;
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Categories;
+
 using Shared.Abstractions;
+using Shared.DTOs;
 using Shared.Exceptions;
-using Shared.Models;
 using Shared.Validators;
 using MongoDB.Bson;
 using NSubstitute;
@@ -41,19 +43,14 @@ public class DeleteCategoryHandlerTests
 	{
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
-		var category = new Category
-		{
-			Id = categoryId,
-			CategoryName = "Bug",
-			Archived = false
-		};
+		var category = new CategoryDto(categoryId, "Bug", string.Empty, DateTime.UtcNow, null, false, UserDto.Empty);
 
 		var command = new DeleteCategoryCommand { Id = categoryId.ToString() };
 
-		_repository.GetAsync(categoryId)
-			.Returns(Result<Category>.Ok(category));
+		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Ok(category));
 
-		_repository.ArchiveAsync(category)
+		_repository.ArchiveAsync(categoryId, Arg.Any<CancellationToken>())
 			.Returns(Result.Ok());
 
 		// Act
@@ -61,8 +58,8 @@ public class DeleteCategoryHandlerTests
 
 		// Assert
 		result.Should().BeTrue();
-		await _repository.Received(1).GetAsync(categoryId);
-		await _repository.Received(1).ArchiveAsync(category);
+		await _repository.Received(1).GetByIdAsync(categoryId, Arg.Any<CancellationToken>());
+		await _repository.Received(1).ArchiveAsync(categoryId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -72,8 +69,8 @@ public class DeleteCategoryHandlerTests
 		var categoryId = ObjectId.GenerateNewId();
 		var command = new DeleteCategoryCommand { Id = categoryId.ToString() };
 
-		_repository.GetAsync(categoryId)
-			.Returns(Result<Category>.Fail("Not found"));
+		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Fail("Not found"));
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
@@ -88,25 +85,20 @@ public class DeleteCategoryHandlerTests
 	{
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
-		var archivedCategory = new Category
-		{
-			Id = categoryId,
-			CategoryName = "Archived",
-			Archived = true
-		};
+		var archivedCategory = new CategoryDto(categoryId, "Archived", string.Empty, DateTime.UtcNow, null, true, UserDto.Empty);
 
 		var command = new DeleteCategoryCommand { Id = categoryId.ToString() };
 
-		_repository.GetAsync(categoryId)
-			.Returns(Result<Category>.Ok(archivedCategory));
+		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Ok(archivedCategory));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
 		result.Should().BeTrue();
-		await _repository.Received(1).GetAsync(categoryId);
-		await _repository.DidNotReceive().ArchiveAsync(Arg.Any<Category>());
+		await _repository.Received(1).GetByIdAsync(categoryId, Arg.Any<CancellationToken>());
+		await _repository.DidNotReceive().ArchiveAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -142,26 +134,21 @@ public class DeleteCategoryHandlerTests
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
 		var cancellationToken = new CancellationToken();
-		var category = new Category
-		{
-			Id = categoryId,
-			CategoryName = "Test",
-			Archived = false
-		};
+		var category = new CategoryDto(categoryId, "Test", string.Empty, DateTime.UtcNow, null, false, UserDto.Empty);
 
 		var command = new DeleteCategoryCommand { Id = categoryId.ToString() };
 
-		_repository.GetAsync(categoryId)
-			.Returns(Result<Category>.Ok(category));
+		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Ok(category));
 
-		_repository.ArchiveAsync(category)
+		_repository.ArchiveAsync(categoryId, Arg.Any<CancellationToken>())
 			.Returns(Result.Ok());
 
 		// Act
 		await _handler.Handle(command, cancellationToken);
 
 		// Assert
-		await _repository.Received(1).GetAsync(categoryId);
-		await _repository.Received(1).ArchiveAsync(category);
+		await _repository.Received(1).GetByIdAsync(categoryId, Arg.Any<CancellationToken>());
+		await _repository.Received(1).ArchiveAsync(categoryId, Arg.Any<CancellationToken>());
 	}
 }

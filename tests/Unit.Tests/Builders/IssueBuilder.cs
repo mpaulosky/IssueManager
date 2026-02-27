@@ -20,7 +20,7 @@ public class IssueBuilder
 	private ObjectId _id = ObjectId.GenerateNewId();
 	private string _title = "Default Test Issue";
 	private string _description = "Default test description";
-	private StatusDto _status = new("Open", "Issue is open");
+	private StatusDto _status = new(ObjectId.GenerateNewId(), "Open", "Issue is open", DateTime.UtcNow, null, false, UserDto.Empty);
 	private DateTime _dateCreated = DateTime.UtcNow;
 	private bool _archived;
 
@@ -72,12 +72,16 @@ public class IssueBuilder
 			_title,
 			_description,
 			_dateCreated,
+			null,
 			UserDto.Empty,
 			CategoryDto.Empty,
 			_status,
-			_archived);
+			_archived,
+			UserDto.Empty,
+			false,
+			false);
 
 	public static IssueBuilder Default() => new();
 	public static IssueBuilder Archived() => new IssueBuilder().AsArchived();
-	public static IssueBuilder Closed() => new IssueBuilder().WithStatus(new StatusDto("Closed", "Issue is closed"));
+	public static IssueBuilder Closed() => new IssueBuilder().WithStatus(new StatusDto(ObjectId.GenerateNewId(), "Closed", "Issue is closed", DateTime.UtcNow, null, false, UserDto.Empty));
 }

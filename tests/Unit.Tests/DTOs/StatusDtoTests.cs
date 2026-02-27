@@ -25,8 +25,8 @@ public sealed class StatusDtoTests
 		// Assert
 		dto.StatusName.Should().BeEmpty();
 		dto.StatusDescription.Should().BeEmpty();
-		dto.Id.Should().BeNull();
-		dto.DateCreated.Should().Be(default);
+		dto.Id.Should().Be(ObjectId.Empty);
+		dto.DateCreated.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
 		dto.DateModified.Should().BeNull();
 	}
 
@@ -36,12 +36,12 @@ public sealed class StatusDtoTests
 		// Arrange
 		var statusName = "Open";
 		var statusDescription = "Issue is open";
-		var id = ObjectId.GenerateNewId().ToString();
+		var id = ObjectId.GenerateNewId();
 		var dateCreated = DateTime.UtcNow;
 		var dateModified = DateTime.UtcNow.AddDays(1);
 
 		// Act
-		var dto = new StatusDto(statusName, statusDescription, id, dateCreated, dateModified);
+		var dto = new StatusDto(id, statusName, statusDescription, dateCreated, dateModified, false, UserDto.Empty);
 
 		// Assert
 		dto.StatusName.Should().Be(statusName);
@@ -59,10 +59,10 @@ public sealed class StatusDtoTests
 		var statusDescription = "Issue is open";
 
 		// Act
-		var dto = new StatusDto(statusName, statusDescription);
+		var dto = new StatusDto(ObjectId.Empty, statusName, statusDescription, default, null, false, UserDto.Empty);
 
 		// Assert
-		dto.Id.Should().BeNull();
+		dto.Id.Should().Be(ObjectId.Empty);
 		dto.DateCreated.Should().Be(default);
 		dto.DateModified.Should().BeNull();
 	}
@@ -86,7 +86,7 @@ public sealed class StatusDtoTests
 		// Assert
 		dto.StatusName.Should().Be(status.StatusName);
 		dto.StatusDescription.Should().Be(status.StatusDescription);
-		dto.Id.Should().Be(status.Id.ToString());
+		dto.Id.Should().Be(status.Id);
 		dto.DateCreated.Should().Be(status.DateCreated);
 		dto.DateModified.Should().Be(status.DateModified);
 	}
@@ -97,13 +97,13 @@ public sealed class StatusDtoTests
 		// Arrange
 		var statusName = "Open";
 		var statusDescription = "Issue is open";
-		var id = ObjectId.GenerateNewId().ToString();
+		var id = ObjectId.GenerateNewId();
 		var dateCreated = DateTime.UtcNow;
 		var dateModified = DateTime.UtcNow.AddDays(1);
 
 		// Act
-		var dto1 = new StatusDto(statusName, statusDescription, id, dateCreated, dateModified);
-		var dto2 = new StatusDto(statusName, statusDescription, id, dateCreated, dateModified);
+		var dto1 = new StatusDto(id, statusName, statusDescription, dateCreated, dateModified, false, UserDto.Empty);
+		var dto2 = new StatusDto(id, statusName, statusDescription, dateCreated, dateModified, false, UserDto.Empty);
 
 		// Assert
 		dto1.Should().Be(dto2);
@@ -117,8 +117,8 @@ public sealed class StatusDtoTests
 		var statusDescription = "Issue is open";
 
 		// Act
-		var dto1 = new StatusDto(statusName, statusDescription);
-		var dto2 = new StatusDto(statusName, statusDescription);
+		var dto1 = new StatusDto(ObjectId.Empty, statusName, statusDescription, default, null, false, UserDto.Empty);
+		var dto2 = new StatusDto(ObjectId.Empty, statusName, statusDescription, default, null, false, UserDto.Empty);
 
 		// Assert
 		dto1.Should().NotBeSameAs(dto2);

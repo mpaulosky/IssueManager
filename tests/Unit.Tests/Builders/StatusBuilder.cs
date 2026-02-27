@@ -54,11 +54,13 @@ public class StatusBuilder
 
 	public StatusDto Build() =>
 		new(
+			MongoDB.Bson.ObjectId.Parse(_id ?? MongoDB.Bson.ObjectId.GenerateNewId().ToString()),
 			_statusName,
 			_statusDescription,
-			_id,
 			_dateCreated,
-			_dateModified);
+			_dateModified,
+			false,
+			UserDto.Empty);
 
 	public static StatusBuilder Default() => new();
 }

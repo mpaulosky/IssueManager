@@ -1,19 +1,14 @@
-namespace Tests.Integration.Fixtures;
+namespace Integration.Fixtures;
 
 /// <summary>
 /// Shared MongoDB TestContainer fixture for integration tests.
 /// </summary>
 public class MongoDbFixture : IAsyncLifetime
 {
-	private const string MONGODB_IMAGE = "mongo:8.0";
-	private readonly MongoDbContainer _mongoContainer;
-
-	public MongoDbFixture()
-	{
-		_mongoContainer = new MongoDbBuilder()
-			.WithImage(MONGODB_IMAGE)
+	private const string MongodbImage = "mongo:8.2";
+	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder()
+			.WithImage(MongodbImage)
 			.Build();
-	}
 
 	/// <summary>
 	/// Gets the MongoDB connection string.

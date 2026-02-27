@@ -7,16 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using Api.Data;
-
-using FluentValidation;
-
-using Shared.DTOs;
-using Shared.Exceptions;
-using Shared.Mappers;
-using Shared.Validators;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Comments;
 
 /// <summary>
 /// Handler for updating existing comments.
@@ -61,17 +52,19 @@ public class UpdateCommentHandler
 		if (!MongoDB.Bson.ObjectId.TryParse(command.Id, out var objectId))
 			throw new NotFoundException($"Comment with ID '{command.Id}' was not found.");
 
-		var getResult = await _repository.GetAsync(objectId);
+		var getResult = await _repository.GetByIdAsync(objectId, cancellationToken);
 		if (getResult.Failure || getResult.Value is null)
 			throw new NotFoundException($"Comment with ID '{command.Id}' was not found.");
 
-		var comment = getResult.Value;
-		comment.Title = command.Title;
+		var updatedComment = getResult.Value with
+		{
+			Title = command.Title
+		};
 
-		var updateResult = await _repository.UpdateAsync(objectId, comment);
+		var updateResult = await _repository.UpdateAsync(updatedComment, cancellationToken);
 		if (updateResult.Failure)
 			throw new NotFoundException($"Comment with ID '{command.Id}' could not be updated.");
 
-		return comment.ToDto();
+		return updateResult.Value;
 	}
 }

@@ -11,9 +11,11 @@ using FluentAssertions;
 using FluentValidation;
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Categories;
+
 using Shared.Abstractions;
+using Shared.DTOs;
 using Shared.Exceptions;
-using Shared.Models;
 using Shared.Validators;
 using MongoDB.Bson;
 using NSubstitute;
@@ -41,12 +43,8 @@ public class UpdateCategoryHandlerTests
 	{
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
-		var existingCategory = new Category
-		{
-			Id = categoryId,
-			CategoryName = "Old Name",
-			CategoryDescription = "Old Description"
-		};
+		var existingCategory = new CategoryDto(categoryId, "Old Name", "Old Description", DateTime.UtcNow, null, false, UserDto.Empty);
+		var updatedCategory = new CategoryDto(categoryId, "Updated Name", "Updated Description", DateTime.UtcNow, null, false, UserDto.Empty);
 
 		var command = new UpdateCategoryCommand
 		{
@@ -55,11 +53,11 @@ public class UpdateCategoryHandlerTests
 			CategoryDescription = "Updated Description"
 		};
 
-		_repository.GetAsync(categoryId)
-			.Returns(Result<Category>.Ok(existingCategory));
+		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Ok(existingCategory));
 
-		_repository.UpdateAsync(categoryId, Arg.Any<Category>())
-			.Returns(Result.Ok());
+		_repository.UpdateAsync(Arg.Any<CategoryDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Ok(updatedCategory));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
@@ -68,9 +66,9 @@ public class UpdateCategoryHandlerTests
 		result.Should().NotBeNull();
 		result.CategoryName.Should().Be("Updated Name");
 		result.CategoryDescription.Should().Be("Updated Description");
-		await _repository.Received(1).UpdateAsync(categoryId, Arg.Is<Category>(c =>
+		await _repository.Received(1).UpdateAsync(Arg.Is<CategoryDto>(c =>
 			c.CategoryName == command.CategoryName &&
-			c.CategoryDescription == command.CategoryDescription));
+			c.CategoryDescription == command.CategoryDescription), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -123,8 +121,8 @@ public class UpdateCategoryHandlerTests
 			CategoryDescription = "Updated Description"
 		};
 
-		_repository.GetAsync(categoryId)
-			.Returns(Result<Category>.Fail("Not found"));
+		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Fail("Not found"));
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
@@ -157,11 +155,7 @@ public class UpdateCategoryHandlerTests
 	{
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
-		var existingCategory = new Category
-		{
-			Id = categoryId,
-			CategoryName = "Old Name"
-		};
+		var existingCategory = new CategoryDto(categoryId, "Old Name", string.Empty, DateTime.UtcNow, null, false, UserDto.Empty);
 
 		var command = new UpdateCategoryCommand
 		{
@@ -170,11 +164,11 @@ public class UpdateCategoryHandlerTests
 			CategoryDescription = "Updated Description"
 		};
 
-		_repository.GetAsync(categoryId)
-			.Returns(Result<Category>.Ok(existingCategory));
+		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Ok(existingCategory));
 
-		_repository.UpdateAsync(categoryId, Arg.Any<Category>())
-			.Returns(Result.Fail("Update failed"));
+		_repository.UpdateAsync(Arg.Any<CategoryDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Fail("Update failed"));
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
@@ -189,11 +183,8 @@ public class UpdateCategoryHandlerTests
 	{
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
-		var existingCategory = new Category
-		{
-			Id = categoryId,
-			CategoryName = "Old Name"
-		};
+		var existingCategory = new CategoryDto(categoryId, "Old Name", string.Empty, DateTime.UtcNow, null, false, UserDto.Empty);
+		var returnedCategory = new CategoryDto(categoryId, "Updated Name", string.Empty, DateTime.UtcNow, null, false, UserDto.Empty);
 
 		var command = new UpdateCategoryCommand
 		{
@@ -202,11 +193,11 @@ public class UpdateCategoryHandlerTests
 			CategoryDescription = null
 		};
 
-		_repository.GetAsync(categoryId)
-			.Returns(Result<Category>.Ok(existingCategory));
+		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Ok(existingCategory));
 
-		_repository.UpdateAsync(categoryId, Arg.Any<Category>())
-			.Returns(Result.Ok());
+		_repository.UpdateAsync(Arg.Any<CategoryDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Ok(returnedCategory));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);

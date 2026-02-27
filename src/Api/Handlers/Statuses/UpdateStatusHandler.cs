@@ -7,16 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using Api.Data;
-
-using FluentValidation;
-
-using Shared.DTOs;
-using Shared.Exceptions;
-using Shared.Mappers;
-using Shared.Validators;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Statuses;
 
 /// <summary>
 /// Handler for updating existing statuses.
@@ -61,18 +52,20 @@ public class UpdateStatusHandler
 		if (!MongoDB.Bson.ObjectId.TryParse(command.Id, out var objectId))
 			throw new NotFoundException($"Status with ID '{command.Id}' was not found.");
 
-		var getResult = await _repository.GetAsync(objectId);
+		var getResult = await _repository.GetByIdAsync(objectId, cancellationToken);
 		if (getResult.Failure || getResult.Value is null)
 			throw new NotFoundException($"Status with ID '{command.Id}' was not found.");
 
-		var status = getResult.Value;
-		status.StatusName = command.StatusName;
-		status.StatusDescription = command.StatusDescription ?? string.Empty;
+		var updatedStatus = getResult.Value with
+		{
+			StatusName = command.StatusName,
+			StatusDescription = command.StatusDescription ?? string.Empty
+		};
 
-		var updateResult = await _repository.UpdateAsync(objectId, status);
+		var updateResult = await _repository.UpdateAsync(updatedStatus, cancellationToken);
 		if (updateResult.Failure)
 			throw new NotFoundException($"Status with ID '{command.Id}' could not be updated.");
 
-		return status.ToDto();
+		return updateResult.Value;
 	}
 }

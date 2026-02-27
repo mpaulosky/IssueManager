@@ -48,12 +48,12 @@ public class Result
 
 	public static Result Fail(string errorMessage)
 	{
-		return new Result(false, errorMessage, ResultErrorCode.None, null);
+		return new Result(false, errorMessage);
 	}
 
 	public static Result Fail(string errorMessage, ResultErrorCode code)
 	{
-		return new Result(false, errorMessage, code, null);
+		return new Result(false, errorMessage, code);
 	}
 
 	public static Result Fail(string errorMessage, ResultErrorCode code, object? details)

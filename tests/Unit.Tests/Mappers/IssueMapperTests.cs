@@ -24,8 +24,8 @@ public class IssueMapperTests
 	{
 		// Arrange
 		var author = new UserDto("507f1f77bcf86cd799439011", "John Doe", "john@example.com");
-		var category = new CategoryDto(ObjectId.GenerateNewId(), "Bug", "Software bugs");
-		var status = new StatusDto("Open", "Issue is open");
+		var category = new CategoryDto(ObjectId.GenerateNewId(), "Bug", "Software bugs", default, null, false, UserDto.Empty);
+		var status = new StatusDto(ObjectId.Empty, "Open", "Issue is open", default, null, false, UserDto.Empty);
 		var archivedBy = new UserDto("507f1f77bcf86cd799439012", "Jane Smith", "jane@example.com");
 		var issue = new Issue
 		{
@@ -35,7 +35,7 @@ public class IssueMapperTests
 			DateCreated = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
 			Author = author,
 			Category = category,
-			IssueStatus = status,
+			Status = status,
 			Archived = true,
 			ArchivedBy = archivedBy,
 			DateModified = new DateTime(2026, 2, 1, 0, 0, 0, DateTimeKind.Utc)
@@ -52,7 +52,7 @@ public class IssueMapperTests
 		dto.DateCreated.Should().Be(issue.DateCreated);
 		dto.Author.Should().Be(issue.Author);
 		dto.Category.Should().Be(issue.Category);
-		dto.Status.Should().Be(issue.IssueStatus);
+		dto.Status.Should().Be(issue.Status);
 		dto.Archived.Should().Be(issue.Archived);
 		dto.ArchivedBy.Should().Be(issue.ArchivedBy);
 		dto.DateModified.Should().Be(issue.DateModified);
@@ -70,7 +70,7 @@ public class IssueMapperTests
 			DateCreated = DateTime.UtcNow,
 			Author = UserDto.Empty,
 			Category = CategoryDto.Empty,
-			IssueStatus = new StatusDto("Open", "Open"),
+			Status = new StatusDto(ObjectId.Empty, "Open", "Open", default, null, false, UserDto.Empty),
 			Archived = false,
 			ArchivedBy = UserDto.Empty,
 			DateModified = null
@@ -96,7 +96,7 @@ public class IssueMapperTests
 			DateCreated = DateTime.UtcNow,
 			Author = UserDto.Empty,
 			Category = CategoryDto.Empty,
-			IssueStatus = new StatusDto("Closed", "Closed"),
+			Status = new StatusDto(ObjectId.Empty, "Closed", "Closed", default, null, false, UserDto.Empty),
 			Archived = true,
 			ArchivedBy = new UserDto("507f1f77bcf86cd799439011", "Admin", "admin@example.com")
 		};
@@ -115,20 +115,22 @@ public class IssueMapperTests
 	{
 		// Arrange
 		var author = new UserDto("507f1f77bcf86cd799439011", "Alice Brown", "alice@example.com");
-		var category = new CategoryDto(ObjectId.GenerateNewId(), "Feature", "New features");
-		var status = new StatusDto("In Progress", "Work in progress");
+		var category = new CategoryDto(ObjectId.GenerateNewId(), "Feature", "New features", default, null, false, UserDto.Empty);
+		var status = new StatusDto(ObjectId.Empty, "In Progress", "Work in progress", default, null, false, UserDto.Empty);
 		var archivedBy = new UserDto("507f1f77bcf86cd799439012", "Bob Wilson", "bob@example.com");
 		var dto = new IssueDto(
 			ObjectId.GenerateNewId(),
 			"DTO Issue",
 			"DTO description",
 			new DateTime(2026, 1, 15, 0, 0, 0, DateTimeKind.Utc),
+			new DateTime(2026, 2, 15, 0, 0, 0, DateTimeKind.Utc),
 			author,
 			category,
 			status,
 			true,
 			archivedBy,
-			new DateTime(2026, 2, 15, 0, 0, 0, DateTimeKind.Utc));
+			false,
+			false);
 
 		// Act
 		var model = dto.ToModel();
@@ -141,7 +143,7 @@ public class IssueMapperTests
 		model.DateCreated.Should().Be(dto.DateCreated);
 		model.Author.Should().Be(dto.Author);
 		model.Category.Should().Be(dto.Category);
-		model.IssueStatus.Should().Be(dto.Status);
+		model.Status.Should().Be(dto.Status);
 		model.Archived.Should().Be(dto.Archived);
 		model.ArchivedBy.Should().Be(dto.ArchivedBy);
 		model.DateModified.Should().Be(dto.DateModified);
@@ -156,9 +158,13 @@ public class IssueMapperTests
 			"Test Title",
 			"Test Description",
 			DateTime.UtcNow,
+			null,
 			UserDto.Empty,
 			CategoryDto.Empty,
-			new StatusDto("Open", "Open"),
+			new StatusDto(ObjectId.Empty, "Open", "Open", default, null, false, UserDto.Empty),
+			false,
+			UserDto.Empty,
+			false,
 			false);
 
 		// Act
@@ -178,9 +184,13 @@ public class IssueMapperTests
 			"Unarchived Issue",
 			"This issue is not archived",
 			DateTime.UtcNow,
+			null,
 			UserDto.Empty,
 			CategoryDto.Empty,
-			new StatusDto("Open", "Open"),
+			new StatusDto(ObjectId.Empty, "Open", "Open", default, null, false, UserDto.Empty),
+			false,
+			UserDto.Empty,
+			false,
 			false);
 
 		// Act
@@ -195,8 +205,8 @@ public class IssueMapperTests
 	{
 		// Arrange
 		var author = new UserDto("507f1f77bcf86cd799439011", "Charlie Davis", "charlie@example.com");
-		var category = new CategoryDto(ObjectId.GenerateNewId(), "Enhancement", "Improvements");
-		var status = new StatusDto("Done", "Completed");
+		var category = new CategoryDto(ObjectId.GenerateNewId(), "Enhancement", "Improvements", default, null, false, UserDto.Empty);
+		var status = new StatusDto(ObjectId.Empty, "Done", "Completed", default, null, false, UserDto.Empty);
 		var archivedBy = new UserDto("507f1f77bcf86cd799439012", "Diana Evans", "diana@example.com");
 		var original = new Issue
 		{
@@ -206,7 +216,7 @@ public class IssueMapperTests
 			DateCreated = new DateTime(2026, 3, 1, 0, 0, 0, DateTimeKind.Utc),
 			Author = author,
 			Category = category,
-			IssueStatus = status,
+			Status = status,
 			Archived = true,
 			ArchivedBy = archivedBy,
 			DateModified = new DateTime(2026, 3, 10, 0, 0, 0, DateTimeKind.Utc)
@@ -224,7 +234,7 @@ public class IssueMapperTests
 		roundTripped.DateCreated.Should().Be(original.DateCreated);
 		roundTripped.Author.Should().Be(original.Author);
 		roundTripped.Category.Should().Be(original.Category);
-		roundTripped.IssueStatus.Should().Be(original.IssueStatus);
+		roundTripped.Status.Should().Be(original.Status);
 		roundTripped.Archived.Should().Be(original.Archived);
 		roundTripped.ArchivedBy.Should().Be(original.ArchivedBy);
 		roundTripped.DateModified.Should().Be(original.DateModified);
@@ -235,20 +245,22 @@ public class IssueMapperTests
 	{
 		// Arrange
 		var author = new UserDto("507f1f77bcf86cd799439011", "Eve Foster", "eve@example.com");
-		var category = new CategoryDto(ObjectId.GenerateNewId(), "Security", "Security issues");
-		var status = new StatusDto("Closed", "Resolved");
+		var category = new CategoryDto(ObjectId.GenerateNewId(), "Security", "Security issues", default, null, false, UserDto.Empty);
+		var status = new StatusDto(ObjectId.Empty, "Closed", "Resolved", default, null, false, UserDto.Empty);
 		var archivedBy = new UserDto("507f1f77bcf86cd799439012", "Frank Green", "frank@example.com");
 		var original = new IssueDto(
 			ObjectId.GenerateNewId(),
 			"Original DTO",
 			"Original DTO description",
 			new DateTime(2026, 4, 1, 0, 0, 0, DateTimeKind.Utc),
+			new DateTime(2026, 4, 5, 0, 0, 0, DateTimeKind.Utc),
 			author,
 			category,
 			status,
 			true,
 			archivedBy,
-			new DateTime(2026, 4, 5, 0, 0, 0, DateTimeKind.Utc));
+			false,
+			false);
 
 		// Act
 		var model = original.ToModel();

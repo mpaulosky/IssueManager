@@ -7,12 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using Api.Data;
-
-using Shared.DTOs;
-using Shared.Mappers;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Statuses;
 
 /// <summary>
 /// Handler for listing all statuses.
@@ -40,10 +35,10 @@ public class ListStatusesHandler
 	/// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of all statuses as <see cref="StatusDto"/> objects.</returns>
 	public async Task<IEnumerable<StatusDto>> Handle(CancellationToken cancellationToken = default)
 	{
-		var result = await _repository.GetAllAsync();
+		var result = await _repository.GetAllAsync(cancellationToken);
 		if (result.Failure)
 			return Enumerable.Empty<StatusDto>();
 
-		return result.Value?.Select(s => s.ToDto()) ?? Enumerable.Empty<StatusDto>();
+		return result.Value ?? Enumerable.Empty<StatusDto>();
 	}
 }

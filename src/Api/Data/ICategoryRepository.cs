@@ -7,10 +7,6 @@
 // Project Name :  Shared
 // =============================================
 
-using MongoDB.Bson;
-using Shared.Abstractions;
-using Shared.Models;
-
 namespace Api.Data;
 
 /// <summary>
@@ -20,48 +16,41 @@ public interface ICategoryRepository
 {
 
 	/// <summary>
-	/// Archives a category by marking it as inactive in the data store.
+	/// Soft-deletes a category by setting Archived to true.
 	/// </summary>
-	/// <param name="category">The category to archive.</param>
-	/// <returns>A task representing the asynchronous operation.</returns>
-	/// <exception cref="ArgumentNullException">Thrown when <paramref name="category"/> is null.</exception>
-	Task<Result> ArchiveAsync(Category category);
+	Task<Result> ArchiveAsync(ObjectId categoryId, CancellationToken cancellationToken = default);
 
 	/// <summary>
-	/// Creates a new category in the data store.
+	/// Creates a new category in the database.
 	/// </summary>
-	/// <param name="category">The category to create.</param>
-	/// <returns>A task representing the asynchronous operation.</returns>
-	/// <exception cref="ArgumentNullException">Thrown when <paramref name="category"/> is null.</exception>
-	Task<Result> CreateAsync(Category category);
+	Task<Result<CategoryDto>> CreateAsync(CategoryDto category, CancellationToken cancellationToken = default);
 
 	/// <summary>
-	/// Retrieves a specific category from the data store by its unique identifier.
+	/// Gets a category by its unique identifier.
 	/// </summary>
-	/// <param name="itemId">The unique identifier of the category.</param>
-	/// <returns>
-	/// A task that represents the asynchronous operation.
-	/// The task result contains the requested <see cref="Category"/>.
-	/// </returns>
-	/// <exception cref="ArgumentException">Thrown when <paramref name="itemId"/> is null or empty.</exception>
-	Task<Result<Category>> GetAsync(ObjectId itemId);
+	Task<Result<CategoryDto>> GetByIdAsync(ObjectId categoryId, CancellationToken cancellationToken = default);
 
 	/// <summary>
-	/// Retrieves all categories from the data store.
+	/// Gets all categories from the database.
 	/// </summary>
-	/// <returns>
-	/// A task that represents the asynchronous operation.
-	/// The task result contains an enumerable collection of all <see cref="Category"/> instances.
-	/// </returns>
-	Task<Result<IEnumerable<Category>>> GetAllAsync();
+	Task<Result<IReadOnlyList<CategoryDto>>> GetAllAsync(CancellationToken cancellationToken = default);
 
 	/// <summary>
-	/// Updates an existing category in the data store.
+	/// Gets paginated categories from the database, excluding archived categories by default.
 	/// </summary>
-	/// <param name="itemId">The unique identifier of the category to update.</param>
-	/// <param name="category">The updated category data.</param>
-	/// <returns>A task representing the asynchronous operation.</returns>
-	/// <exception cref="ArgumentException">Thrown when <paramref name="itemId"/> is null or empty.</exception>
-	/// <exception cref="ArgumentNullException">Thrown when <paramref name="category"/> is null.</exception>
-	Task<Result> UpdateAsync(ObjectId itemId, Category category);
+	Task<Result<(IReadOnlyList<CategoryDto> Items, long Total)>> GetAllAsync(
+			int page,
+			int pageSize,
+			CancellationToken cancellationToken = default);
+
+	/// <summary>
+	/// Updates an existing category in the database.
+	/// </summary>
+	Task<Result<CategoryDto>> UpdateAsync(CategoryDto category, CancellationToken cancellationToken = default);
+
+	/// <summary>
+	/// Counts the total number of categories in the database.
+	/// </summary>
+	Task<Result<long>> CountAsync(CancellationToken cancellationToken = default);
+
 }

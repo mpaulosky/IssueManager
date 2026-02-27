@@ -10,8 +10,10 @@
 using FluentAssertions;
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Categories;
+
 using Shared.Abstractions;
-using Shared.Models;
+using Shared.DTOs;
 using MongoDB.Bson;
 using NSubstitute;
 
@@ -36,16 +38,10 @@ public class GetCategoryHandlerTests
 	{
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
-		var category = new Category
-		{
-			Id = categoryId,
-			CategoryName = "Bug",
-			CategoryDescription = "Bug reports",
-			DateCreated = DateTime.UtcNow
-		};
+		var category = new CategoryDto(categoryId, "Bug", "Bug reports", DateTime.UtcNow, null, false, UserDto.Empty);
 
-		_repository.GetAsync(categoryId)
-			.Returns(Result<Category>.Ok(category));
+		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Ok(category));
 
 		var query = new GetCategoryQuery(categoryId.ToString());
 
@@ -56,7 +52,7 @@ public class GetCategoryHandlerTests
 		result.Should().NotBeNull();
 		result!.CategoryName.Should().Be("Bug");
 		result.CategoryDescription.Should().Be("Bug reports");
-		await _repository.Received(1).GetAsync(categoryId);
+		await _repository.Received(1).GetByIdAsync(categoryId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -64,8 +60,8 @@ public class GetCategoryHandlerTests
 	{
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
-		_repository.GetAsync(categoryId)
-			.Returns(Result<Category>.Fail("Not found"));
+		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Fail("Not found"));
 
 		var query = new GetCategoryQuery(categoryId.ToString());
 
@@ -115,7 +111,7 @@ public class GetCategoryHandlerTests
 
 		// Assert
 		result.Should().BeNull();
-		await _repository.DidNotReceive().GetAsync(Arg.Any<ObjectId>());
+		await _repository.DidNotReceive().GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -124,15 +120,10 @@ public class GetCategoryHandlerTests
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
 		var cancellationToken = new CancellationToken();
-		var category = new Category
-		{
-			Id = categoryId,
-			CategoryName = "Feature",
-			CategoryDescription = "Feature requests"
-		};
+		var category = new CategoryDto(categoryId, "Feature", "Feature requests", DateTime.UtcNow, null, false, UserDto.Empty);
 
-		_repository.GetAsync(categoryId)
-			.Returns(Result<Category>.Ok(category));
+		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Ok(category));
 
 		var query = new GetCategoryQuery(categoryId.ToString());
 
@@ -140,6 +131,6 @@ public class GetCategoryHandlerTests
 		await _handler.Handle(query, cancellationToken);
 
 		// Assert
-		await _repository.Received(1).GetAsync(categoryId);
+		await _repository.Received(1).GetByIdAsync(categoryId, Arg.Any<CancellationToken>());
 	}
 }

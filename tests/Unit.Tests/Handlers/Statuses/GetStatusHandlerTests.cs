@@ -10,8 +10,10 @@
 using FluentAssertions;
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Statuses;
+
 using Shared.Abstractions;
-using Shared.Models;
+using Shared.DTOs;
 using MongoDB.Bson;
 using NSubstitute;
 
@@ -36,16 +38,10 @@ public class GetStatusHandlerTests
 	{
 		// Arrange
 		var statusId = ObjectId.GenerateNewId();
-		var status = new Status
-		{
-			Id = statusId,
-			StatusName = "Open",
-			StatusDescription = "Issue is open",
-			DateCreated = DateTime.UtcNow
-		};
 
-		_repository.GetAsync(statusId)
-			.Returns(Result<Status>.Ok(status));
+		_repository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
+			.Returns(Result<StatusDto>.Ok(new StatusDto(
+				statusId, "Open", "Issue is open", DateTime.UtcNow, null, false, UserDto.Empty)));
 
 		var query = new GetStatusQuery(statusId.ToString());
 
@@ -56,7 +52,7 @@ public class GetStatusHandlerTests
 		result.Should().NotBeNull();
 		result!.StatusName.Should().Be("Open");
 		result.StatusDescription.Should().Be("Issue is open");
-		await _repository.Received(1).GetAsync(statusId);
+		await _repository.Received(1).GetByIdAsync(statusId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -64,8 +60,8 @@ public class GetStatusHandlerTests
 	{
 		// Arrange
 		var statusId = ObjectId.GenerateNewId();
-		_repository.GetAsync(statusId)
-			.Returns(Result<Status>.Fail("Not found"));
+		_repository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
+			.Returns(Result<StatusDto>.Fail("Not found"));
 
 		var query = new GetStatusQuery(statusId.ToString());
 
@@ -115,7 +111,7 @@ public class GetStatusHandlerTests
 
 		// Assert
 		result.Should().BeNull();
-		await _repository.DidNotReceive().GetAsync(Arg.Any<ObjectId>());
+		await _repository.DidNotReceive().GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -124,15 +120,10 @@ public class GetStatusHandlerTests
 		// Arrange
 		var statusId = ObjectId.GenerateNewId();
 		var cancellationToken = new CancellationToken();
-		var status = new Status
-		{
-			Id = statusId,
-			StatusName = "Closed",
-			StatusDescription = "Issue is closed"
-		};
 
-		_repository.GetAsync(statusId)
-			.Returns(Result<Status>.Ok(status));
+		_repository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
+			.Returns(Result<StatusDto>.Ok(new StatusDto(
+				statusId, "Closed", "Issue is closed", DateTime.UtcNow, null, false, UserDto.Empty)));
 
 		var query = new GetStatusQuery(statusId.ToString());
 
@@ -140,6 +131,6 @@ public class GetStatusHandlerTests
 		await _handler.Handle(query, cancellationToken);
 
 		// Assert
-		await _repository.Received(1).GetAsync(statusId);
+		await _repository.Received(1).GetByIdAsync(statusId, Arg.Any<CancellationToken>());
 	}
 }

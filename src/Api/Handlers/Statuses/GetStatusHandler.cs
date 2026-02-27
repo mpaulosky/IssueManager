@@ -7,12 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using Api.Data;
-
-using Shared.DTOs;
-using Shared.Mappers;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Statuses;
 
 /// <summary>
 /// Query for retrieving a single status.
@@ -54,7 +49,7 @@ public class GetStatusHandler
 		if (!MongoDB.Bson.ObjectId.TryParse(query.StatusId, out var objectId))
 			return null;
 
-		var result = await _repository.GetAsync(objectId);
-		return result.Success ? result.Value?.ToDto() : null;
+		var result = await _repository.GetByIdAsync(objectId, cancellationToken);
+		return result.Success ? result.Value : null;
 	}
 }

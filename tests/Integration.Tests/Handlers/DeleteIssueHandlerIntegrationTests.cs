@@ -1,13 +1,9 @@
-using FluentAssertions;
-using Api.Data;
-using Api.Handlers;
-using MongoDB.Bson;
-using Shared.DTOs;
+using Api.Handlers.Issues;
+
 using Shared.Exceptions;
 using Shared.Validators;
-using Testcontainers.MongoDb;
 
-namespace Tests.Integration.Handlers;
+namespace Integration.Handlers;
 
 /// <summary>
 /// Integration tests for DeleteIssueHandler (soft-delete via Archived) with real MongoDB database.
@@ -15,19 +11,14 @@ namespace Tests.Integration.Handlers;
 [Collection("Integration")]
 public class DeleteIssueHandlerIntegrationTests : IAsyncLifetime
 {
-private const string MONGODB_IMAGE = "mongo:8.0";
-private const string TEST_DATABASE = "IssueManagerTestDb";
-private readonly MongoDbContainer _mongoContainer;
+private const string MongodbImage = "mongo:8.2";
+private const string TestDatabase = "IssueManagerTestDb";
+private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder()
+		.WithImage(MongodbImage)
+		.Build();
 
 private IIssueRepository _repository = null!;
 private DeleteIssueHandler _handler = null!;
-
-public DeleteIssueHandlerIntegrationTests()
-{
-_mongoContainer = new MongoDbBuilder()
-.WithImage(MONGODB_IMAGE)
-.Build();
-}
 
 /// <summary>
 /// Initializes the test container and repository.
@@ -36,7 +27,7 @@ public async Task InitializeAsync()
 {
 await _mongoContainer.StartAsync();
 var connectionString = _mongoContainer.GetConnectionString();
-_repository = new IssueRepository(connectionString, TEST_DATABASE);
+_repository = new IssueRepository(connectionString, TestDatabase);
 _handler = new DeleteIssueHandler(_repository, new DeleteIssueValidator());
 }
 
@@ -50,7 +41,7 @@ await _mongoContainer.DisposeAsync();
 }
 
 private static IssueDto CreateTestIssueDto(string title, string description, bool archived = false) =>
-new(ObjectId.GenerateNewId(), title, description, DateTime.UtcNow, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty, archived);
+new(ObjectId.GenerateNewId(), title, description, DateTime.UtcNow, null, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty, archived, UserDto.Empty, false, false);
 
 [Fact]
 public async Task Handle_ValidIssue_SetsArchivedInDatabase()
@@ -59,15 +50,16 @@ public async Task Handle_ValidIssue_SetsArchivedInDatabase()
 var issue = CreateTestIssueDto("Issue to Delete", "This will be archived");
 var created = await _repository.CreateAsync(issue);
 
-var command = new DeleteIssueCommand { Id = created.Id.ToString() };
+var command = new DeleteIssueCommand { Id = created.Value.Id.ToString() };
 
 // Act
 await _handler.Handle(command, CancellationToken.None);
 
 // Assert - Verify Archived is set in database
-var dbIssue = await _repository.GetByIdAsync(created.Id.ToString());
-dbIssue.Should().NotBeNull();
-dbIssue!.Archived.Should().BeTrue();
+var getResult = await _repository.GetByIdAsync(created.Value.Id);
+getResult.Should().NotBeNull();
+var dbIssue = getResult.Value;
+dbIssue.Archived.Should().BeTrue();
 }
 
 [Fact]
@@ -77,14 +69,15 @@ public async Task Handle_ArchivedIssue_ExcludedFromListByDefault()
 var issue = CreateTestIssueDto("Issue to Archive", "Test");
 var created = await _repository.CreateAsync(issue);
 
-var command = new DeleteIssueCommand { Id = created.Id.ToString() };
+var command = new DeleteIssueCommand { Id = created.Value.Id.ToString() };
 
 // Act - Archive the issue
 await _handler.Handle(command, CancellationToken.None);
 
 // Assert - GetAll (paginated) should exclude archived issues
-var (allIssues, _) = await _repository.GetAllAsync(1, 100);
-allIssues.Should().NotContain(i => i.Id == created.Id);
+var result = await _repository.GetAllAsync(1, 100);
+var allIssues = result.Value.Items;
+allIssues.Should().NotContain(i => i.Id == created.Value.Id);
 }
 
 [Fact]
@@ -108,16 +101,18 @@ public async Task Handle_IssueNotDeleted_RecordStillExists()
 var issue = CreateTestIssueDto("Issue to Archive", "Should still exist in DB");
 var created = await _repository.CreateAsync(issue);
 
-var command = new DeleteIssueCommand { Id = created.Id.ToString() };
+var command = new DeleteIssueCommand { Id = created.Value.Id.ToString() };
 
 // Act - Soft delete
 await _handler.Handle(command, CancellationToken.None);
 
 // Assert - Record should still exist (soft delete)
-var dbIssue = await _repository.GetByIdAsync(created.Id.ToString());
-dbIssue.Should().NotBeNull();
-dbIssue!.Id.Should().Be(created.Id);
-dbIssue.Archived.Should().BeTrue();
+var dbIssue = await _repository.GetByIdAsync(created.Value.Id);
+var getResult = dbIssue;
+getResult.Should().NotBeNull();
+var dto = getResult.Value;
+dto.Id.Should().Be(created.Value.Id);
+dto.Archived.Should().BeTrue();
 }
 
 [Fact]
@@ -127,15 +122,16 @@ public async Task Handle_AlreadyArchivedIssue_IsIdempotent()
 var archivedIssue = CreateTestIssueDto("Already Archived", "Already archived", archived: true);
 var created = await _repository.CreateAsync(archivedIssue);
 
-var command = new DeleteIssueCommand { Id = created.Id.ToString() };
+var command = new DeleteIssueCommand { Id = created.Value.Id.ToString() };
 
 // Act - Delete already archived issue (should be idempotent)
 await _handler.Handle(command, CancellationToken.None);
 
 // Assert - Should still be archived
-var dbIssue = await _repository.GetByIdAsync(created.Id.ToString());
-dbIssue.Should().NotBeNull();
-dbIssue!.Archived.Should().BeTrue();
+var dbIssueResult = await _repository.GetByIdAsync(created.Value.Id);
+dbIssueResult.Should().NotBeNull();
+var dbIssue = dbIssueResult.Value;
+dbIssue.Archived.Should().BeTrue();
 }
 
 [Fact]
@@ -148,16 +144,20 @@ var issue2 = CreateTestIssueDto("Issue 2", "Should remain active");
 var created1 = await _repository.CreateAsync(issue1);
 var created2 = await _repository.CreateAsync(issue2);
 
-var command = new DeleteIssueCommand { Id = created1.Id.ToString() };
+var command = new DeleteIssueCommand { Id = created1.Value.Id.ToString() };
 
 // Act
 await _handler.Handle(command, CancellationToken.None);
 
 // Assert
-var dbIssue1 = await _repository.GetByIdAsync(created1.Id.ToString());
-var dbIssue2 = await _repository.GetByIdAsync(created2.Id.ToString());
+var getResult1 = await _repository.GetByIdAsync(created1.Value.Id);
+var getResult2 = await _repository.GetByIdAsync(created2.Value.Id);
 
-dbIssue1!.Archived.Should().BeTrue();
-dbIssue2!.Archived.Should().BeFalse();
+getResult1.Should().NotBeNull();
+
+var dto = getResult1.Value;
+
+dto.Archived.Should().BeTrue();
+getResult2.Value.Archived.Should().BeFalse();
 }
 }

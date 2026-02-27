@@ -9,8 +9,11 @@
 
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Comments;
+
 using MongoDB.Bson;
 using Shared.Abstractions;
+using Shared.DTOs;
 using Shared.Validators;
 
 namespace Tests.Unit.Handlers.Comments;
@@ -43,8 +46,8 @@ public class CreateCommentHandlerTests
 			IssueId = issueId
 		};
 
-		_repository.CreateAsync(Arg.Any<Shared.Models.Comment>())
-			.Returns(Result.Ok());
+		_repository.CreateAsync(Arg.Any<CommentDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result<CommentDto>.Ok(CommentDto.Empty with { Title = command.Title, Description = command.CommentText }));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
@@ -53,9 +56,9 @@ public class CreateCommentHandlerTests
 		result.Should().NotBeNull();
 		result.Title.Should().Be(command.Title);
 		result.Description.Should().Be(command.CommentText);
-		await _repository.Received(1).CreateAsync(Arg.Is<Shared.Models.Comment>(c =>
+		await _repository.Received(1).CreateAsync(Arg.Is<CommentDto>(c =>
 			c.Title == command.Title &&
-			c.Description == command.CommentText));
+			c.Description == command.CommentText), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -145,8 +148,8 @@ public class CreateCommentHandlerTests
 			IssueId = ObjectId.GenerateNewId().ToString()
 		};
 
-		_repository.CreateAsync(Arg.Any<Shared.Models.Comment>())
-			.Returns(Result.Fail("Database error"));
+		_repository.CreateAsync(Arg.Any<CommentDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result<CommentDto>.Fail("Database error"));
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
@@ -168,13 +171,13 @@ public class CreateCommentHandlerTests
 			IssueId = ObjectId.GenerateNewId().ToString()
 		};
 
-		_repository.CreateAsync(Arg.Any<Shared.Models.Comment>())
-			.Returns(Result.Ok());
+		_repository.CreateAsync(Arg.Any<CommentDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result<CommentDto>.Ok(CommentDto.Empty));
 
 		// Act
 		await _handler.Handle(command, cancellationToken);
 
 		// Assert
-		await _repository.Received(1).CreateAsync(Arg.Any<Shared.Models.Comment>());
+		await _repository.Received(1).CreateAsync(Arg.Any<CommentDto>(), Arg.Any<CancellationToken>());
 	}
 }

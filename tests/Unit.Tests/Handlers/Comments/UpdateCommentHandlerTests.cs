@@ -9,10 +9,12 @@
 
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Comments;
+
 using MongoDB.Bson;
 using Shared.Abstractions;
+using Shared.DTOs;
 using Shared.Exceptions;
-using Shared.Models;
 using Shared.Validators;
 
 namespace Tests.Unit.Handlers.Comments;
@@ -38,12 +40,8 @@ public class UpdateCommentHandlerTests
 	{
 		// Arrange
 		var commentId = ObjectId.GenerateNewId();
-		var existingComment = new Comment
-		{
-			Id = commentId,
-			Title = "Old Title",
-			Description = "Old comment text."
-		};
+		var existingCommentDto = CommentDto.Empty with { Id = commentId, Title = "Old Title", Description = "Old comment text." };
+		var updatedCommentDto = CommentDto.Empty with { Id = commentId, Title = "Updated Title", Description = "Updated comment text." };
 
 		var command = new UpdateCommentCommand
 		{
@@ -52,11 +50,11 @@ public class UpdateCommentHandlerTests
 			CommentText = "Updated comment text."
 		};
 
-		_repository.GetAsync(commentId)
-			.Returns(Result<Comment>.Ok(existingComment));
+		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
+			.Returns(Result<CommentDto>.Ok(existingCommentDto));
 
-		_repository.UpdateAsync(commentId, Arg.Any<Comment>())
-			.Returns(Result.Ok());
+		_repository.UpdateAsync(Arg.Any<CommentDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result<CommentDto>.Ok(updatedCommentDto));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
@@ -64,8 +62,8 @@ public class UpdateCommentHandlerTests
 		// Assert
 		result.Should().NotBeNull();
 		result.Title.Should().Be("Updated Title");
-		await _repository.Received(1).UpdateAsync(commentId, Arg.Is<Comment>(c =>
-			c.Title == command.Title));
+		await _repository.Received(1).UpdateAsync(Arg.Is<CommentDto>(c =>
+			c.Title == command.Title), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -137,8 +135,8 @@ public class UpdateCommentHandlerTests
 			CommentText = "Updated comment text."
 		};
 
-		_repository.GetAsync(commentId)
-			.Returns(Result<Comment>.Fail("Not found"));
+		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
+			.Returns(Result<CommentDto>.Fail("Not found"));
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
@@ -171,12 +169,7 @@ public class UpdateCommentHandlerTests
 	{
 		// Arrange
 		var commentId = ObjectId.GenerateNewId();
-		var existingComment = new Comment
-		{
-			Id = commentId,
-			Title = "Old Title",
-			Description = "Old comment text."
-		};
+		var existingCommentDto = CommentDto.Empty with { Id = commentId, Title = "Old Title", Description = "Old comment text." };
 
 		var command = new UpdateCommentCommand
 		{
@@ -185,11 +178,11 @@ public class UpdateCommentHandlerTests
 			CommentText = "Updated comment text."
 		};
 
-		_repository.GetAsync(commentId)
-			.Returns(Result<Comment>.Ok(existingComment));
+		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
+			.Returns(Result<CommentDto>.Ok(existingCommentDto));
 
-		_repository.UpdateAsync(commentId, Arg.Any<Comment>())
-			.Returns(Result.Fail("Update failed"));
+		_repository.UpdateAsync(Arg.Any<CommentDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result<CommentDto>.Fail("Update failed"));
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);

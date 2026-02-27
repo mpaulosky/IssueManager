@@ -1,7 +1,6 @@
-using MongoDB.Bson;
-using Shared.DTOs;
+using Api.Handlers.Issues;
 
-namespace Tests.Integration.Handlers;
+namespace Integration.Handlers;
 
 /// <summary>
 /// Integration tests for GetIssueHandler with real MongoDB database.
@@ -9,19 +8,14 @@ namespace Tests.Integration.Handlers;
 [Collection("Integration")]
 public class GetIssueHandlerTests : IAsyncLifetime
 {
-	private const string MONGODB_IMAGE = "mongo:8.0";
-	private const string TEST_DATABASE = "IssueManagerTestDb";
-	private readonly MongoDbContainer _mongoContainer;
+	private const string MongodbImage = "mongo:8.2";
+	private const string TestDatabase = "IssueManagerTestDb";
+	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder()
+			.WithImage(MongodbImage)
+			.Build();
 
 	private IIssueRepository _repository = null!;
 	private GetIssueHandler _handler = null!;
-
-	public GetIssueHandlerTests()
-	{
-		_mongoContainer = new MongoDbBuilder()
-			.WithImage(MONGODB_IMAGE)
-			.Build();
-	}
 
 	/// <summary>
 	/// Initializes the test container and repository.
@@ -30,7 +24,7 @@ public class GetIssueHandlerTests : IAsyncLifetime
 	{
 		await _mongoContainer.StartAsync();
 		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new IssueRepository(connectionString, TEST_DATABASE);
+		_repository = new IssueRepository(connectionString, TestDatabase);
 		_handler = new GetIssueHandler(_repository);
 	}
 
@@ -44,7 +38,7 @@ public class GetIssueHandlerTests : IAsyncLifetime
 	}
 
 	private static IssueDto CreateTestIssueDto(string title, string description) =>
-		new(ObjectId.GenerateNewId(), title, description, DateTime.UtcNow, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty);
+		new(ObjectId.GenerateNewId(), title, description, DateTime.UtcNow, null, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty, false, UserDto.Empty, false, false);
 
 	[Fact]
 	public async Task Handle_ExistingIssueId_ReturnsIssue()
@@ -52,14 +46,14 @@ public class GetIssueHandlerTests : IAsyncLifetime
 		// Arrange
 		var issue = CreateTestIssueDto("Test Issue", "Test Description");
 		var created = await _repository.CreateAsync(issue);
-		var query = new GetIssueQuery(created.Id.ToString());
+		var query = new GetIssueQuery(created.Value.Id.ToString());
 
 		// Act
 		var result = await _handler.Handle(query);
 
 		// Assert
 		result.Should().NotBeNull();
-		result!.Id.Should().Be(created.Id);
+		result!.Id.Should().Be(created.Value.Id);
 		result.Title.Should().Be("Test Issue");
 		result.Description.Should().Be("Test Description");
 	}

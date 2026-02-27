@@ -18,19 +18,46 @@ public record IssueDto(
 	string Title,
 	string Description,
 	DateTime DateCreated,
+	DateTime? DateModified,
 	UserDto Author,
 	CategoryDto Category,
 	StatusDto Status,
-	bool Archived = false,
-	UserDto? ArchivedBy = null,
-	DateTime? DateModified = null)
+	bool Archived,
+	UserDto ArchivedBy,
+	bool ApprovedForRelease,
+	bool Rejected)
 {
+	/// <summary>
+	///   Initializes a new instance of the <see cref="IssueDto" /> record.
+	/// </summary>
+	/// <param name="issue">The issue.</param>
+	public IssueDto(Issue issue) : this(
+		issue.Id,
+		issue.Title,
+		issue.Description,
+		issue.DateCreated,
+		issue.DateModified,
+		issue.Author,
+		issue.Category,
+		issue.Status,
+		issue.Archived,
+		issue.ArchivedBy,
+		issue.ApprovedForRelease,
+		issue.Rejected)
+	{
+	}
+
 	public static IssueDto Empty => new(
 		ObjectId.Empty,
 		string.Empty,
 		string.Empty,
 		DateTime.UtcNow,
+		null,
 		UserDto.Empty,
 		CategoryDto.Empty,
-		StatusDto.Empty);
+		StatusDto.Empty,
+		false,
+		UserDto.Empty,
+		false,
+		false);
 }

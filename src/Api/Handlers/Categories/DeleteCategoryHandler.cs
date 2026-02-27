@@ -7,14 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using Api.Data;
-
-using FluentValidation;
-
-using Shared.Exceptions;
-using Shared.Validators;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Categories;
 
 /// <summary>
 /// Handler for deleting (soft-deleting/archiving) categories.
@@ -59,14 +52,14 @@ public class DeleteCategoryHandler
 		if (!MongoDB.Bson.ObjectId.TryParse(command.Id, out var objectId))
 			throw new NotFoundException($"Category with ID '{command.Id}' was not found.");
 
-		var getResult = await _repository.GetAsync(objectId);
+		var getResult = await _repository.GetByIdAsync(objectId, cancellationToken);
 		if (getResult.Failure || getResult.Value is null)
 			throw new NotFoundException($"Category with ID '{command.Id}' was not found.");
 
 		if (getResult.Value.Archived)
 			return true;
 
-		var archiveResult = await _repository.ArchiveAsync(getResult.Value);
+		var archiveResult = await _repository.ArchiveAsync(objectId, cancellationToken);
 		return archiveResult.Success;
 	}
 }

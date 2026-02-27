@@ -1,6 +1,9 @@
 using FluentAssertions;
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Issues;
+
+using Shared.Abstractions;
 using Shared.DTOs;
 using Shared.Exceptions;
 using Shared.Validators;
@@ -35,9 +38,14 @@ public class UpdateIssueHandlerTests
 			"Original Title",
 			"Original Description",
 			DateTime.UtcNow.AddDays(-1),
+			null,
 			UserDto.Empty,
 			CategoryDto.Empty,
-			StatusDto.Empty);
+			StatusDto.Empty,
+			false,
+			UserDto.Empty,
+			false,
+			false);
 
 		var command = new UpdateIssueCommand
 		{
@@ -46,8 +54,8 @@ public class UpdateIssueHandlerTests
 			Description = "Updated Description"
 		};
 
-		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
-			.Returns(existingIssue);
+		_repository.GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>())
+			.Returns(Result<IssueDto>.Ok(existingIssue));
 
 		var updatedIssue = existingIssue with
 		{
@@ -56,7 +64,7 @@ public class UpdateIssueHandlerTests
 		};
 
 		_repository.UpdateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>())
-			.Returns(updatedIssue);
+			.Returns(Result<IssueDto>.Ok(updatedIssue));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
@@ -66,10 +74,10 @@ public class UpdateIssueHandlerTests
 		result.Title.Should().Be("Updated Title");
 		result.Description.Should().Be("Updated Description");
 
-		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
+		await _repository.Received(1).GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>());
 		await _repository.Received(1).UpdateAsync(Arg.Is<IssueDto>(i =>
-			i.Title == command.Title &&
-			i.Description == command.Description), Arg.Any<CancellationToken>());
+				i.Title == command.Title &&
+				i.Description == command.Description), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -141,8 +149,8 @@ public class UpdateIssueHandlerTests
 			Description = "Updated Description"
 		};
 
-		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
-			.Returns((IssueDto?)null);
+		_repository.GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>())
+			.Returns(Result<IssueDto>.Fail("Not found"));
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
@@ -162,10 +170,14 @@ public class UpdateIssueHandlerTests
 			"Archived Issue",
 			"This is archived",
 			DateTime.UtcNow.AddDays(-1),
+			null,
 			UserDto.Empty,
 			CategoryDto.Empty,
 			StatusDto.Empty,
-			Archived: true);
+			true,
+			UserDto.Empty,
+			false,
+			false);
 
 		var command = new UpdateIssueCommand
 		{
@@ -174,8 +186,8 @@ public class UpdateIssueHandlerTests
 			Description = "Updated Description"
 		};
 
-		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
-			.Returns(archivedIssue);
+		_repository.GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>())
+			.Returns(Result<IssueDto>.Ok(archivedIssue));
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
@@ -195,9 +207,14 @@ public class UpdateIssueHandlerTests
 			"Same Title",
 			"Same Description",
 			DateTime.UtcNow.AddDays(-1),
+			null,
 			UserDto.Empty,
 			CategoryDto.Empty,
-			StatusDto.Empty);
+			StatusDto.Empty,
+			false,
+			UserDto.Empty,
+			false,
+			false);
 
 		var command = new UpdateIssueCommand
 		{
@@ -206,13 +223,13 @@ public class UpdateIssueHandlerTests
 			Description = "Same Description"
 		};
 
-		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
-			.Returns(existingIssue);
+		_repository.GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>())
+			.Returns(Result<IssueDto>.Ok(existingIssue));
 
 		var updatedIssue = existingIssue with { };
 
 		_repository.UpdateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>())
-			.Returns(updatedIssue);
+			.Returns(Result<IssueDto>.Ok(updatedIssue));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
@@ -232,9 +249,14 @@ public class UpdateIssueHandlerTests
 			"Original Title",
 			"Original Description",
 			DateTime.UtcNow.AddDays(-1),
+			null,
 			UserDto.Empty,
 			CategoryDto.Empty,
-			StatusDto.Empty);
+			StatusDto.Empty,
+			false,
+			UserDto.Empty,
+			false,
+			false);
 
 		var command = new UpdateIssueCommand
 		{
@@ -243,8 +265,8 @@ public class UpdateIssueHandlerTests
 			Description = null
 		};
 
-		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
-			.Returns(existingIssue);
+		_repository.GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>())
+			.Returns(Result<IssueDto>.Ok(existingIssue));
 
 		var updatedIssue = existingIssue with
 		{
@@ -253,7 +275,7 @@ public class UpdateIssueHandlerTests
 		};
 
 		_repository.UpdateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>())
-			.Returns(updatedIssue);
+			.Returns(Result<IssueDto>.Ok(updatedIssue));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);

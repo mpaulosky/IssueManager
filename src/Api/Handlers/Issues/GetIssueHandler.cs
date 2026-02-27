@@ -7,10 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using Api.Data;
-using Shared.DTOs;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Issues;
 
 /// <summary>
 /// Query for retrieving a single issue.
@@ -40,7 +37,11 @@ public class GetIssueHandler
 		if (string.IsNullOrWhiteSpace(query.IssueId))
 			throw new ArgumentException("Issue ID cannot be empty.", nameof(query.IssueId));
 
-		return await _repository.GetByIdAsync(query.IssueId, cancellationToken);
+		if (!ObjectId.TryParse(query.IssueId, out var issueId))
+			return null;
+
+		var result = await _repository.GetByIdAsync(issueId, cancellationToken);
+		return result.Success ? result.Value : null;
 	}
 
 	/// <summary>
@@ -48,6 +49,7 @@ public class GetIssueHandler
 	/// </summary>
 	public async Task<IReadOnlyList<IssueDto>> HandleGetAll(CancellationToken cancellationToken = default)
 	{
-		return await _repository.GetAllAsync(cancellationToken);
+		var result = await _repository.GetAllAsync(cancellationToken);
+		return result.Value;
 	}
 }

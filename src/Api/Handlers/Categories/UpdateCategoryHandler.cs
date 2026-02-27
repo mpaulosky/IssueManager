@@ -7,16 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using Api.Data;
-
-using FluentValidation;
-
-using Shared.DTOs;
-using Shared.Exceptions;
-using Shared.Mappers;
-using Shared.Validators;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Categories;
 
 /// <summary>
 /// Handler for updating existing categories.
@@ -61,18 +52,20 @@ public class UpdateCategoryHandler
 		if (!MongoDB.Bson.ObjectId.TryParse(command.Id, out var objectId))
 			throw new NotFoundException($"Category with ID '{command.Id}' was not found.");
 
-		var getResult = await _repository.GetAsync(objectId);
-		if (getResult.Failure || getResult.Value is null)
+		var getResult = await _repository.GetByIdAsync(objectId, cancellationToken);
+		if (!getResult.Success || getResult.Value is null)
 			throw new NotFoundException($"Category with ID '{command.Id}' was not found.");
 
-		var category = getResult.Value;
-		category.CategoryName = command.CategoryName;
-		category.CategoryDescription = command.CategoryDescription ?? string.Empty;
+		var updatedCategory = getResult.Value with
+		{
+			CategoryName = command.CategoryName,
+			CategoryDescription = command.CategoryDescription ?? string.Empty
+		};
 
-		var updateResult = await _repository.UpdateAsync(objectId, category);
-		if (updateResult.Failure)
+		var updateResult = await _repository.UpdateAsync(updatedCategory, cancellationToken);
+		if (!updateResult.Success)
 			throw new NotFoundException($"Category with ID '{command.Id}' could not be updated.");
 
-		return category.ToDto();
+		return updateResult.Value;
 	}
 }

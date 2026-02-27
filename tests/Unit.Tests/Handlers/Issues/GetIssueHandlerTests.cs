@@ -10,6 +10,9 @@
 using FluentAssertions;
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Issues;
+
+using Shared.Abstractions;
 using Shared.DTOs;
 using MongoDB.Bson;
 using NSubstitute;
@@ -41,8 +44,8 @@ public class GetIssueHandlerTests
 			.WithTitle("Test Issue")
 			.Build();
 
-		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
-			.Returns(expectedIssue);
+		_repository.GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>())
+			.Returns(Result.Ok(expectedIssue));
 
 		var query = new GetIssueQuery(issueId);
 
@@ -53,7 +56,7 @@ public class GetIssueHandlerTests
 		result.Should().NotBeNull();
 		result!.Id.ToString().Should().Be(issueId);
 		result.Title.Should().Be("Test Issue");
-		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
+		await _repository.Received(1).GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -61,8 +64,8 @@ public class GetIssueHandlerTests
 	{
 		// Arrange
 		var issueId = ObjectId.GenerateNewId().ToString();
-		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
-			.Returns((IssueDto?)null);
+		_repository.GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>())
+			.Returns(Result.Fail<IssueDto>("Not found"));
 
 		var query = new GetIssueQuery(issueId);
 
@@ -71,7 +74,7 @@ public class GetIssueHandlerTests
 
 		// Assert
 		result.Should().BeNull();
-		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
+		await _repository.Received(1).GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -110,8 +113,8 @@ public class GetIssueHandlerTests
 		var cancellationToken = new CancellationToken();
 		var expectedIssue = IssueBuilder.Default().WithId(issueId).Build();
 
-		_repository.GetByIdAsync(issueId, cancellationToken)
-			.Returns(expectedIssue);
+		_repository.GetByIdAsync(ObjectId.Parse(issueId), cancellationToken)
+			.Returns(Result.Ok(expectedIssue));
 
 		var query = new GetIssueQuery(issueId);
 
@@ -119,7 +122,7 @@ public class GetIssueHandlerTests
 		await _handler.Handle(query, cancellationToken);
 
 		// Assert
-		await _repository.Received(1).GetByIdAsync(issueId, cancellationToken);
+		await _repository.Received(1).GetByIdAsync(ObjectId.Parse(issueId), cancellationToken);
 	}
 
 	[Fact]
@@ -134,7 +137,7 @@ public class GetIssueHandlerTests
 		};
 
 		_repository.GetAllAsync(Arg.Any<CancellationToken>())
-			.Returns(issues);
+			.Returns(Result.Ok<IReadOnlyList<IssueDto>>(issues.AsReadOnly()));
 
 		// Act
 		var result = await _handler.HandleGetAll(CancellationToken.None);
@@ -151,7 +154,7 @@ public class GetIssueHandlerTests
 	{
 		// Arrange
 		_repository.GetAllAsync(Arg.Any<CancellationToken>())
-			.Returns(new List<IssueDto>());
+			.Returns(Result.Ok<IReadOnlyList<IssueDto>>(new List<IssueDto>().AsReadOnly()));
 
 		// Act
 		var result = await _handler.HandleGetAll(CancellationToken.None);

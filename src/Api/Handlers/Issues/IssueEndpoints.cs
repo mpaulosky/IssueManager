@@ -1,7 +1,6 @@
 using Api.Handlers;
-using Shared.DTOs;
-using Shared.Validators;
-using static Api.Handlers.GetIssueHandler;
+
+using static Api.Handlers.Issues.GetIssueHandler;
 
 namespace Api.Handlers.Issues;
 

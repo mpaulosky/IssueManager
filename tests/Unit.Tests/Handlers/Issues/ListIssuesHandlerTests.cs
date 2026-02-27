@@ -4,6 +4,8 @@ using FluentValidation;
 
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Issues;
+
 using Shared.Validators;
 using MongoDB.Bson;
 using NSubstitute;
@@ -195,9 +197,9 @@ public class ListIssuesHandlerTests
 		// Create issues already in expected descending order (newest first)
 		var orderedIssues = new List<IssueDto>
 		{
-			new(ObjectId.GenerateNewId(), "Issue 3", "Desc", DateTime.UtcNow.AddDays(-1), UserDto.Empty, CategoryDto.Empty, StatusDto.Empty),
-			new(ObjectId.GenerateNewId(), "Issue 2", "Desc", DateTime.UtcNow.AddDays(-2), UserDto.Empty, CategoryDto.Empty, StatusDto.Empty),
-			new(ObjectId.GenerateNewId(), "Issue 1", "Desc", DateTime.UtcNow.AddDays(-3), UserDto.Empty, CategoryDto.Empty, StatusDto.Empty),
+			new(ObjectId.GenerateNewId(), "Issue 3", "Desc", DateTime.UtcNow.AddDays(-1), null, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty, false, UserDto.Empty, false, false),
+			new(ObjectId.GenerateNewId(), "Issue 2", "Desc", DateTime.UtcNow.AddDays(-2), null, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty, false, UserDto.Empty, false, false),
+			new(ObjectId.GenerateNewId(), "Issue 1", "Desc", DateTime.UtcNow.AddDays(-3), null, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty, false, UserDto.Empty, false, false),
 		};
 
 		_repository.GetAllAsync(1, 3, Arg.Any<CancellationToken>())
@@ -223,9 +225,14 @@ public class ListIssuesHandlerTests
 				$"Issue {i + 1}",
 				$"Description {i + 1}",
 				DateTime.UtcNow.AddDays(-i),
+				null,
 				UserDto.Empty,
 				CategoryDto.Empty,
-				new StatusDto("Open", "Issue is open")));
+				new StatusDto(ObjectId.Empty, "Open", "Issue is open", DateTime.UtcNow, null, false, UserDto.Empty),
+				false,
+				UserDto.Empty,
+				false,
+				false));
 		}
 		return issues;
 	}

@@ -11,7 +11,11 @@ using FluentAssertions;
 using FluentValidation;
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Statuses;
+
+using MongoDB.Bson;
 using Shared.Abstractions;
+using Shared.DTOs;
 using Shared.Validators;
 using NSubstitute;
 
@@ -43,8 +47,8 @@ public class CreateStatusHandlerTests
 			StatusDescription = "Issue is open"
 		};
 
-		_repository.CreateAsync(Arg.Any<Shared.Models.Status>())
-			.Returns(Result.Ok());
+		_repository.CreateAsync(Arg.Any<StatusDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result.Ok(new StatusDto(ObjectId.GenerateNewId(), command.StatusName, command.StatusDescription, DateTime.UtcNow, null, false, UserDto.Empty)));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
@@ -53,9 +57,9 @@ public class CreateStatusHandlerTests
 		result.Should().NotBeNull();
 		result.StatusName.Should().Be(command.StatusName);
 		result.StatusDescription.Should().Be(command.StatusDescription);
-		await _repository.Received(1).CreateAsync(Arg.Is<Shared.Models.Status>(s =>
+		await _repository.Received(1).CreateAsync(Arg.Is<StatusDto>(s =>
 			s.StatusName == command.StatusName &&
-			s.StatusDescription == command.StatusDescription));
+			s.StatusDescription == command.StatusDescription), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -140,8 +144,8 @@ public class CreateStatusHandlerTests
 			StatusDescription = null
 		};
 
-		_repository.CreateAsync(Arg.Any<Shared.Models.Status>())
-			.Returns(Result.Ok());
+		_repository.CreateAsync(Arg.Any<StatusDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result.Ok(new StatusDto(ObjectId.GenerateNewId(), command.StatusName, string.Empty, DateTime.UtcNow, null, false, UserDto.Empty)));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
@@ -160,8 +164,8 @@ public class CreateStatusHandlerTests
 			StatusDescription = "Description"
 		};
 
-		_repository.CreateAsync(Arg.Any<Shared.Models.Status>())
-			.Returns(Result.Fail("Database error"));
+		_repository.CreateAsync(Arg.Any<StatusDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result.Fail<StatusDto>("Database error"));
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);

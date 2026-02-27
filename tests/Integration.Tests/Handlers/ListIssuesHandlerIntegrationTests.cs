@@ -1,12 +1,8 @@
-using FluentAssertions;
-using Api.Data;
-using Api.Handlers;
-using MongoDB.Bson;
-using Shared.DTOs;
-using Shared.Validators;
-using Testcontainers.MongoDb;
+using Api.Handlers.Issues;
 
-namespace Tests.Integration.Handlers;
+using Shared.Validators;
+
+namespace Integration.Handlers;
 
 /// <summary>
 /// Integration tests for ListIssuesHandler with pagination and real MongoDB database.
@@ -14,19 +10,14 @@ namespace Tests.Integration.Handlers;
 [Collection("Integration")]
 public class ListIssuesHandlerIntegrationTests : IAsyncLifetime
 {
-private const string MONGODB_IMAGE = "mongo:8.0";
-private const string TEST_DATABASE = "IssueManagerTestDb";
-private readonly MongoDbContainer _mongoContainer;
+private const string MongodbImage = "mongo:8.2";
+private const string TestDatabase = "IssueManagerTestDb";
+private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder()
+		.WithImage(MongodbImage)
+		.Build();
 
 private IIssueRepository _repository = null!;
 private ListIssuesHandler _handler = null!;
-
-public ListIssuesHandlerIntegrationTests()
-{
-_mongoContainer = new MongoDbBuilder()
-.WithImage(MONGODB_IMAGE)
-.Build();
-}
 
 /// <summary>
 /// Initializes the test container and repository.
@@ -35,7 +26,7 @@ public async Task InitializeAsync()
 {
 await _mongoContainer.StartAsync();
 var connectionString = _mongoContainer.GetConnectionString();
-_repository = new IssueRepository(connectionString, TEST_DATABASE);
+_repository = new IssueRepository(connectionString, TestDatabase);
 _handler = new ListIssuesHandler(_repository, new ListIssuesQueryValidator());
 }
 
@@ -49,7 +40,7 @@ await _mongoContainer.DisposeAsync();
 }
 
 private static IssueDto CreateTestIssueDto(string title, string description, DateTime? dateCreated = null) =>
-new(ObjectId.GenerateNewId(), title, description, dateCreated ?? DateTime.UtcNow, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty);
+new(ObjectId.GenerateNewId(), title, description, dateCreated ?? DateTime.UtcNow, null, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty, false, UserDto.Empty, false, false);
 
 [Fact]
 public async Task Handle_WithPagination_ReturnsCorrectPage()
@@ -105,12 +96,12 @@ for (int i = 0; i < 10; i++)
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
 	var created = await _repository.CreateAsync(issue);
 	if (i < 3)
-		issuesToArchive.Add(created.Id.ToString());
+		issuesToArchive.Add(created.Value.Id.ToString());
 }
 
 foreach (var id in issuesToArchive)
 {
-	await _repository.ArchiveAsync(id);
+	await _repository.ArchiveAsync(ObjectId.Parse(id));
 }
 
 var query = new ListIssuesQuery { Page = 1, PageSize = 20 };

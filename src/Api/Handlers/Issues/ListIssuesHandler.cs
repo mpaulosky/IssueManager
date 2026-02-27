@@ -7,12 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using FluentValidation;
-using Api.Data;
-using Shared.Validators;
-using Shared.DTOs;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Issues;
 
 /// <summary>
 /// Handler for listing issues with pagination.
@@ -40,7 +35,8 @@ public class ListIssuesHandler
 		if (!validationResult.IsValid)
 			throw new ValidationException(validationResult.Errors);
 
-		var (items, total) = await _repository.GetAllAsync(query.Page, query.PageSize, cancellationToken);
+		var result = await _repository.GetAllAsync(query.Page, query.PageSize, cancellationToken);
+		var (items, total) = result.Value;
 
 		return new PaginatedResponse<IssueDto>(items, total, query.Page, query.PageSize);
 	}

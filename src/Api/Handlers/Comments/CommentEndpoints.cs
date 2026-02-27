@@ -1,7 +1,6 @@
 using Api.Handlers;
-using Shared.DTOs;
-using Shared.Validators;
-using static Api.Handlers.GetCommentHandler;
+
+using static Api.Handlers.Comments.GetCommentHandler;
 
 namespace Api.Handlers.Comments;
 

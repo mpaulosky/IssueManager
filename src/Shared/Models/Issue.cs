@@ -87,7 +87,7 @@ public class Issue
 	/// <value>
 	///   The issue status.
 	/// </value>
-	public StatusDto IssueStatus { get; set; } = StatusDto.Empty;
+	public StatusDto Status { get; set; } = StatusDto.Empty;
 
 	/// <summary>
 	///   Gets or sets a value indicating whether this <see cref="Issue" /> is archived.

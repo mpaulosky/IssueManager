@@ -11,6 +11,9 @@ using FluentAssertions;
 using FluentValidation;
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Issues;
+
+using Shared.Abstractions;
 using Shared.DTOs;
 using Shared.Validators;
 using MongoDB.Bson;
@@ -47,14 +50,19 @@ public class CreateIssueHandlerTests
 		var createdIssue = new IssueDto(
 			ObjectId.GenerateNewId(),
 			command.Title,
-			command.Description,
+			command.Description ?? string.Empty,
 			DateTime.UtcNow,
+			null,
 			UserDto.Empty,
 			CategoryDto.Empty,
-			StatusDto.Empty);
+			StatusDto.Empty,
+			false,
+			UserDto.Empty,
+			false,
+			false);
 
 		_repository.CreateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>())
-			.Returns(createdIssue);
+			.Returns(Result.Ok(createdIssue));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
@@ -135,12 +143,17 @@ public class CreateIssueHandlerTests
 			command.Title,
 			string.Empty,
 			DateTime.UtcNow,
+			null,
 			UserDto.Empty,
 			CategoryDto.Empty,
-			StatusDto.Empty);
+			StatusDto.Empty,
+			false,
+			UserDto.Empty,
+			false,
+			false);
 
 		_repository.CreateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>())
-			.Returns(createdIssue);
+			.Returns(Result.Ok(createdIssue));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
@@ -163,14 +176,19 @@ public class CreateIssueHandlerTests
 		var createdIssue = new IssueDto(
 			ObjectId.GenerateNewId(),
 			command.Title,
-			command.Description,
+			command.Description ?? string.Empty,
 			DateTime.UtcNow,
+			null,
 			UserDto.Empty,
 			CategoryDto.Empty,
-			StatusDto.Empty);
+			StatusDto.Empty,
+			false,
+			UserDto.Empty,
+			false,
+			false);
 
 		_repository.CreateAsync(Arg.Any<IssueDto>(), cancellationToken)
-			.Returns(createdIssue);
+			.Returns(Result.Ok(createdIssue));
 
 		// Act
 		await _handler.Handle(command, cancellationToken);

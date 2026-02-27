@@ -84,7 +84,7 @@ public class Comment
 	/// <value>
 	///   The user votes.
 	/// </value>
-	public HashSet<string> UserVotes { get; init; } = new();
+	public HashSet<string> UserVotes { get; set; } = [];
 
 	/// <summary>
 	///   Gets or sets a value indicating whether this <see cref="Comment" /> is archived.

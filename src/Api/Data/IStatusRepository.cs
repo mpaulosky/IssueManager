@@ -7,10 +7,6 @@
 // Project Name :  Shared
 // =============================================
 
-using MongoDB.Bson;
-using Shared.Abstractions;
-using Shared.Models;
-
 namespace Api.Data;
 
 /// <summary>
@@ -18,49 +14,35 @@ namespace Api.Data;
 /// </summary>
 public interface IStatusRepository
 {
-	/// <summary>
-	/// Archives a status by marking it as inactive in the data store.
-	/// </summary>
-	/// <param name="status">The status to archive.</param>
-	/// <returns>A task representing the asynchronous operation.</returns>
-	/// <exception cref="ArgumentNullException">Thrown when <paramref name="status"/> is null.</exception>
-	Task<Result> ArchiveAsync(Status status);
 
 	/// <summary>
-	/// Creates a new status in the data store.
+	/// Soft-deletes a status by setting Archived to true.
 	/// </summary>
-	/// <param name="status">The status to create.</param>
-	/// <returns>A task representing the asynchronous operation.</returns>
-	/// <exception cref="ArgumentNullException">Thrown when <paramref name="status"/> is null.</exception>
-	Task<Result> CreateAsync(Status status);
+	Task<Result> ArchiveAsync(ObjectId statusId, CancellationToken cancellationToken = default);
 
 	/// <summary>
-	/// Retrieves a specific status from the data store by its unique identifier.
+	/// Creates a new status in the database.
 	/// </summary>
-	/// <param name="itemId">The unique identifier of the status.</param>
-	/// <returns>
-	/// A task that represents the asynchronous operation.
-	/// The task result contains the requested <see cref="Status"/>.
-	/// </returns>
-	/// <exception cref="ArgumentException">Thrown when <paramref name="itemId"/> is null or empty.</exception>
-	Task<Result<Status>> GetAsync(ObjectId itemId);
+	Task<Result<StatusDto>> CreateAsync(StatusDto status, CancellationToken cancellationToken = default);
 
 	/// <summary>
-	/// Retrieves all statuses from the data store.
+	/// Gets a status by its unique identifier.
 	/// </summary>
-	/// <returns>
-	/// A task that represents the asynchronous operation.
-	/// The task result contains an enumerable collection of all <see cref="Status"/> instances.
-	/// </returns>
-	Task<Result<IEnumerable<Status>>> GetAllAsync();
+	Task<Result<StatusDto>> GetByIdAsync(ObjectId statusId, CancellationToken cancellationToken = default);
 
 	/// <summary>
-	/// Updates an existing status in the data store.
+	/// Gets all status's from the database.
 	/// </summary>
-	/// <param name="itemId">The unique identifier of the status to update.</param>
-	/// <param name="status">The updated status data.</param>
-	/// <returns>A task representing the asynchronous operation.</returns>
-	/// <exception cref="ArgumentException">Thrown when <paramref name="itemId"/> is null or empty.</exception>
-	/// <exception cref="ArgumentNullException">Thrown when <paramref name="status"/> is null.</exception>
-	Task<Result> UpdateAsync(ObjectId itemId, Status status);
+	Task<Result<IReadOnlyList<StatusDto>>> GetAllAsync(CancellationToken cancellationToken = default);
+
+	/// <summary>
+	/// Gets paginated status from the database, excluding archived status by default.
+	/// </summary>
+	Task<Result<(IReadOnlyList<StatusDto> Items, long Total)>> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken = default);
+
+	/// <summary>
+	/// Updates an existing status in the database.
+	/// </summary>
+	Task<Result<StatusDto>> UpdateAsync(StatusDto status, CancellationToken cancellationToken = default);
+
 }

@@ -7,11 +7,6 @@
 // Project Name :  Api
 // =======================================================
 
-using MongoDB.Bson;
-using MongoDB.Driver;
-using Shared.Abstractions;
-using Shared.Models;
-
 namespace Api.Data;
 
 /// <summary>
@@ -32,54 +27,84 @@ public class StatusRepository : IStatusRepository
 	}
 
 	/// <inheritdoc />
-	public async Task<Result> ArchiveAsync(Status status)
+	public async Task<Result> ArchiveAsync(ObjectId statusId, CancellationToken cancellationToken = default)
 	{
-		if (status is null) return Result.Fail("Status cannot be null.");
+		if (statusId == ObjectId.Empty)
+			return Result.Fail("Status cannot be null.");
 
-		status.Archived = true;
-		status.DateModified = DateTime.UtcNow;
-
-		var result = await _collection.ReplaceOneAsync(x => x.Id == status.Id, status);
-		return result.ModifiedCount > 0
-			? Result.Ok()
-			: Result.Fail("Status not found or could not be archived.", ResultErrorCode.NotFound);
+		var update = Builders<Status>.Update.Set(x => x.Archived, true);
+		var result = await _collection.UpdateOneAsync(x => x.Id == statusId, update, cancellationToken: cancellationToken);
+		return result.ModifiedCount > 0 ? Result.Ok() : Result.Fail("Status not found or already archived.");
 	}
 
 	/// <inheritdoc />
-	public async Task<Result> CreateAsync(Status status)
+	public async Task<Result<StatusDto>> CreateAsync(StatusDto dto, CancellationToken cancellationToken = default)
 	{
-		if (status is null) return Result.Fail("Status cannot be null.");
+		if (dto is null)
+			return Result.Fail<StatusDto>("Status cannot be null.");
 
-		await _collection.InsertOneAsync(status);
-		return Result.Ok();
+		var model = dto.ToModel();
+		await _collection.InsertOneAsync(model, cancellationToken: cancellationToken);
+		return Result.Ok(model.ToDto());
 	}
 
 	/// <inheritdoc />
-	public async Task<Result<Status>> GetAsync(ObjectId itemId)
+	public async Task<Result<StatusDto>> GetByIdAsync( ObjectId statusId, CancellationToken cancellationToken = default)
 	{
-		var entity = await _collection.Find(x => x.Id == itemId).FirstOrDefaultAsync();
-		return entity is not null
-			? Result.Ok(entity)
-			: Result.Fail<Status>("Status not found.", ResultErrorCode.NotFound);
+		if (!ObjectId.TryParse(statusId.ToString(), out var id))
+			return Result.Fail<StatusDto>("Invalid status ID format.");
+
+		var entity = await _collection.Find(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
+
+		return entity is not null ? Result.Ok(entity.ToDto()) : Result.Fail<StatusDto>("Status not found.");
 	}
 
 	/// <inheritdoc />
-	public async Task<Result<IEnumerable<Status>>> GetAllAsync()
+	public async Task<Result<IReadOnlyList<StatusDto>>> GetAllAsync(CancellationToken cancellationToken = default)
 	{
-		var entities = await _collection.Find(_ => true).ToListAsync();
-		return Result.Ok<IEnumerable<Status>>(entities);
+		var entities = await _collection.Find(_ => true).ToListAsync(cancellationToken);
+		return Result.Ok<IReadOnlyList<StatusDto>>(entities.Select(x => x.ToDto()).ToList().AsReadOnly());
 	}
 
 	/// <inheritdoc />
-	public async Task<Result> UpdateAsync(ObjectId itemId, Status status)
+	public async Task<Result<(IReadOnlyList<StatusDto> Items, long Total)>> GetAllAsync(
+			int page,
+			int pageSize,
+			CancellationToken cancellationToken = default)
 	{
-		if (status is null) return Result.Fail("Status cannot be null.");
+		var filter = Builders<Status>.Filter.Eq(x => x.Archived, false);
+		var total = await _collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
+		var entities = await _collection
+			.Find(filter)
+			.Skip((page - 1) * pageSize)
+			.Limit(pageSize)
+			.ToListAsync(cancellationToken);
 
-		status.DateModified = DateTime.UtcNow;
-
-		var result = await _collection.ReplaceOneAsync(x => x.Id == itemId, status);
-		return result.ModifiedCount > 0
-			? Result.Ok()
-			: Result.Fail("Status not found or could not be updated.", ResultErrorCode.NotFound);
+		return (Result<(IReadOnlyList<StatusDto> Items, long Total)>)(entities.Count > 0
+				? Result.Ok((entities.Select(x => x.ToDto()).ToList().AsReadOnly(), total))
+				: Result.Fail("Issues not found."));
 	}
+
+	/// <inheritdoc />
+	public async Task<Result<StatusDto>> UpdateAsync(StatusDto dto, CancellationToken cancellationToken = default)
+	{
+		if (dto is null)
+			return Result.Fail<StatusDto>("Status cannot be null.");
+
+		var model = dto.ToModel();
+
+		var result = await _collection.ReplaceOneAsync(
+				x => x.Id == model.Id,
+				model,
+				cancellationToken: cancellationToken);
+
+		return result.ModifiedCount > 0 ? Result.Ok(model.ToDto()) :
+				Result.Fail<StatusDto>("Status not found or update failed.");
+	}
+
+	public async Task<Result<long>> CountAsync(CancellationToken cancellationToken = default)
+	{
+		return Result.Ok(await _collection.CountDocumentsAsync(_ => true, cancellationToken: cancellationToken));
+	}
+
 }

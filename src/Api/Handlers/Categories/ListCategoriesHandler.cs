@@ -7,12 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
-using Api.Data;
-
-using Shared.DTOs;
-using Shared.Mappers;
-
-namespace Api.Handlers;
+namespace Api.Handlers.Categories;
 
 /// <summary>
 /// Handler for listing all categories.
@@ -41,9 +36,9 @@ public class ListCategoriesHandler
 	public async Task<IEnumerable<CategoryDto>> Handle(CancellationToken cancellationToken = default)
 	{
 		var result = await _repository.GetAllAsync();
-		if (result.Failure)
+		if (!result.Success)
 			return Enumerable.Empty<CategoryDto>();
 
-		return result.Value?.Select(c => c.ToDto()) ?? Enumerable.Empty<CategoryDto>();
+		return result.Value ?? Enumerable.Empty<CategoryDto>();
 	}
 }

@@ -7,3 +7,7 @@ global using MongoDB.Driver;
 
 global using Api.Data;
 global using Api.Handlers;
+
+global using MongoDB.Bson;
+
+global using Shared.DTOs;

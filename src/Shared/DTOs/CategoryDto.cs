@@ -17,8 +17,10 @@ public record CategoryDto(
 	ObjectId Id,
 	string CategoryName,
 	string CategoryDescription,
-	DateTime DateCreated = default,
-	DateTime? DateModified = null)
+	DateTime DateCreated,
+	DateTime? DateModified,
+	bool Archived,
+	UserDto ArchivedBy)
 {
 	/// <summary>
 	///   Initializes a new instance of the <see cref="CategoryDto" /> record.
@@ -29,9 +31,18 @@ public record CategoryDto(
 		category.CategoryName,
 		category.CategoryDescription,
 		category.DateCreated,
-		category.DateModified)
+		category.DateModified,
+		category.Archived,
+		category.ArchivedBy)
 	{
 	}
 
-	public static CategoryDto Empty => new(ObjectId.Empty, string.Empty, string.Empty);
+	public static CategoryDto Empty => new(
+			ObjectId.Empty,
+			string.Empty,
+			string.Empty,
+			DateTime.UtcNow,
+			null,
+			false,
+			UserDto.Empty);
 }

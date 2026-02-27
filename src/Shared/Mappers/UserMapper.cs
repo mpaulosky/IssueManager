@@ -17,13 +17,13 @@ public static class UserMapper
 	/// <summary>
 	///   Converts a <see cref="Shared.Models.User"/> to a <see cref="UserDto"/>.
 	/// </summary>
-	public static UserDto ToDto(this Shared.Models.User user) =>
+	public static UserDto ToDto(this User user) =>
 		new(user.Id, user.Name, user.Email);
 
 	/// <summary>
 	///   Converts a <see cref="UserDto"/> to a <see cref="Shared.Models.User"/>.
 	/// </summary>
-	public static Shared.Models.User ToModel(this UserDto dto) =>
+	public static User ToModel(this UserDto dto) =>
 		new()
 		{
 			Name = dto.Name,

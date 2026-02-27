@@ -1,9 +1,8 @@
-using Tests.Integration.Fixtures;
+using Api.Handlers.Issues;
 
-using Shared.DTOs;
 using Shared.Validators;
 
-namespace Tests.Integration.Handlers;
+namespace Integration.Handlers;
 
 /// <summary>
 /// Integration tests for CreateIssueHandler with real MongoDB database.
@@ -11,19 +10,14 @@ namespace Tests.Integration.Handlers;
 [Collection("Integration")]
 public class CreateIssueHandlerTests : IAsyncLifetime
 {
-	private const string MONGODB_IMAGE = "mongo:8.0";
-	private const string TEST_DATABASE = "IssueManagerTestDb";
-	private readonly MongoDbContainer _mongoContainer;
+	private const string MongodbImage = "mongo:8.2";
+	private const string TestDatabase = "IssueManagerTestDb";
+	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder()
+			.WithImage(MongodbImage)
+			.Build();
 
 	private IIssueRepository _repository = null!;
 	private CreateIssueHandler _handler = null!;
-
-	public CreateIssueHandlerTests()
-	{
-		_mongoContainer = new MongoDbBuilder()
-			.WithImage(MONGODB_IMAGE)
-			.Build();
-	}
 
 	/// <summary>
 	/// Initializes the test container and repository.
@@ -32,7 +26,7 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 	{
 		await _mongoContainer.StartAsync();
 		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new IssueRepository(connectionString, TEST_DATABASE);
+		_repository = new IssueRepository(connectionString, TestDatabase);
 		_handler = new CreateIssueHandler(_repository, new CreateIssueValidator());
 	}
 
@@ -65,9 +59,10 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 		result.Description.Should().Be("This is a test issue description.");
 
 		// Verify persistence
-		var retrieved = await _repository.GetByIdAsync(result.Id.ToString());
-		retrieved.Should().NotBeNull();
-		retrieved!.Title.Should().Be("Test Issue");
+		var retrievedResult = await _repository.GetByIdAsync(result.Id);
+		retrievedResult.Should().NotBeNull();
+		var retrieved = retrievedResult.Value;
+		retrieved.Title.Should().Be("Test Issue");
 	}
 
 	[Fact]
@@ -122,9 +117,12 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 
 		// Assert
 		var count = await _repository.CountAsync();
-		count.Should().Be(3);
+		count.Success.Should().BeTrue();
+		count.Value.Should().Be(3);
 
-		var allIssues = await _repository.GetAllAsync();
+		var allIssuesResult = await _repository.GetAllAsync();
+		allIssuesResult.Should().NotBeNull();
+		var allIssues = allIssuesResult.Value;
 		allIssues.Should().HaveCount(3);
 		allIssues.Should().Contain(i => i.Title == "First Issue");
 		allIssues.Should().Contain(i => i.Title == "Second Issue");
@@ -149,8 +147,10 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 		result.Description.Should().BeEmpty();
 
 		// Verify persistence
-		var retrieved = await _repository.GetByIdAsync(result.Id.ToString());
-		retrieved!.Description.Should().BeEmpty();
+		var retrievedResult = await _repository.GetByIdAsync(result.Id);
+		retrievedResult.Should().NotBeNull();
+		var retrieved = retrievedResult.Value;
+		retrieved.Description.Should().BeEmpty();
 	}
 
 	[Fact]

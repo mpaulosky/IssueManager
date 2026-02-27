@@ -11,9 +11,11 @@ using FluentAssertions;
 using FluentValidation;
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Statuses;
+
 using Shared.Abstractions;
+using Shared.DTOs;
 using Shared.Exceptions;
-using Shared.Models;
 using Shared.Validators;
 using MongoDB.Bson;
 using NSubstitute;
@@ -41,19 +43,21 @@ public class DeleteStatusHandlerTests
 	{
 		// Arrange
 		var statusId = ObjectId.GenerateNewId();
-		var status = new Status
-		{
-			Id = statusId,
-			StatusName = "Open",
-			Archived = false
-		};
+		var status = new StatusDto(
+			statusId,
+			"Open",
+			string.Empty,
+			DateTime.UtcNow,
+			null,
+			false,
+			UserDto.Empty);
 
 		var command = new DeleteStatusCommand { Id = statusId.ToString() };
 
-		_repository.GetAsync(statusId)
-			.Returns(Result<Status>.Ok(status));
+		_repository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
+			.Returns(Result<StatusDto>.Ok(status));
 
-		_repository.ArchiveAsync(status)
+		_repository.ArchiveAsync(statusId, Arg.Any<CancellationToken>())
 			.Returns(Result.Ok());
 
 		// Act
@@ -61,8 +65,8 @@ public class DeleteStatusHandlerTests
 
 		// Assert
 		result.Should().BeTrue();
-		await _repository.Received(1).GetAsync(statusId);
-		await _repository.Received(1).ArchiveAsync(status);
+		await _repository.Received(1).GetByIdAsync(statusId, Arg.Any<CancellationToken>());
+		await _repository.Received(1).ArchiveAsync(statusId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -72,8 +76,8 @@ public class DeleteStatusHandlerTests
 		var statusId = ObjectId.GenerateNewId();
 		var command = new DeleteStatusCommand { Id = statusId.ToString() };
 
-		_repository.GetAsync(statusId)
-			.Returns(Result<Status>.Fail("Not found"));
+		_repository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
+			.Returns(Result<StatusDto>.Fail("Not found"));
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
@@ -88,25 +92,27 @@ public class DeleteStatusHandlerTests
 	{
 		// Arrange
 		var statusId = ObjectId.GenerateNewId();
-		var archivedStatus = new Status
-		{
-			Id = statusId,
-			StatusName = "Archived",
-			Archived = true
-		};
+		var archivedStatus = new StatusDto(
+			statusId,
+			"Archived",
+			string.Empty,
+			DateTime.UtcNow,
+			null,
+			true,
+			UserDto.Empty);
 
 		var command = new DeleteStatusCommand { Id = statusId.ToString() };
 
-		_repository.GetAsync(statusId)
-			.Returns(Result<Status>.Ok(archivedStatus));
+		_repository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
+			.Returns(Result<StatusDto>.Ok(archivedStatus));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
 		result.Should().BeTrue();
-		await _repository.Received(1).GetAsync(statusId);
-		await _repository.DidNotReceive().ArchiveAsync(Arg.Any<Status>());
+		await _repository.Received(1).GetByIdAsync(statusId, Arg.Any<CancellationToken>());
+		await _repository.DidNotReceive().ArchiveAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -142,26 +148,28 @@ public class DeleteStatusHandlerTests
 		// Arrange
 		var statusId = ObjectId.GenerateNewId();
 		var cancellationToken = new CancellationToken();
-		var status = new Status
-		{
-			Id = statusId,
-			StatusName = "Test",
-			Archived = false
-		};
+		var status = new StatusDto(
+			statusId,
+			"Test",
+			string.Empty,
+			DateTime.UtcNow,
+			null,
+			false,
+			UserDto.Empty);
 
 		var command = new DeleteStatusCommand { Id = statusId.ToString() };
 
-		_repository.GetAsync(statusId)
-			.Returns(Result<Status>.Ok(status));
+		_repository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
+			.Returns(Result<StatusDto>.Ok(status));
 
-		_repository.ArchiveAsync(status)
+		_repository.ArchiveAsync(statusId, Arg.Any<CancellationToken>())
 			.Returns(Result.Ok());
 
 		// Act
 		await _handler.Handle(command, cancellationToken);
 
 		// Assert
-		await _repository.Received(1).GetAsync(statusId);
-		await _repository.Received(1).ArchiveAsync(status);
+		await _repository.Received(1).GetByIdAsync(statusId, Arg.Any<CancellationToken>());
+		await _repository.Received(1).ArchiveAsync(statusId, Arg.Any<CancellationToken>());
 	}
 }

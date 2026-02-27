@@ -9,10 +9,12 @@
 
 using Api.Data;
 using Api.Handlers;
+using Api.Handlers.Comments;
+
 using MongoDB.Bson;
 using Shared.Abstractions;
 using Shared.Exceptions;
-using Shared.Models;
+using Shared.DTOs;
 using Shared.Validators;
 
 namespace Tests.Unit.Handlers.Comments;
@@ -38,19 +40,26 @@ public class DeleteCommentHandlerTests
 	{
 		// Arrange
 		var commentId = ObjectId.GenerateNewId();
-		var comment = new Comment
-		{
-			Id = commentId,
-			Title = "Test Comment",
-			Archived = false
-		};
+		var comment = new CommentDto(
+			commentId,
+			"Test Comment",
+			string.Empty,
+			DateTime.UtcNow,
+			null,
+			IssueDto.Empty,
+			UserDto.Empty,
+			[],
+			false,
+			UserDto.Empty,
+			false,
+			UserDto.Empty);
 
 		var command = new DeleteCommentCommand { Id = commentId.ToString() };
 
-		_repository.GetAsync(commentId)
-			.Returns(Result<Comment>.Ok(comment));
+		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
+			.Returns(Result<CommentDto>.Ok(comment));
 
-		_repository.ArchiveAsync(comment)
+		_repository.ArchiveAsync(commentId, Arg.Any<CancellationToken>())
 			.Returns(Result.Ok());
 
 		// Act
@@ -58,8 +67,8 @@ public class DeleteCommentHandlerTests
 
 		// Assert
 		result.Should().BeTrue();
-		await _repository.Received(1).GetAsync(commentId);
-		await _repository.Received(1).ArchiveAsync(comment);
+		await _repository.Received(1).GetByIdAsync(commentId, Arg.Any<CancellationToken>());
+		await _repository.Received(1).ArchiveAsync(commentId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -69,8 +78,8 @@ public class DeleteCommentHandlerTests
 		var commentId = ObjectId.GenerateNewId();
 		var command = new DeleteCommentCommand { Id = commentId.ToString() };
 
-		_repository.GetAsync(commentId)
-			.Returns(Result<Comment>.Fail("Not found"));
+		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
+			.Returns(Result<CommentDto>.Fail("Not found"));
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
@@ -85,25 +94,32 @@ public class DeleteCommentHandlerTests
 	{
 		// Arrange
 		var commentId = ObjectId.GenerateNewId();
-		var archivedComment = new Comment
-		{
-			Id = commentId,
-			Title = "Archived Comment",
-			Archived = true
-		};
+		var archivedComment = new CommentDto(
+			commentId,
+			"Archived Comment",
+			string.Empty,
+			DateTime.UtcNow,
+			null,
+			IssueDto.Empty,
+			UserDto.Empty,
+			[],
+			true,
+			UserDto.Empty,
+			false,
+			UserDto.Empty);
 
 		var command = new DeleteCommentCommand { Id = commentId.ToString() };
 
-		_repository.GetAsync(commentId)
-			.Returns(Result<Comment>.Ok(archivedComment));
+		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
+			.Returns(Result<CommentDto>.Ok(archivedComment));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
 		result.Should().BeTrue();
-		await _repository.Received(1).GetAsync(commentId);
-		await _repository.DidNotReceive().ArchiveAsync(Arg.Any<Comment>());
+		await _repository.Received(1).GetByIdAsync(commentId, Arg.Any<CancellationToken>());
+		await _repository.DidNotReceive().ArchiveAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -139,26 +155,33 @@ public class DeleteCommentHandlerTests
 		// Arrange
 		var commentId = ObjectId.GenerateNewId();
 		var cancellationToken = new CancellationToken();
-		var comment = new Comment
-		{
-			Id = commentId,
-			Title = "Test Comment",
-			Archived = false
-		};
+		var comment = new CommentDto(
+			commentId,
+			"Test Comment",
+			string.Empty,
+			DateTime.UtcNow,
+			null,
+			IssueDto.Empty,
+			UserDto.Empty,
+			[],
+			false,
+			UserDto.Empty,
+			false,
+			UserDto.Empty);
 
 		var command = new DeleteCommentCommand { Id = commentId.ToString() };
 
-		_repository.GetAsync(commentId)
-			.Returns(Result<Comment>.Ok(comment));
+		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
+			.Returns(Result<CommentDto>.Ok(comment));
 
-		_repository.ArchiveAsync(comment)
+		_repository.ArchiveAsync(commentId, Arg.Any<CancellationToken>())
 			.Returns(Result.Ok());
 
 		// Act
 		await _handler.Handle(command, cancellationToken);
 
 		// Assert
-		await _repository.Received(1).GetAsync(commentId);
-		await _repository.Received(1).ArchiveAsync(comment);
+		await _repository.Received(1).GetByIdAsync(commentId, Arg.Any<CancellationToken>());
+		await _repository.Received(1).ArchiveAsync(commentId, Arg.Any<CancellationToken>());
 	}
 }
