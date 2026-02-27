@@ -57,9 +57,17 @@ public class CommentRepository : ICommentRepository
 	}
 
 	/// <inheritdoc />
-	public async Task<Result<IReadOnlyList<CommentDto>>> GetAllAsync(CancellationToken cancellationToken = default)
+	public async Task<Result<IReadOnlyList<CommentDto>>> GetAllAsync(string? issueId = null, CancellationToken cancellationToken = default)
 	{
-		var entities = await _collection.Find(_ => true).ToListAsync(cancellationToken);
+		var filterBuilder = Builders<Comment>.Filter;
+		var filter = filterBuilder.Empty;
+
+		if (!string.IsNullOrWhiteSpace(issueId) && ObjectId.TryParse(issueId, out var objectId))
+		{
+			filter = filterBuilder.Eq(c => c.Issue.Id, objectId);
+		}
+
+		var entities = await _collection.Find(filter).ToListAsync(cancellationToken);
 		return Result.Ok<IReadOnlyList<CommentDto>>(entities.Select(x => x.ToDto()).ToList().AsReadOnly());
 	}
 

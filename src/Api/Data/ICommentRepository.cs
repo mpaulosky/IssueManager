@@ -33,7 +33,9 @@ public interface ICommentRepository
 	/// <summary>
 	/// Gets all comments from the database.
 	/// </summary>
-	Task<Result<IReadOnlyList<CommentDto>>> GetAllAsync(CancellationToken cancellationToken = default);
+	/// <param name="issueId">Optional issue ID to filter comments by specific issue.</param>
+	/// <param name="cancellationToken">Cancellation token.</param>
+	Task<Result<IReadOnlyList<CommentDto>>> GetAllAsync(string? issueId = null, CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Gets paginated comments from the database, excluding archived comments by default.

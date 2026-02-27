@@ -50,6 +50,6 @@ public class GetIssueHandler
 	public async Task<IReadOnlyList<IssueDto>> HandleGetAll(CancellationToken cancellationToken = default)
 	{
 		var result = await _repository.GetAllAsync(cancellationToken);
-		return result.Value;
+		return result.Success ? result.Value! : [];
 	}
 }

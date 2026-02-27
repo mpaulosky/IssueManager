@@ -17,8 +17,8 @@ namespace Web.Services;
 /// <summary>Defines the contract for the Comments API client.</summary>
 public interface ICommentApiClient
 {
-	/// <summary>Gets all comments.</summary>
-	Task<IEnumerable<CommentDto>> GetAllAsync(CancellationToken cancellationToken = default);
+	/// <summary>Gets all comments, optionally filtered by issue ID.</summary>
+	Task<IEnumerable<CommentDto>> GetAllAsync(string? issueId = null, CancellationToken cancellationToken = default);
 
 	/// <summary>Gets a comment by its identifier.</summary>
 	Task<CommentDto?> GetByIdAsync(string id, CancellationToken cancellationToken = default);
@@ -42,12 +42,18 @@ public class CommentApiClient : ICommentApiClient
 	public CommentApiClient(HttpClient httpClient) => _httpClient = httpClient;
 
 	/// <inheritdoc/>
-	public async Task<IEnumerable<CommentDto>> GetAllAsync(CancellationToken cancellationToken = default)
+	public async Task<IEnumerable<CommentDto>> GetAllAsync(string? issueId = null, CancellationToken cancellationToken = default)
 	{
 		try
 		{
+			var url = "/api/v1/comments";
+			if (!string.IsNullOrWhiteSpace(issueId))
+			{
+				url += $"?issueId={Uri.EscapeDataString(issueId)}";
+			}
+
 			var result = await _httpClient.GetFromJsonAsync<IEnumerable<CommentDto>>(
-				"/api/v1/comments", cancellationToken).ConfigureAwait(false);
+				url, cancellationToken).ConfigureAwait(false);
 			return result ?? [];
 		}
 		catch (HttpRequestException)

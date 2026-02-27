@@ -66,6 +66,6 @@ public class UpdateCategoryHandler
 		if (!updateResult.Success)
 			throw new NotFoundException($"Category with ID '{command.Id}' could not be updated.");
 
-		return updateResult.Value;
+		return updateResult.Value!;
 	}
 }

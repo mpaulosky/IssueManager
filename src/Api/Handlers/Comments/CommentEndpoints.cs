@@ -11,13 +11,13 @@ public static class CommentEndpoints
 	{
 		var group = app.MapGroup("/api/v1/comments").WithTags("Comments");
 
-		group.MapGet("", async (ListCommentsHandler handler) =>
+		group.MapGet("", async (string? issueId, ListCommentsHandler handler) =>
 		{
-			var result = await handler.Handle();
+			var result = await handler.Handle(issueId);
 			return Results.Ok(result);
 		})
 		.WithName("ListComments")
-		.WithSummary("Get all comments")
+		.WithSummary("Get all comments, optionally filtered by issue ID")
 		.Produces<IEnumerable<CommentDto>>(StatusCodes.Status200OK);
 
 		group.MapGet("{id}", async (string id, GetCommentHandler handler) =>
