@@ -35,8 +35,15 @@
 	{
 		if (firstRender)
 		{
-			_isDark = await JS.InvokeAsync<bool>("themeHelpers.isDark");
-			StateHasChanged();
+			try
+			{
+				_isDark = await JS.InvokeAsync<bool>("themeHelpers.isDark");
+				await InvokeAsync(StateHasChanged);
+			}
+			catch (JSException)
+			{
+				// JS not ready, default to light mode
+			}
 		}
 	}
 

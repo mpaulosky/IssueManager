@@ -1,0 +1,106 @@
+@* Copyright (c) 2026. All rights reserved. *@
+@namespace Web.Pages.Statuses
+@page "/statuses"
+@attribute [StreamRendering]
+@inject IStatusApiClient StatusClient
+
+<PageTitle>Statuses — IssueManager</PageTitle>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+	<div class="flex items-center justify-between mb-6">
+		<h1 class="text-2xl font-bold text-[var(--text-main)]">Statuses</h1>
+		<a href="/statuses/create" class="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
+			New Status
+		</a>
+	</div>
+
+	<DataTable Items="_statuses" IsLoading="_isLoading" EmptyMessage="No statuses found." TItem="StatusDto">
+		<HeaderContent>
+			<th scope="col" class="px-6 py-3">Status Name</th>
+			<th scope="col" class="px-6 py-3">Description</th>
+			<th scope="col" class="px-6 py-3 text-right">Actions</th>
+		</HeaderContent>
+		<RowContent>
+			<tr class="bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] transition-colors">
+				<td class="px-6 py-4">
+					<StatusBadge Status="@context" />
+				</td>
+				<td class="px-6 py-4 text-[var(--text-muted)]">@(string.IsNullOrWhiteSpace(context.StatusDescription) ? "—" : context.StatusDescription)</td>
+				<td class="px-6 py-4 text-right">
+					<div class="inline-flex items-center gap-3">
+						<a href="/statuses/@context.Id.ToString()/edit" class="text-[var(--color-primary)] hover:underline text-sm">
+							Edit
+						</a>
+						<button @onclick="() => ShowDeleteConfirm(context)" class="text-red-600 hover:underline text-sm">
+							Delete
+						</button>
+					</div>
+				</td>
+			</tr>
+		</RowContent>
+	</DataTable>
+
+	<ConfirmDialog
+		IsVisible="_showDeleteDialog"
+		Title="Delete Status"
+		Message="@($"Are you sure you want to delete the status \"{_statusToDelete?.StatusName}\"? This action cannot be undone.")"
+		ConfirmText="Delete"
+		CancelText="Cancel"
+		OnConfirm="ConfirmDelete"
+		OnCancel="CancelDelete" />
+</div>
+
+@code {
+	private IEnumerable<StatusDto> _statuses = [];
+	private bool _isLoading = true;
+	private bool _showDeleteDialog = false;
+	private StatusDto? _statusToDelete;
+
+	/// <summary>
+	/// Loads all statuses on initialization.
+	/// </summary>
+	protected override async Task OnInitializedAsync()
+	{
+		_isLoading = true;
+		try
+		{
+			_statuses = await StatusClient.GetAllAsync();
+		}
+		finally
+		{
+			_isLoading = false;
+		}
+	}
+
+	/// <summary>
+	/// Shows the delete confirmation dialog for a status.
+	/// </summary>
+	private void ShowDeleteConfirm(StatusDto status)
+	{
+		_statusToDelete = status;
+		_showDeleteDialog = true;
+	}
+
+	/// <summary>
+	/// Confirms the deletion of the status and reloads the list.
+	/// </summary>
+	private async Task ConfirmDelete()
+	{
+		if (_statusToDelete != null)
+		{
+			await StatusClient.DeleteAsync(_statusToDelete.Id.ToString());
+			_statuses = await StatusClient.GetAllAsync();
+		}
+		_showDeleteDialog = false;
+		_statusToDelete = null;
+	}
+
+	/// <summary>
+	/// Cancels the deletion and closes the confirmation dialog.
+	/// </summary>
+	private void CancelDelete()
+	{
+		_showDeleteDialog = false;
+		_statusToDelete = null;
+	}
+}

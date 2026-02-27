@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# pre-push hook — runs Unit.Tests, Blazor.Tests, and Architecture.Tests before any push.
+# Blocks the push if any test suite fails so broken code never reaches GitHub.
+# Integration.Tests are excluded (require Docker/TestContainers which may not be available locally).
+#
+# Install: bash scripts/hooks/install-hooks.sh
+
+set -euo pipefail
+
+FAILED=0
+
+run_tests() {
+  local project="$1"
+  echo "🔎 pre-push: running $project…"
+  if dotnet test "$project" --configuration Release --verbosity quiet 2>&1; then
+    echo "✅ $project passed."
+  else
+    echo "❌ $project FAILED."
+    FAILED=1
+  fi
+}
+
+run_tests "tests/Unit.Tests"
+run_tests "tests/Blazor.Tests"
+run_tests "tests/Architecture.Tests"
+
+if [ "$FAILED" -ne 0 ]; then
+  echo ""
+  echo "❌ pre-push: one or more test suites FAILED. Push aborted."
+  echo "   Fix the failures locally before pushing."
+  exit 1
+fi
+
+echo ""
+echo "✅ pre-push: all tests passed — push allowed."

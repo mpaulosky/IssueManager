@@ -18,7 +18,20 @@ Backend Developer on IssueManager (.NET 10, MongoDB, EF Core, CQRS, MediatR, Min
 
 ### Key file paths
 - API: `src/Api/`
-- Repositories: `src/Api/Repositories/`
-- Endpoints: `src/Api/Endpoints/`
+- Repositories: `src/Api/Data/` (IIssueRepository, IssueRepository)
+- Endpoints: `src/Api/Handlers/Issues/IssueEndpoints.cs`
+- Handlers: `src/Api/Handlers/Issues/`
 - Program: `src/Api/Program.cs`
 - Shared: `src/Shared/`
+- Validators: `src/Shared/Validators/`
+
+### Search/Filter implementation (2026-02-27)
+- Added search and filter capability to Issues list endpoint
+- Pattern: MongoDB regex filters with case-insensitive matching using `Builders<T>.Filter.Regex()`
+- SearchTerm: filters on Title OR Description (using `Filter.Or()`)
+- AuthorName: filters on Author.Name field
+- All filters combined with `Filter.And()` along with base Archived filter
+- Query string parameters flow: IssueEndpoints → ListIssuesHandler → IssueRepository
+- IssueApiClient builds URL with conditional query params using `Uri.EscapeDataString()`
+- FluentValidation: optional string parameters with max length 200 chars
+- Updated interface signature requires all implementations and test mocks to include new optional params

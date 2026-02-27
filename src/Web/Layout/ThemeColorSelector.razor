@@ -61,8 +61,15 @@
 	{
 		if (firstRender)
 		{
-			_activeTheme = await JS.InvokeAsync<string>("themeHelpers.getColorTheme") ?? "blue";
-			StateHasChanged();
+			try
+			{
+				_activeTheme = await JS.InvokeAsync<string>("themeHelpers.getColorTheme") ?? "blue";
+				await InvokeAsync(StateHasChanged);
+			}
+			catch (JSException)
+			{
+				// JS not ready, default to blue theme
+			}
 		}
 	}
 

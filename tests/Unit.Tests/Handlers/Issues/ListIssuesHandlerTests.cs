@@ -34,7 +34,7 @@ public class ListIssuesHandlerTests
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
 
 		var issues = GenerateIssueDtos(20);
-		_repository.GetAllAsync(1, 20, Arg.Any<CancellationToken>())
+		_repository.GetAllAsync(1, 20, null, null, Arg.Any<CancellationToken>())
 		.Returns(((IReadOnlyList<IssueDto>)issues, 42L));
 
 		// Act
@@ -55,7 +55,7 @@ public class ListIssuesHandlerTests
 		var query = new ListIssuesQuery { Page = 2, PageSize = 10 };
 
 		var issues = GenerateIssueDtos(10);
-		_repository.GetAllAsync(2, 10, Arg.Any<CancellationToken>())
+		_repository.GetAllAsync(2, 10, null, null, Arg.Any<CancellationToken>())
 		.Returns(((IReadOnlyList<IssueDto>)issues, 42L));
 
 		// Act
@@ -76,7 +76,7 @@ public class ListIssuesHandlerTests
 		var query = new ListIssuesQuery { Page = 3, PageSize = 20 };
 
 		var issues = GenerateIssueDtos(2); // Last page has only 2 items
-		_repository.GetAllAsync(3, 20, Arg.Any<CancellationToken>())
+		_repository.GetAllAsync(3, 20, null, null, Arg.Any<CancellationToken>())
 		.Returns(((IReadOnlyList<IssueDto>)issues, 42L));
 
 		// Act
@@ -96,7 +96,7 @@ public class ListIssuesHandlerTests
 		// Arrange
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
 
-		_repository.GetAllAsync(1, 20, Arg.Any<CancellationToken>())
+		_repository.GetAllAsync(1, 20, null, null, Arg.Any<CancellationToken>())
 		.Returns(((IReadOnlyList<IssueDto>)new List<IssueDto>(), 0L));
 
 		// Act
@@ -116,7 +116,7 @@ public class ListIssuesHandlerTests
 		// Arrange
 		var query = new ListIssuesQuery { Page = 10, PageSize = 20 };
 
-		_repository.GetAllAsync(10, 20, Arg.Any<CancellationToken>())
+		_repository.GetAllAsync(10, 20, null, null, Arg.Any<CancellationToken>())
 		.Returns(((IReadOnlyList<IssueDto>)new List<IssueDto>(), 42L));
 
 		// Act
@@ -177,14 +177,14 @@ public class ListIssuesHandlerTests
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
 
 		var issues = GenerateIssueDtos(10);
-		_repository.GetAllAsync(1, 20, Arg.Any<CancellationToken>())
+		_repository.GetAllAsync(1, 20, null, null, Arg.Any<CancellationToken>())
 		.Returns(((IReadOnlyList<IssueDto>)issues, 10L));
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		await _repository.Received(1).GetAllAsync(1, 20, Arg.Any<CancellationToken>());
+		await _repository.Received(1).GetAllAsync(1, 20, null, null, Arg.Any<CancellationToken>());
 		result.Items.Should().HaveCount(10);
 	}
 
@@ -202,7 +202,7 @@ public class ListIssuesHandlerTests
 			new(ObjectId.GenerateNewId(), "Issue 1", "Desc", DateTime.UtcNow.AddDays(-3), null, UserDto.Empty, CategoryDto.Empty, StatusDto.Empty, false, UserDto.Empty, false, false),
 		};
 
-		_repository.GetAllAsync(1, 3, Arg.Any<CancellationToken>())
+		_repository.GetAllAsync(1, 3, null, null, Arg.Any<CancellationToken>())
 		.Returns(((IReadOnlyList<IssueDto>)orderedIssues, 3L));
 
 		// Act

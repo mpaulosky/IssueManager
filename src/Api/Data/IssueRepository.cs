@@ -64,9 +64,31 @@ public class IssueRepository : IIssueRepository
 	public async Task<Result<(IReadOnlyList<IssueDto> Items, long Total)>> GetAllAsync(
 			int page,
 			int pageSize,
+			string? searchTerm = null,
+			string? authorName = null,
 			CancellationToken cancellationToken = default)
 	{
-		var filter = Builders<Issue>.Filter.Eq(x => x.Archived, false);
+		var filterBuilder = Builders<Issue>.Filter;
+		var filters = new List<FilterDefinition<Issue>>
+		{
+			filterBuilder.Eq(x => x.Archived, false)
+		};
+
+		if (!string.IsNullOrWhiteSpace(searchTerm))
+		{
+			var searchFilter = filterBuilder.Or(
+				filterBuilder.Regex(x => x.Title, new MongoDB.Bson.BsonRegularExpression(searchTerm, "i")),
+				filterBuilder.Regex(x => x.Description, new MongoDB.Bson.BsonRegularExpression(searchTerm, "i"))
+			);
+			filters.Add(searchFilter);
+		}
+
+		if (!string.IsNullOrWhiteSpace(authorName))
+		{
+			filters.Add(filterBuilder.Regex(x => x.Author.Name, new MongoDB.Bson.BsonRegularExpression(authorName, "i")));
+		}
+
+		var filter = filterBuilder.And(filters);
 		var total = await _collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
 		var entities = await _collection
 			.Find(filter)
