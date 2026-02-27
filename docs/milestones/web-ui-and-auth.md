@@ -1,4 +1,4 @@
-## Web Interface + Auth0 + Theme Milestone
+# Web Interface + Auth0 + Theme Milestone
 
 **Status:** Planning  
 **Lead:** Aragorn  
@@ -107,7 +107,7 @@ Tokens remain server-side (Blazor Server). API validates JWT Bearer tokens.
 | # | Item | Description |
 |---|------|-------------|
 | 5.1 | Runtime verification | Test dark/light toggle + color switcher persistence; document findings |
-| 5.2 | Fix identified issues | Likely: FOUC from `<body>` IIFE placement; SSR icon flash; Blazor re-render reset |
+| 5.2 | Fix identified issues | Likely: Flash of Unstyled Content (FOUC) from `<body>` IIFE placement; SSR icon flash; Blazor re-render reset |
 | 5.3 | OS preference fallback | Default to `prefers-color-scheme` for first-time visitors |
 
 ---
