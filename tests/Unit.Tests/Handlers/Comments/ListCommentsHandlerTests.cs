@@ -42,11 +42,11 @@ public class ListCommentsHandlerTests
 			new(ObjectId.GenerateNewId(), "Third Comment", "Third comment text.", DateTime.UtcNow, null, IssueDto.Empty, UserDto.Empty, [], false, UserDto.Empty, false, UserDto.Empty)
 		};
 
-		_repository.GetAllAsync()
+		_repository.GetAllAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Result<IReadOnlyList<CommentDto>>.Ok(comments));
 
 		// Act
-		var result = await _handler.Handle(CancellationToken.None);
+		var result = await _handler.Handle(cancellationToken: CancellationToken.None);
 
 		// Assert
 		result.Should().HaveCount(3);
@@ -59,11 +59,11 @@ public class ListCommentsHandlerTests
 	public async Task Handle_NoComments_ReturnsEmptyList()
 	{
 		// Arrange
-		_repository.GetAllAsync()
+		_repository.GetAllAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Result<IReadOnlyList<CommentDto>>.Ok((IReadOnlyList<CommentDto>)new List<CommentDto>()));
 
 		// Act
-		var result = await _handler.Handle(CancellationToken.None);
+		var result = await _handler.Handle(cancellationToken: CancellationToken.None);
 
 		// Assert
 		result.Should().BeEmpty();
@@ -73,11 +73,11 @@ public class ListCommentsHandlerTests
 	public async Task Handle_RepositoryFails_ReturnsEmptyList()
 	{
 		// Arrange
-		_repository.GetAllAsync()
+		_repository.GetAllAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Result<IReadOnlyList<CommentDto>>.Fail("Database error"));
 
 		// Act
-		var result = await _handler.Handle(CancellationToken.None);
+		var result = await _handler.Handle(cancellationToken: CancellationToken.None);
 
 		// Assert
 		result.Should().BeEmpty();
@@ -87,11 +87,11 @@ public class ListCommentsHandlerTests
 	public async Task Handle_RepositoryReturnsNull_ReturnsEmptyList()
 	{
 		// Arrange
-		_repository.GetAllAsync()
+		_repository.GetAllAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Result<IReadOnlyList<CommentDto>>.Ok((IReadOnlyList<CommentDto>)null!));
 
 		// Act
-		var result = await _handler.Handle(CancellationToken.None);
+		var result = await _handler.Handle(cancellationToken: CancellationToken.None);
 
 		// Assert
 		result.Should().BeEmpty();
@@ -107,13 +107,13 @@ public class ListCommentsHandlerTests
 			new(ObjectId.GenerateNewId(), "Test Comment", string.Empty, DateTime.UtcNow, null, IssueDto.Empty, UserDto.Empty, [], false, UserDto.Empty, false, UserDto.Empty)
 		};
 
-		_repository.GetAllAsync()
+		_repository.GetAllAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Result<IReadOnlyList<CommentDto>>.Ok(comments));
 
 		// Act
-		await _handler.Handle(cancellationToken);
+		await _handler.Handle(cancellationToken: cancellationToken);
 
 		// Assert
-		await _repository.Received(1).GetAllAsync();
+		await _repository.Received(1).GetAllAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>());
 	}
 }

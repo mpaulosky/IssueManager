@@ -76,7 +76,7 @@
 									<span>•</span>
 									<span>@comment.DateCreated.ToString("MMM dd, yyyy HH:mm")</span>
 								</div>
-								@if (_editingCommentId != comment.Id)
+								@if (_editingCommentId != comment.Id.ToString())
 								{
 									<!-- TODO: Restrict to comment owner when auth is implemented -->
 									<div class="flex items-center gap-2">
@@ -88,7 +88,7 @@
 										</button>
 										<button
 											type="button"
-											@onclick="() => ShowDeleteConfirmDialog(comment.Id)"
+											@onclick="() => ShowDeleteConfirmDialog(comment.Id.ToString())"
 											class="text-xs text-red-600 hover:underline">
 											Delete
 										</button>
@@ -96,7 +96,7 @@
 								}
 							</div>
 
-							@if (_editingCommentId == comment.Id)
+							@if (_editingCommentId == comment.Id.ToString())
 							{
 								<!-- Edit mode -->
 								<textarea
@@ -201,7 +201,7 @@
 			if (_issue != null)
 			{
 				var allComments = await CommentClient.GetAllAsync();
-				_comments = allComments.Where(c => c.IssueId == Id);
+				_comments = allComments.Where(c => c.Issue.Id.ToString() == Id);
 			}
 		}
 		finally
@@ -244,7 +244,7 @@
 	/// </summary>
 	private void StartEditComment(CommentDto comment)
 	{
-		_editingCommentId = comment.Id;
+		_editingCommentId = comment.Id.ToString();
 		_editCommentText = comment.Description;
 	}
 
@@ -267,7 +267,7 @@
 			var updatedComment = await CommentClient.UpdateAsync(_editingCommentId, command);
 			if (updatedComment != null)
 			{
-				_comments = _comments.Select(c => c.Id == _editingCommentId ? updatedComment : c);
+				_comments = _comments.Select(c => c.Id.ToString() == _editingCommentId ? updatedComment : c);
 				_editingCommentId = null;
 				_editCommentText = "";
 			}
@@ -307,7 +307,7 @@
 		var success = await CommentClient.DeleteAsync(_commentToDeleteId);
 		if (success)
 		{
-			_comments = _comments.Where(c => c.Id != _commentToDeleteId);
+			_comments = _comments.Where(c => c.Id.ToString() != _commentToDeleteId);
 			await InvokeAsync(StateHasChanged);
 		}
 		_commentToDeleteId = null;
