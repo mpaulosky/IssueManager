@@ -23,9 +23,6 @@ on:
   pull_request:
     branches:
       - "**"
-    paths:
-      - "**.cs"
-      - "**.csproj"
 
   workflow_dispatch:
     inputs:
