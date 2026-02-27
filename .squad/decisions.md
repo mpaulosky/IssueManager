@@ -78,3 +78,25 @@
 **By:** Matthew Paulosky (via Copilot)
 **What:** The `.squad/` folder (team.md, routing.md, decisions.md, ceremonies.md, skills/) must be version-controlled in the repository so squad knowledge persists across clones and team members.
 **Why:** Squad state was wiped when PR #54 was squash-merged (required `git rm --cached -r .squad/` to pass the branch guard). Committing the folder ensures future clones have the full team context.
+
+---
+
+### 2026-02-26: Repository Pattern — Interface as Contract
+**By:** Aragorn (Lead Developer)
+**What:** The interface defines the contract. Always update implementations and callers to match the interface, never change the interface to match old caller code.
+**Why:** During build repair, 14 compilation errors were caused by mismatched repository method signatures between interfaces and handlers. Handlers were calling `GetAsync()` while interface defined `GetByIdAsync()`. The authoritative contract lives in the interface; all implementations and callers must conform to it.
+**Implementation:** When fixing repository/handler mismatches: update handler code to match interface. For create operations, handlers must construct DTOs matching the interface signature, not models.
+
+---
+
+### 2026-02-27: Integration Test Repair - Result Pattern Migration
+**By:** Aragorn (Lead)
+**Status:** Completed
+**What:** All integration tests migrated to align with Result<T> wrapper pattern, ObjectId parameters, and extended IssueDto constructor.
+**Key Changes:**
+- All repository methods now return Result<T> (access via .Value, check .Success)
+- IssueDto constructor now requires 12 parameters (Id, Title, Description, DateCreated, DateModified, Author, Category, Status, Archived, ArchivedBy, ApprovedForRelease, Rejected)
+- GetByIdAsync and ArchiveAsync now accept ObjectId instead of string
+- GetAllAsync(page, pageSize) returns Result<(IReadOnlyList<IssueDto> Items, long Total)>
+**Why:** Result pattern improves error handling; integration tests must align with production API contracts.
+**Impact:** All integration tests now compile successfully; build is clean.
