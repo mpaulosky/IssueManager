@@ -59,7 +59,7 @@ public class CreateIssueValidatorTests
 
 		// Assert
 		result.IsValid.Should().BeFalse();
-		result.Errors.Should().HaveCountGreaterOrEqualTo(1);
+		result.Errors.Should().HaveCountGreaterThanOrEqualTo(1);
 		result.Errors.Should().Contain(e => e.PropertyName == "Title" && e.ErrorMessage.Contains("required"));
 	}
 

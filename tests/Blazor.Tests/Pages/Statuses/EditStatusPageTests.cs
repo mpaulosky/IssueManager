@@ -17,7 +17,7 @@ namespace Tests.BlazorTests.Pages.Statuses;
 /// </summary>
 public class EditStatusPageTests : IDisposable
 {
-	private readonly TestContext _ctx;
+	private readonly Bunit.TestContext _ctx;
 	private readonly IStatusApiClient _mockStatusClient;
 
 	/// <summary>
@@ -25,7 +25,7 @@ public class EditStatusPageTests : IDisposable
 	/// </summary>
 	public EditStatusPageTests()
 	{
-		_ctx = new TestContext();
+		_ctx = new Bunit.TestContext();
 		_mockStatusClient = Substitute.For<IStatusApiClient>();
 		_mockStatusClient.GetByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<StatusDto?>(null));
@@ -56,7 +56,7 @@ public class EditStatusPageTests : IDisposable
 		// Arrange — mock returns null by default
 
 		// Act
-		var cut = _ctx.RenderComponent<EditStatusPage>(p =>
+		var cut = _ctx.Render<EditStatusPage>(p =>
 			p.Add(c => c.Id, "nonexistent-id"));
 
 		// Assert
@@ -72,7 +72,7 @@ public class EditStatusPageTests : IDisposable
 			.Returns(Task.FromResult<StatusDto?>(status));
 
 		// Act
-		var cut = _ctx.RenderComponent<EditStatusPage>(p =>
+		var cut = _ctx.Render<EditStatusPage>(p =>
 			p.Add(c => c.Id, status.Id.ToString()));
 
 		// Assert
@@ -88,7 +88,7 @@ public class EditStatusPageTests : IDisposable
 			.Returns(Task.FromResult<StatusDto?>(status));
 
 		// Act
-		var cut = _ctx.RenderComponent<EditStatusPage>(p =>
+		var cut = _ctx.Render<EditStatusPage>(p =>
 			p.Add(c => c.Id, status.Id.ToString()));
 
 		// Assert
@@ -105,7 +105,7 @@ public class EditStatusPageTests : IDisposable
 			.Returns(Task.FromResult<StatusDto?>(status));
 
 		// Act
-		var cut = _ctx.RenderComponent<EditStatusPage>(p =>
+		var cut = _ctx.Render<EditStatusPage>(p =>
 			p.Add(c => c.Id, status.Id.ToString()));
 
 		// Assert
@@ -120,7 +120,7 @@ public class EditStatusPageTests : IDisposable
 		_mockStatusClient.GetByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<StatusDto?>(status));
 
-		var cut = _ctx.RenderComponent<EditStatusPage>(p =>
+		var cut = _ctx.Render<EditStatusPage>(p =>
 			p.Add(c => c.Id, status.Id.ToString()));
 
 		// Act — change the name and submit
@@ -140,7 +140,7 @@ public class EditStatusPageTests : IDisposable
 		_mockStatusClient.GetByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<StatusDto?>(status));
 
-		var cut = _ctx.RenderComponent<EditStatusPage>(p =>
+		var cut = _ctx.Render<EditStatusPage>(p =>
 			p.Add(c => c.Id, status.Id.ToString()));
 
 		cut.Find("#status-name").Change("Updated Wontfix");
@@ -160,7 +160,7 @@ public class EditStatusPageTests : IDisposable
 		const string testId = "status-test-123";
 
 		// Act
-		_ctx.RenderComponent<EditStatusPage>(p =>
+		_ctx.Render<EditStatusPage>(p =>
 			p.Add(c => c.Id, testId));
 
 		// Assert

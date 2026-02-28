@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>Api</RootNamespace>
 		<InvariantGlobalization>false</InvariantGlobalization>
+		<UserSecretsId>37795a0b-dd55-4ca7-a0ac-d5b6effd8208</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>

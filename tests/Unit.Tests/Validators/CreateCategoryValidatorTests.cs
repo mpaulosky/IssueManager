@@ -56,7 +56,7 @@ public class CreateCategoryValidatorTests
 
 		// Assert
 		result.IsValid.Should().BeFalse();
-		result.Errors.Should().HaveCountGreaterOrEqualTo(1);
+		result.Errors.Should().HaveCountGreaterThanOrEqualTo(1);
 		result.Errors.Should().Contain(e => e.PropertyName == "CategoryName" && e.ErrorMessage.Contains("required"));
 	}
 

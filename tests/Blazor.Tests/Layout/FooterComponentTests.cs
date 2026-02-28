@@ -15,7 +15,7 @@ public class FooterComponentTests : ComponentTestBase
 	public void FooterComponent_RendersWithoutError()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<FooterComponent>();
+		var cut = TestContext.Render<FooterComponent>();
 
 		// Assert
 		cut.Should().NotBeNull();
@@ -26,7 +26,7 @@ public class FooterComponentTests : ComponentTestBase
 	public void FooterComponent_HasContentInfoRole()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<FooterComponent>();
+		var cut = TestContext.Render<FooterComponent>();
 
 		// Assert
 		cut.Find("[role='contentinfo']").Should().NotBeNull();
@@ -36,7 +36,7 @@ public class FooterComponentTests : ComponentTestBase
 	public void FooterComponent_ShowsCopyrightText()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<FooterComponent>();
+		var cut = TestContext.Render<FooterComponent>();
 
 		// Assert
 		cut.Markup.Should().Contain("IssueManager");
@@ -48,7 +48,7 @@ public class FooterComponentTests : ComponentTestBase
 	public void FooterComponent_ShowsCurrentYear()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<FooterComponent>();
+		var cut = TestContext.Render<FooterComponent>();
 
 		// Assert
 		cut.Markup.Should().Contain(DateTime.Now.Year.ToString());
@@ -58,7 +58,7 @@ public class FooterComponentTests : ComponentTestBase
 	public void FooterComponent_ShowsVersionText()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<FooterComponent>();
+		var cut = TestContext.Render<FooterComponent>();
 
 		// Assert — footer always renders some version/commit text in the font-mono section
 		var monoLinks = cut.FindAll("a.hover\\:text-\\[var\\(--color-primary\\)\\]");
@@ -69,32 +69,32 @@ public class FooterComponentTests : ComponentTestBase
 	public void FooterComponent_ShowsCommitText()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<FooterComponent>();
+		var cut = TestContext.Render<FooterComponent>();
 
 		// Assert — the footer renders at least two anchor tags in the version section
 		var versionLinks = cut.FindAll("a[target='_blank']");
-		versionLinks.Should().HaveCountGreaterOrEqualTo(2);
+		versionLinks.Should().HaveCountGreaterThanOrEqualTo(2);
 	}
 
 	[Fact]
 	public void FooterComponent_HasGitHubLinks()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<FooterComponent>();
+		var cut = TestContext.Render<FooterComponent>();
 
 		// Assert
 		var links = cut.FindAll("a[href*='github.com']");
-		links.Should().HaveCountGreaterOrEqualTo(2);
+		links.Should().HaveCountGreaterThanOrEqualTo(2);
 	}
 
 	[Fact]
 	public void FooterComponent_LinksOpenInNewTab()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<FooterComponent>();
+		var cut = TestContext.Render<FooterComponent>();
 
 		// Assert
 		var externalLinks = cut.FindAll("a[target='_blank']");
-		externalLinks.Should().HaveCountGreaterOrEqualTo(2);
+		externalLinks.Should().HaveCountGreaterThanOrEqualTo(2);
 	}
 }

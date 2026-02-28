@@ -17,7 +17,7 @@ namespace Tests.BlazorTests.Pages.Categories;
 /// </summary>
 public class EditCategoryPageTests : IDisposable
 {
-	private readonly TestContext _ctx;
+	private readonly Bunit.TestContext _ctx;
 	private readonly ICategoryApiClient _mockCategoryClient;
 
 	/// <summary>
@@ -25,7 +25,7 @@ public class EditCategoryPageTests : IDisposable
 	/// </summary>
 	public EditCategoryPageTests()
 	{
-		_ctx = new TestContext();
+		_ctx = new Bunit.TestContext();
 		_mockCategoryClient = Substitute.For<ICategoryApiClient>();
 		_mockCategoryClient.GetByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<CategoryDto?>(null));
@@ -56,7 +56,7 @@ public class EditCategoryPageTests : IDisposable
 		// Arrange — mock returns null by default
 
 		// Act
-		var cut = _ctx.RenderComponent<EditCategoryPage>(p =>
+		var cut = _ctx.Render<EditCategoryPage>(p =>
 			p.Add(c => c.Id, "nonexistent-id"));
 
 		// Assert
@@ -72,7 +72,7 @@ public class EditCategoryPageTests : IDisposable
 			.Returns(Task.FromResult<CategoryDto?>(category));
 
 		// Act
-		var cut = _ctx.RenderComponent<EditCategoryPage>(p =>
+		var cut = _ctx.Render<EditCategoryPage>(p =>
 			p.Add(c => c.Id, category.Id.ToString()));
 
 		// Assert
@@ -88,7 +88,7 @@ public class EditCategoryPageTests : IDisposable
 			.Returns(Task.FromResult<CategoryDto?>(category));
 
 		// Act
-		var cut = _ctx.RenderComponent<EditCategoryPage>(p =>
+		var cut = _ctx.Render<EditCategoryPage>(p =>
 			p.Add(c => c.Id, category.Id.ToString()));
 
 		// Assert
@@ -105,7 +105,7 @@ public class EditCategoryPageTests : IDisposable
 			.Returns(Task.FromResult<CategoryDto?>(category));
 
 		// Act
-		var cut = _ctx.RenderComponent<EditCategoryPage>(p =>
+		var cut = _ctx.Render<EditCategoryPage>(p =>
 			p.Add(c => c.Id, category.Id.ToString()));
 
 		// Assert
@@ -120,7 +120,7 @@ public class EditCategoryPageTests : IDisposable
 		_mockCategoryClient.GetByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<CategoryDto?>(category));
 
-		var cut = _ctx.RenderComponent<EditCategoryPage>(p =>
+		var cut = _ctx.Render<EditCategoryPage>(p =>
 			p.Add(c => c.Id, category.Id.ToString()));
 
 		// Act — change the name and submit
@@ -140,7 +140,7 @@ public class EditCategoryPageTests : IDisposable
 		_mockCategoryClient.GetByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<CategoryDto?>(category));
 
-		var cut = _ctx.RenderComponent<EditCategoryPage>(p =>
+		var cut = _ctx.Render<EditCategoryPage>(p =>
 			p.Add(c => c.Id, category.Id.ToString()));
 
 		cut.Find("#category-name").Change("Updated Network");
@@ -160,7 +160,7 @@ public class EditCategoryPageTests : IDisposable
 		const string testId = "cat-test-123";
 
 		// Act
-		_ctx.RenderComponent<EditCategoryPage>(p =>
+		_ctx.Render<EditCategoryPage>(p =>
 			p.Add(c => c.Id, testId));
 
 		// Assert

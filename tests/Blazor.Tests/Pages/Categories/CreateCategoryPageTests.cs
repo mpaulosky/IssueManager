@@ -15,7 +15,7 @@ namespace Tests.BlazorTests.Pages.Categories;
 /// </summary>
 public class CreateCategoryPageTests : IDisposable
 {
-	private readonly TestContext _ctx;
+	private readonly Bunit.TestContext _ctx;
 	private readonly ICategoryApiClient _mockCategoryClient;
 
 	/// <summary>
@@ -23,7 +23,7 @@ public class CreateCategoryPageTests : IDisposable
 	/// </summary>
 	public CreateCategoryPageTests()
 	{
-		_ctx = new TestContext();
+		_ctx = new Bunit.TestContext();
 		_mockCategoryClient = Substitute.For<ICategoryApiClient>();
 		_mockCategoryClient
 			.CreateAsync(Arg.Any<CreateCategoryCommand>(), Arg.Any<CancellationToken>())
@@ -42,7 +42,7 @@ public class CreateCategoryPageTests : IDisposable
 	public void CreateCategoryPage_RendersWithoutError_AndShowsHeading()
 	{
 		// Act
-		var cut = _ctx.RenderComponent<CreateCategoryPage>();
+		var cut = _ctx.Render<CreateCategoryPage>();
 
 		// Assert
 		cut.Should().NotBeNull();
@@ -53,7 +53,7 @@ public class CreateCategoryPageTests : IDisposable
 	public void CreateCategoryPage_HasNameInput()
 	{
 		// Act
-		var cut = _ctx.RenderComponent<CreateCategoryPage>();
+		var cut = _ctx.Render<CreateCategoryPage>();
 
 		// Assert
 		cut.Find("#category-name").Should().NotBeNull();
@@ -63,7 +63,7 @@ public class CreateCategoryPageTests : IDisposable
 	public void CreateCategoryPage_HasDescriptionInput()
 	{
 		// Act
-		var cut = _ctx.RenderComponent<CreateCategoryPage>();
+		var cut = _ctx.Render<CreateCategoryPage>();
 
 		// Assert
 		cut.Find("#category-description").Should().NotBeNull();
@@ -73,7 +73,7 @@ public class CreateCategoryPageTests : IDisposable
 	public void CreateCategoryPage_HasSubmitButton()
 	{
 		// Act
-		var cut = _ctx.RenderComponent<CreateCategoryPage>();
+		var cut = _ctx.Render<CreateCategoryPage>();
 
 		// Assert
 		var submitButton = cut.Find("button[type='submit']");
@@ -85,7 +85,7 @@ public class CreateCategoryPageTests : IDisposable
 	public void CreateCategoryPage_HasCancelLink()
 	{
 		// Act
-		var cut = _ctx.RenderComponent<CreateCategoryPage>();
+		var cut = _ctx.Render<CreateCategoryPage>();
 
 		// Assert
 		var cancelLink = cut.Find("a[href='/categories']");
@@ -96,7 +96,7 @@ public class CreateCategoryPageTests : IDisposable
 	public async Task CreateCategoryPage_SubmitWithValidName_CallsCreateAsync()
 	{
 		// Arrange
-		var cut = _ctx.RenderComponent<CreateCategoryPage>();
+		var cut = _ctx.Render<CreateCategoryPage>();
 		cut.Find("#category-name").Change("New Category Name");
 
 		// Act
@@ -111,7 +111,7 @@ public class CreateCategoryPageTests : IDisposable
 	public async Task CreateCategoryPage_AfterSuccessfulSubmit_NavigatesToCategoriesList()
 	{
 		// Arrange
-		var cut = _ctx.RenderComponent<CreateCategoryPage>();
+		var cut = _ctx.Render<CreateCategoryPage>();
 		cut.Find("#category-name").Change("Valid Category");
 
 		// Act

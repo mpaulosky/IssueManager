@@ -14,7 +14,7 @@ namespace Tests.BlazorTests.Pages.Statuses;
 /// </summary>
 public class StatusesPageTests : IDisposable
 {
-	private readonly TestContext _ctx;
+	private readonly Bunit.TestContext _ctx;
 	private readonly IStatusApiClient _mockStatusClient;
 
 	/// <summary>
@@ -22,7 +22,7 @@ public class StatusesPageTests : IDisposable
 	/// </summary>
 	public StatusesPageTests()
 	{
-		_ctx = new TestContext();
+		_ctx = new Bunit.TestContext();
 		_mockStatusClient = Substitute.For<IStatusApiClient>();
 		_mockStatusClient.GetAllAsync(Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IEnumerable<StatusDto>>([]));
@@ -49,7 +49,7 @@ public class StatusesPageTests : IDisposable
 	public void StatusesPage_RendersWithoutError_AndShowsHeading()
 	{
 		// Act
-		var cut = _ctx.RenderComponent<StatusesPage>();
+		var cut = _ctx.Render<StatusesPage>();
 
 		// Assert
 		cut.Should().NotBeNull();
@@ -60,7 +60,7 @@ public class StatusesPageTests : IDisposable
 	public void StatusesPage_HasNewStatusLink()
 	{
 		// Act
-		var cut = _ctx.RenderComponent<StatusesPage>();
+		var cut = _ctx.Render<StatusesPage>();
 
 		// Assert
 		var link = cut.Find("a[href='/statuses/create']");
@@ -74,7 +74,7 @@ public class StatusesPageTests : IDisposable
 		// Arrange — mock already returns empty by default
 
 		// Act
-		var cut = _ctx.RenderComponent<StatusesPage>();
+		var cut = _ctx.Render<StatusesPage>();
 
 		// Assert
 		cut.Markup.Should().Contain("No statuses found.");
@@ -89,7 +89,7 @@ public class StatusesPageTests : IDisposable
 			.Returns(Task.FromResult<IEnumerable<StatusDto>>(new[] { status }));
 
 		// Act
-		var cut = _ctx.RenderComponent<StatusesPage>();
+		var cut = _ctx.Render<StatusesPage>();
 
 		// Assert
 		cut.Markup.Should().Contain("In Progress");
@@ -104,7 +104,7 @@ public class StatusesPageTests : IDisposable
 			.Returns(Task.FromResult<IEnumerable<StatusDto>>(new[] { status }));
 
 		// Act
-		var cut = _ctx.RenderComponent<StatusesPage>();
+		var cut = _ctx.Render<StatusesPage>();
 
 		// Assert
 		var editLink = cut.Find($"a[href='/statuses/{status.Id}/edit']");
@@ -120,7 +120,7 @@ public class StatusesPageTests : IDisposable
 			.Returns(Task.FromResult<IEnumerable<StatusDto>>(new[] { status }));
 
 		// Act
-		var cut = _ctx.RenderComponent<StatusesPage>();
+		var cut = _ctx.Render<StatusesPage>();
 
 		// Assert
 		var deleteButtons = cut.FindAll("button").Where(b => b.TextContent.Trim() == "Delete");
@@ -131,7 +131,7 @@ public class StatusesPageTests : IDisposable
 	public void StatusesPage_CallsGetAllAsync_OnInitialization()
 	{
 		// Act
-		_ctx.RenderComponent<StatusesPage>();
+		_ctx.Render<StatusesPage>();
 
 		// Assert
 		_mockStatusClient.Received(1).GetAllAsync(Arg.Any<CancellationToken>());

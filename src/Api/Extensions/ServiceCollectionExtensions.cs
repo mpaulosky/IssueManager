@@ -24,17 +24,17 @@ public static class ServiceCollectionExtensions
 	/// </summary>
 	public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
 	{
-		var connectionString = configuration.GetConnectionString("issuemanager")
+		var connectionString = configuration.GetConnectionString("dev-issuemanagerdb")
 			?? "mongodb://localhost:27017";
 
 		services.AddSingleton<IIssueRepository>(sp =>
-			new IssueRepository(connectionString, "IssueManagerDb"));
+			new IssueRepository(connectionString, "dev-issuemanagerdb"));
 		services.AddSingleton<IStatusRepository>(sp =>
-			new StatusRepository(connectionString, "IssueManagerDb"));
+			new StatusRepository(connectionString, "dev-issuemanagerdb"));
 		services.AddSingleton<ICategoryRepository>(sp =>
-			new CategoryRepository(connectionString, "IssueManagerDb"));
+			new CategoryRepository(connectionString, "dev-issuemanagerdb"));
 		services.AddSingleton<ICommentRepository>(sp =>
-			new CommentRepository(connectionString, "IssueManagerDb"));
+			new CommentRepository(connectionString, "dev-issuemanagerdb"));
 
 		return services;
 	}

@@ -15,7 +15,7 @@ namespace Tests.BlazorTests.Pages.Statuses;
 /// </summary>
 public class CreateStatusPageTests : IDisposable
 {
-	private readonly TestContext _ctx;
+	private readonly Bunit.TestContext _ctx;
 	private readonly IStatusApiClient _mockStatusClient;
 
 	/// <summary>
@@ -23,7 +23,7 @@ public class CreateStatusPageTests : IDisposable
 	/// </summary>
 	public CreateStatusPageTests()
 	{
-		_ctx = new TestContext();
+		_ctx = new Bunit.TestContext();
 		_mockStatusClient = Substitute.For<IStatusApiClient>();
 		_mockStatusClient
 			.CreateAsync(Arg.Any<CreateStatusCommand>(), Arg.Any<CancellationToken>())
@@ -42,7 +42,7 @@ public class CreateStatusPageTests : IDisposable
 	public void CreateStatusPage_RendersWithoutError_AndShowsHeading()
 	{
 		// Act
-		var cut = _ctx.RenderComponent<CreateStatusPage>();
+		var cut = _ctx.Render<CreateStatusPage>();
 
 		// Assert
 		cut.Should().NotBeNull();
@@ -53,7 +53,7 @@ public class CreateStatusPageTests : IDisposable
 	public void CreateStatusPage_HasStatusNameInput()
 	{
 		// Act
-		var cut = _ctx.RenderComponent<CreateStatusPage>();
+		var cut = _ctx.Render<CreateStatusPage>();
 
 		// Assert
 		cut.Find("#status-name").Should().NotBeNull();
@@ -63,7 +63,7 @@ public class CreateStatusPageTests : IDisposable
 	public void CreateStatusPage_HasDescriptionInput()
 	{
 		// Act
-		var cut = _ctx.RenderComponent<CreateStatusPage>();
+		var cut = _ctx.Render<CreateStatusPage>();
 
 		// Assert
 		cut.Find("#status-description").Should().NotBeNull();
@@ -73,7 +73,7 @@ public class CreateStatusPageTests : IDisposable
 	public void CreateStatusPage_HasSubmitButton()
 	{
 		// Act
-		var cut = _ctx.RenderComponent<CreateStatusPage>();
+		var cut = _ctx.Render<CreateStatusPage>();
 
 		// Assert
 		var submitButton = cut.Find("button[type='submit']");
@@ -85,7 +85,7 @@ public class CreateStatusPageTests : IDisposable
 	public void CreateStatusPage_HasCancelLink()
 	{
 		// Act
-		var cut = _ctx.RenderComponent<CreateStatusPage>();
+		var cut = _ctx.Render<CreateStatusPage>();
 
 		// Assert
 		var cancelLink = cut.Find("a[href='/statuses']");
@@ -96,7 +96,7 @@ public class CreateStatusPageTests : IDisposable
 	public async Task CreateStatusPage_SubmitWithValidName_CallsCreateAsync()
 	{
 		// Arrange
-		var cut = _ctx.RenderComponent<CreateStatusPage>();
+		var cut = _ctx.Render<CreateStatusPage>();
 		cut.Find("#status-name").Change("New Status Name");
 
 		// Act
@@ -111,7 +111,7 @@ public class CreateStatusPageTests : IDisposable
 	public async Task CreateStatusPage_AfterSuccessfulSubmit_NavigatesToStatusesList()
 	{
 		// Arrange
-		var cut = _ctx.RenderComponent<CreateStatusPage>();
+		var cut = _ctx.Render<CreateStatusPage>();
 		cut.Find("#status-name").Change("Valid Status");
 
 		// Act

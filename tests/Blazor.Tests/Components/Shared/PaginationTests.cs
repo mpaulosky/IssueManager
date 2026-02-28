@@ -25,7 +25,7 @@ public class PaginationTests : ComponentTestBase
 	public void Pagination_DoesNotRender_WhenTotalPagesIsOne()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<Pagination>(p => p
+		var cut = TestContext.Render<Pagination>(p => p
 			.Add(x => x.CurrentPage, 1)
 			.Add(x => x.TotalPages, 1));
 
@@ -37,7 +37,7 @@ public class PaginationTests : ComponentTestBase
 	public void Pagination_DoesNotRender_WhenTotalPagesIsZero()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<Pagination>(p => p
+		var cut = TestContext.Render<Pagination>(p => p
 			.Add(x => x.CurrentPage, 1)
 			.Add(x => x.TotalPages, 0));
 
@@ -49,7 +49,7 @@ public class PaginationTests : ComponentTestBase
 	public void Pagination_RendersPageButtons_WhenTotalPagesIsGreaterThanOne()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<Pagination>(p => p
+		var cut = TestContext.Render<Pagination>(p => p
 			.Add(x => x.CurrentPage, 1)
 			.Add(x => x.TotalPages, 3));
 
@@ -62,7 +62,7 @@ public class PaginationTests : ComponentTestBase
 	public void Pagination_PreviousButtonIsDisabled_OnFirstPage()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<Pagination>(p => p
+		var cut = TestContext.Render<Pagination>(p => p
 			.Add(x => x.CurrentPage, 1)
 			.Add(x => x.TotalPages, 5));
 
@@ -75,7 +75,7 @@ public class PaginationTests : ComponentTestBase
 	public void Pagination_NextButtonIsDisabled_OnLastPage()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<Pagination>(p => p
+		var cut = TestContext.Render<Pagination>(p => p
 			.Add(x => x.CurrentPage, 5)
 			.Add(x => x.TotalPages, 5));
 
@@ -89,7 +89,7 @@ public class PaginationTests : ComponentTestBase
 	{
 		// Arrange
 		var changedPage = 0;
-		var cut = TestContext.RenderComponent<Pagination>(p => p
+		var cut = TestContext.Render<Pagination>(p => p
 			.Add(x => x.CurrentPage, 1)
 			.Add(x => x.TotalPages, 5)
 			.Add(x => x.OnPageChanged, EventCallback.Factory.Create<int>(this, page => changedPage = page)));

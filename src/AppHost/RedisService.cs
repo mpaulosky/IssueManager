@@ -3,17 +3,9 @@
 // File Name :     RedisServices.cs
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
-// Solution Name : ArticleSite
+// Solution Name : IssueManager
 // Project Name :  AppHost
 // =======================================================
-
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Logging;
-
-using StackExchange.Redis;
-
-using static Shared.Constants.Constants;
 
 namespace AppHost;
 
@@ -22,6 +14,7 @@ namespace AppHost;
 /// </summary>
 public static class RedisServices
 {
+
 	/// <summary>
 	/// Adds Redis services to the distributed application builder with a clear cache command and persistent lifetime.
 	/// </summary>
@@ -29,10 +22,12 @@ public static class RedisServices
 	/// <returns>An <see cref="IResourceBuilder{RedisResource}"/> for further configuration.</returns>
 	public static IResourceBuilder<RedisResource> AddRedisServices(this IDistributedApplicationBuilder builder)
 	{
+
 		var cache = builder.AddRedis(RedisCache)
 			.WithClearCommand()
 			.WithLifetime(ContainerLifetime.Persistent);
 		return cache;
+
 	}
 
 	/// <summary>
@@ -42,18 +37,24 @@ public static class RedisServices
 	/// <returns>The updated <see cref="IResourceBuilder{RedisResource}"/>.</returns>
 	private static IResourceBuilder<RedisResource> WithClearCommand(this IResourceBuilder<RedisResource> builder)
 	{
+
 		builder.WithCommand(
 			name: "clear-cache",
 			displayName: "Clear Cache",
 			executeCommand: context => OnRunClearCacheCommandAsync(builder, context),
 			commandOptions: new CommandOptions
 			{
-				UpdateState = OnUpdateResourceState,
+
+					UpdateState = OnUpdateResourceState,
 				ConfirmationMessage = "Are you sure you want to clear the cache?",
 				Description = "This command will clear all cached data in the Redis cache.",
+
 			}
+
 		);
+
 		return builder;
+
 	}
 
 	/// <summary>
@@ -66,6 +67,7 @@ public static class RedisServices
 		IResourceBuilder<RedisResource> builder,
 		ExecuteCommandContext context)
 	{
+
 		var connectionString = await builder.Resource.GetConnectionStringAsync() ?? throw new InvalidOperationException(
 			$"Unable to get the '{context.ResourceName}' connection string.");
 
@@ -73,6 +75,7 @@ public static class RedisServices
 		var database = connection.GetDatabase();
 		await database.ExecuteAsync("FLUSHALL");
 		return CommandResults.Success();
+
 	}
 
 	/// <summary>
@@ -82,11 +85,14 @@ public static class RedisServices
 	/// <returns>The new <see cref="ResourceCommandState"/> for the command.</returns>
 	private static ResourceCommandState OnUpdateResourceState(UpdateCommandStateContext context)
 	{
+
 		var logger = context.ServiceProvider.GetRequiredService<ILogger<Program>>();
 		if (logger.IsEnabled(LogLevel.Information))
 		{
 			logger.LogInformation("Updating resource state: {ResourceSnapshot}", context.ResourceSnapshot);
 		}
 		return context.ResourceSnapshot.HealthStatus is HealthStatus.Healthy ? ResourceCommandState.Enabled : ResourceCommandState.Disabled;
+
 	}
+
 }

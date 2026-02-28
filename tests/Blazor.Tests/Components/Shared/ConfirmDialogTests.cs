@@ -25,7 +25,7 @@ public class ConfirmDialogTests : ComponentTestBase
 	public void ConfirmDialog_DoesNotRender_WhenIsVisibleIsFalse()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<ConfirmDialog>(p =>
+		var cut = TestContext.Render<ConfirmDialog>(p =>
 			p.Add(x => x.IsVisible, false));
 
 		// Assert
@@ -36,7 +36,7 @@ public class ConfirmDialogTests : ComponentTestBase
 	public void ConfirmDialog_Renders_WhenIsVisibleIsTrue()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<ConfirmDialog>(p =>
+		var cut = TestContext.Render<ConfirmDialog>(p =>
 			p.Add(x => x.IsVisible, true));
 
 		// Assert
@@ -47,7 +47,7 @@ public class ConfirmDialogTests : ComponentTestBase
 	public void ConfirmDialog_RendersTitleAndMessage_WhenVisible()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<ConfirmDialog>(p => p
+		var cut = TestContext.Render<ConfirmDialog>(p => p
 			.Add(x => x.IsVisible, true)
 			.Add(x => x.Title, "Delete Item")
 			.Add(x => x.Message, "Are you sure?"));
@@ -62,7 +62,7 @@ public class ConfirmDialogTests : ComponentTestBase
 	{
 		// Arrange
 		var confirmed = false;
-		var cut = TestContext.RenderComponent<ConfirmDialog>(p => p
+		var cut = TestContext.Render<ConfirmDialog>(p => p
 			.Add(x => x.IsVisible, true)
 			.Add(x => x.ConfirmText, "Yes, Delete")
 			.Add(x => x.OnConfirm, EventCallback.Factory.Create(this, () => { confirmed = true; })));
@@ -81,7 +81,7 @@ public class ConfirmDialogTests : ComponentTestBase
 	{
 		// Arrange
 		var cancelled = false;
-		var cut = TestContext.RenderComponent<ConfirmDialog>(p => p
+		var cut = TestContext.Render<ConfirmDialog>(p => p
 			.Add(x => x.IsVisible, true)
 			.Add(x => x.CancelText, "No, Keep")
 			.Add(x => x.OnCancel, EventCallback.Factory.Create(this, () => { cancelled = true; })));

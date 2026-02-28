@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>Web</RootNamespace>
 		<InvariantGlobalization>false</InvariantGlobalization>
+		<UserSecretsId>9ea929cd-8b58-4052-a68a-b79a1b47c36c</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>

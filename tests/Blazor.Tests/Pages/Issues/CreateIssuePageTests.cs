@@ -35,7 +35,7 @@ public class CreateIssuePageTests : ComponentTestBase
 	public void CreateIssuePage_RendersWithoutError_AndShowsHeading()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<CreateIssuePage>();
+		var cut = TestContext.Render<CreateIssuePage>();
 
 		// Assert
 		cut.Should().NotBeNull();
@@ -46,7 +46,7 @@ public class CreateIssuePageTests : ComponentTestBase
 	public void CreateIssuePage_RendersIssueForm()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<CreateIssuePage>();
+		var cut = TestContext.Render<CreateIssuePage>();
 
 		// Assert
 		cut.FindComponent<IssueForm>().Should().NotBeNull();
@@ -56,7 +56,7 @@ public class CreateIssuePageTests : ComponentTestBase
 	public void CreateIssuePage_IssueFormHasSubmitButton()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<CreateIssuePage>();
+		var cut = TestContext.Render<CreateIssuePage>();
 
 		// Assert
 		var submitButton = cut.Find("button[type='submit']");
@@ -67,7 +67,7 @@ public class CreateIssuePageTests : ComponentTestBase
 	public async Task CreateIssuePage_SubmitWithValidData_CallsCreateAsync()
 	{
 		// Arrange
-		var cut = TestContext.RenderComponent<CreateIssuePage>();
+		var cut = TestContext.Render<CreateIssuePage>();
 		cut.Find("#title").Change("A Valid Issue Title");
 		cut.Find("#description").Change("Some description text");
 
@@ -83,7 +83,7 @@ public class CreateIssuePageTests : ComponentTestBase
 	public async Task CreateIssuePage_AfterSuccessfulSubmit_NavigatesToIssuesList()
 	{
 		// Arrange
-		var cut = TestContext.RenderComponent<CreateIssuePage>();
+		var cut = TestContext.Render<CreateIssuePage>();
 		cut.Find("#title").Change("A Valid Issue Title");
 		cut.Find("#description").Change("Some description");
 

@@ -22,7 +22,7 @@ public class LoadingSpinnerTests : ComponentTestBase
 	public void LoadingSpinner_ShowsDefaultLabel_WhenLabelNotProvided()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<LoadingSpinner>();
+		var cut = TestContext.Render<LoadingSpinner>();
 
 		// Assert
 		cut.Find("span").TextContent.Should().Be("Loading...");
@@ -32,7 +32,7 @@ public class LoadingSpinnerTests : ComponentTestBase
 	public void LoadingSpinner_ShowsCustomLabel_WhenLabelIsProvided()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<LoadingSpinner>(p =>
+		var cut = TestContext.Render<LoadingSpinner>(p =>
 			p.Add(x => x.Label, "Please wait"));
 
 		// Assert
@@ -43,7 +43,7 @@ public class LoadingSpinnerTests : ComponentTestBase
 	public void LoadingSpinner_HasAnimateSpinClass_InMarkup()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<LoadingSpinner>();
+		var cut = TestContext.Render<LoadingSpinner>();
 
 		// Assert
 		cut.Find(".animate-spin").Should().NotBeNull();

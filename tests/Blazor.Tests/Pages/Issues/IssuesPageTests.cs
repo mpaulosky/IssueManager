@@ -51,7 +51,7 @@ public class IssuesPageTests : ComponentTestBase
 	public void IssuesPage_RendersWithoutError_AndShowsHeading()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<IssuesPage>();
+		var cut = TestContext.Render<IssuesPage>();
 
 		// Assert
 		cut.Should().NotBeNull();
@@ -62,7 +62,7 @@ public class IssuesPageTests : ComponentTestBase
 	public void IssuesPage_HasNewIssueLink()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<IssuesPage>();
+		var cut = TestContext.Render<IssuesPage>();
 
 		// Assert
 		var link = cut.Find("a[href='/issues/create']");
@@ -74,7 +74,7 @@ public class IssuesPageTests : ComponentTestBase
 	public void IssuesPage_HasSearchInput()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<IssuesPage>();
+		var cut = TestContext.Render<IssuesPage>();
 
 		// Assert
 		cut.Find("#search").Should().NotBeNull();
@@ -84,7 +84,7 @@ public class IssuesPageTests : ComponentTestBase
 	public void IssuesPage_HasStatusAndCategoryFilters()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<IssuesPage>();
+		var cut = TestContext.Render<IssuesPage>();
 
 		// Assert
 		cut.Find("#status-filter").Should().NotBeNull();
@@ -97,7 +97,7 @@ public class IssuesPageTests : ComponentTestBase
 		// Arrange — mock already returns PaginatedResponse.Empty by default
 
 		// Act
-		var cut = TestContext.RenderComponent<IssuesPage>();
+		var cut = TestContext.Render<IssuesPage>();
 
 		// Assert
 		cut.Markup.Should().Contain("No issues found.");
@@ -118,7 +118,7 @@ public class IssuesPageTests : ComponentTestBase
 			.Returns(Task.FromResult(response));
 
 		// Act
-		var cut = TestContext.RenderComponent<IssuesPage>();
+		var cut = TestContext.Render<IssuesPage>();
 
 		// Assert
 		cut.Markup.Should().Contain("My Integration Bug");
@@ -128,7 +128,7 @@ public class IssuesPageTests : ComponentTestBase
 	public void IssuesPage_CallsGetAllAsync_OnInitialization()
 	{
 		// Act
-		TestContext.RenderComponent<IssuesPage>();
+		TestContext.Render<IssuesPage>();
 
 		// Assert
 		_mockIssueClient.Received(1)

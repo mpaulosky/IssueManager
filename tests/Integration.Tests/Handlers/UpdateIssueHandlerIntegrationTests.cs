@@ -23,7 +23,7 @@ private UpdateIssueHandler _handler = null!;
 /// <summary>
 /// Initializes the test container and repository.
 /// </summary>
-public async Task InitializeAsync()
+public async ValueTask InitializeAsync()
 {
 await _mongoContainer.StartAsync();
 var connectionString = _mongoContainer.GetConnectionString();
@@ -34,7 +34,7 @@ _handler = new UpdateIssueHandler(_repository, new UpdateIssueValidator());
 /// <summary>
 /// Disposes the test container.
 /// </summary>
-public async Task DisposeAsync()
+public async ValueTask DisposeAsync()
 {
 await _mongoContainer.StopAsync();
 await _mongoContainer.DisposeAsync();

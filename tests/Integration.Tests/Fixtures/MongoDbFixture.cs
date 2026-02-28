@@ -18,7 +18,7 @@ public class MongoDbFixture : IAsyncLifetime
 	/// <summary>
 	/// Initializes the MongoDB container.
 	/// </summary>
-	public async Task InitializeAsync()
+	public async ValueTask InitializeAsync()
 	{
 		await _mongoContainer.StartAsync();
 	}
@@ -26,7 +26,7 @@ public class MongoDbFixture : IAsyncLifetime
 	/// <summary>
 	/// Disposes the MongoDB container.
 	/// </summary>
-	public async Task DisposeAsync()
+	public async ValueTask DisposeAsync()
 	{
 		await _mongoContainer.StopAsync();
 		await _mongoContainer.DisposeAsync();

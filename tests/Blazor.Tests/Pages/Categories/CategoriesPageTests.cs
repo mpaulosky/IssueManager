@@ -15,7 +15,7 @@ namespace Tests.BlazorTests.Pages.Categories;
 /// </summary>
 public class CategoriesPageTests : IDisposable
 {
-	private readonly TestContext _ctx;
+	private readonly Bunit.TestContext _ctx;
 	private readonly ICategoryApiClient _mockCategoryClient;
 
 	/// <summary>
@@ -23,7 +23,7 @@ public class CategoriesPageTests : IDisposable
 	/// </summary>
 	public CategoriesPageTests()
 	{
-		_ctx = new TestContext();
+		_ctx = new Bunit.TestContext();
 		_mockCategoryClient = Substitute.For<ICategoryApiClient>();
 		_mockCategoryClient.GetAllAsync(Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IEnumerable<CategoryDto>>([]));
@@ -50,7 +50,7 @@ public class CategoriesPageTests : IDisposable
 	public void CategoriesPage_RendersWithoutError_AndShowsHeading()
 	{
 		// Act
-		var cut = _ctx.RenderComponent<CategoriesPage>();
+		var cut = _ctx.Render<CategoriesPage>();
 
 		// Assert
 		cut.Should().NotBeNull();
@@ -61,7 +61,7 @@ public class CategoriesPageTests : IDisposable
 	public void CategoriesPage_HasNewCategoryLink()
 	{
 		// Act
-		var cut = _ctx.RenderComponent<CategoriesPage>();
+		var cut = _ctx.Render<CategoriesPage>();
 
 		// Assert
 		var link = cut.Find("a[href='/categories/create']");
@@ -75,7 +75,7 @@ public class CategoriesPageTests : IDisposable
 		// Arrange — mock already returns empty by default
 
 		// Act
-		var cut = _ctx.RenderComponent<CategoriesPage>();
+		var cut = _ctx.Render<CategoriesPage>();
 
 		// Assert
 		cut.Markup.Should().Contain("No categories found.");
@@ -90,7 +90,7 @@ public class CategoriesPageTests : IDisposable
 			.Returns(Task.FromResult<IEnumerable<CategoryDto>>(new[] { category }));
 
 		// Act
-		var cut = _ctx.RenderComponent<CategoriesPage>();
+		var cut = _ctx.Render<CategoriesPage>();
 
 		// Assert
 		cut.Markup.Should().Contain("Performance");
@@ -105,7 +105,7 @@ public class CategoriesPageTests : IDisposable
 			.Returns(Task.FromResult<IEnumerable<CategoryDto>>(new[] { category }));
 
 		// Act
-		var cut = _ctx.RenderComponent<CategoriesPage>();
+		var cut = _ctx.Render<CategoriesPage>();
 
 		// Assert
 		var editLink = cut.Find($"a[href='/categories/{category.Id}/edit']");
@@ -121,7 +121,7 @@ public class CategoriesPageTests : IDisposable
 			.Returns(Task.FromResult<IEnumerable<CategoryDto>>(new[] { category }));
 
 		// Act
-		var cut = _ctx.RenderComponent<CategoriesPage>();
+		var cut = _ctx.Render<CategoriesPage>();
 
 		// Assert
 		var deleteButtons = cut.FindAll("button").Where(b => b.TextContent.Trim() == "Delete");
@@ -132,7 +132,7 @@ public class CategoriesPageTests : IDisposable
 	public void CategoriesPage_CallsGetAllAsync_OnInitialization()
 	{
 		// Act
-		_ctx.RenderComponent<CategoriesPage>();
+		_ctx.Render<CategoriesPage>();
 
 		// Assert
 		_mockCategoryClient.Received(1).GetAllAsync(Arg.Any<CancellationToken>());

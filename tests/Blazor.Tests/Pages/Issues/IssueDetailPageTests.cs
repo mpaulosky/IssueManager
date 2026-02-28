@@ -72,7 +72,7 @@ public class IssueDetailPageTests : ComponentTestBase
 		// Arrange — mock returns null by default
 
 		// Act
-		var cut = TestContext.RenderComponent<IssueDetailPage>(p =>
+		var cut = TestContext.Render<IssueDetailPage>(p =>
 			p.Add(c => c.Id, "nonexistent-id"));
 
 		// Assert
@@ -88,7 +88,7 @@ public class IssueDetailPageTests : ComponentTestBase
 			.Returns(Task.FromResult<IssueDto?>(issue));
 
 		// Act
-		var cut = TestContext.RenderComponent<IssueDetailPage>(p =>
+		var cut = TestContext.Render<IssueDetailPage>(p =>
 			p.Add(c => c.Id, issue.Id.ToString()));
 
 		// Assert
@@ -104,7 +104,7 @@ public class IssueDetailPageTests : ComponentTestBase
 			.Returns(Task.FromResult<IssueDto?>(issue));
 
 		// Act
-		var cut = TestContext.RenderComponent<IssueDetailPage>(p =>
+		var cut = TestContext.Render<IssueDetailPage>(p =>
 			p.Add(c => c.Id, issue.Id.ToString()));
 
 		// Assert
@@ -120,7 +120,7 @@ public class IssueDetailPageTests : ComponentTestBase
 			.Returns(Task.FromResult<IssueDto?>(issue));
 
 		// Act
-		var cut = TestContext.RenderComponent<IssueDetailPage>(p =>
+		var cut = TestContext.Render<IssueDetailPage>(p =>
 			p.Add(c => c.Id, issue.Id.ToString()));
 
 		// Assert
@@ -138,7 +138,7 @@ public class IssueDetailPageTests : ComponentTestBase
 		// mock already returns empty comments by default
 
 		// Act
-		var cut = TestContext.RenderComponent<IssueDetailPage>(p =>
+		var cut = TestContext.Render<IssueDetailPage>(p =>
 			p.Add(c => c.Id, issue.Id.ToString()));
 
 		// Assert
@@ -157,7 +157,7 @@ public class IssueDetailPageTests : ComponentTestBase
 			.Returns(Task.FromResult<IEnumerable<CommentDto>>(new[] { comment }));
 
 		// Act
-		var cut = TestContext.RenderComponent<IssueDetailPage>(p =>
+		var cut = TestContext.Render<IssueDetailPage>(p =>
 			p.Add(c => c.Id, issue.Id.ToString()));
 
 		// Assert
@@ -173,7 +173,7 @@ public class IssueDetailPageTests : ComponentTestBase
 			.Returns(Task.FromResult<IssueDto?>(issue));
 
 		// Act
-		var cut = TestContext.RenderComponent<IssueDetailPage>(p =>
+		var cut = TestContext.Render<IssueDetailPage>(p =>
 			p.Add(c => c.Id, issue.Id.ToString()));
 
 		// Assert
@@ -187,7 +187,7 @@ public class IssueDetailPageTests : ComponentTestBase
 		const string testId = "abc123";
 
 		// Act
-		TestContext.RenderComponent<IssueDetailPage>(p =>
+		TestContext.Render<IssueDetailPage>(p =>
 			p.Add(c => c.Id, testId));
 
 		// Assert

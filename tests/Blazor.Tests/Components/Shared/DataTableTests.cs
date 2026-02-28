@@ -35,7 +35,7 @@ public class DataTableTests : ComponentTestBase
 	public void DataTable_ShowsLoadingSpinner_WhenIsLoadingIsTrue()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<DataTable<string>>(p => p
+		var cut = TestContext.Render<DataTable<string>>(p => p
 			.Add(x => x.Items, Array.Empty<string>())
 			.Add(x => x.IsLoading, true));
 
@@ -47,7 +47,7 @@ public class DataTableTests : ComponentTestBase
 	public void DataTable_ShowsCustomEmptyMessage_WhenItemsIsEmpty()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<DataTable<string>>(p => p
+		var cut = TestContext.Render<DataTable<string>>(p => p
 			.Add(x => x.Items, Array.Empty<string>())
 			.Add(x => x.EmptyMessage, "Nothing here yet"));
 
@@ -59,7 +59,7 @@ public class DataTableTests : ComponentTestBase
 	public void DataTable_ShowsDefaultEmptyMessage_WhenEmptyMessageNotProvided_AndItemsEmpty()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<DataTable<string>>(p => p
+		var cut = TestContext.Render<DataTable<string>>(p => p
 			.Add(x => x.Items, Array.Empty<string>()));
 
 		// Assert
@@ -73,7 +73,7 @@ public class DataTableTests : ComponentTestBase
 		var items = new[] { "Alpha", "Beta" };
 
 		// Act
-		var cut = TestContext.RenderComponent<DataTable<string>>(p => p
+		var cut = TestContext.Render<DataTable<string>>(p => p
 			.Add(x => x.Items, items)
 			.Add(x => x.RowContent, StringRowContent));
 

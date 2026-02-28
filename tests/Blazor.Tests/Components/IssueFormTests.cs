@@ -18,7 +18,7 @@ public class IssueFormTests : ComponentTestBase
 	public void IssueForm_RendersCorrectly_WhenInitialized()
 	{
 		// Act
-		var component = TestContext.RenderComponent<IssueForm>();
+		var component = TestContext.Render<IssueForm>();
 
 		// Assert
 		component.Should().NotBeNull();
@@ -33,7 +33,7 @@ public class IssueFormTests : ComponentTestBase
 	public void IssueForm_ShowsCreateButtonText_WhenIsEditModeIsFalse()
 	{
 		// Act
-		var component = TestContext.RenderComponent<IssueForm>(
+		var component = TestContext.Render<IssueForm>(
 			parameters => parameters.Add(c => c.IsEditMode, false)
 		);
 
@@ -46,7 +46,7 @@ public class IssueFormTests : ComponentTestBase
 	public void IssueForm_ShowsUpdateButtonText_WhenIsEditModeIsTrue()
 	{
 		// Act
-		var component = TestContext.RenderComponent<IssueForm>(
+		var component = TestContext.Render<IssueForm>(
 			parameters => parameters.Add(c => c.IsEditMode, true)
 		);
 
@@ -62,7 +62,7 @@ public class IssueFormTests : ComponentTestBase
 		var cancelCallback = EventCallback.Factory.Create(this, () => { /* Cancel handler */ });
 
 		// Act
-		var component = TestContext.RenderComponent<IssueForm>(
+		var component = TestContext.Render<IssueForm>(
 			parameters => parameters.Add(c => c.OnCancel, cancelCallback)
 		);
 
@@ -76,7 +76,7 @@ public class IssueFormTests : ComponentTestBase
 	public void IssueForm_HidesCancelButton_WhenOnCancelCallbackIsNotDefined()
 	{
 		// Act
-		var component = TestContext.RenderComponent<IssueForm>();
+		var component = TestContext.Render<IssueForm>();
 
 		// Assert
 		var buttons = component.FindAll("button");
@@ -93,7 +93,7 @@ public class IssueFormTests : ComponentTestBase
 			request => { submittedRequest = request; }
 		);
 
-		var component = TestContext.RenderComponent<IssueForm>(
+		var component = TestContext.Render<IssueForm>(
 			parameters => parameters.Add(c => c.OnSubmit, submitCallback)
 		);
 
@@ -122,7 +122,7 @@ public class IssueFormTests : ComponentTestBase
 		var cancelInvoked = false;
 		var cancelCallback = EventCallback.Factory.Create(this, () => { cancelInvoked = true; });
 
-		var component = TestContext.RenderComponent<IssueForm>(
+		var component = TestContext.Render<IssueForm>(
 			parameters => parameters.Add(c => c.OnCancel, cancelCallback)
 		);
 
@@ -146,7 +146,7 @@ public class IssueFormTests : ComponentTestBase
 		};
 
 		// Act
-		var component = TestContext.RenderComponent<IssueForm>(
+		var component = TestContext.Render<IssueForm>(
 			parameters => parameters.Add(c => c.InitialValues, initialValues)
 		);
 
@@ -173,7 +173,7 @@ public class IssueFormTests : ComponentTestBase
 			Status = "Open"
 		};
 
-		var component = TestContext.RenderComponent<IssueForm>(
+		var component = TestContext.Render<IssueForm>(
 			parameters => parameters.Add(c => c.InitialValues, initialValues)
 		);
 
@@ -185,7 +185,8 @@ public class IssueFormTests : ComponentTestBase
 			Status = "Closed"
 		};
 
-		component.SetParametersAndRender(
+		// bUnit 2.x: Re-render component entirely with new parameters
+		component = TestContext.Render<IssueForm>(
 			parameters => parameters.Add(c => c.InitialValues, updatedValues)
 		);
 
@@ -201,7 +202,7 @@ public class IssueFormTests : ComponentTestBase
 	public void IssueForm_DisablesButtons_WhenIsSubmittingIsTrue()
 	{
 		// Act
-		var component = TestContext.RenderComponent<IssueForm>(
+		var component = TestContext.Render<IssueForm>(
 			parameters => parameters
 				.Add(c => c.IsSubmitting, true)
 				.Add(c => c.OnCancel, EventCallback.Factory.Create(this, () => { }))
@@ -222,7 +223,7 @@ public class IssueFormTests : ComponentTestBase
 	public void IssueForm_ShowsSpinner_WhenIsSubmittingIsTrue()
 	{
 		// Act
-		var component = TestContext.RenderComponent<IssueForm>(
+		var component = TestContext.Render<IssueForm>(
 			parameters => parameters.Add(c => c.IsSubmitting, true)
 		);
 
@@ -235,7 +236,7 @@ public class IssueFormTests : ComponentTestBase
 	public void IssueForm_DefaultsToOpenStatus_WhenNoInitialValuesProvided()
 	{
 		// Act
-		var component = TestContext.RenderComponent<IssueForm>();
+		var component = TestContext.Render<IssueForm>();
 
 		// Assert
 		// Status is now API-driven (StatusId bound to dynamic options from the API).
@@ -247,7 +248,7 @@ public class IssueFormTests : ComponentTestBase
 	public void IssueForm_ShowsValidationSummary_WhenRendered()
 	{
 		// Act
-		var component = TestContext.RenderComponent<IssueForm>();
+		var component = TestContext.Render<IssueForm>();
 
 		// Assert
 		var validationSummary = component.FindComponents<Microsoft.AspNetCore.Components.Forms.ValidationSummary>();

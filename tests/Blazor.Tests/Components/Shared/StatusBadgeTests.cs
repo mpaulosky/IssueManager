@@ -29,7 +29,7 @@ public class StatusBadgeTests : ComponentTestBase
 	public void StatusBadge_RendersGreenBadge_ForOpenStatus()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<StatusBadge>(p =>
+		var cut = TestContext.Render<StatusBadge>(p =>
 			p.Add(x => x.Status, MakeStatus("Open")));
 
 		// Assert
@@ -40,7 +40,7 @@ public class StatusBadgeTests : ComponentTestBase
 	public void StatusBadge_RendersBlueBadge_ForInProgressStatus()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<StatusBadge>(p =>
+		var cut = TestContext.Render<StatusBadge>(p =>
 			p.Add(x => x.Status, MakeStatus("In Progress")));
 
 		// Assert
@@ -51,7 +51,7 @@ public class StatusBadgeTests : ComponentTestBase
 	public void StatusBadge_RendersGrayBadge_ForClosedStatus()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<StatusBadge>(p =>
+		var cut = TestContext.Render<StatusBadge>(p =>
 			p.Add(x => x.Status, MakeStatus("Closed")));
 
 		// Assert
@@ -62,7 +62,7 @@ public class StatusBadgeTests : ComponentTestBase
 	public void StatusBadge_RendersPurpleBadge_ForUnknownStatus()
 	{
 		// Act
-		var cut = TestContext.RenderComponent<StatusBadge>(p =>
+		var cut = TestContext.Render<StatusBadge>(p =>
 			p.Add(x => x.Status, MakeStatus("Unknown")));
 
 		// Assert
@@ -76,7 +76,7 @@ public class StatusBadgeTests : ComponentTestBase
 		var status = MakeStatus("Open");
 
 		// Act
-		var cut = TestContext.RenderComponent<StatusBadge>(p =>
+		var cut = TestContext.Render<StatusBadge>(p =>
 			p.Add(x => x.Status, status));
 
 		// Assert

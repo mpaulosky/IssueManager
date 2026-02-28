@@ -56,7 +56,7 @@ public class EditIssuePageTests : ComponentTestBase
 		// Arrange — mock returns null by default
 
 		// Act
-		var cut = TestContext.RenderComponent<EditIssuePage>(p =>
+		var cut = TestContext.Render<EditIssuePage>(p =>
 			p.Add(c => c.Id, "nonexistent-id"));
 
 		// Assert
@@ -72,7 +72,7 @@ public class EditIssuePageTests : ComponentTestBase
 			.Returns(Task.FromResult<IssueDto?>(issue));
 
 		// Act
-		var cut = TestContext.RenderComponent<EditIssuePage>(p =>
+		var cut = TestContext.Render<EditIssuePage>(p =>
 			p.Add(c => c.Id, issue.Id.ToString()));
 
 		// Assert
@@ -88,7 +88,7 @@ public class EditIssuePageTests : ComponentTestBase
 			.Returns(Task.FromResult<IssueDto?>(issue));
 
 		// Act
-		var cut = TestContext.RenderComponent<EditIssuePage>(p =>
+		var cut = TestContext.Render<EditIssuePage>(p =>
 			p.Add(c => c.Id, issue.Id.ToString()));
 
 		// Assert
@@ -104,7 +104,7 @@ public class EditIssuePageTests : ComponentTestBase
 			.Returns(Task.FromResult<IssueDto?>(issue));
 
 		// Act
-		var cut = TestContext.RenderComponent<EditIssuePage>(p =>
+		var cut = TestContext.Render<EditIssuePage>(p =>
 			p.Add(c => c.Id, issue.Id.ToString()));
 
 		// Assert
@@ -121,7 +121,7 @@ public class EditIssuePageTests : ComponentTestBase
 			.Returns(Task.FromResult<IssueDto?>(issue));
 
 		// Act
-		var cut = TestContext.RenderComponent<EditIssuePage>(p =>
+		var cut = TestContext.Render<EditIssuePage>(p =>
 			p.Add(c => c.Id, issue.Id.ToString()));
 
 		// Assert — edit mode shows "Update Issue" on the submit button
@@ -136,7 +136,7 @@ public class EditIssuePageTests : ComponentTestBase
 		_mockIssueClient.GetByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IssueDto?>(issue));
 
-		var cut = TestContext.RenderComponent<EditIssuePage>(p =>
+		var cut = TestContext.Render<EditIssuePage>(p =>
 			p.Add(c => c.Id, issue.Id.ToString()));
 
 		// Act — update the title and submit
@@ -156,7 +156,7 @@ public class EditIssuePageTests : ComponentTestBase
 		_mockIssueClient.GetByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IssueDto?>(issue));
 
-		var cut = TestContext.RenderComponent<EditIssuePage>(p =>
+		var cut = TestContext.Render<EditIssuePage>(p =>
 			p.Add(c => c.Id, issue.Id.ToString()));
 
 		cut.Find("#title").Change("Updated Title");
