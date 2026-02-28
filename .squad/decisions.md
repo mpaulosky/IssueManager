@@ -278,3 +278,46 @@ logger.LogInformation("MongoDB configured for {Environment} environment with dat
 **Breaking Changes:** Async assertion API changed in v7+. `.Should().CompleteWithinAsync()` now returns `Task<AndConstraint<...>>` instead of `Assertion<...>`. Tests using chained async assertions may require manual updates (old pattern `.Should().CompleteWithinAsync(...).Should()...` needs refactoring).  
 **Next Steps:** Gimli to verify test compilation and fix any async assertion API incompatibilities.  
 **Impact:** Directory.Packages.props committed on squad branch.
+
+---
+
+### 2026-02-28: xUnit v3 Migration (3.2.2)
+**Date:** 2026-02-28  
+**Author:** Boromir (DevOps)  
+**Status:** ✅ Complete  
+**What:** Migrated from xUnit 2.9.3 → xunit.v3 3.2.2 (latest stable). Mandatory code fixes:
+- **IAsyncLifetime Return Types:** Task → ValueTask in 11 integration test fixtures (MongoDbFixture + 10 test classes)
+- **TestContext Namespace Collision:** xUnit v3 introduced `Xunit.TestContext`, conflicting with bUnit's `Bunit.TestContext`. Resolved by fully qualifying all bUnit references as `Bunit.TestContext` in 7 Blazor test files.
+- **Package Swap:** All 4 test .csproj files + Directory.Packages.props updated to xunit.v3 3.2.2
+**Build Results:** Unit.Tests ✅, Integration.Tests ✅, Architecture.Tests ✅. Blazor.Tests has 118 errors (unrelated — bUnit 2.6.2 API deprecations requiring separate migration).
+**Key Learning:** Major version cascades expose pre-existing migration debt. xUnit v3 breaking changes were surgical; bUnit 2.x required parallel effort.
+
+---
+
+### 2026-02-28: bUnit 2.x Migration (2.6.2)
+**Date:** 2026-02-28  
+**Author:** Gimli (Tester)  
+**Status:** ✅ Complete  
+**What:** Migrated all Blazor test files from bUnit 1.29.5 → 2.6.2. Breaking changes applied:
+- **RenderComponent<T>() → Render<T>():** Global rename across 17 files (~100 occurrences)
+- **SetParametersAndRender() Removal:** Replaced in IssueFormTests.cs with full component re-render using `TestContext.Render<T>(parameters => ...)`
+- **TestContext Namespace Collision:** Resolved by fully qualifying as `Bunit.TestContext` in 6 page test files
+- **FluentAssertions v8 Bonus:** Fixed `HaveCountGreaterOrEqualTo()` → `HaveCountGreaterThanOrEqualTo()` in FooterComponentTests.cs
+**Build Results:** 0 errors, 13 CS0618 obsolete warnings (optional future fix: migrate to `BunitContext`). All 143 Blazor tests pass (3 seconds).
+**Validation:** All compilation errors resolved. No test logic changed (surgical edits only).
+**Optional P3 Future Work:** Migrate from `Bunit.TestContext` → `BunitContext` to eliminate obsolete warnings.
+
+---
+
+### 2026-02-28: FluentAssertions v8 Compatibility Scan
+**Date:** 2026-02-28  
+**Author:** Gimli (Tester)  
+**Status:** ✅ Complete  
+**What:** Scanned all 96 test files (Unit, Integration, Blazor, Architecture) for FluentAssertions v6 → v8 breaking changes.
+**Findings:**
+- `CompleteWithinAsync` return type changes — NOT USED
+- `ThrowAsync` API changes — USED (20+ files) — all COMPATIBLE with FA v8 pattern `Func<Task> act = async () => ...; await act.Should().ThrowAsync<T>()`
+- `BeEquivalentTo` — USED (1 file) — COMPATIBLE (no excluded members pattern)
+- `.Subject` removal, `ExecutionTime`, `BeApproximately` — NOT USED
+**Result:** ZERO breaking changes detected. All 96 test files fully compatible with FA v8.8.0.
+**Build Errors:** 122 total errors found are exclusively bUnit v2.x breaking changes (`RenderComponent`, `SetParametersAndRender`), NOT FluentAssertions.

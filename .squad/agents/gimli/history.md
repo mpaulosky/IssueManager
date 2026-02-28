@@ -48,6 +48,35 @@ Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, Te
 - Tests written against expected API after Sam's changes (ListIssuesQuery with SearchTerm?/AuthorName? properties)
 - MockHandler enhanced to capture LastRequest for URL assertion in API client tests
 - All tests follow AAA pattern, use FluentAssertions `.Should()`, and include proper file headers
+
+### 2026-02-28: bUnit 2.x Migration — Complete
+
+**Task:** Migrate all Blazor test files from bUnit 1.29.5 → 2.6.2 API following Boromir's package upgrade.
+
+**Breaking Changes Applied:**
+
+1. **`TestContext` namespace collision**: bUnit 2.x introduced `Bunit.TestContext` class, colliding with `Xunit.TestContext`.
+   - **Fix**: Fully qualified as `Bunit.TestContext` in 6 files (Categories/Statuses page tests).
+   
+2. **`RenderComponent<T>()` → `Render<T>()`**: Primary rendering method renamed.
+   - **Fix**: Global replace across 17 files (~100 occurrences).
+   
+3. **`SetParametersAndRender()` removed**: Lambda-based parameter update method no longer exists.
+   - **Fix**: Re-render component entirely with `TestContext.Render<T>(parameters => ...)` in IssueFormTests.cs.
+   
+4. **FluentAssertions v8 bonus fix**: `HaveCountGreaterOrEqualTo()` → `HaveCountGreaterThanOrEqualTo()` in FooterComponentTests.cs (3 occurrences).
+
+**Build Result:** ✅ Build succeeded. 0 errors, 13 CS0618 obsolete warnings (non-blocking — `Bunit.TestContext` marked obsolete in favor of `BunitContext`).
+
+**Test Result:** ✅ All 143 Blazor tests pass (Duration: 3 seconds).
+
+**Files Modified:** 17 unique files, ~116 surgical edits. No test logic changed.
+
+**Future Work (Optional, P3):** Migrate from `Bunit.TestContext` → `BunitContext` to eliminate obsolete warnings (non-breaking, cosmetic).
+
+**Decision Inbox:** Full migration report created at `.squad/decisions/inbox/gimli-bunit-2x-migration.md`.
+
+
 - Integration tests validate: case-insensitive search, description matching, author filtering, combined filters with pagination, empty results
 
 ### 2026-02-27: Sprint 4 — Auth0 integration tests written
@@ -66,4 +95,21 @@ Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, Te
   - Unit.Tests: 6.4s (includes 14 new CurrentUserService tests)
   - Blazor.Tests: 6.7s
   - Integration.Tests: 350.0s (includes 1 updated CreateIssueHandlerTests)
+
+### 2026-02-28: FluentAssertions v6.12.1 → v8.8.0 scan — NO BREAKING CHANGES FOUND
+- Scanned ALL 96 test files (Unit.Tests, Integration.Tests, Blazor.Tests, Architecture.Tests)
+- Searched for FA v8 breaking change patterns:
+  - `CompleteWithinAsync` return type changes — NO USAGE FOUND
+  - `NotThrowAsync` / `ThrowAsync` API surface changes — patterns used are FA v8 compatible (`Func<Task> act = async () => ...` pattern)
+  - `ExecutionTime()` / `ExecuteWithinAsync` changes — NO USAGE FOUND
+  - `.Subject` property removal — NO USAGE FOUND
+  - `BeEquivalentTo` option changes — usage found is compatible (no excluded members)
+  - Numeric assertion changes (`BeApproximately`) — NO USAGE FOUND
+- All async exception assertions use the correct FA v8 pattern:
+  ```csharp
+  Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+  await act.Should().ThrowAsync<ExceptionType>().WithMessage("*pattern*");
+  ```
+- **RESULT:** Zero FluentAssertions v8 breaking changes detected. All test files are FA v8 compatible.
+- **NOTE:** Build failures found are bUnit v2.x breaking changes (`RenderComponent` → `Render`, `SetParametersAndRender` removal) — NOT FluentAssertions. This is expected from Boromir's NuGet upgrade (bUnit 1.29.5 → 2.6.2). bUnit migration is a separate task.
 

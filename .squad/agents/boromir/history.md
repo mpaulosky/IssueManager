@@ -60,3 +60,33 @@ DevOps on IssueManager (.NET 10, GitHub Actions, Aspire, NuGet centralized packa
 - `.github/workflows/` — GitHub Actions CI definitions
 - `src/AppHost/` — Aspire AppHost project
 - `src/ServiceDefaults/` — Aspire ServiceDefaults project
+
+### 2026-02-28: FluentAssertions Upgrade to v8+
+- FluentAssertions upgraded from 6.12.1 → 8.8.0 (latest stable v7+ version)
+- Project confirmed non-commercial by Matthew Paulosky — commercial license concern resolved
+- v7+ breaking changes to async assertion API: .Should().CompleteWithinAsync() now returns Task<AndConstraint<...>> instead of Assertion<...>
+- Tests using async assertions will need updates (e.g., .Should().CompleteWithinAsync(...).Should()... patterns changed)
+- Updated in Directory.Packages.props line 43
+
+### 2026-02-28: xUnit v3 Migration (3.2.2)
+- **Package:** xUnit 2.9.3 → xunit.v3 3.2.2 (latest stable)
+- **Breaking Changes Fixed:**
+  - `IAsyncLifetime` return types: `Task` → `ValueTask` (11 test classes affected)
+  - `Xunit.Abstractions` namespace: types moved to `Xunit` namespace (no instances found)
+  - `TestContext` ambiguity: xUnit v3 introduces its own TestContext type, conflicting with bUnit's TestContext
+    - Solution: Fully qualified all bUnit TestContext references as `Bunit.TestContext`
+    - Files affected: ComponentTestBase.cs + 6 page test files
+- **Files Modified:**
+  - Directory.Packages.props (package version)
+  - All 4 test .csproj files (package reference name)
+  - MongoDbFixture.cs + 10 integration test classes (IAsyncLifetime)
+  - ComponentTestBase.cs + 6 Blazor page test files (TestContext qualification)
+- **Build Status:**
+  - ✅ Unit.Tests: compiles successfully
+  - ✅ Integration.Tests: compiles successfully
+  - ✅ Architecture.Tests: compiles successfully
+  - ⚠️ Blazor.Tests: 117 CS0619 warnings (bUnit deprecated API usage) + 1 CS1061 error (bUnit breaking change)
+    - These are bUnit 2.6.2 API changes, NOT xUnit v3 issues
+    - Requires separate bUnit migration (RenderComponent → Render, SetParametersAndRender removed)
+    - Gimli must run bunit-test-migration skill
+
