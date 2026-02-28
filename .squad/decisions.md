@@ -259,3 +259,22 @@ logger.LogInformation("MongoDB configured for {Environment} environment with dat
 **Rationale:** Minor Aspire patch applied for maintenance. OpenTelemetry bump synchronizes observability dependencies. MongoDB Driver 3.6.0 brings compatibility improvements. Auth0 1.6.1 provides latest Auth0 integration enhancements. Major version bumps (Scalar, bunit, Testcontainers) require downstream validation. xunit and FluentAssertions held pending explicit approval due to breaking changes and licensing.  
 **Downstream Impact:** Gimli must run bunit-test-migration skill for bunit 2.x API changes and verify Testcontainers v4 container lifecycle compatibility. Legolas/Sam must verify Scalar 2.x API reference configuration. All agents: execute build-repair prompt (restore → build → fix → test) after merge.  
 **Decisions:** xunit migration requires Matthew Paulosky approval + Gimli pass. FluentAssertions upgrade requires license review + approval + Gimli pass. Documented in boromir-package-upgrade-constraints.md.
+
+---
+
+### 2026-02-28T22:57:09Z: User Directive — Project Non-Commercial
+**By:** Matthew Paulosky (via Copilot)
+**What:** IssueManager is confirmed non-commercial. FluentAssertions v7+ commercial licensing restriction does not apply.
+**Why:** Enables FluentAssertions upgrade to v8.8.0 without licensing concerns.
+
+---
+
+### 2026-02-28: FluentAssertions v6.12.1 → v8.8.0 Upgrade
+**Date:** 2026-02-28  
+**Author:** Boromir (DevOps)  
+**Status:** ✅ Complete  
+**What:** FluentAssertions upgraded from 6.12.1 to 8.8.0 in `Directory.Packages.props` line 43.  
+**Project Status:** Confirmed non-commercial by Matthew Paulosky on 2026-02-28.  
+**Breaking Changes:** Async assertion API changed in v7+. `.Should().CompleteWithinAsync()` now returns `Task<AndConstraint<...>>` instead of `Assertion<...>`. Tests using chained async assertions may require manual updates (old pattern `.Should().CompleteWithinAsync(...).Should()...` needs refactoring).  
+**Next Steps:** Gimli to verify test compilation and fix any async assertion API incompatibilities.  
+**Impact:** Directory.Packages.props committed on squad branch.
