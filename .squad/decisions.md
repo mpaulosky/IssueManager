@@ -152,3 +152,110 @@
 - **P1 gaps to schedule:** Scalar UI, API Versioning, Application Insights.
 **Why:** Instructions that reference wrong project name, wrong libraries, and wrong paths erode developer trust and cause Copilot suggestions to be misaligned with actual codebase.
 **Outcome:** Accuracy restored; developer confidence improved. Full gap report at `docs/reviews/copilot-instructions-audit.md`.
+
+---
+
+### 2026-02-25: AppHost Static Extension Method Logging Pattern
+**Date:** 2026-02-25  
+**Author:** Boromir (DevOps)  
+**Status:** Proposed  
+**What:** Use `LoggerFactory.Create(b => b.AddConsole())` to bootstrap a logger in static extension methods for AppHost configuration.
+**Why:** Static extension methods in .NET Aspire AppHost don't have direct access to DI container during configuration. This pragmatic pattern works without DI being fully built, logs appear during AppHost startup, uses named parameters for structured logging, and follows .NET conventions.
+**Pattern:**
+```csharp
+using var loggerFactory = LoggerFactory.Create(b => b.AddConsole());
+var logger = loggerFactory.CreateLogger<DatabaseService>();
+logger.LogInformation("MongoDB configured for {Environment} environment with database: {DatabaseName}", 
+    environmentName, databaseName);
+```
+**Guidance:** Use `LogInformation` for key lifecycle events; use `LogDebug` for detailed steps; always use named parameters; dispose loggerFactory with `using var`.
+
+---
+
+### 2026-02-27: Auth0 Scaffold — Passive Configuration Pattern
+**Date:** 2026-02-27
+**By:** Gandalf (Security Officer)
+**Branch:** feat/sprint-3-hardening
+**Status:** Implemented
+**What:** Implemented Auth0 authentication extensions using a **passive configuration pattern**. Extensions check for required config values (Auth0:Domain, Auth0:ClientId/Audience) before setup. If config missing, extensions return early without throwing. Applications run in "open mode" (no authentication enforced) until secrets are configured. Both API (JWT Bearer) and Web (OIDC) authentication scaffolded simultaneously.
+**Implementation:** Added `Auth0.AspNetCore.Authentication` v1.5.0 and `Microsoft.AspNetCore.Authentication.JwtBearer` v10.0.0 packages. API extension validates `Auth0:Domain` and `Auth0:Audience`; Web extension validates `Auth0:Domain` and `Auth0:ClientId`. Single `builder.AddAuth0()` call in both Program.cs files.
+**Rationale:** Passive pattern allows parallel development while secrets are being obtained. Graceful degradation prevents build breaks. Single-line integration minimizes merge conflicts. Applications currently run in **open mode** — this is intentional for staged rollout, NOT a security vulnerability.
+
+---
+
+### 2026-02-27: Auth0 Middleware Pipeline Activation
+**Date:** 2026-02-27  
+**By:** Gandalf (Security Officer)  
+**Sprint:** Sprint 4  
+**Branch:** feat/sprint-4-auth  
+**Status:** Complete
+**What:** Activated the Auth0 authentication and authorization middleware pipeline in both API and Web projects. Added `UseAuthentication()` and `UseAuthorization()` middleware. Added login/logout endpoints. Created `TokenForwardingHandler` to automatically attach user's access token to outgoing API requests.
+**Key Changes:** API middleware order: HttpsRedirection → Cors → **Authentication** → **Authorization** → OpenApi. Web middleware order: HttpsRedirection → StaticFiles → **Authentication** → **Authorization** → Antiforgery. Login/logout endpoints at `/auth/login` and `/auth/logout`. TokenForwardingHandler registered as transient handler on all HttpClient instances.
+**Rationale:** Middleware order matters — UseAuthentication populates HttpContext.User; UseStaticFiles comes before auth; UseAntiforgery comes after. Token forwarding follows standard ASP.NET Core delegating handler pattern using IHttpContextAccessor to propagate Bearer token to API.
+**Impact:** Authentication pipeline now active; when Auth0 secrets configured, middleware will validate tokens and populate HttpContext.User. Token propagation works — logged-in users' API calls carry their Bearer token automatically.
+
+---
+
+### 2026-02-27: Sprint 4 Web Auth Protection
+**Date:** 2026-02-27
+**Author:** Legolas (Frontend Developer)
+**Status:** Implemented
+**What:** Added `<AuthorizeView>` blocks to NavMenu showing login/logout UI. Added `@attribute [Authorize]` to all create/edit pages (6 pages: CreateIssuePage, EditIssuePage, CreateCategoryPage, EditCategoryPage, CreateStatusPage, EditStatusPage). Created `RedirectToLoginPage.razor` and updated `Routes.razor` to use `AuthorizeRouteView` with unauthorized handler. Added global usings for Authorization.
+**Rationale:** List/view pages intentionally left public for anonymous browsing. Only mutating operations require authentication. AuthorizeView provides cascading auth state. RedirectToLoginPage with forceLoad:true ensures full page reload to trigger OIDC flow.
+**Impact:** Build clean (0 errors). Unauthenticated users can browse issues but must log in to create/edit.
+
+---
+
+### 2026-02-28: API Authorization Policies Applied
+**Date:** 2026-02-28  
+**Agent:** Sam (Backend Developer)  
+**Task:** s4-api-policies  
+**Branch:** feat/sprint-4-auth  
+**Status:** Completed
+**What:** Added `.RequireAuthorization()` to all write endpoints (POST, PATCH, DELETE) across all four resource types (Issues, Categories, Statuses, Comments). Read-only GET endpoints remain public.
+**Pattern:** Used `.RequireAuthorization()` method in minimal API endpoint definitions.
+**Rationale:** Write operations security — all create/update/delete operations require authenticated users. Public read access supports public browsing and integration scenarios. Consistent policy across all resource types.
+**Build Status:** ✅ Api.csproj builds successfully.
+
+---
+
+### 2026-02-28: API Versioning Strategy
+**Date:** 2026-02-28  
+**Author:** Sam (Backend Developer)  
+**Status:** Implemented  
+**What:** Added formal API versioning infrastructure using `Asp.Versioning.Http` v8.1.0. Configured default version 1.0, AssumeDefaultVersionWhenUnspecified, ReportApiVersions. Multiple version readers: URL segment, `X-Api-Version` header, `api-version` query string.
+**Rationale:** Minimal disruption — existing `/api/v1/` routes work as-is. Flexibility for clients. Graceful defaults. Transparency via response headers.
+**Implementation:** Extension method `AddApiVersioning()` in `ApiVersioningExtensions.cs`. Registration in Program.cs.
+
+---
+
+### 2026-02-27: CurrentUserService Implementation
+**Date:** 2026-02-27  
+**By:** Sam (Backend Developer)  
+**Task:** s4-current-user (Sprint 4 authentication wiring)
+**Status:** Completed
+**What:** Implemented `ICurrentUserService` to provide access to currently authenticated user's identity from Auth0 JWT claims. Created interface with properties: UserId, Name, Email, IsAuthenticated. Implementation reads claims from HttpContext.User via IHttpContextAccessor with fallback to Auth0-specific claim names ("sub", "name", "email") and standard claim types. Created `CurrentUserExtensions.AddCurrentUser()` to register both IHttpContextAccessor and ICurrentUserService as scoped services. Integrated into handlers: CreateIssueHandler and CreateCommentHandler now inject ICurrentUserService to populate Author field from current user.
+**Claim Reading Strategy:** Try standard claim type first (ClaimTypes.NameIdentifier/Name/Email), fall back to Auth0-specific name ("sub"/"name"/"email"). Handles unauthenticated requests gracefully.
+**Build Status:** Api.csproj builds successfully (0 errors/0 warnings).
+
+---
+
+### 2026-02-27: Sam Sprint 3 API Hardening Decisions
+**Date:** 2026-02-27
+**Agent:** Sam (Backend Developer)
+**Branch:** feat/sprint-3-hardening
+**What:** Four API hardening decisions: (1) Added `app.MapScalarApiReference()` after `app.MapOpenApi()` for interactive API documentation UI (Scalar is project standard per copilot-instructions.md); (2) Added CORS policy with configurable origins from `Cors:AllowedOrigins` config, defaults to localhost:7001/5001, called `app.UseCors()` after `UseHttpsRedirection()`; (3) Fixed 14 CS8603/CS8625 nullable warnings using null-forgiving operator `!` on `Result.Value` (pattern: check Failure before accessing Value); (4) Extended GET /api/v1/comments to accept optional `?issueId=` query parameter for filtering comments by issue using MongoDB's `Builders<T>.Filter` API with conditional `Eq()`.
+**Rationale:** Scalar provides required API documentation. CORS enables Web frontend to call Api backend. Nullable warning pattern is safe (Result.Success guarantees Value non-null). Comment filtering needed for issue detail page to display associated comments.
+**Implementation:** Added `global using Scalar.AspNetCore;` to GlobalUsings.cs. CORS uses `AddDefaultPolicy` with `AllowAnyHeader()` and `AllowAnyMethod()`. Comment filtering: repository accepts optional issueId, applies conditional MongoDB filter.
+**Impact:** Api.csproj builds clean (0 errors, 0 warnings). All changes maintain backward compatibility.
+
+---
+
+### 2026-02-28: NuGet Package Upgrades — Boromir DevOps Sprint
+**Date:** 2026-02-28  
+**Author:** Boromir (DevOps)  
+**Status:** Completed  
+**What:** Upgraded 18 NuGet packages to latest stable versions in `Directory.Packages.props`. Major version bumps: Scalar 1.2.51→2.12.50, bunit 1.29.5→2.6.2, Testcontainers 3.10.0→4.10.0, Microsoft.NET.Test.Sdk 17.13.0→18.3.0, Coverlet 6.0.0→8.0.0. Minor/patch updates: Aspire 13.1.1→13.1.2, OpenTelemetry 1.14.0→1.15.0, MongoDB Driver/Bson 3.5.2→3.6.0, Auth0 1.5.0→1.6.1, Asp.Versioning.Http 8.0.1→8.1.0. Intentionally held: xunit at 2.9.3 (v3 breaking), FluentAssertions at 6.12.1 (v7+ commercial licensing).  
+**Rationale:** Minor Aspire patch applied for maintenance. OpenTelemetry bump synchronizes observability dependencies. MongoDB Driver 3.6.0 brings compatibility improvements. Auth0 1.6.1 provides latest Auth0 integration enhancements. Major version bumps (Scalar, bunit, Testcontainers) require downstream validation. xunit and FluentAssertions held pending explicit approval due to breaking changes and licensing.  
+**Downstream Impact:** Gimli must run bunit-test-migration skill for bunit 2.x API changes and verify Testcontainers v4 container lifecycle compatibility. Legolas/Sam must verify Scalar 2.x API reference configuration. All agents: execute build-repair prompt (restore → build → fix → test) after merge.  
+**Decisions:** xunit migration requires Matthew Paulosky approval + Gimli pass. FluentAssertions upgrade requires license review + approval + Gimli pass. Documented in boromir-package-upgrade-constraints.md.
