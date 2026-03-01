@@ -113,3 +113,28 @@ Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, Te
 - **RESULT:** Zero FluentAssertions v8 breaking changes detected. All test files are FA v8 compatible.
 - **NOTE:** Build failures found are bUnit v2.x breaking changes (`RenderComponent` → `Render`, `SetParametersAndRender` removal) — NOT FluentAssertions. This is expected from Boromir's NuGet upgrade (bUnit 1.29.5 → 2.6.2). bUnit migration is a separate task.
 
+### 2026-02-28: Phase 3 — BunitContext migration + xUnit1051 CancellationToken cleanup
+
+**Task:** Eliminate pre-push hook warnings: CS0618 (Bunit.TestContext obsolete) and xUnit1051 (CancellationToken.None).
+
+**Fix 1 — BunitContext migration (7 files, CS0618 eliminated):**
+- `Bunit.TestContext` → `BunitContext` in field declarations, property types, and constructor calls
+- Files: `ComponentTestBase.cs`, `CategoriesPageTests.cs`, `CreateCategoryPageTests.cs`, `EditCategoryPageTests.cs`, `StatusesPageTests.cs`, `CreateStatusPageTests.cs`, `EditStatusPageTests.cs`
+- `using Bunit;` already present — just drop the `Bunit.` prefix and use `BunitContext` directly
+
+**Fix 2 — xUnit1051 CancellationToken (~50 call sites across 10 files):**
+- `_handler.Handle(CancellationToken.None)` → `_handler.Handle(Xunit.TestContext.Current.CancellationToken)` in `ListCategoriesHandlerTests.cs` and `ListStatusesHandlerTests.cs`
+- NSubstitute setup calls `_repository.GetAllAsync()` → `_repository.GetAllAsync(Arg.Any<CancellationToken>())` — critical: needed because `ListStatusesHandler` DOES forward CT while `ListCategoriesHandler` does NOT. Using `Arg.Any<>()` works for both.
+- `await _repository.Received(1).GetAllAsync()` → `Arg.Any<CancellationToken>()` variant for same reason
+- Repository method calls in `RepositoryValidationTests.cs`: add `Xunit.TestContext.Current.CancellationToken` as last argument
+- API client test calls in `StatusApiClientTests.cs`, `CategoryApiClientTests.cs`, `IssueApiClientTests.cs`: add CT as last argument
+- `CommentApiClientTests.cs`: special case — `ICommentApiClient.GetAllAsync(string? issueId = null, CancellationToken ct = default)` has `issueId` as first param, so must use named arg `cancellationToken:` instead of positional
+
+**Key Discovery — ListCategoriesHandler production bug (flagged, NOT fixed):**
+- `ListCategoriesHandler.Handle()` accepts a CancellationToken parameter but does NOT forward it to `_repository.GetAllAsync()`. This is a production code bug. Not my job to fix — flagged for Aragorn/Sam.
+
+**Build/Test results:** Unit.Tests 390/390 ✅, Blazor.Tests 143/143 ✅. Build: 0 warnings, 0 errors. Pre-push gate: all 3 test suites passed.
+
+**Commit:** `414828f` — fix(tests): Phase 3 - BunitContext migration and xUnit1051 CancellationToken cleanup
+
+

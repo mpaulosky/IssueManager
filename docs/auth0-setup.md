@@ -43,7 +43,7 @@ Add to user secrets for the **Api** project:
 
 ```bash
 cd src/Api
-dotnet user-secrets set "Auth0:Domain" "your-tenant.auth0.com"
+dotnet user-secrets set "Auth0:Domain" "dev-63xbriztum2j1765.us.auth0.com"
 dotnet user-secrets set "Auth0:Audience" "https://api.issuemanager.com"
 ```
 
@@ -51,9 +51,9 @@ Add to user secrets for the **Web** project:
 
 ```bash
 cd src/Web
-dotnet user-secrets set "Auth0:Domain" "your-tenant.auth0.com"
-dotnet user-secrets set "Auth0:ClientId" "your-client-id"
-dotnet user-secrets set "Auth0:ClientSecret" "your-client-secret"
+dotnet user-secrets set "Auth0:Domain" "dev-63xbriztum2j1765.us.auth0.com"
+dotnet user-secrets set "Auth0:ClientId" "TCtpPzgZldVYUo1OdhFTrEUMLYwrZibs"
+dotnet user-secrets set "Auth0:ClientSecret" "EIB-OTL_mWm87JD61g-jg_-5kwlNPZ6UXJzEB9-1yVTIZ8Nkpp6EeOE5FC86DwaL"
 dotnet user-secrets set "Auth0:Audience" "https://api.issuemanager.com"
 ```
 
