@@ -44,11 +44,11 @@ public class ListStatusesHandlerTests
 			new(ObjectId.GenerateNewId(), "In Progress", "Work in progress", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
-		_repository.GetAllAsync()
+		_repository.GetAllAsync(Arg.Any<CancellationToken>())
 			.Returns(Result<IReadOnlyList<StatusDto>>.Ok(statuses));
 
 		// Act
-		var result = await _handler.Handle(CancellationToken.None);
+		var result = await _handler.Handle(Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().HaveCount(3);
@@ -61,11 +61,11 @@ public class ListStatusesHandlerTests
 	public async Task Handle_NoStatuses_ReturnsEmptyList()
 	{
 		// Arrange
-		_repository.GetAllAsync()
+		_repository.GetAllAsync(Arg.Any<CancellationToken>())
 			.Returns(Result<IReadOnlyList<StatusDto>>.Ok((IReadOnlyList<StatusDto>)new List<StatusDto>()));
 
 		// Act
-		var result = await _handler.Handle(CancellationToken.None);
+		var result = await _handler.Handle(Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeEmpty();
@@ -75,11 +75,11 @@ public class ListStatusesHandlerTests
 	public async Task Handle_RepositoryFails_ReturnsEmptyList()
 	{
 		// Arrange
-		_repository.GetAllAsync()
+		_repository.GetAllAsync(Arg.Any<CancellationToken>())
 			.Returns(Result<IReadOnlyList<StatusDto>>.Fail("Database error"));
 
 		// Act
-		var result = await _handler.Handle(CancellationToken.None);
+		var result = await _handler.Handle(Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeEmpty();
@@ -89,11 +89,11 @@ public class ListStatusesHandlerTests
 	public async Task Handle_RepositoryReturnsNull_ReturnsEmptyList()
 	{
 		// Arrange
-		_repository.GetAllAsync()
+		_repository.GetAllAsync(Arg.Any<CancellationToken>())
 			.Returns(Result<IReadOnlyList<StatusDto>>.Ok((IReadOnlyList<StatusDto>)null!));
 
 		// Act
-		var result = await _handler.Handle(CancellationToken.None);
+		var result = await _handler.Handle(Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeEmpty();
@@ -103,19 +103,18 @@ public class ListStatusesHandlerTests
 	public async Task Handle_PassesCancellationToken()
 	{
 		// Arrange
-		var cancellationToken = new CancellationToken();
 		IReadOnlyList<StatusDto> statuses = new List<StatusDto>
 		{
 			new(ObjectId.GenerateNewId(), "Test", string.Empty, DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
-		_repository.GetAllAsync()
+		_repository.GetAllAsync(Arg.Any<CancellationToken>())
 			.Returns(Result<IReadOnlyList<StatusDto>>.Ok(statuses));
 
 		// Act
-		await _handler.Handle(cancellationToken);
+		await _handler.Handle(Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
-		await _repository.Received(1).GetAllAsync();
+		await _repository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
 	}
 }

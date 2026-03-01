@@ -56,7 +56,7 @@ public class CategoryApiClientTests
 		var client = new CategoryApiClient(CreateMockClient(response));
 
 		// Act
-		var result = await client.GetAllAsync();
+		var result = await client.GetAllAsync(Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -71,7 +71,7 @@ public class CategoryApiClientTests
 		var client = new CategoryApiClient(CreateMockClient(response));
 
 		// Act
-		var result = await client.GetAllAsync();
+		var result = await client.GetAllAsync(Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -88,7 +88,7 @@ public class CategoryApiClientTests
 		var command = new CreateCategoryCommand { CategoryName = "New Category" };
 
 		// Act
-		var result = await client.CreateAsync(command);
+		var result = await client.CreateAsync(command, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -104,7 +104,7 @@ public class CategoryApiClientTests
 		var command = new CreateCategoryCommand { CategoryName = "x" };
 
 		// Act
-		var result = await client.CreateAsync(command);
+		var result = await client.CreateAsync(command, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeNull();
@@ -118,7 +118,7 @@ public class CategoryApiClientTests
 		var client = new CategoryApiClient(CreateMockClient(response));
 
 		// Act
-		var result = await client.DeleteAsync(ObjectId.GenerateNewId().ToString());
+		var result = await client.DeleteAsync(ObjectId.GenerateNewId().ToString(), Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeTrue();
@@ -132,7 +132,7 @@ public class CategoryApiClientTests
 		var client = new CategoryApiClient(CreateMockClient(response));
 
 		// Act
-		var result = await client.DeleteAsync(ObjectId.GenerateNewId().ToString());
+		var result = await client.DeleteAsync(ObjectId.GenerateNewId().ToString(), Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeFalse();

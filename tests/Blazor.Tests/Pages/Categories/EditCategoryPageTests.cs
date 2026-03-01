@@ -17,7 +17,7 @@ namespace Tests.BlazorTests.Pages.Categories;
 /// </summary>
 public class EditCategoryPageTests : IDisposable
 {
-	private readonly Bunit.TestContext _ctx;
+	private readonly BunitContext _ctx;
 	private readonly ICategoryApiClient _mockCategoryClient;
 
 	/// <summary>
@@ -25,7 +25,7 @@ public class EditCategoryPageTests : IDisposable
 	/// </summary>
 	public EditCategoryPageTests()
 	{
-		_ctx = new Bunit.TestContext();
+		_ctx = new BunitContext();
 		_mockCategoryClient = Substitute.For<ICategoryApiClient>();
 		_mockCategoryClient.GetByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<CategoryDto?>(null));

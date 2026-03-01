@@ -14,7 +14,7 @@ namespace Tests.BlazorTests.Pages.Statuses;
 /// </summary>
 public class StatusesPageTests : IDisposable
 {
-	private readonly Bunit.TestContext _ctx;
+	private readonly BunitContext _ctx;
 	private readonly IStatusApiClient _mockStatusClient;
 
 	/// <summary>
@@ -22,7 +22,7 @@ public class StatusesPageTests : IDisposable
 	/// </summary>
 	public StatusesPageTests()
 	{
-		_ctx = new Bunit.TestContext();
+		_ctx = new BunitContext();
 		_mockStatusClient = Substitute.For<IStatusApiClient>();
 		_mockStatusClient.GetAllAsync(Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IEnumerable<StatusDto>>([]));

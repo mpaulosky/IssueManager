@@ -76,7 +76,7 @@ public sealed class RepositoryValidationTests
 		const string emptyUserId = "";
 
 		// Act
-		var result = await repo.GetByUserAsync(emptyUserId);
+		var result = await repo.GetByUserAsync(emptyUserId, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -91,7 +91,7 @@ public sealed class RepositoryValidationTests
 		const string whitespaceUserId = "   ";
 
 		// Act
-		var result = await repo.GetByUserAsync(whitespaceUserId);
+		var result = await repo.GetByUserAsync(whitespaceUserId, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -106,7 +106,7 @@ public sealed class RepositoryValidationTests
 		string? nullUserId = null;
 
 		// Act
-		var result = await repo.GetByUserAsync(nullUserId!);
+		var result = await repo.GetByUserAsync(nullUserId!, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -120,7 +120,7 @@ public sealed class RepositoryValidationTests
 		var repo = new CommentRepository("mongodb://localhost:27017", "TestDb");
 
 		// Act
-		var result = await repo.GetByIssueAsync(null!);
+		var result = await repo.GetByIssueAsync(null!, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -136,7 +136,7 @@ public sealed class RepositoryValidationTests
 		const string emptyUserId = "";
 
 		// Act
-		var result = await repo.UpVoteAsync(commentId, emptyUserId);
+		var result = await repo.UpVoteAsync(commentId, emptyUserId, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -152,7 +152,7 @@ public sealed class RepositoryValidationTests
 		const string whitespaceUserId = "  ";
 
 		// Act
-		var result = await repo.UpVoteAsync(commentId, whitespaceUserId);
+		var result = await repo.UpVoteAsync(commentId, whitespaceUserId, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -170,7 +170,7 @@ public sealed class RepositoryValidationTests
 		var repo = new CategoryRepository("mongodb://localhost:27017", "TestDb");
 
 		// Act
-		var result = await repo.CreateAsync(null!);
+		var result = await repo.CreateAsync(null!, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -217,7 +217,7 @@ public sealed class RepositoryValidationTests
 		var repo = new StatusRepository("mongodb://localhost:27017", "TestDb");
 
 		// Act
-		var result = await repo.CreateAsync(null!);
+		var result = await repo.CreateAsync(null!, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -264,7 +264,7 @@ public sealed class RepositoryValidationTests
 		var repo = new CommentRepository("mongodb://localhost:27017", "TestDb");
 
 		// Act
-		var result = await repo.CreateAsync(null!);
+		var result = await repo.CreateAsync(null!, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();

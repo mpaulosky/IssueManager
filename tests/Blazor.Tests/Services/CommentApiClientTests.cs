@@ -61,7 +61,7 @@ public class CommentApiClientTests
 		var client = new CommentApiClient(CreateMockClient(response));
 
 		// Act
-		var result = await client.GetAllAsync();
+		var result = await client.GetAllAsync(cancellationToken: Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -76,7 +76,7 @@ public class CommentApiClientTests
 		var client = new CommentApiClient(CreateMockClient(response));
 
 		// Act
-		var result = await client.GetAllAsync();
+		var result = await client.GetAllAsync(cancellationToken: Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -98,7 +98,7 @@ public class CommentApiClientTests
 		};
 
 		// Act
-		var result = await client.CreateAsync(command);
+		var result = await client.CreateAsync(command, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -114,7 +114,7 @@ public class CommentApiClientTests
 		var command = new CreateCommentCommand { Title = "x", CommentText = "", IssueId = "invalid" };
 
 		// Act
-		var result = await client.CreateAsync(command);
+		var result = await client.CreateAsync(command, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeNull();
@@ -128,7 +128,7 @@ public class CommentApiClientTests
 		var client = new CommentApiClient(CreateMockClient(response));
 
 		// Act
-		var result = await client.DeleteAsync(ObjectId.GenerateNewId().ToString());
+		var result = await client.DeleteAsync(ObjectId.GenerateNewId().ToString(), Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeTrue();
@@ -142,7 +142,7 @@ public class CommentApiClientTests
 		var client = new CommentApiClient(CreateMockClient(response));
 
 		// Act
-		var result = await client.DeleteAsync(ObjectId.GenerateNewId().ToString());
+		var result = await client.DeleteAsync(ObjectId.GenerateNewId().ToString(), Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeFalse();

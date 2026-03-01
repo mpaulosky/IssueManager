@@ -73,7 +73,7 @@ public class IssueApiClientTests
 		var client = new IssueApiClient(CreateMockClient(response));
 
 		// Act
-		var result = await client.GetAllAsync();
+		var result = await client.GetAllAsync(cancellationToken: Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -90,7 +90,7 @@ public class IssueApiClientTests
 		var client = new IssueApiClient(CreateMockClient(response));
 
 		// Act
-		var result = await client.GetAllAsync();
+		var result = await client.GetAllAsync(cancellationToken: Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -107,7 +107,7 @@ public class IssueApiClientTests
 		var client = new IssueApiClient(CreateMockClient(response));
 
 		// Act
-		var result = await client.GetByIdAsync(expected.Id.ToString());
+		var result = await client.GetByIdAsync(expected.Id.ToString(), Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -122,7 +122,7 @@ public class IssueApiClientTests
 		var client = new IssueApiClient(CreateMockClient(response));
 
 		// Act
-		var result = await client.GetByIdAsync(ObjectId.GenerateNewId().ToString());
+		var result = await client.GetByIdAsync(ObjectId.GenerateNewId().ToString(), Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeNull();
@@ -138,7 +138,7 @@ public class IssueApiClientTests
 		var command = new CreateIssueCommand { Title = "New Issue", Description = "Description" };
 
 		// Act
-		var result = await client.CreateAsync(command);
+		var result = await client.CreateAsync(command, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -154,7 +154,7 @@ public class IssueApiClientTests
 		var command = new CreateIssueCommand { Title = "x" };
 
 		// Act
-		var result = await client.CreateAsync(command);
+		var result = await client.CreateAsync(command, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeNull();
@@ -168,7 +168,7 @@ public class IssueApiClientTests
 		var client = new IssueApiClient(CreateMockClient(response));
 
 		// Act
-		var result = await client.DeleteAsync(ObjectId.GenerateNewId().ToString());
+		var result = await client.DeleteAsync(ObjectId.GenerateNewId().ToString(), Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeTrue();
@@ -182,7 +182,7 @@ public class IssueApiClientTests
 		var client = new IssueApiClient(CreateMockClient(response));
 
 		// Act
-		var result = await client.DeleteAsync(ObjectId.GenerateNewId().ToString());
+		var result = await client.DeleteAsync(ObjectId.GenerateNewId().ToString(), Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeFalse();
@@ -199,7 +199,7 @@ public class IssueApiClientTests
 		var client = new IssueApiClient(httpClient);
 
 		// Act
-		var result = await client.GetAllAsync(searchTerm: "bug fix");
+		var result = await client.GetAllAsync(searchTerm: "bug fix", cancellationToken: Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		handler.LastRequest.Should().NotBeNull();
@@ -218,7 +218,7 @@ public class IssueApiClientTests
 		var client = new IssueApiClient(httpClient);
 
 		// Act
-		var result = await client.GetAllAsync(authorName: "John");
+		var result = await client.GetAllAsync(authorName: "John", cancellationToken: Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		handler.LastRequest.Should().NotBeNull();
@@ -237,7 +237,7 @@ public class IssueApiClientTests
 		var client = new IssueApiClient(httpClient);
 
 		// Act
-		var result = await client.GetAllAsync(searchTerm: "bug", authorName: "Alice");
+		var result = await client.GetAllAsync(searchTerm: "bug", authorName: "Alice", cancellationToken: Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		handler.LastRequest.Should().NotBeNull();
@@ -258,7 +258,7 @@ public class IssueApiClientTests
 		var client = new IssueApiClient(httpClient);
 
 		// Act
-		var result = await client.GetAllAsync();
+		var result = await client.GetAllAsync(cancellationToken: Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		handler.LastRequest.Should().NotBeNull();

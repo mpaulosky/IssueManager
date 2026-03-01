@@ -13,14 +13,14 @@ public abstract class ComponentTestBase : IDisposable
 	/// <summary>
 	/// Gets the test context used for rendering components.
 	/// </summary>
-	protected Bunit.TestContext TestContext { get; }
+	protected BunitContext TestContext { get; }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="ComponentTestBase"/> class.
 	/// </summary>
 	protected ComponentTestBase()
 	{
-		TestContext = new Bunit.TestContext();
+		TestContext = new BunitContext();
 
 		var categoryClient = Substitute.For<ICategoryApiClient>();
 		categoryClient.GetAllAsync(Arg.Any<CancellationToken>())
