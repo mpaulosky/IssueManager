@@ -118,7 +118,7 @@ jobs:
           exit $exit_code
 
       - name: Upload Unit Test Results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: unit-test-results
@@ -170,7 +170,7 @@ jobs:
           exit $exit_code
 
       - name: Upload Architecture Test Results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: architecture-test-results
@@ -223,7 +223,7 @@ jobs:
           exit $exit_code
 
       - name: Upload bUnit Test Results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: bunit-test-results
@@ -289,7 +289,7 @@ jobs:
           exit $exit_code
 
       - name: Upload Integration Test Results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: integration-test-results
@@ -354,7 +354,7 @@ jobs:
           exit $exit_code
 
       - name: Upload Aspire Test Results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: aspire-test-results
@@ -381,7 +381,7 @@ jobs:
           global-json-file: global.json
 
       - name: Download coverage reports
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: coverage-reports
 
@@ -409,7 +409,7 @@ jobs:
           fi
 
       - name: Upload coverage reports
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-reports
@@ -441,12 +441,12 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Download all test results
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: all-test-results
 
       - name: Publish test results
-        uses: EnricoMi/publish-unit-test-result-action@v2.22.0
+        uses: EnricoMi/publish-unit-test-result-action@v2.23.0
         if: always()
         with:
           files: all-test-results/**/*.trx
