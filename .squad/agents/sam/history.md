@@ -62,6 +62,13 @@ Backend Developer on IssueManager (.NET 10, MongoDB, EF Core, CQRS, MediatR, Min
 - **Build verification:** Api.csproj builds successfully. Test failures expected (Gimli's scope to fix test instantiation)
 - **Note:** Did NOT add [Authorize] attributes — that's s4-api-policies task scope
 
+### CancellationToken propagation (2026-03-01)
+- **Bug pattern:** Handler accepting `CancellationToken` but not forwarding it to the repository call — silent discard
+- **Fix location:** `ListCategoriesHandler.Handle()` line 38 — `GetAllAsync()` → `GetAllAsync(cancellationToken)`
+- **Verification step:** Always grep handler `Handle()` calls to confirm `cancellationToken` flows into every async repository call
+- **Scope:** `ListStatusesHandler` was already correct; only `ListCategoriesHandler` was affected
+- **Interface check:** `ICategoryRepository.GetAllAsync(CancellationToken = default)` already had the right signature — purely a call-site omission
+
 ### Sprint 4 API Authorization Policies (2026-02-28)
 - **Authorization applied:** Added `.RequireAuthorization()` to all 12 write endpoints (POST, PATCH, DELETE) across IssueEndpoints, CategoryEndpoints, StatusEndpoints, and CommentEndpoints
 - **Read-only endpoints:** GET endpoints (list, getById) remain public — no authorization required for read operations

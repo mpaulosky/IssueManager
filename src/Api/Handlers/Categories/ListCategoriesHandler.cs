@@ -35,7 +35,7 @@ public class ListCategoriesHandler
 	/// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of all categories as <see cref="CategoryDto"/> objects.</returns>
 	public async Task<IEnumerable<CategoryDto>> Handle(CancellationToken cancellationToken = default)
 	{
-		var result = await _repository.GetAllAsync();
+		var result = await _repository.GetAllAsync(cancellationToken);
 		if (!result.Success)
 			return Enumerable.Empty<CategoryDto>();
 
