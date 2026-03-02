@@ -55,7 +55,8 @@ public class CreateCommentHandlerIntegrationTests : IAsyncLifetime
 		var command = new CreateCommentCommand
 		{
 			Title = "New Comment",
-			CommentText = "New comment text"
+			CommentText = "New comment text",
+			IssueId = ObjectId.GenerateNewId().ToString()
 		};
 
 		// Act
@@ -93,7 +94,8 @@ public class CreateCommentHandlerIntegrationTests : IAsyncLifetime
 		var command = new CreateCommentCommand
 		{
 			Title = "Retrievable Comment",
-			CommentText = "Test comment text"
+			CommentText = "Test comment text",
+			IssueId = ObjectId.GenerateNewId().ToString()
 		};
 
 		// Act - Create comment

@@ -58,7 +58,8 @@ public class UpdateCommentHandlerIntegrationTests : IAsyncLifetime
 		var command = new UpdateCommentCommand
 		{
 			Id = created.Value.Id.ToString(),
-			Title = "Updated Title"
+			Title = "Updated Title",
+			CommentText = "Updated comment text"
 		};
 
 		// Act
@@ -78,7 +79,8 @@ public class UpdateCommentHandlerIntegrationTests : IAsyncLifetime
 		var command = new UpdateCommentCommand
 		{
 			Id = nonExistentId,
-			Title = "Updated Title"
+			Title = "Updated Title",
+			CommentText = "Non-existent comment text"
 		};
 
 		// Act
