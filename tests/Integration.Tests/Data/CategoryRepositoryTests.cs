@@ -18,7 +18,7 @@ namespace Tests.Integration.Data;
 /// </summary>
 public class CategoryRepositoryTests : IAsyncLifetime
 {
-	private const string MONGODB_IMAGE = "mongo:8.0";
+	private const string MONGODB_IMAGE = "mongo:latest";
 	private const string TEST_DATABASE = "IssueManagerTestDb";
 	private readonly MongoDbContainer _mongoContainer;
 
@@ -26,8 +26,7 @@ public class CategoryRepositoryTests : IAsyncLifetime
 
 	public CategoryRepositoryTests()
 	{
-		_mongoContainer = new MongoDbBuilder()
-			.WithImage(MONGODB_IMAGE)
+		_mongoContainer = new MongoDbBuilder(MONGODB_IMAGE)
 			.Build();
 	}
 

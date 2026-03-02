@@ -6,8 +6,7 @@ namespace Integration.Fixtures;
 public class MongoDbFixture : IAsyncLifetime
 {
 	private const string MongodbImage = "mongo:latest";
-	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder()
-			.WithImage(MongodbImage)
+	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage)
 			.Build();
 
 	/// <summary>

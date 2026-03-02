@@ -10,10 +10,9 @@ namespace Integration.Handlers;
 [Collection("Integration")]
 public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 {
-	private const string MongodbImage = "mongo:8.2";
+	private const string MongodbImage = "mongo:latest";
 	private const string TestDatabase = "IssueManagerTestDb";
-	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder()
-			.WithImage(MongodbImage)
+	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage)
 			.Build();
 
 	private IIssueRepository _repository = null!;
