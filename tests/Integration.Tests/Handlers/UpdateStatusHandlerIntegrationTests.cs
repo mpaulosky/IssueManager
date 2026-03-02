@@ -62,7 +62,7 @@ public class UpdateStatusHandlerIntegrationTests : IAsyncLifetime
 		};
 
 		// Act
-		var result = await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -84,7 +84,7 @@ public class UpdateStatusHandlerIntegrationTests : IAsyncLifetime
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		Func<Task> act = async () => await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		await act.Should().ThrowAsync<NotFoundException>()
@@ -106,7 +106,7 @@ public class UpdateStatusHandlerIntegrationTests : IAsyncLifetime
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		Func<Task> act = async () => await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		await act.Should().ThrowAsync<ValidationException>();

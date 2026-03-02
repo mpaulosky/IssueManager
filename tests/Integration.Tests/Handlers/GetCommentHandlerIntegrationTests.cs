@@ -58,7 +58,7 @@ public class GetCommentHandlerIntegrationTests : IAsyncLifetime
 		var query = new GetCommentQuery(created.Value.Id.ToString());
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -74,7 +74,7 @@ public class GetCommentHandlerIntegrationTests : IAsyncLifetime
 		var query = new GetCommentQuery(nonExistentId);
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeNull();
@@ -87,7 +87,7 @@ public class GetCommentHandlerIntegrationTests : IAsyncLifetime
 		var query = new GetCommentQuery("invalid-id-format");
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeNull();
@@ -100,7 +100,7 @@ public class GetCommentHandlerIntegrationTests : IAsyncLifetime
 		var query = new GetCommentQuery(string.Empty);
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(query, CancellationToken.None);
+		Func<Task> act = async () => await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		await act.Should().ThrowAsync<ArgumentException>()

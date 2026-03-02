@@ -55,7 +55,7 @@ public class ListCommentsHandlerIntegrationTests : IAsyncLifetime
 		// Arrange - No comments in database
 
 		// Act
-		var result = await _handler.Handle(null, CancellationToken.None);
+		var result = await _handler.Handle(null, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeEmpty();
@@ -74,7 +74,7 @@ public class ListCommentsHandlerIntegrationTests : IAsyncLifetime
 		await _repository.CreateAsync(comment3, TestContext.Current.CancellationToken);
 
 		// Act
-		var result = await _handler.Handle(null, CancellationToken.None);
+		var result = await _handler.Handle(null, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().HaveCount(3);
@@ -99,7 +99,7 @@ public class ListCommentsHandlerIntegrationTests : IAsyncLifetime
 		await _repository.CreateAsync(comment3, TestContext.Current.CancellationToken);
 
 		// Act - Filter by issueId1
-		var result = await _handler.Handle(issueId1.ToString(), CancellationToken.None);
+		var result = await _handler.Handle(issueId1.ToString(), TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().HaveCount(2);
@@ -117,7 +117,7 @@ public class ListCommentsHandlerIntegrationTests : IAsyncLifetime
 
 		// Act - Filter by non-existent issue ID
 		var nonExistentIssueId = ObjectId.GenerateNewId().ToString();
-		var result = await _handler.Handle(nonExistentIssueId, CancellationToken.None);
+		var result = await _handler.Handle(nonExistentIssueId, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeEmpty();

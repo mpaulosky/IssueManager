@@ -23,6 +23,5 @@ global using Shared.Mappers;
 global using Shared.Models;
 global using Shared.Validators;
 global using System;
-global using System.Reflection;
 global using System.Security.Claims;
 global using Tests.Unit.Builders;

@@ -59,7 +59,7 @@ public class CreateCommentHandlerIntegrationTests : IAsyncLifetime
 		};
 
 		// Act
-		var result = await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -80,7 +80,7 @@ public class CreateCommentHandlerIntegrationTests : IAsyncLifetime
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		Func<Task> act = async () => await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		await act.Should().ThrowAsync<ValidationException>();
@@ -97,7 +97,7 @@ public class CreateCommentHandlerIntegrationTests : IAsyncLifetime
 		};
 
 		// Act - Create comment
-		var created = await _handler.Handle(command, CancellationToken.None);
+		var created = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert - Verify it can be retrieved
 		var retrieved = await _repository.GetByIdAsync(created.Id, TestContext.Current.CancellationToken);
