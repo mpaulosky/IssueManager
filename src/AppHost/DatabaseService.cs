@@ -35,7 +35,8 @@ public static class DatabaseService
 		var databaseName = isDevelopment ? DevDatabaseName : DatabaseName;
 
 		var environmentName = isDevelopment ? "Development" : "Production";
-		logger.LogInformation("MongoDB configured for {Environment} environment with database: {DatabaseName}", 
+
+		logger.LogInformation("MongoDB configured for {Environment} environment with database: {DatabaseName}",
 			environmentName, databaseName);
 
 		// Use a valid resource name, not the connection string
@@ -50,7 +51,7 @@ public static class DatabaseService
 		logger.LogDebug("Creating MongoDB database resource: {DatabaseName}", databaseName);
 		var database = server.AddDatabase(databaseName);
 
-		logger.LogInformation("MongoDB resources configured successfully: server={ServerName}, database={DatabaseName}", 
+		logger.LogInformation("MongoDB resources configured successfully: server={ServerName}, database={DatabaseName}",
 			Server, databaseName);
 
 		return database;

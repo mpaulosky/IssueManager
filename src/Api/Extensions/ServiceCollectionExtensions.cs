@@ -13,6 +13,10 @@ using Api.Handlers.Comments;
 using Api.Handlers.Issues;
 using Api.Handlers.Statuses;
 
+using Microsoft.Extensions.Hosting;
+
+using static Shared.Constants.Constants;
+
 namespace Api.Extensions;
 
 /// <summary>Extension methods for registering application services.</summary>
@@ -20,21 +24,35 @@ public static class ServiceCollectionExtensions
 {
 	/// <summary>
 	/// Registers all MongoDB repositories, reading the connection string from configuration.
+	/// Selects the database name based on the current environment: <see cref="Shared.Constants.Constants.DevDatabaseName"/>
+	/// for Development, <see cref="Shared.Constants.Constants.DatabaseName"/> for all other environments.
 	/// Falls back to <c>mongodb://localhost:27017</c> if no connection string is configured.
 	/// </summary>
-	public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
+	public static IServiceCollection AddRepositories(
+		this IServiceCollection services,
+		IConfiguration configuration,
+		IHostEnvironment? environment = null)
 	{
-		var connectionString = configuration.GetConnectionString("dev-issuemanagerdb")
+		// Determine the database name based on the environment
+		var isDevelopment = environment?.IsDevelopment()
+			?? string.Equals(
+				configuration["ASPNETCORE_ENVIRONMENT"] ?? configuration["DOTNET_ENVIRONMENT"],
+				"Development",
+				StringComparison.OrdinalIgnoreCase);
+
+		var databaseName = isDevelopment ? DevDatabaseName : DatabaseName;
+
+		var connectionString = configuration.GetConnectionString(databaseName)
 			?? "mongodb://localhost:27017";
 
 		services.AddSingleton<IIssueRepository>(sp =>
-			new IssueRepository(connectionString, "dev-issuemanagerdb"));
+			new IssueRepository(connectionString, databaseName));
 		services.AddSingleton<IStatusRepository>(sp =>
-			new StatusRepository(connectionString, "dev-issuemanagerdb"));
+			new StatusRepository(connectionString, databaseName));
 		services.AddSingleton<ICategoryRepository>(sp =>
-			new CategoryRepository(connectionString, "dev-issuemanagerdb"));
+			new CategoryRepository(connectionString, databaseName));
 		services.AddSingleton<ICommentRepository>(sp =>
-			new CommentRepository(connectionString, "dev-issuemanagerdb"));
+			new CommentRepository(connectionString, databaseName));
 
 		return services;
 	}

@@ -5,7 +5,7 @@ namespace Integration.Fixtures;
 /// </summary>
 public class MongoDbFixture : IAsyncLifetime
 {
-	private const string MongodbImage = "mongo:8.2";
+	private const string MongodbImage = "mongo:latest";
 	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder()
 			.WithImage(MongodbImage)
 			.Build();

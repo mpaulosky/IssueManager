@@ -25,7 +25,7 @@ builder.Services.AddCors(options =>
 	});
 });
 
-builder.Services.AddRepositories(builder.Configuration);
+builder.Services.AddRepositories(builder.Configuration, builder.Environment);
 builder.Services.AddValidators();
 builder.Services.AddHandlers();
 builder.Services.AddCurrentUser();
