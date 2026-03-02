@@ -22,3 +22,4 @@ global using Web.Pages.Categories;
 global using Web.Pages.Issues;
 global using Web.Pages.Statuses;
 global using Web.Services;
+global using Microsoft.Extensions.DependencyInjection;
