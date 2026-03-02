@@ -1,8 +1,6 @@
 // Copyright (c) 2026. All rights reserved.
 
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
-using System.Security.Claims;
 
 namespace Tests.BlazorTests.Layout;
 
@@ -16,8 +14,7 @@ public class MainLayoutTests : ComponentTestBase
 	public void MainLayout_RendersWithoutError()
 	{
 		// Arrange
-		var authContext = CreateTestAuthorizationContext(isAuthorized: false);
-		TestContext.Services.AddSingleton(authContext);
+		TestContext.AddAuthorization();
 		TestContext.JSInterop.Mode = JSRuntimeMode.Loose;
 
 		// Act
@@ -32,8 +29,7 @@ public class MainLayoutTests : ComponentTestBase
 	public void MainLayout_RendersBodyContent()
 	{
 		// Arrange
-		var authContext = CreateTestAuthorizationContext(isAuthorized: false);
-		TestContext.Services.AddSingleton(authContext);
+		TestContext.AddAuthorization();
 		TestContext.JSInterop.Mode = JSRuntimeMode.Loose;
 		const string bodyContent = "Test Body Content";
 
@@ -49,8 +45,7 @@ public class MainLayoutTests : ComponentTestBase
 	public void MainLayout_ContainsNavMenu()
 	{
 		// Arrange
-		var authContext = CreateTestAuthorizationContext(isAuthorized: false);
-		TestContext.Services.AddSingleton(authContext);
+		TestContext.AddAuthorization();
 		TestContext.JSInterop.Mode = JSRuntimeMode.Loose;
 
 		// Act
@@ -65,8 +60,7 @@ public class MainLayoutTests : ComponentTestBase
 	public void MainLayout_ContainsFooter()
 	{
 		// Arrange
-		var authContext = CreateTestAuthorizationContext(isAuthorized: false);
-		TestContext.Services.AddSingleton(authContext);
+		TestContext.AddAuthorization();
 		TestContext.JSInterop.Mode = JSRuntimeMode.Loose;
 
 		// Act
@@ -75,20 +69,5 @@ public class MainLayoutTests : ComponentTestBase
 
 		// Assert
 		cut.Find("footer").Should().NotBeNull();
-	}
-
-	private static AuthenticationStateProvider CreateTestAuthorizationContext(bool isAuthorized, string userName = "TestUser")
-	{
-		var identity = isAuthorized
-			? new ClaimsIdentity([new Claim(ClaimTypes.Name, userName)], "Test")
-			: new ClaimsIdentity();
-
-		var user = new ClaimsPrincipal(identity);
-		var authState = Task.FromResult(new AuthenticationState(user));
-
-		var authStateProvider = Substitute.For<AuthenticationStateProvider>();
-		authStateProvider.GetAuthenticationStateAsync().Returns(authState);
-
-		return authStateProvider;
 	}
 }

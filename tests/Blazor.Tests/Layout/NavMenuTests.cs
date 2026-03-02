@@ -1,8 +1,5 @@
 // Copyright (c) 2026. All rights reserved.
 
-using Microsoft.AspNetCore.Components.Authorization;
-using System.Security.Claims;
-
 namespace Tests.BlazorTests.Layout;
 
 /// <summary>
@@ -15,8 +12,8 @@ public class NavMenuTests : ComponentTestBase
 	public void NavMenu_RendersWithoutError()
 	{
 		// Arrange
-		var authContext = CreateTestAuthorizationContext(isAuthorized: false);
-		TestContext.Services.AddSingleton(authContext);
+		TestContext.AddAuthorization();
+		TestContext.JSInterop.Mode = JSRuntimeMode.Loose;
 
 		// Act
 		var cut = TestContext.Render<NavMenu>();
@@ -30,8 +27,8 @@ public class NavMenuTests : ComponentTestBase
 	public void NavMenu_ShowsNavLinks()
 	{
 		// Arrange
-		var authContext = CreateTestAuthorizationContext(isAuthorized: false);
-		TestContext.Services.AddSingleton(authContext);
+		TestContext.AddAuthorization();
+		TestContext.JSInterop.Mode = JSRuntimeMode.Loose;
 
 		// Act
 		var cut = TestContext.Render<NavMenu>();
@@ -47,8 +44,8 @@ public class NavMenuTests : ComponentTestBase
 	public void NavMenu_ShowsLoginLink_WhenNotAuthorized()
 	{
 		// Arrange
-		var authContext = CreateTestAuthorizationContext(isAuthorized: false);
-		TestContext.Services.AddSingleton(authContext);
+		TestContext.AddAuthorization();
+		TestContext.JSInterop.Mode = JSRuntimeMode.Loose;
 
 		// Act
 		var cut = TestContext.Render<NavMenu>();
@@ -62,8 +59,9 @@ public class NavMenuTests : ComponentTestBase
 	public void NavMenu_ShowsLogoutLink_WhenAuthorized()
 	{
 		// Arrange
-		var authContext = CreateTestAuthorizationContext(isAuthorized: true, userName: "TestUser");
-		TestContext.Services.AddSingleton(authContext);
+		var authContext = TestContext.AddAuthorization();
+		authContext.SetAuthorized("TestUser");
+		TestContext.JSInterop.Mode = JSRuntimeMode.Loose;
 
 		// Act
 		var cut = TestContext.Render<NavMenu>();
@@ -78,8 +76,8 @@ public class NavMenuTests : ComponentTestBase
 	public void NavMenu_MobileMenu_TogglesOnButtonClick()
 	{
 		// Arrange
-		var authContext = CreateTestAuthorizationContext(isAuthorized: false);
-		TestContext.Services.AddSingleton(authContext);
+		TestContext.AddAuthorization();
+		TestContext.JSInterop.Mode = JSRuntimeMode.Loose;
 		var cut = TestContext.Render<NavMenu>();
 
 		// Mobile menu should not be visible initially
@@ -93,20 +91,5 @@ public class NavMenuTests : ComponentTestBase
 		// Assert — mobile menu should now be visible
 		var mobileMenu = cut.Find("#mobile-menu");
 		mobileMenu.Should().NotBeNull();
-	}
-
-	private static AuthenticationStateProvider CreateTestAuthorizationContext(bool isAuthorized, string userName = "TestUser")
-	{
-		var identity = isAuthorized
-			? new ClaimsIdentity([new Claim(ClaimTypes.Name, userName)], "Test")
-			: new ClaimsIdentity();
-
-		var user = new ClaimsPrincipal(identity);
-		var authState = Task.FromResult(new AuthenticationState(user));
-
-		var authStateProvider = Substitute.For<AuthenticationStateProvider>();
-		authStateProvider.GetAuthenticationStateAsync().Returns(authState);
-
-		return authStateProvider;
 	}
 }
