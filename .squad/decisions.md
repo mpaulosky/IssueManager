@@ -370,3 +370,200 @@ var result = await _repository.GetAllAsync(cancellationToken);
 **Rationale:** Consistency across test suite; latest MongoDB features; deprecation warning fix (eliminated 11 CS0618 warnings); build cleanliness.
 **Files Modified (11):** MongoDbFixture, DeleteIssueHandlerIntegrationTests, DeleteIssueHandlerTests, CreateIssueHandlerTests, GetIssueHandlerTests, UpdateIssueHandlerIntegrationTests, IssueRepositorySearchTests, ListIssuesHandlerIntegrationTests, UpdateIssueStatusHandlerTests, CategoryRepositoryTests, IssueRepositoryTests.
 **Build Status:** Before: 11 CS0618 warnings. After: ✅ 0 warnings, 0 errors. Test logic unchanged.
+
+---
+
+### 2026-03-02: xUnit1051 CancellationToken Integration Test Fix
+**Date:** 2026-03-01  
+**Author:** Gimli (Tester)  
+**Status:** Completed  
+**Commit:** `4f67ddb`
+
+## What
+
+Fixed all xUnit1051 analyzer warnings across 10 Integration.Tests files by passing `TestContext.Current.CancellationToken` to every async repository and handler method call within test methods.
+
+## Scope
+
+**Files Fixed (10):**
+- `tests/Integration.Tests/Data/CategoryRepositoryTests.cs`
+- `tests/Integration.Tests/Data/IssueRepositoryTests.cs`
+- `tests/Integration.Tests/Handlers/CreateIssueHandlerTests.cs`
+- `tests/Integration.Tests/Handlers/DeleteIssueHandlerIntegrationTests.cs`
+- `tests/Integration.Tests/Handlers/DeleteIssueHandlerTests.cs`
+- `tests/Integration.Tests/Handlers/GetIssueHandlerTests.cs`
+- `tests/Integration.Tests/Handlers/IssueRepositorySearchTests.cs`
+- `tests/Integration.Tests/Handlers/ListIssuesHandlerIntegrationTests.cs`
+- `tests/Integration.Tests/Handlers/UpdateIssueHandlerIntegrationTests.cs`
+- `tests/Integration.Tests/Handlers/UpdateIssueStatusHandlerTests.cs`
+
+**Total Fixes:** 131 async call sites updated
+
+## Build Results
+
+- **Before:** 103+ xUnit1051 warnings, 0 errors
+- **After:** ✅ 0 xUnit1051 warnings, 0 errors
+
+---
+
+### 2026-03-02: Integration Test Patterns for Handler Testing
+
+**Date:** 2026-03-02  
+**Author:** Gimli (Tester)  
+**Status:** ✅ Implemented  
+
+## Context
+
+Issue #64 required integration tests for Category, Comment, and Status handlers. Existing integration tests for Issue handlers provided the pattern to follow.
+
+## Pattern Established
+
+### File Structure
+```
+tests/Integration.Tests/Handlers/
+  List{Resource}HandlerIntegrationTests.cs
+  Get{Resource}HandlerIntegrationTests.cs
+  Create{Resource}HandlerIntegrationTests.cs
+  Update{Resource}HandlerIntegrationTests.cs
+  Delete{Resource}HandlerIntegrationTests.cs
+```
+
+### Common Elements
+
+**1. TestContainers Setup (IAsyncLifetime)**
+```csharp
+private const string MongodbImage = "mongo:latest";
+private const string TestDatabase = "IssueManagerTestDb";
+private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage).Build();
+
+private I{Resource}Repository _repository = null!;
+private {Handler}Handler _handler = null!;
+
+public async ValueTask InitializeAsync()
+{
+    await _mongoContainer.StartAsync();
+    var connectionString = _mongoContainer.GetConnectionString();
+    _repository = new {Resource}Repository(connectionString, TestDatabase);
+    _handler = new {Handler}Handler(_repository, new {Handler}Validator());
+}
+
+public async ValueTask DisposeAsync()
+{
+    await _mongoContainer.StopAsync();
+    await _mongoContainer.DisposeAsync();
+}
+```
+
+**2. Critical Attributes**
+- `[Collection("Integration")]` — REQUIRED on ALL integration test classes to prevent Docker port conflicts
+- `[ExcludeFromCodeCoverage]` — Integration tests don't count toward code coverage
+
+**3. Helper Methods for DTO Creation**
+```csharp
+private static CategoryDto CreateTestCategoryDto(string name, string description = "Test description") =>
+    new(ObjectId.GenerateNewId(), name, description, DateTime.UtcNow, null, false, UserDto.Empty);
+```
+
+**Always read the actual DTO constructor before writing helpers** — parameter order matters!
+
+**4. Handler Dependencies**
+- **Most handlers**: `new {Handler}Handler(_repository, new {Handler}Validator())`
+- **CreateCommentHandler special case**: Requires `ICurrentUserService` — use NSubstitute mock:
+  ```csharp
+  var currentUserService = Substitute.For<ICurrentUserService>();
+  currentUserService.IsAuthenticated.Returns(false);
+  _handler = new CreateCommentHandler(_repository, new CreateCommentValidator(), currentUserService);
+  ```
+
+### Test Coverage Pattern (Per Resource)
+
+**List Handler (3-4 tests):**
+- Empty database returns empty list
+- With entities returns all
+- Handles archived entities correctly
+- (Optional) Tests filtering parameters (e.g., ListCommentsHandler with issueId filter)
+
+**Get Handler (4 tests):**
+- Existing entity returns entity
+- Non-existent entity returns null
+- Invalid ObjectId format returns null
+- Empty ID throws ArgumentException
+
+**Create Handler (3 tests):**
+- Valid command creates entity
+- Invalid command throws ValidationException
+- Created entity can be retrieved from repository
+
+**Update Handler (3 tests):**
+- Existing entity updates successfully
+- Non-existent entity throws NotFoundException
+- Invalid command throws ValidationException
+
+**Delete Handler (4 tests):**
+- Valid entity sets Archived in database
+- Non-existent entity throws NotFoundException
+- Already archived entity is idempotent (returns true)
+- Deleted entity record still exists (soft delete)
+
+## Outcome
+
+✅ **52 new integration tests** written across 15 files  
+✅ **Build succeeded** with 0 errors  
+✅ **PR #69** created and merged  
+
+---
+
+### 2026-03-02: bUnit 2.x Authorization Testing Pattern
+
+**Date:** 2026-03-02  
+**Author:** Gimli (Tester)  
+**Status:** Accepted
+
+## Context
+
+bUnit 2.6.2 does not include the `AddTestAuthorization()` extension method from bUnit 1.x. We need a standard pattern for testing Blazor components that use `AuthorizeView` or other authentication-dependent features.
+
+## Decision
+
+Use a custom helper method to create a mocked `AuthenticationStateProvider`:
+
+```csharp
+private static AuthenticationStateProvider CreateTestAuthorizationContext(
+    bool isAuthorized, 
+    string userName = "TestUser")
+{
+    var identity = isAuthorized
+        ? new ClaimsIdentity([new Claim(ClaimTypes.Name, userName)], "Test")
+        : new ClaimsIdentity();
+
+    var user = new ClaimsPrincipal(identity);
+    var authState = Task.FromResult(new AuthenticationState(user));
+
+    var authStateProvider = Substitute.For<AuthenticationStateProvider>();
+    authStateProvider.GetAuthenticationStateAsync().Returns(authState);
+
+    return authStateProvider;
+}
+```
+
+Register the provider in tests:
+
+```csharp
+var authContext = CreateTestAuthorizationContext(isAuthorized: false);
+TestContext.Services.AddSingleton(authContext);
+```
+
+## Consequences
+
+### Positive
+- **Explicit control**: Full control over authentication state without hidden bUnit magic
+- **Flexible**: Easy to customize claims, roles, or auth schemes per test
+- **Framework-aligned**: Uses standard ASP.NET Core auth abstractions
+
+### Negative
+- **Boilerplate**: Requires helper method in each test class (could be moved to `ComponentTestBase` in future)
+- **No built-in test roles/policies**: Must manually create claims for role-based or policy-based tests
+
+## Files Using This Pattern
+- `tests/Blazor.Tests/Layout/NavMenuTests.cs` (5 tests)
+- `tests/Blazor.Tests/Layout/MainLayoutTests.cs` (4 tests)
