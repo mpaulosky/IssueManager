@@ -321,3 +321,52 @@ logger.LogInformation("MongoDB configured for {Environment} environment with dat
 - `.Subject` removal, `ExecutionTime`, `BeApproximately` — NOT USED
 **Result:** ZERO breaking changes detected. All 96 test files fully compatible with FA v8.8.0.
 **Build Errors:** 122 total errors found are exclusively bUnit v2.x breaking changes (`RenderComponent`, `SetParametersAndRender`), NOT FluentAssertions.
+
+---
+
+### 2026-03-01: Forward CancellationToken in ListCategoriesHandler
+**Date:** 2026-03-01  
+**Author:** Sam (Backend Developer)  
+**Status:** Completed  
+**What:** Fixed `ListCategoriesHandler.Handle()` to forward `CancellationToken` to repository call. Handler accepted a `CancellationToken` parameter but called `_repository.GetAllAsync()` without passing it, silently discarding cancellation signals.
+**Fix:** Updated call site in `src/Api/Handlers/Categories/ListCategoriesHandler.cs` line 38:
+```csharp
+// Before
+var result = await _repository.GetAllAsync();
+
+// After
+var result = await _repository.GetAllAsync(cancellationToken);
+```
+**Scope Check:** `ListStatusesHandler` was already correct. No other handlers required changes.
+**Impact:** Build passes. CancellationToken now correctly propagated to MongoDB async operations, enabling cooperative cancellation under load.
+
+---
+
+### 2026-02-28: Phase 3 Test Warning Cleanup
+**Date:** 2026-02-28  
+**Author:** Gimli (Tester)  
+**Status:** Complete  
+**Commit:** `414828f`  
+**What:** Eliminated all pre-push hook compiler warnings from `tests/Unit.Tests/` and `tests/Blazor.Tests/`.
+**CS0618 — Bunit.TestContext obsolete (7 files):** Migrated from `Bunit.TestContext` → `BunitContext` (non-obsolete bUnit 2.x class).
+**xUnit1051 — CancellationToken.None at ~50 call sites (10 files):** Replaced with `Xunit.TestContext.Current.CancellationToken`. NSubstitute setups use `Arg.Any<CancellationToken>()` to allow flexibility.
+**Patterns Established:**
+- BunitContext migration: `new Bunit.TestContext()` → `new BunitContext()`
+- Handler tests: Use `Xunit.TestContext.Current.CancellationToken` in calls, `Arg.Any<CancellationToken>()` in NSubstitute setups
+- API client tests: Explicit `Xunit.TestContext.Current.CancellationToken` on all async calls; named params for optional CT params like `CommentApiClient.GetAllAsync(cancellationToken: ...)`
+**Results:** Unit.Tests 390/390 passed, Blazor.Tests 143/143 passed, 0 warnings/errors. Pre-push gate all 3 suites ✅.
+
+---
+
+### 2026-02-28: MongoDB Image Standardization (mongo:latest)
+**Date:** 2026-02-28  
+**Agent:** Gimli (Tester)  
+**Status:** Implemented  
+**Branch:** main  
+**Commit:** `4ad9e6f`  
+**What:** Standardized all integration tests to use `mongo:latest` image tag and updated Testcontainers.MongoDB v4.10.0 constructor API.
+**Image Tag Changes:** All hardcoded version tags (8.0, 8.2) replaced with `mongo:latest` across 11 files.
+**Constructor API Changes:** Updated from parameterless `new MongoDbBuilder().WithImage(imageName).Build()` to `new MongoDbBuilder(imageName).Build()` pattern to align with Testcontainers.MongoDB v4.10.0.
+**Rationale:** Consistency across test suite; latest MongoDB features; deprecation warning fix (eliminated 11 CS0618 warnings); build cleanliness.
+**Files Modified (11):** MongoDbFixture, DeleteIssueHandlerIntegrationTests, DeleteIssueHandlerTests, CreateIssueHandlerTests, GetIssueHandlerTests, UpdateIssueHandlerIntegrationTests, IssueRepositorySearchTests, ListIssuesHandlerIntegrationTests, UpdateIssueStatusHandlerTests, CategoryRepositoryTests, IssueRepositoryTests.
+**Build Status:** Before: 11 CS0618 warnings. After: ✅ 0 warnings, 0 errors. Test logic unchanged.

@@ -137,4 +137,35 @@ Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, Te
 
 **Commit:** `414828f` — fix(tests): Phase 3 - BunitContext migration and xUnit1051 CancellationToken cleanup
 
+### 2026-02-28: MongoDB Image Standardization — mongo:latest + MongoDbBuilder v4 API
+
+**Task:** Standardize all integration tests to use `mongo:latest` image and fix deprecated MongoDbBuilder() parameterless constructor.
+
+**Files Fixed (11 total):**
+- `tests/Integration.Tests/Fixtures/MongoDbFixture.cs` (already had mongo:latest)
+- `tests/Integration.Tests/Handlers/DeleteIssueHandlerIntegrationTests.cs` (mongo:8.2 → latest)
+- `tests/Integration.Tests/Handlers/DeleteIssueHandlerTests.cs` (mongo:8.2 → latest)
+- `tests/Integration.Tests/Handlers/CreateIssueHandlerTests.cs` (mongo:8.2 → latest)
+- `tests/Integration.Tests/Handlers/GetIssueHandlerTests.cs` (mongo:8.2 → latest)
+- `tests/Integration.Tests/Handlers/UpdateIssueHandlerIntegrationTests.cs` (mongo:8.2 → latest)
+- `tests/Integration.Tests/Handlers/IssueRepositorySearchTests.cs` (mongo:8.2 → latest)
+- `tests/Integration.Tests/Handlers/ListIssuesHandlerIntegrationTests.cs` (mongo:8.2 → latest)
+- `tests/Integration.Tests/Handlers/UpdateIssueStatusHandlerTests.cs` (mongo:8.2 → latest)
+- `tests/Integration.Tests/Data/CategoryRepositoryTests.cs` (mongo:8.0 → latest)
+- `tests/Integration.Tests/Data/IssueRepositoryTests.cs` (mongo:8.2 → latest)
+
+**Changes Applied:**
+1. **Image tag**: Changed all hardcoded `"mongo:8.0"` and `"mongo:8.2"` to `"mongo:latest"` for consistency
+2. **MongoDbBuilder API**: Fixed deprecated parameterless constructor by passing image directly to constructor
+   - **Old pattern**: `new MongoDbBuilder().WithImage(MongodbImage).Build()`
+   - **New pattern**: `new MongoDbBuilder(MongodbImage).Build()` (Testcontainers v4.10.0 API)
+
+**Build Results:** 
+- Before: 11 CS0618 obsolete warnings for MongoDbBuilder()
+- After: ✅ 0 warnings, 0 errors, build succeeded
+
+**Rationale:** User requested all Testcontainers use latest MongoDB image. Testcontainers.MongoDB v4.10.0 deprecated the parameterless constructor in favor of passing the image name directly to the constructor, aligning with the testcontainers-dotnet project's direction per https://github.com/testcontainers/testcontainers-dotnet/discussions/1470.
+
+**Commit:** `4ad9e6f` — test: standardize all integration tests to mongo:latest image
+
 
