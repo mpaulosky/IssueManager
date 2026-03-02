@@ -58,11 +58,12 @@ public class UpdateCommentHandlerIntegrationTests : IAsyncLifetime
 		var command = new UpdateCommentCommand
 		{
 			Id = created.Value.Id.ToString(),
-			Title = "Updated Title"
+			Title = "Updated Title",
+			CommentText = "Updated comment text"
 		};
 
 		// Act
-		var result = await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -78,11 +79,12 @@ public class UpdateCommentHandlerIntegrationTests : IAsyncLifetime
 		var command = new UpdateCommentCommand
 		{
 			Id = nonExistentId,
-			Title = "Updated Title"
+			Title = "Updated Title",
+			CommentText = "Non-existent comment text"
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		Func<Task> act = async () => await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		await act.Should().ThrowAsync<NotFoundException>()
@@ -103,7 +105,7 @@ public class UpdateCommentHandlerIntegrationTests : IAsyncLifetime
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		Func<Task> act = async () => await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		await act.Should().ThrowAsync<ValidationException>();

@@ -57,7 +57,7 @@ public class GetStatusHandlerIntegrationTests : IAsyncLifetime
 		var query = new GetStatusQuery(created.Value.Id.ToString());
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -73,7 +73,7 @@ public class GetStatusHandlerIntegrationTests : IAsyncLifetime
 		var query = new GetStatusQuery(nonExistentId);
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeNull();
@@ -86,7 +86,7 @@ public class GetStatusHandlerIntegrationTests : IAsyncLifetime
 		var query = new GetStatusQuery("invalid-id-format");
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeNull();
@@ -99,7 +99,7 @@ public class GetStatusHandlerIntegrationTests : IAsyncLifetime
 		var query = new GetStatusQuery(string.Empty);
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(query, CancellationToken.None);
+		Func<Task> act = async () => await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		await act.Should().ThrowAsync<ArgumentException>()

@@ -22,4 +22,3 @@ global using Shared.Abstractions;
 global using Shared.Exceptions;
 global using Shared.Validators;
 global using System;
-global using System.Reflection;

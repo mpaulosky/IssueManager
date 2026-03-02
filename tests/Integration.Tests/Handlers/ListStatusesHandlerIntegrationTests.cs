@@ -53,7 +53,7 @@ public class ListStatusesHandlerIntegrationTests : IAsyncLifetime
 		// Arrange - No statuses in database
 
 		// Act
-		var result = await _handler.Handle(CancellationToken.None);
+		var result = await _handler.Handle(TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeEmpty();
@@ -72,7 +72,7 @@ public class ListStatusesHandlerIntegrationTests : IAsyncLifetime
 		await _repository.CreateAsync(status3, TestContext.Current.CancellationToken);
 
 		// Act
-		var result = await _handler.Handle(CancellationToken.None);
+		var result = await _handler.Handle(TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().HaveCount(3);
@@ -82,7 +82,7 @@ public class ListStatusesHandlerIntegrationTests : IAsyncLifetime
 	}
 
 	[Fact]
-	public async Task Handle_MultipleStatuses_ReturnsAllNonArchived()
+	public async Task Handle_MultipleStatuses_ReturnsAll_IncludingArchived()
 	{
 		// Arrange - Create 5 statuses, archive 2
 		var statusesToCreate = new List<StatusDto>();
@@ -98,7 +98,7 @@ public class ListStatusesHandlerIntegrationTests : IAsyncLifetime
 		await _repository.ArchiveAsync(statusesToCreate[1].Id, TestContext.Current.CancellationToken);
 
 		// Act
-		var result = await _handler.Handle(CancellationToken.None);
+		var result = await _handler.Handle(TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().HaveCount(5); // GetAllAsync returns all including archived

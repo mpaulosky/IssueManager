@@ -58,7 +58,7 @@ public class DeleteCommentHandlerIntegrationTests : IAsyncLifetime
 		var command = new DeleteCommentCommand { Id = created.Value.Id.ToString() };
 
 		// Act
-		var result = await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeTrue();
@@ -77,7 +77,7 @@ public class DeleteCommentHandlerIntegrationTests : IAsyncLifetime
 		var command = new DeleteCommentCommand { Id = nonExistentId };
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		Func<Task> act = async () => await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		await act.Should().ThrowAsync<NotFoundException>();
@@ -93,7 +93,7 @@ public class DeleteCommentHandlerIntegrationTests : IAsyncLifetime
 		var command = new DeleteCommentCommand { Id = created.Value.Id.ToString() };
 
 		// Act - Delete already archived comment (should be idempotent)
-		var result = await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert - Should still return true
 		result.Should().BeTrue();
@@ -113,7 +113,7 @@ public class DeleteCommentHandlerIntegrationTests : IAsyncLifetime
 		var command = new DeleteCommentCommand { Id = created.Value.Id.ToString() };
 
 		// Act - Soft delete
-		await _handler.Handle(command, CancellationToken.None);
+		await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert - Record should still exist (soft delete)
 		var dbComment = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);

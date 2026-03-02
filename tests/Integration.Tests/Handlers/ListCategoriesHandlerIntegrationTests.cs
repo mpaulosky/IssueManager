@@ -53,7 +53,7 @@ public class ListCategoriesHandlerIntegrationTests : IAsyncLifetime
 		// Arrange - No categories in database
 
 		// Act
-		var result = await _handler.Handle(CancellationToken.None);
+		var result = await _handler.Handle(TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeEmpty();
@@ -72,7 +72,7 @@ public class ListCategoriesHandlerIntegrationTests : IAsyncLifetime
 		await _repository.CreateAsync(category3, TestContext.Current.CancellationToken);
 
 		// Act
-		var result = await _handler.Handle(CancellationToken.None);
+		var result = await _handler.Handle(TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().HaveCount(3);
@@ -82,7 +82,7 @@ public class ListCategoriesHandlerIntegrationTests : IAsyncLifetime
 	}
 
 	[Fact]
-	public async Task Handle_MultipleCategories_ReturnsAllNonArchived()
+	public async Task Handle_MultipleCategories_ReturnsAll_IncludingArchived()
 	{
 		// Arrange - Create 5 categories, archive 2
 		var categoriesToCreate = new List<CategoryDto>();
@@ -98,7 +98,7 @@ public class ListCategoriesHandlerIntegrationTests : IAsyncLifetime
 		await _repository.ArchiveAsync(categoriesToCreate[1].Id, TestContext.Current.CancellationToken);
 
 		// Act
-		var result = await _handler.Handle(CancellationToken.None);
+		var result = await _handler.Handle(TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().HaveCount(5); // GetAllAsync returns all including archived
