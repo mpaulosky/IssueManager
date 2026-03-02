@@ -66,7 +66,7 @@ public class CategoryRepositoryTests : IAsyncLifetime
 		var category = CreateTestCategory();
 
 		// Act
-		var result = await _repository.CreateAsync(category);
+		var result = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
@@ -79,7 +79,7 @@ public class CategoryRepositoryTests : IAsyncLifetime
 		var category = CreateTestCategory("New Category", "New Description");
 
 		// Act
-		var result = await _repository.CreateAsync(category);
+		var result = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
@@ -91,10 +91,10 @@ public class CategoryRepositoryTests : IAsyncLifetime
 	{
 		// Arrange
 		var category = CreateTestCategory();
-		var created = await _repository.CreateAsync(category);
+		var created = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
 
 		// Act
-		var result = await _repository.GetByIdAsync(created.Value.Id);
+		var result = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
@@ -108,7 +108,7 @@ public class CategoryRepositoryTests : IAsyncLifetime
 		var nonExistentId = ObjectId.GenerateNewId();
 
 		// Act
-		var result = await _repository.GetByIdAsync(nonExistentId);
+		var result = await _repository.GetByIdAsync(nonExistentId, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -119,12 +119,12 @@ public class CategoryRepositoryTests : IAsyncLifetime
 	public async Task GetAllAsync_WithCategories_ReturnsAllCategories()
 	{
 		// Arrange
-		await _repository.CreateAsync(CreateTestCategory("Category 1", "Description 1"));
-		await _repository.CreateAsync(CreateTestCategory("Category 2", "Description 2"));
-		await _repository.CreateAsync(CreateTestCategory("Category 3", "Description 3"));
+		await _repository.CreateAsync(CreateTestCategory("Category 1", "Description 1"), TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(CreateTestCategory("Category 2", "Description 2"), TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(CreateTestCategory("Category 3", "Description 3"), TestContext.Current.CancellationToken);
 
 		// Act
-		var result = await _repository.GetAllAsync();
+		var result = await _repository.GetAllAsync(TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
@@ -135,7 +135,7 @@ public class CategoryRepositoryTests : IAsyncLifetime
 	public async Task GetAllAsync_WithEmptyDatabase_ReturnsEmptyList()
 	{
 		// Act
-		var result = await _repository.GetAllAsync();
+		var result = await _repository.GetAllAsync(TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
@@ -147,10 +147,10 @@ public class CategoryRepositoryTests : IAsyncLifetime
 	{
 		// Arrange
 		var category = CreateTestCategory();
-		var created = await _repository.CreateAsync(category);
+		var created = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
 
 		// Act
-		var result = await _repository.ArchiveAsync(created.Value.Id);
+		var result = await _repository.ArchiveAsync(created.Value.Id, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
@@ -161,11 +161,11 @@ public class CategoryRepositoryTests : IAsyncLifetime
 	{
 		// Arrange
 		var category = CreateTestCategory();
-		var created = await _repository.CreateAsync(category);
+		var created = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
 
 		// Act
-		await _repository.ArchiveAsync(created.Value.Id);
-		var getResult = await _repository.GetByIdAsync(created.Value.Id);
+		await _repository.ArchiveAsync(created.Value.Id, TestContext.Current.CancellationToken);
+		var getResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 
 		// Assert
 		getResult.Value.Archived.Should().BeTrue();
@@ -178,7 +178,7 @@ public class CategoryRepositoryTests : IAsyncLifetime
 		var nonExistentId = ObjectId.GenerateNewId();
 
 		// Act
-		var result = await _repository.ArchiveAsync(nonExistentId);
+		var result = await _repository.ArchiveAsync(nonExistentId, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -190,11 +190,11 @@ public class CategoryRepositoryTests : IAsyncLifetime
 	{
 		// Arrange
 		var category = CreateTestCategory();
-		var created = await _repository.CreateAsync(category);
+		var created = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
 		var updated = created.Value with { CategoryName = "Updated Name" };
 
 		// Act
-		var result = await _repository.UpdateAsync(updated);
+		var result = await _repository.UpdateAsync(updated, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
@@ -205,12 +205,12 @@ public class CategoryRepositoryTests : IAsyncLifetime
 	{
 		// Arrange
 		var category = CreateTestCategory();
-		var created = await _repository.CreateAsync(category);
+		var created = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
 		var updated = created.Value with { CategoryName = "Updated Name" };
 
 		// Act
-		await _repository.UpdateAsync(updated);
-		var getResult = await _repository.GetByIdAsync(created.Value.Id);
+		await _repository.UpdateAsync(updated, TestContext.Current.CancellationToken);
+		var getResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 
 		// Assert
 		getResult.Value.CategoryName.Should().Be("Updated Name");
@@ -223,7 +223,7 @@ public class CategoryRepositoryTests : IAsyncLifetime
 		var nonExistentCategory = CreateTestCategory() with { Id = ObjectId.GenerateNewId() };
 
 		// Act
-		var result = await _repository.UpdateAsync(nonExistentCategory);
+		var result = await _repository.UpdateAsync(nonExistentCategory, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();

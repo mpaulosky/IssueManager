@@ -47,7 +47,7 @@ public async Task Handle_ValidUpdate_UpdatesIssueInDatabase()
 {
 // Arrange - Create an issue first
 var originalIssue = CreateTestIssueDto("Original Title", "Original Description");
-var created = await _repository.CreateAsync(originalIssue);
+var created = await _repository.CreateAsync(originalIssue, TestContext.Current.CancellationToken);
 
 var command = new UpdateIssueCommand
 {
@@ -66,7 +66,7 @@ result.Title.Should().Be("Updated Title");
 result.Description.Should().Be("Updated Description");
 
 // Verify in database
-var dbIssueResult = await _repository.GetByIdAsync(created.Value.Id);
+var dbIssueResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 dbIssueResult.Should().NotBeNull();
 var dbIssue = dbIssueResult.Value;
 dbIssue.Title.Should().Be("Updated Title");
@@ -78,7 +78,7 @@ public async Task Handle_AtomicUpdate_TitleAndDescriptionBothUpdate()
 {
 // Arrange
 var originalIssue = CreateTestIssueDto("Original Title", "Original Description");
-var created = await _repository.CreateAsync(originalIssue);
+var created = await _repository.CreateAsync(originalIssue, TestContext.Current.CancellationToken);
 
 var command = new UpdateIssueCommand
 {
@@ -91,7 +91,7 @@ Description = "New Description"
 var result = await _handler.Handle(command, CancellationToken.None);
 
 // Assert - Both fields should be updated atomically
-var dbIssueResult = await _repository.GetByIdAsync(created.Value.Id);
+var dbIssueResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 dbIssueResult.Should().NotBeNull();
 var dbIssue = dbIssueResult.Value;
 dbIssue.Title.Should().Be("New Title");
@@ -122,7 +122,7 @@ public async Task Handle_ConcurrentUpdates_LastWriteWins()
 {
 // Arrange - Create an issue
 var issue = CreateTestIssueDto("Original Title", "Original Description");
-var created = await _repository.CreateAsync(issue);
+var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 
 var command1 = new UpdateIssueCommand
 {
@@ -139,12 +139,12 @@ Description = "Second Description"
 };
 
 // Act - Simulate sequential updates
-await _handler.Handle(command1, CancellationToken.None);
-await Task.Delay(100); // Small delay to ensure different ordering
-await _handler.Handle(command2, CancellationToken.None);
+await _handler.Handle(command1, TestContext.Current.CancellationToken);
+await Task.Delay(100, TestContext.Current.CancellationToken); // Small delay to ensure different ordering
+await _handler.Handle(command2, TestContext.Current.CancellationToken);
 
 // Assert - Last write wins
-var dbIssueResult = await _repository.GetByIdAsync(created.Value.Id);
+var dbIssueResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 dbIssueResult.Should().NotBeNull();
 var dbIssue = dbIssueResult.Value;
 dbIssue.Title.Should().Be("Second Update");
@@ -156,7 +156,7 @@ public async Task Handle_ArchivedIssue_ThrowsConflictException()
 {
 // Arrange - Create and archive an issue
 var archivedIssue = CreateTestIssueDto("Archived Issue", "This is archived", archived: true);
-var created = await _repository.CreateAsync(archivedIssue);
+var created = await _repository.CreateAsync(archivedIssue, TestContext.Current.CancellationToken);
 
 var command = new UpdateIssueCommand
 {
@@ -172,7 +172,7 @@ Func<Task> act = async () => await _handler.Handle(command, CancellationToken.No
 await act.Should().ThrowAsync<ConflictException>();
 
 // Verify the issue wasn't updated
-var dbIssueResult = await _repository.GetByIdAsync(created.Value.Id);
+var dbIssueResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 var dbIssue = dbIssueResult.Value;
 dbIssue.Title.Should().Be("Archived Issue");
 }

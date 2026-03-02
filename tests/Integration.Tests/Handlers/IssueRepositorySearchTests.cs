@@ -63,9 +63,9 @@ public class IssueRepositorySearchTests : IAsyncLifetime
 		var issue2 = CreateTestIssueDto("Feature request for search", "Add search functionality");
 		var issue3 = CreateTestIssueDto("Another bug found", "Bug in payment processing");
 
-		await _repository.CreateAsync(issue1);
-		await _repository.CreateAsync(issue2);
-		await _repository.CreateAsync(issue3);
+		await _repository.CreateAsync(issue1, TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(issue2, TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(issue3, TestContext.Current.CancellationToken);
 
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20, SearchTerm = "bug" };
 
@@ -86,9 +86,9 @@ public class IssueRepositorySearchTests : IAsyncLifetime
 		var issue2 = CreateTestIssueDto("Issue by Bob", "Description 2", "Bob");
 		var issue3 = CreateTestIssueDto("Another by Alice", "Description 3", "Alice");
 
-		await _repository.CreateAsync(issue1);
-		await _repository.CreateAsync(issue2);
-		await _repository.CreateAsync(issue3);
+		await _repository.CreateAsync(issue1, TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(issue2, TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(issue3, TestContext.Current.CancellationToken);
 
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20, AuthorName = "Alice" };
 
@@ -109,12 +109,12 @@ public class IssueRepositorySearchTests : IAsyncLifetime
 		var issue2 = CreateTestIssueDto("Issue 2", "Description 2");
 		var issue3 = CreateTestIssueDto("Issue 3", "Description 3");
 
-		var created1 = await _repository.CreateAsync(issue1);
-		var created2 = await _repository.CreateAsync(issue2);
-		var created3 = await _repository.CreateAsync(issue3);
+		var created1 = await _repository.CreateAsync(issue1, TestContext.Current.CancellationToken);
+		var created2 = await _repository.CreateAsync(issue2, TestContext.Current.CancellationToken);
+		var created3 = await _repository.CreateAsync(issue3, TestContext.Current.CancellationToken);
 
 		// Archive one issue
-		await _repository.ArchiveAsync(ObjectId.Parse(created1.Value.Id.ToString()));
+		await _repository.ArchiveAsync(ObjectId.Parse(created1.Value.Id.ToString()), TestContext.Current.CancellationToken);
 
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
 
@@ -136,10 +136,10 @@ public class IssueRepositorySearchTests : IAsyncLifetime
 		var issue3 = CreateTestIssueDto("Feature request", "Description 3", "Alice");
 		var issue4 = CreateTestIssueDto("Another bug", "Description 4", "Alice");
 
-		await _repository.CreateAsync(issue1);
-		await _repository.CreateAsync(issue2);
-		await _repository.CreateAsync(issue3);
-		await _repository.CreateAsync(issue4);
+		await _repository.CreateAsync(issue1, TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(issue2, TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(issue3, TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(issue4, TestContext.Current.CancellationToken);
 
 		var query = new ListIssuesQuery
 		{
@@ -167,9 +167,9 @@ public class IssueRepositorySearchTests : IAsyncLifetime
 		var issue2 = CreateTestIssueDto("bug found", "Description");
 		var issue3 = CreateTestIssueDto("Bug Report", "Description");
 
-		await _repository.CreateAsync(issue1);
-		await _repository.CreateAsync(issue2);
-		await _repository.CreateAsync(issue3);
+		await _repository.CreateAsync(issue1, TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(issue2, TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(issue3, TestContext.Current.CancellationToken);
 
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20, SearchTerm = "BuG" };
 
@@ -189,9 +189,9 @@ public class IssueRepositorySearchTests : IAsyncLifetime
 		var issue2 = CreateTestIssueDto("Issue 2", "Normal description");
 		var issue3 = CreateTestIssueDto("Issue 3", "Another bug description");
 
-		await _repository.CreateAsync(issue1);
-		await _repository.CreateAsync(issue2);
-		await _repository.CreateAsync(issue3);
+		await _repository.CreateAsync(issue1, TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(issue2, TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(issue3, TestContext.Current.CancellationToken);
 
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20, SearchTerm = "bug" };
 
@@ -210,8 +210,8 @@ public class IssueRepositorySearchTests : IAsyncLifetime
 		var issue1 = CreateTestIssueDto("Feature request", "Add new feature");
 		var issue2 = CreateTestIssueDto("Enhancement", "Improve performance");
 
-		await _repository.CreateAsync(issue1);
-		await _repository.CreateAsync(issue2);
+		await _repository.CreateAsync(issue1, TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(issue2, TestContext.Current.CancellationToken);
 
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20, SearchTerm = "bug" };
 
@@ -230,8 +230,8 @@ public class IssueRepositorySearchTests : IAsyncLifetime
 		var issue1 = CreateTestIssueDto("Issue 1", "Description", "Alice");
 		var issue2 = CreateTestIssueDto("Issue 2", "Description", "Bob");
 
-		await _repository.CreateAsync(issue1);
-		await _repository.CreateAsync(issue2);
+		await _repository.CreateAsync(issue1, TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(issue2, TestContext.Current.CancellationToken);
 
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20, AuthorName = "Charlie" };
 
@@ -250,14 +250,14 @@ public class IssueRepositorySearchTests : IAsyncLifetime
 		for (int i = 0; i < 30; i++)
 		{
 			var issue = CreateTestIssueDto($"Bug #{i + 1}", $"Description {i + 1}", "Alice");
-			await _repository.CreateAsync(issue);
+			await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 		}
 
 		// Create some noise (different author)
 		for (int i = 0; i < 10; i++)
 		{
 			var issue = CreateTestIssueDto($"Bug #{i + 1}", $"Description {i + 1}", "Bob");
-			await _repository.CreateAsync(issue);
+			await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 		}
 
 		var query = new ListIssuesQuery

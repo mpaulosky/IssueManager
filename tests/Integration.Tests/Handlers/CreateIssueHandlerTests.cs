@@ -56,7 +56,7 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 		};
 
 		// Act
-		var result = await _handler.Handle(command);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -65,7 +65,7 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 		result.Description.Should().Be("This is a test issue description.");
 
 		// Verify persistence
-		var retrievedResult = await _repository.GetByIdAsync(result.Id);
+		var retrievedResult = await _repository.GetByIdAsync(result.Id, TestContext.Current.CancellationToken);
 		retrievedResult.Should().NotBeNull();
 		var retrieved = retrievedResult.Value;
 		retrieved.Title.Should().Be("Test Issue");
@@ -82,7 +82,7 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 		};
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ValidationException>(() => _handler.Handle(command));
+		await Assert.ThrowsAsync<ValidationException>(() => _handler.Handle(command, TestContext.Current.CancellationToken));
 	}
 
 	[Fact]
@@ -96,7 +96,7 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 		};
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ValidationException>(() => _handler.Handle(command));
+		await Assert.ThrowsAsync<ValidationException>(() => _handler.Handle(command, TestContext.Current.CancellationToken));
 	}
 
 	[Fact]
@@ -110,23 +110,23 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 		};
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ValidationException>(() => _handler.Handle(command));
+		await Assert.ThrowsAsync<ValidationException>(() => _handler.Handle(command, TestContext.Current.CancellationToken));
 	}
 
 	[Fact]
 	public async Task Handle_MultipleIssues_AllPersistedCorrectly()
 	{
 		// Arrange & Act
-		var issue1 = await _handler.Handle(new CreateIssueCommand { Title = "First Issue" });
-		var issue2 = await _handler.Handle(new CreateIssueCommand { Title = "Second Issue" });
-		var issue3 = await _handler.Handle(new CreateIssueCommand { Title = "Third Issue" });
+		var issue1 = await _handler.Handle(new CreateIssueCommand { Title = "First Issue" }, TestContext.Current.CancellationToken);
+		var issue2 = await _handler.Handle(new CreateIssueCommand { Title = "Second Issue" }, TestContext.Current.CancellationToken);
+		var issue3 = await _handler.Handle(new CreateIssueCommand { Title = "Third Issue" }, TestContext.Current.CancellationToken);
 
 		// Assert
-		var count = await _repository.CountAsync();
+		var count = await _repository.CountAsync(TestContext.Current.CancellationToken);
 		count.Success.Should().BeTrue();
 		count.Value.Should().Be(3);
 
-		var allIssuesResult = await _repository.GetAllAsync();
+		var allIssuesResult = await _repository.GetAllAsync(TestContext.Current.CancellationToken);
 		allIssuesResult.Should().NotBeNull();
 		var allIssues = allIssuesResult.Value;
 		allIssues.Should().HaveCount(3);
@@ -146,14 +146,14 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 		};
 
 		// Act
-		var result = await _handler.Handle(command);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
 		result.Description.Should().BeEmpty();
 
 		// Verify persistence
-		var retrievedResult = await _repository.GetByIdAsync(result.Id);
+		var retrievedResult = await _repository.GetByIdAsync(result.Id, TestContext.Current.CancellationToken);
 		retrievedResult.Should().NotBeNull();
 		var retrieved = retrievedResult.Value;
 		retrieved.Description.Should().BeEmpty();
@@ -170,7 +170,7 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 		};
 
 		// Act
-		var result = await _handler.Handle(command);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 		var afterCreation = DateTime.UtcNow.AddSeconds(1);
 
 		// Assert
