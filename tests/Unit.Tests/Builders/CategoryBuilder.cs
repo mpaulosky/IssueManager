@@ -7,14 +7,12 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-using MongoDB.Bson;
-using Shared.DTOs;
-
 namespace Tests.Unit.Builders;
 
 /// <summary>
 /// Builder for creating CategoryDto test data with fluent API.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class CategoryBuilder
 {
 	private ObjectId _id = ObjectId.GenerateNewId();

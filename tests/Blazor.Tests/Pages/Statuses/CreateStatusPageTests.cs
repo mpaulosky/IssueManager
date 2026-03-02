@@ -1,18 +1,11 @@
 // Copyright (c) 2026. All rights reserved.
 
-using Microsoft.AspNetCore.Components;
-
-using Shared.DTOs;
-using Shared.Validators;
-
-using Web.Pages.Statuses;
-using Web.Services;
-
 namespace Tests.BlazorTests.Pages.Statuses;
 
 /// <summary>
 /// bUnit tests for the <see cref="CreateStatusPage"/> Blazor page.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class CreateStatusPageTests : IDisposable
 {
 	private readonly BunitContext _ctx;

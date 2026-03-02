@@ -7,24 +7,12 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-using FluentAssertions;
-using FluentValidation;
-using Api.Data;
-using Api.Handlers;
-using Api.Handlers.Categories;
-
-using Shared.Abstractions;
-using Shared.DTOs;
-using Shared.Exceptions;
-using Shared.Validators;
-using MongoDB.Bson;
-using NSubstitute;
-
 namespace Tests.Unit.Handlers.Categories;
 
 /// <summary>
 /// Unit tests for DeleteCategoryHandler (soft-delete via Archived).
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class DeleteCategoryHandlerTests
 {
 	private readonly ICategoryRepository _repository;

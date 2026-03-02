@@ -1,13 +1,10 @@
-using Api.Handlers.Issues;
-
-using Shared.Validators;
-
 namespace Integration.Handlers;
 
 /// <summary>
 /// Integration tests for UpdateIssueStatusHandler with real MongoDB database.
 /// </summary>
 [Collection("Integration")]
+[ExcludeFromCodeCoverage]
 public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 {
 	private const string MongodbImage = "mongo:latest";
@@ -46,7 +43,7 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 	{
 		// Arrange
 		var issueDto = CreateTestIssueDto("Test Issue", "Test Description");
-		var created = await _repository.CreateAsync(issueDto);
+		var created = await _repository.CreateAsync(issueDto, TestContext.Current.CancellationToken);
 		var newStatus = new StatusDto(ObjectId.GenerateNewId(), "InProgress", "Issue is in progress", DateTime.UtcNow, null, false, UserDto.Empty);
 
 		var command = new UpdateIssueStatusCommand
@@ -56,14 +53,14 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 		};
 
 		// Act
-		var result = await _handler.Handle(command);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
 		result!.Status.StatusName.Should().Be("InProgress");
 
 		// Verify persistence
-		var retrievedResult = await _repository.GetByIdAsync(created.Value.Id);
+		var retrievedResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 		retrievedResult.Should().NotBeNull();
 		var retrieved = retrievedResult.Value;
 		retrieved.Status.StatusName.Should().Be("InProgress");
@@ -80,7 +77,7 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 		};
 
 		// Act
-		var result = await _handler.Handle(command);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeNull();
@@ -97,7 +94,7 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 		};
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ValidationException>(() => _handler.Handle(command));
+		await Assert.ThrowsAsync<ValidationException>(() => _handler.Handle(command, TestContext.Current.CancellationToken));
 	}
 
 	[Fact]
@@ -105,7 +102,7 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 	{
 		// Arrange
 		var issueDto = CreateTestIssueDto("Status Transition Test", "Testing status transitions");
-		var created = await _repository.CreateAsync(issueDto);
+		var created = await _repository.CreateAsync(issueDto, TestContext.Current.CancellationToken);
 
 		// Act - Transition to InProgress
 		var inProgressCommand = new UpdateIssueStatusCommand
@@ -113,7 +110,7 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 			IssueId = created.Value.Id.ToString(),
 			Status = new StatusDto(ObjectId.GenerateNewId(), "InProgress", "Issue is in progress", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
-		var inProgressResult = await _handler.Handle(inProgressCommand);
+		var inProgressResult = await _handler.Handle(inProgressCommand, TestContext.Current.CancellationToken);
 
 		// Assert InProgress
 		inProgressResult.Should().NotBeNull();
@@ -125,14 +122,14 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 			IssueId = created.Value.Id.ToString(),
 			Status = new StatusDto(ObjectId.GenerateNewId(), "Closed", "Issue is closed", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
-		var closedResult = await _handler.Handle(closedCommand);
+		var closedResult = await _handler.Handle(closedCommand, TestContext.Current.CancellationToken);
 
 		// Assert Closed
 		closedResult.Should().NotBeNull();
 		closedResult!.Status.StatusName.Should().Be("Closed");
 
 		// Verify final state in database
-		var retrievedResult = await _repository.GetByIdAsync(created.Value.Id);
+		var retrievedResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 		retrievedResult.Should().NotBeNull();
 		var retrieved = retrievedResult.Value;
 		retrieved.Status.StatusName.Should().Be("Closed");

@@ -5,6 +5,7 @@ namespace Integration.Handlers;
 /// Verifies correct behavior when archiving existing, already-archived, and non-existent issues.
 /// </summary>
 [Collection("Integration")]
+[ExcludeFromCodeCoverage]
 public class DeleteIssueHandlerTests : IAsyncLifetime
 {
 	private const string MongodbImage = "mongo:latest";
@@ -41,15 +42,15 @@ public class DeleteIssueHandlerTests : IAsyncLifetime
 	{
 		// Arrange
 		var issue = CreateTestIssueDto("Test Issue", "Test Description");
-		var created = await _repository.CreateAsync(issue);
+		var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 
 		// Act
-		var result = await _repository.ArchiveAsync(created.Value.Id);
+		var result = await _repository.ArchiveAsync(created.Value.Id, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
 
-		var retrievedResult = await _repository.GetByIdAsync(created.Value.Id);
+		var retrievedResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 		retrievedResult.Should().NotBeNull();
 		var retrieved = retrievedResult.Value;
 		retrieved.Archived.Should().BeTrue();
@@ -60,11 +61,11 @@ public class DeleteIssueHandlerTests : IAsyncLifetime
 	{
 		// Arrange
 		var issue = CreateTestIssueDto("Already Archived Issue", "Description");
-		var created = await _repository.CreateAsync(issue);
-		await _repository.ArchiveAsync(created.Value.Id);
+		var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
+		await _repository.ArchiveAsync(created.Value.Id, TestContext.Current.CancellationToken);
 
 		// Act - archive again (already archived, ModifiedCount = 0)
-		var result = await _repository.ArchiveAsync(created.Value.Id);
+		var result = await _repository.ArchiveAsync(created.Value.Id, TestContext.Current.CancellationToken);
 
 		// Assert - should return false since no modification was made
 		result.Success.Should().BeFalse();
@@ -74,7 +75,7 @@ public class DeleteIssueHandlerTests : IAsyncLifetime
 	public async Task ArchiveAsync_NonExistentIssue_ReturnsFalse()
 	{
 		// Act
-		var result = await _repository.ArchiveAsync(ObjectId.GenerateNewId());
+		var result = await _repository.ArchiveAsync(ObjectId.GenerateNewId(), TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();

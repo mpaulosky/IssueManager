@@ -9,7 +9,9 @@ public static class AuthExtensions
 {
 	/// <summary>
 	/// Adds Auth0 JWT Bearer authentication to the API services.
-	/// Only wires up authentication when AUTH0_DOMAIN and AUTH0_AUDIENCE configuration values are present.
+	/// Only wires up real authentication when Auth0:Domain and Auth0:Audience configuration values are present.
+	/// When those values are absent, falls back to a no-op scheme only if the environment is "Testing"
+	/// or if <c>Auth:EnableNoAuthForTesting=true</c> is set; otherwise throws.
 	/// </summary>
 	/// <remarks>
 	/// Required configuration (set via user secrets or environment variables):
@@ -23,11 +25,28 @@ public static class AuthExtensions
 		var domain = builder.Configuration["Auth0:Domain"];
 		var audience = builder.Configuration["Auth0:Audience"];
 
+		// Always add authorization services (required by UseAuthorization middleware)
+		builder.Services.AddAuthorization();
+
 		if (string.IsNullOrEmpty(domain) || string.IsNullOrEmpty(audience))
 		{
-			// Auth0 is not yet configured — skip authentication setup.
-			// Set Auth0:Domain and Auth0:Audience in user secrets or environment to enable.
-			return builder;
+			var isTestingEnvironment = builder.Environment.IsEnvironment("Testing");
+			var enableNoAuthForTesting = builder.Configuration["Auth:EnableNoAuthForTesting"];
+			var noAuthEnabled = isTestingEnvironment ||
+				string.Equals(enableNoAuthForTesting, "true", System.StringComparison.OrdinalIgnoreCase);
+
+			if (noAuthEnabled)
+			{
+				// Auth0 is not configured — add a no-op authentication scheme only for safe testing environments.
+				builder.Services.AddAuthentication("NoAuth")
+					.AddScheme<NoAuthOptions, NoAuthHandler>("NoAuth", options => { });
+				return builder;
+			}
+
+			throw new System.InvalidOperationException(
+				"Auth0 configuration is missing (Auth0:Domain and/or Auth0:Audience). " +
+				"Configure Auth0 for this environment, or set 'Auth:EnableNoAuthForTesting=true' " +
+				"only in safe testing environments to bypass authentication.");
 		}
 
 		builder.Services.AddAuthentication("Bearer")
@@ -44,8 +63,37 @@ public static class AuthExtensions
 				};
 			});
 
-		builder.Services.AddAuthorization();
-
 		return builder;
+	}
+}
+
+/// <summary>
+/// No-op authentication handler options.
+/// </summary>
+public class NoAuthOptions : Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions
+{
+}
+
+/// <summary>
+/// No-op authentication handler that allows all requests through without authentication.
+/// Used when Auth0 is not configured (e.g., in local development or testing).
+/// </summary>
+public class NoAuthHandler : Microsoft.AspNetCore.Authentication.AuthenticationHandler<NoAuthOptions>
+{
+	public NoAuthHandler(
+		Microsoft.Extensions.Options.IOptionsMonitor<NoAuthOptions> options,
+		Microsoft.Extensions.Logging.ILoggerFactory logger,
+		System.Text.Encodings.Web.UrlEncoder encoder)
+		: base(options, logger, encoder)
+	{
+	}
+
+	protected override Task<Microsoft.AspNetCore.Authentication.AuthenticateResult> HandleAuthenticateAsync()
+	{
+		// No authentication - always succeed
+		var identity = new System.Security.Claims.ClaimsIdentity("NoAuth");
+		var principal = new System.Security.Claims.ClaimsPrincipal(identity);
+		var ticket = new Microsoft.AspNetCore.Authentication.AuthenticationTicket(principal, "NoAuth");
+		return Task.FromResult(Microsoft.AspNetCore.Authentication.AuthenticateResult.Success(ticket));
 	}
 }

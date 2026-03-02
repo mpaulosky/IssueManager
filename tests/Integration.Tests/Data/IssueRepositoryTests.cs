@@ -3,6 +3,7 @@ namespace Integration.Data;
 /// <summary>
 /// Integration tests for IssueRepository with pagination, filtering, and soft-delete.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class IssueRepositoryTests : IAsyncLifetime
 {
 private const string MongodbImage = "mongo:latest";
@@ -53,11 +54,11 @@ public async Task GetAllAsync_FirstPage_ReturnsCorrectItems()
 for (int i = 0; i < 50; i++)
 {
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
-	await _repository.CreateAsync(issue);
+	await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 }
 
 // Act
-var result = await _repository.GetAllAsync(page: 1, pageSize: 20);
+var result = await _repository.GetAllAsync(page: 1, pageSize: 20, cancellationToken: TestContext.Current.CancellationToken);
 var items = result.Value.Items;
 var total = result.Value.Total;
 
@@ -73,13 +74,13 @@ public async Task GetAllAsync_SecondPage_ReturnsNextSetOfItems()
 for (int i = 0; i < 50; i++)
 {
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
-	await _repository.CreateAsync(issue);
+	await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 }
 
 // Act
-var result1 = await _repository.GetAllAsync(page: 1, pageSize: 20);
+var result1 = await _repository.GetAllAsync(page: 1, pageSize: 20, cancellationToken: TestContext.Current.CancellationToken);
 var page1Items = result1.Value.Items;
-var result2 = await _repository.GetAllAsync(page: 2, pageSize: 20);
+var result2 = await _repository.GetAllAsync(page: 2, pageSize: 20, cancellationToken: TestContext.Current.CancellationToken);
 var page2Items = result2.Value.Items;
 
 // Assert
@@ -95,18 +96,18 @@ var issuesToArchive = new List<string>();
 for (int i = 0; i < 10; i++)
 {
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
-	var created = await _repository.CreateAsync(issue);
+	var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 	if (i < 3)
 		issuesToArchive.Add(created.Value.Id.ToString());
 }
 
 foreach (var id in issuesToArchive)
 {
-	await _repository.ArchiveAsync(ObjectId.Parse(id));
+	await _repository.ArchiveAsync(ObjectId.Parse(id), TestContext.Current.CancellationToken);
 }
 
 // Act
-var result = await _repository.GetAllAsync(page: 1, pageSize: 20);
+var result = await _repository.GetAllAsync(page: 1, pageSize: 20, cancellationToken: TestContext.Current.CancellationToken);
 var items = result.Value.Items;
 var total = result.Value.Total;
 
@@ -124,18 +125,18 @@ var issuesToArchive = new List<string>();
 for (int i = 0; i < 10; i++)
 {
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
-	var created = await _repository.CreateAsync(issue);
+	var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 	if (i < 3)
 		issuesToArchive.Add(created.Value.Id.ToString());
 }
 
 foreach (var id in issuesToArchive)
 {
-	await _repository.ArchiveAsync(ObjectId.Parse(id));
+	await _repository.ArchiveAsync(ObjectId.Parse(id), TestContext.Current.CancellationToken);
 }
 
 // Act — non-paginated GetAllAsync returns all records
-var allIssuesResult = await _repository.GetAllAsync();
+var allIssuesResult = await _repository.GetAllAsync(TestContext.Current.CancellationToken);
 var allIssues = allIssuesResult.Value;
 
 // Assert
@@ -150,18 +151,18 @@ var issuesToArchive = new List<string>();
 for (int i = 0; i < 10; i++)
 {
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
-	var created = await _repository.CreateAsync(issue);
+	var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 	if (i < 3)
 		issuesToArchive.Add(created.Value.Id.ToString());
 }
 
 foreach (var id in issuesToArchive)
 {
-	await _repository.ArchiveAsync(ObjectId.Parse(id));
+	await _repository.ArchiveAsync(ObjectId.Parse(id), TestContext.Current.CancellationToken);
 }
 
 // Act
-var countResult = await _repository.CountAsync();
+var countResult = await _repository.CountAsync(TestContext.Current.CancellationToken);
 
 // Assert — CountAsync counts all issues regardless of archive status
 countResult.Value.Should().Be(10);
@@ -172,16 +173,16 @@ public async Task ArchiveAsync_SetsArchivedToTrue()
 {
 // Arrange - Create an issue
 var issue = CreateTestIssueDto("Issue to Archive", "Test");
-var created = await _repository.CreateAsync(issue);
+var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 
 // Act
-var archiveResult = await _repository.ArchiveAsync(created.Value.Id);
+var archiveResult = await _repository.ArchiveAsync(created.Value.Id, TestContext.Current.CancellationToken);
 
 // Assert
 archiveResult.Success.Should().BeTrue();
 
 // Verify in database
-var getResult = await _repository.GetByIdAsync(created.Value.Id);
+var getResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 var dbIssue = getResult.Value;
 dbIssue.Should().NotBeNull();
 dbIssue!.Archived.Should().BeTrue();
@@ -192,13 +193,13 @@ public async Task ArchiveAsync_DoesNotDeleteRecord()
 {
 // Arrange - Create an issue
 var issue = CreateTestIssueDto("Issue to Archive", "Should still exist");
-var created = await _repository.CreateAsync(issue);
+var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 
 // Act - Soft delete (archive)
-await _repository.ArchiveAsync(created.Value.Id);
+await _repository.ArchiveAsync(created.Value.Id, TestContext.Current.CancellationToken);
 
 // Assert - Record still exists
-var getResult = await _repository.GetByIdAsync(created.Value.Id);
+var getResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 var dbIssue = getResult.Value;
 dbIssue.Should().NotBeNull();
 dbIssue!.Id.Should().Be(created.Value.Id);
@@ -212,7 +213,7 @@ public async Task UpdateAsync_NonExistentIssue_ReturnsNull()
 var nonExistentIssue = CreateTestIssueDto("Non-existent", "Does not exist");
 
 // Act
-var result = await _repository.UpdateAsync(nonExistentIssue);
+var result = await _repository.UpdateAsync(nonExistentIssue, TestContext.Current.CancellationToken);
 
 // Assert
 result.Success.Should().BeFalse();
@@ -222,7 +223,7 @@ result.Success.Should().BeFalse();
 public async Task GetAllAsync_EmptyDatabase_ReturnsEmptyList()
 {
 // Act
-var result = await _repository.GetAllAsync(page: 1, pageSize: 20);
+var result = await _repository.GetAllAsync(page: 1, pageSize: 20, cancellationToken: TestContext.Current.CancellationToken);
 var items = result.Value.Items;
 var total = result.Value.Total;
 

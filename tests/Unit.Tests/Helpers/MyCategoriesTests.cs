@@ -5,8 +5,6 @@
 // Solution Name : IssueManager
 // Project Name :  Unit.Tests
 
-using Shared.Helpers;
-
 namespace Tests.Unit.Helpers;
 
 /// <summary>

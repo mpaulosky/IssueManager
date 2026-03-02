@@ -5,6 +5,7 @@ namespace Integration.Fixtures;
 /// Docker resource contention when multiple MongoDbContainers start simultaneously.
 /// </summary>
 [CollectionDefinition("Integration", DisableParallelization = true)]
+[ExcludeFromCodeCoverage]
 public class IntegrationTestCollection
 {
 }

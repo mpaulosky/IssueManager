@@ -7,14 +7,12 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-using MongoDB.Bson;
-using Shared.DTOs;
-
 namespace Tests.Unit.Builders;
 
 /// <summary>
 /// Builder for creating CommentDto test data with fluent API.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class CommentBuilder
 {
 	private string _id = ObjectId.GenerateNewId().ToString();

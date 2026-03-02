@@ -7,18 +7,12 @@
 // Project Name :  Blazor.Tests
 // =============================================
 
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Rendering;
-
-using Tests.BlazorTests.Fixtures;
-
-using Web.Components.Shared;
-
 namespace Tests.BlazorTests.Components.Shared;
 
 /// <summary>
 /// Unit tests for the <see cref="DataTable{TItem}"/> generic Blazor component.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class DataTableTests : ComponentTestBase
 {
 	private static RenderFragment<string> StringRowContent =>

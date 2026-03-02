@@ -1,11 +1,10 @@
-using Api.Handlers.Issues;
-
 namespace Integration.Handlers;
 
 /// <summary>
 /// Integration tests for GetIssueHandler with real MongoDB database.
 /// </summary>
 [Collection("Integration")]
+[ExcludeFromCodeCoverage]
 public class GetIssueHandlerTests : IAsyncLifetime
 {
 	private const string MongodbImage = "mongo:latest";
@@ -44,11 +43,11 @@ public class GetIssueHandlerTests : IAsyncLifetime
 	{
 		// Arrange
 		var issue = CreateTestIssueDto("Test Issue", "Test Description");
-		var created = await _repository.CreateAsync(issue);
+		var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 		var query = new GetIssueQuery(created.Value.Id.ToString());
 
 		// Act
-		var result = await _handler.Handle(query);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -64,7 +63,7 @@ public class GetIssueHandlerTests : IAsyncLifetime
 		var query = new GetIssueQuery(ObjectId.GenerateNewId().ToString());
 
 		// Act
-		var result = await _handler.Handle(query);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeNull();
@@ -77,7 +76,7 @@ public class GetIssueHandlerTests : IAsyncLifetime
 		var query = new GetIssueQuery("");
 
 		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentException>(() => _handler.Handle(query));
+		await Assert.ThrowsAsync<ArgumentException>(() => _handler.Handle(query, TestContext.Current.CancellationToken));
 	}
 
 	[Fact]
@@ -88,12 +87,12 @@ public class GetIssueHandlerTests : IAsyncLifetime
 		var issue2 = CreateTestIssueDto("Issue 2", "Description 2");
 		var issue3 = CreateTestIssueDto("Issue 3", "Description 3");
 
-		await _repository.CreateAsync(issue1);
-		await _repository.CreateAsync(issue2);
-		await _repository.CreateAsync(issue3);
+		await _repository.CreateAsync(issue1, TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(issue2, TestContext.Current.CancellationToken);
+		await _repository.CreateAsync(issue3, TestContext.Current.CancellationToken);
 
 		// Act
-		var result = await _handler.HandleGetAll();
+		var result = await _handler.HandleGetAll(TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().HaveCount(3);
@@ -106,7 +105,7 @@ public class GetIssueHandlerTests : IAsyncLifetime
 	public async Task HandleGetAll_EmptyDatabase_ReturnsEmptyList()
 	{
 		// Act
-		var result = await _handler.HandleGetAll();
+		var result = await _handler.HandleGetAll(TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();

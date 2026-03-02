@@ -1,13 +1,9 @@
-using Bunit;
-using NSubstitute;
-using Shared.DTOs;
-using Web.Services;
-
 namespace Tests.BlazorTests.Fixtures;
 
 /// <summary>
 /// Base class for Blazor component tests providing common bUnit setup and utilities.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public abstract class ComponentTestBase : IDisposable
 {
 	/// <summary>

@@ -1,11 +1,9 @@
-using FluentAssertions;
-using Shared.Validators;
-
 namespace Tests.Unit.Validators;
 
 /// <summary>
 /// Unit tests for ListIssuesQueryValidator.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class ListIssuesQueryValidatorTests
 {
 	private readonly ListIssuesQueryValidator _validator = new();

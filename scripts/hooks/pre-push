@@ -1,13 +1,115 @@
 #!/usr/bin/env bash
-# pre-push hook — runs Unit.Tests, Blazor.Tests, and Architecture.Tests before any push.
-# Blocks the push if any test suite fails so broken code never reaches GitHub.
-# Integration.Tests are excluded (require Docker/TestContainers which may not be available locally).
+# pre-push hook — runs three gate checks before allowing any push:
+#
+#   Gate 1: Copyright Header Validation
+#     - Validates File Name, Solution Name, and Project Name in all .cs files with full headers
+#
+#   Gate 2: Code Formatting Check
+#     - Runs `dotnet format --verify-no-changes` to ensure code is properly formatted
+#
+#   Gate 3: Test Suite Execution
+#     - Runs Unit.Tests, Blazor.Tests, and Architecture.Tests
+#     - Integration.Tests excluded (require Docker/TestContainers)
+#
+# Blocks the push if ANY gate fails so broken/non-compliant code never reaches GitHub.
 #
 # Install: bash scripts/hooks/install-hooks.sh
 
 set -euo pipefail
 
 FAILED=0
+
+# ─── Gate 1: Copyright Header Validation ────────────────────────────────────
+
+validate_copyright_headers() {
+  echo "🔎 pre-push: validating copyright headers…"
+
+  local checked=0
+  local failed=0
+  local failures=()
+
+  get_expected_project() {
+    local filepath="$1"
+    case "$filepath" in
+      *"/src/Api/"*)              echo "Api" ;;
+      *"/src/Web/"*)              echo "Web" ;;
+      *"/src/Shared/"*)           echo "Shared" ;;
+      *"/src/AppHost/"*)          echo "AppHost" ;;
+      *"/src/ServiceDefaults/"*)  echo "ServiceDefaults" ;;
+      *"/tests/Unit.Tests/"*)     echo "Unit Tests" ;;
+      *"/tests/Integration.Tests/"*) echo "Integration.Tests" ;;
+      *"/tests/Blazor.Tests/"*)   echo "Blazor.Tests" ;;
+      *"/tests/Architecture.Tests/"*) echo "Architecture.Tests" ;;
+      *)                          echo "Unknown" ;;
+    esac
+  }
+
+  while IFS= read -r filepath; do
+    # Only validate files that contain the full header block
+    if ! grep -q "^// File Name :" "$filepath" 2>/dev/null; then
+      continue
+    fi
+
+    checked=$((checked + 1))
+    local actual_filename
+    actual_filename=$(basename "$filepath")
+
+    local header_filename header_solution header_project expected_project
+    header_filename=$(grep "^// File Name :"    "$filepath" | sed 's|^// File Name :||' | xargs)
+    header_solution=$(grep "^// Solution Name :" "$filepath" | sed 's|^// Solution Name :||' | xargs)
+    header_project=$(grep "^// Project Name :"  "$filepath" | sed 's|^// Project Name :||' | xargs)
+    expected_project=$(get_expected_project "$filepath")
+
+    if [ "$header_filename" != "$actual_filename" ]; then
+      failures+=("$filepath: File Name mismatch (header: '$header_filename', actual: '$actual_filename')")
+      failed=$((failed + 1))
+      continue
+    fi
+
+    if [ "$header_solution" != "IssueManager" ]; then
+      failures+=("$filepath: Solution Name mismatch (expected: 'IssueManager', found: '$header_solution')")
+      failed=$((failed + 1))
+      continue
+    fi
+
+    if [ "$header_project" != "$expected_project" ]; then
+      # Accept "Unit.Tests" as a valid alternative to "Unit Tests" for tests/Unit.Tests/ files
+      if [ "$expected_project" = "Unit Tests" ] && [ "$header_project" = "Unit.Tests" ]; then
+        :  # both values are acceptable during transition
+      else
+        failures+=("$filepath: Project Name mismatch (expected: '$expected_project', found: '$header_project')")
+        failed=$((failed + 1))
+        continue
+      fi
+    fi
+
+  done < <(find src tests -name "*.cs" -type f 2>/dev/null)
+
+  if [ $failed -gt 0 ]; then
+    echo "❌ Copyright header validation FAILED ($failed of $checked files):"
+    for failure in "${failures[@]}"; do
+      echo "   - $failure"
+    done
+    FAILED=1
+  else
+    echo "✅ Copyright header validation passed ($checked files checked)."
+  fi
+}
+
+# ─── Gate 2: Code Formatting Check ─────────────────────────────────────────
+
+validate_formatting() {
+  echo "🔎 pre-push: checking code formatting…"
+  if dotnet format IssueManager.sln --verify-no-changes --verbosity quiet 2>&1; then
+    echo "✅ Code formatting check passed."
+  else
+    echo "❌ Code formatting check FAILED."
+    echo "   Run 'dotnet format' locally to fix formatting issues."
+    FAILED=1
+  fi
+}
+
+# ─── Gate 3: Test Suite Execution ───────────────────────────────────────────
 
 run_tests() {
   local project="$1"
@@ -20,16 +122,20 @@ run_tests() {
   fi
 }
 
+# ─── Run All Gates (fastest → slowest) ──────────────────────────────────────
+
+validate_copyright_headers
+validate_formatting
 run_tests "tests/Unit.Tests"
 run_tests "tests/Blazor.Tests"
 run_tests "tests/Architecture.Tests"
 
 if [ "$FAILED" -ne 0 ]; then
   echo ""
-  echo "❌ pre-push: one or more test suites FAILED. Push aborted."
+  echo "❌ pre-push: one or more gates FAILED. Push aborted."
   echo "   Fix the failures locally before pushing."
   exit 1
 fi
 
 echo ""
-echo "✅ pre-push: all tests passed — push allowed."
+echo "✅ pre-push: all gates passed — push allowed."

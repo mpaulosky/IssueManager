@@ -7,21 +7,12 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-using Api.Data;
-using Api.Handlers;
-using Api.Handlers.Comments;
-
-using MongoDB.Bson;
-using Shared.Abstractions;
-using Shared.Exceptions;
-using Shared.DTOs;
-using Shared.Validators;
-
 namespace Tests.Unit.Handlers.Comments;
 
 /// <summary>
 /// Unit tests for DeleteCommentHandler (soft-delete via Archived).
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class DeleteCommentHandlerTests
 {
 	private readonly ICommentRepository _repository;

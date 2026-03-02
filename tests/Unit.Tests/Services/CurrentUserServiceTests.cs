@@ -7,16 +7,12 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-using System.Security.Claims;
-using Api.Services;
-using Microsoft.AspNetCore.Http;
-using NSubstitute;
-
 namespace Tests.Unit.Services;
 
 /// <summary>
 /// Unit tests for CurrentUserService.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class CurrentUserServiceTests
 {
 	private readonly IHttpContextAccessor _httpContextAccessor;

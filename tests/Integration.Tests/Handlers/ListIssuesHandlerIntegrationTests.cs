@@ -1,13 +1,10 @@
-using Api.Handlers.Issues;
-
-using Shared.Validators;
-
 namespace Integration.Handlers;
 
 /// <summary>
 /// Integration tests for ListIssuesHandler with pagination and real MongoDB database.
 /// </summary>
 [Collection("Integration")]
+[ExcludeFromCodeCoverage]
 public class ListIssuesHandlerIntegrationTests : IAsyncLifetime
 {
 private const string MongodbImage = "mongo:latest";
@@ -48,7 +45,7 @@ public async Task Handle_WithPagination_ReturnsCorrectPage()
 for (int i = 0; i < 50; i++)
 {
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
-	await _repository.CreateAsync(issue);
+	await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 }
 
 var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
@@ -71,7 +68,7 @@ public async Task Handle_SecondPage_ReturnsNextSetOfItems()
 for (int i = 0; i < 50; i++)
 {
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
-	await _repository.CreateAsync(issue);
+	await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 }
 
 var query = new ListIssuesQuery { Page = 2, PageSize = 20 };
@@ -93,14 +90,14 @@ var issuesToArchive = new List<string>();
 for (int i = 0; i < 10; i++)
 {
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
-	var created = await _repository.CreateAsync(issue);
+	var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 	if (i < 3)
 		issuesToArchive.Add(created.Value.Id.ToString());
 }
 
 foreach (var id in issuesToArchive)
 {
-	await _repository.ArchiveAsync(ObjectId.Parse(id));
+	await _repository.ArchiveAsync(ObjectId.Parse(id), TestContext.Current.CancellationToken);
 }
 
 var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
@@ -135,7 +132,7 @@ public async Task Handle_LastPagePartial_ReturnsRemainingItems()
 for (int i = 0; i < 42; i++)
 {
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
-	await _repository.CreateAsync(issue);
+	await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 }
 
 var query = new ListIssuesQuery { Page = 3, PageSize = 20 };
@@ -157,7 +154,7 @@ public async Task Handle_LargeDataset_PerformanceUnder1Second()
 for (int i = 0; i < 1000; i++)
 {
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
-	await _repository.CreateAsync(issue);
+	await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 }
 
 var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
@@ -180,7 +177,7 @@ public async Task Handle_ConcurrentCreates_ReturnsConsistentResults()
 for (int i = 0; i < 20; i++)
 {
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
-	await _repository.CreateAsync(issue);
+	await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 }
 
 var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
@@ -189,7 +186,7 @@ var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
 var listTask = _handler.Handle(query, CancellationToken.None);
 
 var newIssue = CreateTestIssueDto("Concurrent Issue", "Created during list");
-var createTask = _repository.CreateAsync(newIssue);
+var createTask = _repository.CreateAsync(newIssue, TestContext.Current.CancellationToken);
 
 await Task.WhenAll(listTask, createTask);
 

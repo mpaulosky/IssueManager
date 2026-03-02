@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
+		<OutputType>Exe</OutputType>
 		<RootNamespace>Architecture</RootNamespace>
 	</PropertyGroup>
 
@@ -16,6 +17,12 @@
 		<PackageReference Include="FluentAssertions" />
 		<PackageReference Include="NetArchTest.Rules" />
 		<PackageReference Include="Coverlet.Collector" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="xunit.runner.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,18 +1,11 @@
 // Copyright (c) 2026. All rights reserved.
 
-using MongoDB.Bson;
-
-using Shared.DTOs;
-using Shared.Validators;
-
-using Web.Pages.Categories;
-using Web.Services;
-
 namespace Tests.BlazorTests.Pages.Categories;
 
 /// <summary>
 /// bUnit tests for the <see cref="CategoriesPage"/> Blazor page.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class CategoriesPageTests : IDisposable
 {
 	private readonly BunitContext _ctx;

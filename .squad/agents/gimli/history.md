@@ -137,4 +137,100 @@ Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, Te
 
 **Commit:** `414828f` — fix(tests): Phase 3 - BunitContext migration and xUnit1051 CancellationToken cleanup
 
+### 2026-02-28: MongoDB Image Standardization — mongo:latest + MongoDbBuilder v4 API
+
+**Task:** Standardize all integration tests to use `mongo:latest` image and fix deprecated MongoDbBuilder() parameterless constructor.
+
+**Files Fixed (11 total):**
+- `tests/Integration.Tests/Fixtures/MongoDbFixture.cs` (already had mongo:latest)
+- `tests/Integration.Tests/Handlers/DeleteIssueHandlerIntegrationTests.cs` (mongo:8.2 → latest)
+- `tests/Integration.Tests/Handlers/DeleteIssueHandlerTests.cs` (mongo:8.2 → latest)
+- `tests/Integration.Tests/Handlers/CreateIssueHandlerTests.cs` (mongo:8.2 → latest)
+- `tests/Integration.Tests/Handlers/GetIssueHandlerTests.cs` (mongo:8.2 → latest)
+- `tests/Integration.Tests/Handlers/UpdateIssueHandlerIntegrationTests.cs` (mongo:8.2 → latest)
+- `tests/Integration.Tests/Handlers/IssueRepositorySearchTests.cs` (mongo:8.2 → latest)
+- `tests/Integration.Tests/Handlers/ListIssuesHandlerIntegrationTests.cs` (mongo:8.2 → latest)
+- `tests/Integration.Tests/Handlers/UpdateIssueStatusHandlerTests.cs` (mongo:8.2 → latest)
+- `tests/Integration.Tests/Data/CategoryRepositoryTests.cs` (mongo:8.0 → latest)
+- `tests/Integration.Tests/Data/IssueRepositoryTests.cs` (mongo:8.2 → latest)
+
+**Changes Applied:**
+1. **Image tag**: Changed all hardcoded `"mongo:8.0"` and `"mongo:8.2"` to `"mongo:latest"` for consistency
+2. **MongoDbBuilder API**: Fixed deprecated parameterless constructor by passing image directly to constructor
+   - **Old pattern**: `new MongoDbBuilder().WithImage(MongodbImage).Build()`
+   - **New pattern**: `new MongoDbBuilder(MongodbImage).Build()` (Testcontainers v4.10.0 API)
+
+**Build Results:** 
+- Before: 11 CS0618 obsolete warnings for MongoDbBuilder()
+- After: ✅ 0 warnings, 0 errors, build succeeded
+
+**Rationale:** User requested all Testcontainers use latest MongoDB image. Testcontainers.MongoDB v4.10.0 deprecated the parameterless constructor in favor of passing the image name directly to the constructor, aligning with the testcontainers-dotnet project's direction per https://github.com/testcontainers/testcontainers-dotnet/discussions/1470.
+
+**Commit:** `4ad9e6f` — test: standardize all integration tests to mongo:latest image
+
+### 2026-03-01: xUnit1051 Integration Test CancellationToken Fix
+**Task:** Fix xUnit1051 warnings across all 10 Integration.Tests files by passing `TestContext.Current.CancellationToken` to async repository and handler calls.
+
+**Files Fixed (10 total):**
+- `tests/Integration.Tests/Data/CategoryRepositoryTests.cs` — 12 async calls fixed
+- `tests/Integration.Tests/Data/IssueRepositoryTests.cs` — 9 async calls fixed
+- `tests/Integration.Tests/Handlers/CreateIssueHandlerTests.cs` — 7 async calls fixed
+- `tests/Integration.Tests/Handlers/DeleteIssueHandlerIntegrationTests.cs` — 18 async calls fixed
+- `tests/Integration.Tests/Handlers/DeleteIssueHandlerTests.cs` — 7 async calls fixed
+- `tests/Integration.Tests/Handlers/GetIssueHandlerTests.cs` — 8 async calls fixed
+- `tests/Integration.Tests/Handlers/IssueRepositorySearchTests.cs` — 35 async calls fixed
+- `tests/Integration.Tests/Handlers/ListIssuesHandlerIntegrationTests.cs` — 13 async calls fixed
+- `tests/Integration.Tests/Handlers/UpdateIssueHandlerIntegrationTests.cs` — 14 async calls fixed (including `Task.Delay(100)` → `Task.Delay(100, ct)`)
+- `tests/Integration.Tests/Handlers/UpdateIssueStatusHandlerTests.cs` — 8 async calls fixed
+
+**Patterns Applied:**
+1. **Repository calls**: `_repository.CreateAsync(entity)` → `_repository.CreateAsync(entity, TestContext.Current.CancellationToken)`
+2. **Handler calls**: `_handler.Handle(command)` → `_handler.Handle(command, TestContext.Current.CancellationToken)`
+3. **Pagination calls**: `GetAllAsync(page: 1, pageSize: 20)` → `GetAllAsync(page: 1, pageSize: 20, cancellationToken: TestContext.Current.CancellationToken)` (named param required due to optional searchTerm/authorName params)
+4. **Exception tests**: `Assert.ThrowsAsync<T>(() => _handler.Handle(cmd))` → `Assert.ThrowsAsync<T>(() => _handler.Handle(cmd, TestContext.Current.CancellationToken))`
+5. **Task.Delay**: `await Task.Delay(100)` → `await Task.Delay(100, TestContext.Current.CancellationToken)`
+
+**Not Fixed (Intentional):**
+- `InitializeAsync` / `DisposeAsync` lifecycle hooks: TestContext.Current is null in lifecycle methods, so container lifecycle calls (`_mongoContainer.StartAsync()`, `StopAsync()`, `DisposeAsync()`) remain without CT. xUnit1051 does NOT apply to lifecycle hooks.
+
+**Build Results:**
+- Before: 103+ xUnit1051 warnings, 0 errors
+- After: ✅ 0 xUnit1051 warnings, 0 errors, Build succeeded
+
+**Commit:** `4f67ddb` — test: pass TestContext.Current.CancellationToken in integration tests (xUnit1051)
+
+**Rationale:** xUnit v3 provides `TestContext.Current.CancellationToken` as the recommended cancellation token for all async test operations. Using it enables more responsive test cancellation when tests timeout or are manually aborted. This aligns with xUnit v3 best practices and eliminates analyzer warnings.
+
+### 2026-03-02: Code Coverage Exclusion — [ExcludeFromCodeCoverage] + GlobalUsings Consolidation
+
+**Task:** Add `[ExcludeFromCodeCoverage]` to ALL test classes/fixtures/builders and consolidate `using` statements into GlobalUsings.cs for each test project.
+
+**Projects Processed (4 total):**
+1. **Unit.Tests** — 58 test/builder/validator files
+2. **Integration.Tests** — 14 test/fixture files
+3. **Blazor.Tests** — 22 test/fixture/page files
+4. **Architecture.Tests** — 1 test file
+
+**Changes Applied:**
+1. **[ExcludeFromCodeCoverage]** added to 153 class declarations (all test/fixture/builder classes)
+   - Placed above `public class`, `public abstract class`, `public static class` declarations
+   - For classes with existing attributes (`[Collection("Integration")]`, `[CollectionDefinition]`), placed below them
+2. **GlobalUsings.cs consolidated** — All individual `using` statements moved to project-level GlobalUsings.cs
+   - Removed ALL individual `using` directives from .cs files (except `global using` in GlobalUsings.cs itself)
+   - Added `System.Diagnostics.CodeAnalysis` to each GlobalUsings.cs (required for `[ExcludeFromCodeCoverage]`)
+   - Added project-specific namespaces:
+     - **Unit.Tests**: Api.*, Shared.*, Tests.Unit.Builders, Microsoft.*, System.*, MongoDB.Bson
+     - **Integration.Tests**: Api.*, Shared.*, NSubstitute, System.*, MongoDB.Bson
+     - **Blazor.Tests**: Web.*, Shared.*, Microsoft.AspNetCore.Components.*, System.Net.*, Tests.BlazorTests.Fixtures
+     - **Architecture.Tests**: Shared.Models, Shared.Validators, System.*, System.Reflection
+
+**Build Results:**
+- ✅ All 4 test projects build successfully (0 errors)
+- Pre-existing warnings (CS8602 nullable reference warnings in Integration.Tests) — NOT FIXED (not related to this task)
+
+**Files Modified:** 99 files changed, 138 insertions(+), 602 deletions(-)
+
+**Commit:** `169add1` — test: add [ExcludeFromCodeCoverage] and consolidate GlobalUsings in all test projects
+
+**Rationale:** Test code should be excluded from code coverage metrics. Consolidating `using` directives at the project level via GlobalUsings.cs reduces repetition, improves maintainability, and follows .NET best practices for file-scoped namespaces and global usings.
 

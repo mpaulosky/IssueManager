@@ -7,13 +7,12 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-using Shared.DTOs;
-
 namespace Tests.Unit.Builders;
 
 /// <summary>
 /// Builder for creating StatusDto test data with fluent API.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class StatusBuilder
 {
 	private string? _id = MongoDB.Bson.ObjectId.GenerateNewId().ToString();

@@ -5,8 +5,6 @@
 // Solution Name : IssueManager
 // Project Name :  Unit.Tests
 
-using Shared.Exceptions;
-
 namespace Tests.Unit.Exceptions;
 
 /// <summary>

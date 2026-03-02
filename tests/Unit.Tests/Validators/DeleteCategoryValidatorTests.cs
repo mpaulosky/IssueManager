@@ -1,12 +1,9 @@
-using FluentAssertions;
-using MongoDB.Bson;
-using Shared.Validators;
-
 namespace Tests.Unit.Validators;
 
 /// <summary>
 /// Unit tests for <see cref="DeleteCategoryValidator"/>.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class DeleteCategoryValidatorTests
 {
 	private readonly DeleteCategoryValidator _validator = new();

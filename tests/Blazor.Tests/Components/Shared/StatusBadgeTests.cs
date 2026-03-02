@@ -7,19 +7,12 @@
 // Project Name :  Blazor.Tests
 // =============================================
 
-using MongoDB.Bson;
-
-using Shared.DTOs;
-
-using Tests.BlazorTests.Fixtures;
-
-using Web.Components.Shared;
-
 namespace Tests.BlazorTests.Components.Shared;
 
 /// <summary>
 /// Unit tests for the <see cref="StatusBadge"/> Blazor component.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class StatusBadgeTests : ComponentTestBase
 {
 	private static StatusDto MakeStatus(string name) =>

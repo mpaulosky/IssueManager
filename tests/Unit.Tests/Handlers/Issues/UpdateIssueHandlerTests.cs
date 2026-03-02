@@ -1,20 +1,9 @@
-using FluentAssertions;
-using Api.Data;
-using Api.Handlers;
-using Api.Handlers.Issues;
-
-using Shared.Abstractions;
-using Shared.DTOs;
-using Shared.Exceptions;
-using Shared.Validators;
-using MongoDB.Bson;
-using NSubstitute;
-
 namespace Tests.Unit.Handlers.Issues;
 
 /// <summary>
 /// Unit tests for UpdateIssueHandler.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class UpdateIssueHandlerTests
 {
 	private readonly IIssueRepository _repository;

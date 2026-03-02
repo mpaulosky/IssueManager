@@ -11,3 +11,12 @@ global using Api.Handlers;
 global using MongoDB.Bson;
 
 global using Shared.DTOs;
+global using System.Diagnostics.CodeAnalysis;
+global using Api.Handlers.Issues;
+global using Api.Services;
+global using NSubstitute;
+global using Shared.Abstractions;
+global using Shared.Exceptions;
+global using Shared.Validators;
+global using System;
+global using System.Reflection;

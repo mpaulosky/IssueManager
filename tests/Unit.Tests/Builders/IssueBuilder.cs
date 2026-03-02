@@ -7,14 +7,12 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-using MongoDB.Bson;
-using Shared.DTOs;
-
 namespace Tests.Unit.Builders;
 
 /// <summary>
 /// Builder for creating IssueDto test data with fluent API.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class IssueBuilder
 {
 	private ObjectId _id = ObjectId.GenerateNewId();

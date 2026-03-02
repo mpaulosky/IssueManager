@@ -1,18 +1,11 @@
 // Copyright (c) 2026. All rights reserved.
 
-using Microsoft.AspNetCore.Components;
-
-using Shared.DTOs;
-using Shared.Validators;
-
-using Web.Pages.Categories;
-using Web.Services;
-
 namespace Tests.BlazorTests.Pages.Categories;
 
 /// <summary>
 /// bUnit tests for the <see cref="CreateCategoryPage"/> Blazor page.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class CreateCategoryPageTests : IDisposable
 {
 	private readonly BunitContext _ctx;

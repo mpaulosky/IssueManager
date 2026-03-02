@@ -1,11 +1,9 @@
-using FluentAssertions;
-using Shared.Validators;
-
 namespace Tests.Unit.Validators;
 
 /// <summary>
 /// Unit tests for <see cref="CreateCategoryValidator"/>.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class CreateCategoryValidatorTests
 {
 	private readonly CreateCategoryValidator _validator = new();

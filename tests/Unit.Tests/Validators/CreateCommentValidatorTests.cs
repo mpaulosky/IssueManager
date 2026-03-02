@@ -1,12 +1,9 @@
-using FluentAssertions;
-using MongoDB.Bson;
-using Shared.Validators;
-
 namespace Tests.Unit.Validators;
 
 /// <summary>
 /// Unit tests for <see cref="CreateCommentValidator"/>.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class CreateCommentValidatorTests
 {
 	private readonly CreateCommentValidator _validator = new();

@@ -7,21 +7,12 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-using FluentAssertions;
-using Api.Data;
-using Api.Handlers;
-using Api.Handlers.Statuses;
-
-using Shared.Abstractions;
-using Shared.DTOs;
-using MongoDB.Bson;
-using NSubstitute;
-
 namespace Tests.Unit.Handlers.Statuses;
 
 /// <summary>
 /// Unit tests for GetStatusHandler.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class GetStatusHandlerTests
 {
 	private readonly IStatusRepository _repository;

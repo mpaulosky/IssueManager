@@ -1,20 +1,11 @@
 // Copyright (c) 2026. All rights reserved.
 
-using Microsoft.AspNetCore.Components;
-
-using Shared.DTOs;
-using Shared.Validators;
-
-using Tests.BlazorTests.Fixtures;
-
-using Web.Pages.Issues;
-using Web.Services;
-
 namespace Tests.BlazorTests.Pages.Issues;
 
 /// <summary>
 /// bUnit tests for the <see cref="CreateIssuePage"/> Blazor page.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class CreateIssuePageTests : ComponentTestBase
 {
 	private readonly IIssueApiClient _mockIssueClient;

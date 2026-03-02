@@ -7,19 +7,12 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-using Api.Data;
-using Api.Handlers;
-using Api.Handlers.Comments;
-
-using MongoDB.Bson;
-using Shared.Abstractions;
-using Shared.DTOs;
-
 namespace Tests.Unit.Handlers.Comments;
 
 /// <summary>
 /// Unit tests for GetCommentHandler.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class GetCommentHandlerTests
 {
 	private readonly ICommentRepository _repository;
