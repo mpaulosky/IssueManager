@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
+		<OutputType>Exe</OutputType>
 		<RootNamespace>BlazorTests</RootNamespace>
 	</PropertyGroup>
 
@@ -17,6 +18,12 @@
 		<PackageReference Include="FluentAssertions" />
 		<PackageReference Include="NSubstitute" />
 		<PackageReference Include="Coverlet.Collector" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="xunit.runner.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>

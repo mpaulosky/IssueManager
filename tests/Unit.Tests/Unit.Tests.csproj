@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
+		<OutputType>Exe</OutputType>
 		<RootNamespace>Unit</RootNamespace>
 	</PropertyGroup>
 
@@ -17,6 +18,7 @@
 		<PackageReference Include="FluentValidation" />
 		<PackageReference Include="NSubstitute" />
 		<PackageReference Include="Coverlet.Collector" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
 	</ItemGroup>
 
 	<ItemGroup>
