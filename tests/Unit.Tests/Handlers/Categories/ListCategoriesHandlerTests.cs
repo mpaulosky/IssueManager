@@ -7,20 +7,12 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-using FluentAssertions;
-using Api.Data;
-using Api.Handlers.Categories;
-
-using Shared.Abstractions;
-using Shared.DTOs;
-using MongoDB.Bson;
-using NSubstitute;
-
 namespace Tests.Unit.Handlers.Categories;
 
 /// <summary>
 /// Unit tests for ListCategoriesHandler.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class ListCategoriesHandlerTests
 {
 	private readonly ICategoryRepository _repository;

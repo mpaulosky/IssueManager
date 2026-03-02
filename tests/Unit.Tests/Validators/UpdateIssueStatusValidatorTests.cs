@@ -1,15 +1,9 @@
-using FluentAssertions;
-
-using MongoDB.Bson;
-
-using Shared.DTOs;
-using Shared.Validators;
-
 namespace Tests.Unit.Validators;
 
 /// <summary>
 /// Unit tests for <see cref="UpdateIssueStatusValidator"/>.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class UpdateIssueStatusValidatorTests
 {
 	private readonly UpdateIssueStatusValidator _validator = new();

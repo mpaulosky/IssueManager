@@ -5,6 +5,7 @@ namespace Integration.Handlers;
 /// Verifies correct behavior when archiving existing, already-archived, and non-existent issues.
 /// </summary>
 [Collection("Integration")]
+[ExcludeFromCodeCoverage]
 public class DeleteIssueHandlerTests : IAsyncLifetime
 {
 	private const string MongodbImage = "mongo:latest";

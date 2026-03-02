@@ -3,6 +3,7 @@ namespace Integration.Fixtures;
 /// <summary>
 /// Shared MongoDB TestContainer fixture for integration tests.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class MongoDbFixture : IAsyncLifetime
 {
 	private const string MongodbImage = "mongo:latest";

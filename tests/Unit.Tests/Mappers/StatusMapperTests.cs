@@ -7,16 +7,12 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-using MongoDB.Bson;
-using Shared.DTOs;
-using Shared.Mappers;
-using Shared.Models;
-
 namespace Tests.Unit.Mappers;
 
 /// <summary>
 /// Unit tests for StatusMapper extension methods.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class StatusMapperTests
 {
 	[Fact]

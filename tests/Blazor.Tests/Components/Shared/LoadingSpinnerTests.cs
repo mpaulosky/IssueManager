@@ -7,15 +7,12 @@
 // Project Name :  Blazor.Tests
 // =============================================
 
-using Tests.BlazorTests.Fixtures;
-
-using Web.Components.Shared;
-
 namespace Tests.BlazorTests.Components.Shared;
 
 /// <summary>
 /// Unit tests for the <see cref="LoadingSpinner"/> Blazor component.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class LoadingSpinnerTests : ComponentTestBase
 {
 	[Fact]

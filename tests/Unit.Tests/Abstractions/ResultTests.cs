@@ -7,8 +7,6 @@
 // Project Name :  Unit.Tests
 // =======================================================
 
-using Shared.Abstractions;
-
 namespace Tests.Unit.Abstractions;
 
 /// <summary>

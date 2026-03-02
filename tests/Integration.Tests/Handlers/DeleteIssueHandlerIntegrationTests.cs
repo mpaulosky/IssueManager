@@ -1,14 +1,10 @@
-using Api.Handlers.Issues;
-
-using Shared.Exceptions;
-using Shared.Validators;
-
 namespace Integration.Handlers;
 
 /// <summary>
 /// Integration tests for DeleteIssueHandler (soft-delete via Archived) with real MongoDB database.
 /// </summary>
 [Collection("Integration")]
+[ExcludeFromCodeCoverage]
 public class DeleteIssueHandlerIntegrationTests : IAsyncLifetime
 {
 private const string MongodbImage = "mongo:latest";

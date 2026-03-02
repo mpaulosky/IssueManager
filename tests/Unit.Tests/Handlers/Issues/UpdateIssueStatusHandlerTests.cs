@@ -7,24 +7,12 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-using FluentAssertions;
-using FluentValidation;
-using Api.Data;
-using Api.Handlers;
-using Api.Handlers.Issues;
-
-using Shared.Abstractions;
-using Shared.DTOs;
-using Shared.Validators;
-using MongoDB.Bson;
-using NSubstitute;
-using Tests.Unit.Builders;
-
 namespace Tests.Unit.Handlers.Issues;
 
 /// <summary>
 /// Unit tests for UpdateIssueStatusHandler.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class UpdateIssueStatusHandlerTests
 {
 	private readonly IIssueRepository _repository;

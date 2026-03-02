@@ -5,9 +5,6 @@
 // Solution Name : IssueManager
 // Project Name :  Unit.Tests
 
-using Shared.DTOs;
-using Shared.Models;
-
 namespace Tests.Unit.DTOs;
 
 /// <summary>

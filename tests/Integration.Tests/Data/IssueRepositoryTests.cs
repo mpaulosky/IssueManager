@@ -3,6 +3,7 @@ namespace Integration.Data;
 /// <summary>
 /// Integration tests for IssueRepository with pagination, filtering, and soft-delete.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class IssueRepositoryTests : IAsyncLifetime
 {
 private const string MongodbImage = "mongo:latest";

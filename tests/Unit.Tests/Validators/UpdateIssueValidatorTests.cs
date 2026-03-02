@@ -1,11 +1,9 @@
-using FluentAssertions;
-using Shared.Validators;
-
 namespace Tests.Unit.Validators;
 
 /// <summary>
 /// Unit tests for UpdateIssueValidator.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class UpdateIssueValidatorTests
 {
 	private readonly UpdateIssueValidator _validator = new();

@@ -1,15 +1,12 @@
 // Copyright (c) 2026. All rights reserved.
 
-using Api.Handlers.Issues;
-
-using Shared.Validators;
-
 namespace Integration.Handlers;
 
 /// <summary>
 /// Integration tests for IssueRepository search and filter functionality with real MongoDB database.
 /// </summary>
 [Collection("Integration")]
+[ExcludeFromCodeCoverage]
 public class IssueRepositorySearchTests : IAsyncLifetime
 {
 	private const string MongodbImage = "mongo:latest";

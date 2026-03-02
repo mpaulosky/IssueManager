@@ -1,12 +1,9 @@
-using FluentAssertions;
-using MongoDB.Bson;
-using Shared.Validators;
-
 namespace Tests.Unit.Validators;
 
 /// <summary>
 /// Unit tests for <see cref="UpdateCategoryValidator"/>.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class UpdateCategoryValidatorTests
 {
 	private readonly UpdateCategoryValidator _validator = new();

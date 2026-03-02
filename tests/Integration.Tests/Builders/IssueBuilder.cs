@@ -3,6 +3,7 @@ namespace Integration.Builders;
 /// <summary>
 /// Builder for creating IssueDto test data with fluent API.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class IssueBuilder
 {
 	private ObjectId _id = ObjectId.GenerateNewId();

@@ -1,11 +1,9 @@
-using FluentAssertions;
-using Shared.Validators;
-
 namespace Tests.Unit.Validators;
 
 /// <summary>
 /// Unit tests for DeleteIssueValidator (for soft-delete/archive operation).
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class DeleteIssueValidatorTests
 {
 	private readonly DeleteIssueValidator _validator = new();

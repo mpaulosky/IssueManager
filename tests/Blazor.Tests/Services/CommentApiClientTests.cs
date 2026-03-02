@@ -7,21 +7,12 @@
 // Project Name :  Blazor.Tests
 // =============================================
 
-using System.Net;
-using System.Net.Http.Json;
-
-using MongoDB.Bson;
-
-using Shared.DTOs;
-using Shared.Validators;
-
-using Web.Services;
-
 namespace Tests.BlazorTests.Services;
 
 /// <summary>
 /// Unit tests for the <see cref="CommentApiClient"/> HTTP client.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class CommentApiClientTests
 {
 	private static HttpClient CreateMockClient(HttpResponseMessage response, string baseUrl = "https://api.test")

@@ -7,24 +7,12 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-using FluentAssertions;
-using FluentValidation;
-using Api.Data;
-using Api.Handlers;
-using Api.Handlers.Statuses;
-
-using Shared.Abstractions;
-using Shared.DTOs;
-using Shared.Exceptions;
-using Shared.Validators;
-using MongoDB.Bson;
-using NSubstitute;
-
 namespace Tests.Unit.Handlers.Statuses;
 
 /// <summary>
 /// Unit tests for DeleteStatusHandler (soft-delete via Archived).
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class DeleteStatusHandlerTests
 {
 	private readonly IStatusRepository _repository;

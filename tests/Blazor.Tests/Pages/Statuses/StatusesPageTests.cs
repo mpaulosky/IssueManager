@@ -1,17 +1,11 @@
 // Copyright (c) 2026. All rights reserved.
 
-using MongoDB.Bson;
-
-using Shared.DTOs;
-
-using Web.Pages.Statuses;
-using Web.Services;
-
 namespace Tests.BlazorTests.Pages.Statuses;
 
 /// <summary>
 /// bUnit tests for the <see cref="StatusesPage"/> Blazor page.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class StatusesPageTests : IDisposable
 {
 	private readonly BunitContext _ctx;

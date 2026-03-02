@@ -1,17 +1,10 @@
-using FluentAssertions;
-using NetArchTest.Rules;
-
-using Shared.Models;
-using Shared.Validators;
-
-using Xunit;
-
 namespace Tests.Architecture;
 
 /// <summary>
 /// Architecture tests that enforce project structure and dependencies.
 /// These tests ensure the codebase follows vertical slice architecture and clean architecture principles.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class ArchitectureTests
 {
 	private const string SharedNamespace = "Shared";

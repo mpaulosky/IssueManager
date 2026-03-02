@@ -7,10 +7,6 @@
 // Project Name :  Unit.Tests
 // =======================================================
 
-using Api.Data;
-using MongoDB.Bson;
-using Shared.Abstractions;
-
 namespace Tests.Unit.Repositories;
 
 /// <summary>

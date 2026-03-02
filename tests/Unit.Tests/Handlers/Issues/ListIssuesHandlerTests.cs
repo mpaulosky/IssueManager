@@ -1,21 +1,9 @@
-using FluentAssertions;
-
-using FluentValidation;
-
-using Api.Data;
-using Api.Handlers;
-using Api.Handlers.Issues;
-
-using Shared.Validators;
-using MongoDB.Bson;
-using NSubstitute;
-using Shared.DTOs;
-
 namespace Tests.Unit.Handlers.Issues;
 
 /// <summary>
 /// Unit tests for ListIssuesHandler with pagination.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class ListIssuesHandlerTests
 {
 	private readonly IIssueRepository _repository;

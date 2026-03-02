@@ -1,17 +1,9 @@
-using Bunit;
-using FluentAssertions;
-
-using Tests.BlazorTests.Fixtures;
-using Web.Components;
-using Microsoft.AspNetCore.Components;
-
-using Xunit;
-
 namespace Tests.BlazorTests.Components;
 
 /// <summary>
 /// Tests for the IssueForm Blazor component.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class IssueFormTests : ComponentTestBase
 {
 	[Fact]

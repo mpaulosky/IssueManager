@@ -1,11 +1,10 @@
-using Api.Handlers.Issues;
-
 namespace Integration.Handlers;
 
 /// <summary>
 /// Integration tests for GetIssueHandler with real MongoDB database.
 /// </summary>
 [Collection("Integration")]
+[ExcludeFromCodeCoverage]
 public class GetIssueHandlerTests : IAsyncLifetime
 {
 	private const string MongodbImage = "mongo:latest";

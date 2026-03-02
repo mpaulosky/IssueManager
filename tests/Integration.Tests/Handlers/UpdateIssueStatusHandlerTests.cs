@@ -1,13 +1,10 @@
-using Api.Handlers.Issues;
-
-using Shared.Validators;
-
 namespace Integration.Handlers;
 
 /// <summary>
 /// Integration tests for UpdateIssueStatusHandler with real MongoDB database.
 /// </summary>
 [Collection("Integration")]
+[ExcludeFromCodeCoverage]
 public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 {
 	private const string MongodbImage = "mongo:latest";

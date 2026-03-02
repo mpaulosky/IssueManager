@@ -1,14 +1,11 @@
 // Copyright (c) 2026. All rights reserved.
 
-using Tests.BlazorTests.Fixtures;
-
-using Web.Layout;
-
 namespace Tests.BlazorTests.Layout;
 
 /// <summary>
 /// bUnit tests for the <see cref="FooterComponent"/> Blazor component.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class FooterComponentTests : ComponentTestBase
 {
 	[Fact]

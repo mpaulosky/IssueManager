@@ -1,22 +1,11 @@
 // Copyright (c) 2026. All rights reserved.
 
-using Microsoft.AspNetCore.Components;
-
-using MongoDB.Bson;
-
-using Shared.DTOs;
-using Shared.Validators;
-
-using Tests.BlazorTests.Fixtures;
-
-using Web.Pages.Issues;
-using Web.Services;
-
 namespace Tests.BlazorTests.Pages.Issues;
 
 /// <summary>
 /// bUnit tests for the <see cref="EditIssuePage"/> Blazor page.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class EditIssuePageTests : ComponentTestBase
 {
 	private readonly IIssueApiClient _mockIssueClient;

@@ -7,15 +7,12 @@
 // Project Name :  Integration.Tests
 // =======================================================
 
-using MongoDB.Bson;
-using Shared.DTOs;
-using Shared.Abstractions;
-
 namespace Tests.Integration.Data;
 
 /// <summary>
 /// Integration tests for CategoryRepository using a real MongoDB container.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class CategoryRepositoryTests : IAsyncLifetime
 {
 	private const string MONGODB_IMAGE = "mongo:latest";

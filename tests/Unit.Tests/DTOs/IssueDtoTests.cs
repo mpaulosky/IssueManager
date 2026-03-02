@@ -5,9 +5,6 @@
 // Solution Name : IssueManager
 // Project Name :  Unit.Tests
 
-using MongoDB.Bson;
-using Shared.DTOs;
-
 namespace Tests.Unit.DTOs;
 
 /// <summary>

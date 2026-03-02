@@ -1,18 +1,9 @@
-using FluentValidation;
-using Api.Data;
-using Api.Handlers.Issues;
-
-using Shared.Abstractions;
-using Shared.DTOs;
-using Shared.Exceptions;
-using Shared.Validators;
-using MongoDB.Bson;
-
 namespace Tests.Unit.Handlers.Issues;
 
 /// <summary>
 /// Unit tests for DeleteIssueHandler (soft-delete via Archived).
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class DeleteIssueHandlerTests
 {
 	private readonly IIssueRepository _repository;

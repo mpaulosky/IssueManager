@@ -7,15 +7,12 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-using Shared.DTOs;
-using Shared.Mappers;
-using Shared.Models;
-
 namespace Tests.Unit.Mappers;
 
 /// <summary>
 /// Unit tests for UserMapper extension methods.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class UserMapperTests
 {
 	[Fact]
