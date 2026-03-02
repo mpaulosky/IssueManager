@@ -23,10 +23,15 @@ public static class AuthExtensions
 		var domain = builder.Configuration["Auth0:Domain"];
 		var audience = builder.Configuration["Auth0:Audience"];
 
+		// Always add authorization services (required by UseAuthorization middleware)
+		builder.Services.AddAuthorization();
+
 		if (string.IsNullOrEmpty(domain) || string.IsNullOrEmpty(audience))
 		{
-			// Auth0 is not yet configured — skip authentication setup.
+			// Auth0 is not yet configured — add a no-op authentication scheme for testing
 			// Set Auth0:Domain and Auth0:Audience in user secrets or environment to enable.
+			builder.Services.AddAuthentication("NoAuth")
+				.AddScheme<NoAuthOptions, NoAuthHandler>("NoAuth", options => { });
 			return builder;
 		}
 
@@ -44,8 +49,37 @@ public static class AuthExtensions
 				};
 			});
 
-		builder.Services.AddAuthorization();
-
 		return builder;
+	}
+}
+
+/// <summary>
+/// No-op authentication handler options.
+/// </summary>
+public class NoAuthOptions : Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions
+{
+}
+
+/// <summary>
+/// No-op authentication handler that allows all requests through without authentication.
+/// Used when Auth0 is not configured (e.g., in local development or testing).
+/// </summary>
+public class NoAuthHandler : Microsoft.AspNetCore.Authentication.AuthenticationHandler<NoAuthOptions>
+{
+	public NoAuthHandler(
+		Microsoft.Extensions.Options.IOptionsMonitor<NoAuthOptions> options,
+		Microsoft.Extensions.Logging.ILoggerFactory logger,
+		System.Text.Encodings.Web.UrlEncoder encoder)
+		: base(options, logger, encoder)
+	{
+	}
+
+	protected override Task<Microsoft.AspNetCore.Authentication.AuthenticateResult> HandleAuthenticateAsync()
+	{
+		// No authentication - always succeed
+		var identity = new System.Security.Claims.ClaimsIdentity("NoAuth");
+		var principal = new System.Security.Claims.ClaimsPrincipal(identity);
+		var ticket = new Microsoft.AspNetCore.Authentication.AuthenticationTicket(principal, "NoAuth");
+		return Task.FromResult(Microsoft.AspNetCore.Authentication.AuthenticateResult.Success(ticket));
 	}
 }
