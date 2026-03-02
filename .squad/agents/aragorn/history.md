@@ -165,3 +165,47 @@ dotnet test tests\Unit.Tests --configuration Release --no-build
 
 **Output:** Full gap report at `docs/reviews/copilot-instructions-audit.md`
 
+---
+
+## 2026-03-01 14:35:00 - API Test Coverage Gap Scope
+
+**Task:** Coordinate and scope the API test coverage gap identified by Matthew Paulosky
+
+**Gaps Identified:**
+1. **Endpoint Unit Tests (CRITICAL)** — 20 endpoints across 4 resources: ZERO test coverage
+   - Issues, Categories, Comments, Statuses endpoints: List, Get, Create, Update, Delete operations
+   - Need to test route binding, status codes, authorization, handler invocation
+
+2. **Integration Handler Tests (HIGH)** — 12 integration handlers missing across 3 resources
+   - Categories: 4 tests (Create, Update, Delete, List)
+   - Comments: 4 tests (Create, Update, Delete, List)
+   - Statuses: 4 tests (Create, Update, Delete, List)
+   - Issues already covered (8 files)
+
+3. **Integration Repository Tests (MEDIUM)** — 2 repositories missing coverage
+   - CommentRepositoryTests (CRUD + filtering)
+   - StatusRepositoryTests (CRUD)
+   - Issues and Categories already covered
+
+4. **Program.cs Startup Tests (LOWER PRIORITY)** — No composition/registration verification
+   - Auth0 setup, CORS, OpenAPI/Scalar, API versioning, DI registration
+   - Can be scheduled after higher-priority items
+
+**GitHub Issues Created:**
+- Issue #63: "Add endpoint unit tests for Issues, Categories, Comments, Statuses" (Gimli, Critical)
+- Issue #64: "Add integration handler tests for Categories, Comments, and Statuses" (Gimli, High)
+- Issue #65: "Add integration repository tests for CommentRepository and StatusRepository" (Gimli, Medium)
+- Issue #66: "Add Program.cs startup/composition tests" (Gimli, Lower)
+
+All labeled: `squad`, `squad:gimli`
+
+**Test Patterns Established:**
+- Unit tests: Mock with NSubstitute, verify handler invocation and status codes
+- Integration tests: MongoDbContainer (mongo:latest), IAsyncLifetime, [Collection("Integration")]
+- CancellationToken: Use TestContext.Current.CancellationToken (xUnit v3)
+- Test data: Use existing builders and Empty DTO constants
+
+**Documentation:** Full scope and patterns documented at `.squad/decisions/inbox/aragorn-api-test-scope.md`
+
+**Next Action:** Gimli reviews issues and begins Issue #63
+

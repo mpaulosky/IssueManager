@@ -3,12 +3,12 @@ global using FluentAssertions;
 global using Bunit;
 global using Bunit.TestDoubles;
 global using NSubstitute;
-
 global using Web.Components;
 global using System.Diagnostics.CodeAnalysis;
 global using Microsoft.AspNetCore.Components;
 global using Microsoft.AspNetCore.Components.Rendering;
 global using Microsoft.AspNetCore.Components.Web;
+global using Microsoft.Extensions.DependencyInjection;
 global using MongoDB.Bson;
 global using Shared.DTOs;
 global using Shared.Validators;
@@ -23,4 +23,3 @@ global using Web.Pages.Categories;
 global using Web.Pages.Issues;
 global using Web.Pages.Statuses;
 global using Web.Services;
-global using Microsoft.Extensions.DependencyInjection;

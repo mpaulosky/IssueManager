@@ -90,3 +90,31 @@ DevOps on IssueManager (.NET 10, GitHub Actions, Aspire, NuGet centralized packa
     - Requires separate bUnit migration (RenderComponent → Render, SetParametersAndRender removed)
     - Gimli must run bunit-test-migration skill
 
+### 2026-02-28: Pre-Push Hook Enhancement — Three-Gate Strategy
+- **Context:** Matthew Paulosky requested adding two new gates to `scripts/hooks/pre-push` BEFORE the existing test suite
+- **Gates Added:**
+  1. **Copyright Header Validation** (Gate 1, fastest):
+     - Scans all `.cs` files in `src/` and `tests/` directories
+     - For files with full header format (detected by `// File Name :` presence), validates:
+       - File Name header matches actual filename
+       - Solution Name header equals "IssueManager"
+       - Project Name header matches expected project name based on directory path
+     - Path-to-project mapping: src/Api → Api, src/Web → Web, tests/Unit.Tests → Unit Tests, etc.
+     - Skips files with simple one-liner copyright (no `// File Name :`)
+     - Reports: files checked count + any failures with file path and field mismatch
+  2. **Code Formatting Check** (Gate 2, medium speed):
+     - Runs `dotnet format IssueManager.sln --verify-no-changes --verbosity quiet`
+     - Blocks push if any files would be reformatted
+     - User must run `dotnet format` locally to fix before pushing
+  3. **Test Suite Execution** (Gate 3, slowest — unchanged):
+     - Runs Unit.Tests, Blazor.Tests, Architecture.Tests in Release mode
+     - Integration.Tests excluded (require Docker/TestContainers)
+- **Implementation Pattern:**
+  - All three gates use `FAILED=1` accumulation (don't abort on first failure, report everything)
+  - Ordered fastest → slowest for quick feedback
+  - Added detailed comment block explaining all three gates
+  - Bash syntax validated with `bash -n`
+  - Line endings: LF (Unix) for cross-platform compatibility
+- **Commit:** `094dab7` on main
+- **Files Modified:** `scripts/hooks/pre-push` (complete rewrite with three gate functions)
+

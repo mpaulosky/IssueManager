@@ -293,4 +293,36 @@ Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, Te
 - **MainLayout body parameter**: Must pass `Body` as `RenderFragment` parameter: `TestContext.Render<MainLayout>(parameters => parameters.Add(p => p.Body, (RenderFragment)(builder => builder.AddContent(0, "content"))))`
 - **JSInterop loose mode**: `TestContext.JSInterop.Mode = JSRuntimeMode.Loose` auto-handles any JS calls without explicit setup — use for components with optional JS interop.
 - **GetTokenAsync mocking complexity**: `HttpContext.GetTokenAsync()` is an extension method that reads from `IAuthenticationService`. Simplest test approach: mock `IAuthenticationService.GetTokenAsync()` directly rather than trying to inject tokens into `DefaultHttpContext`.
+### 2026-03-02: Code Coverage Exclusion — [ExcludeFromCodeCoverage] + GlobalUsings Consolidation
+
+**Task:** Add `[ExcludeFromCodeCoverage]` to ALL test classes/fixtures/builders and consolidate `using` statements into GlobalUsings.cs for each test project.
+
+**Projects Processed (4 total):**
+1. **Unit.Tests** — 58 test/builder/validator files
+2. **Integration.Tests** — 14 test/fixture files
+3. **Blazor.Tests** — 22 test/fixture/page files
+4. **Architecture.Tests** — 1 test file
+
+**Changes Applied:**
+1. **[ExcludeFromCodeCoverage]** added to 153 class declarations (all test/fixture/builder classes)
+   - Placed above `public class`, `public abstract class`, `public static class` declarations
+   - For classes with existing attributes (`[Collection("Integration")]`, `[CollectionDefinition]`), placed below them
+2. **GlobalUsings.cs consolidated** — All individual `using` statements moved to project-level GlobalUsings.cs
+   - Removed ALL individual `using` directives from .cs files (except `global using` in GlobalUsings.cs itself)
+   - Added `System.Diagnostics.CodeAnalysis` to each GlobalUsings.cs (required for `[ExcludeFromCodeCoverage]`)
+   - Added project-specific namespaces:
+     - **Unit.Tests**: Api.*, Shared.*, Tests.Unit.Builders, Microsoft.*, System.*, MongoDB.Bson
+     - **Integration.Tests**: Api.*, Shared.*, NSubstitute, System.*, MongoDB.Bson
+     - **Blazor.Tests**: Web.*, Shared.*, Microsoft.AspNetCore.Components.*, System.Net.*, Tests.BlazorTests.Fixtures
+     - **Architecture.Tests**: Shared.Models, Shared.Validators, System.*, System.Reflection
+
+**Build Results:**
+- ✅ All 4 test projects build successfully (0 errors)
+- Pre-existing warnings (CS8602 nullable reference warnings in Integration.Tests) — NOT FIXED (not related to this task)
+
+**Files Modified:** 99 files changed, 138 insertions(+), 602 deletions(-)
+
+**Commit:** `169add1` — test: add [ExcludeFromCodeCoverage] and consolidate GlobalUsings in all test projects
+
+**Rationale:** Test code should be excluded from code coverage metrics. Consolidating `using` directives at the project level via GlobalUsings.cs reduces repetition, improves maintainability, and follows .NET best practices for file-scoped namespaces and global usings.
 

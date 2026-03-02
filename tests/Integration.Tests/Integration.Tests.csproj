@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
+		<OutputType>Exe</OutputType>
 		<RootNamespace>Integration</RootNamespace>
 	</PropertyGroup>
 
@@ -19,6 +20,12 @@
 		<PackageReference Include="Testcontainers.MongoDB" />
 		<PackageReference Include="MongoDB.Driver" />
 		<PackageReference Include="Coverlet.Collector" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="xunit.runner.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
