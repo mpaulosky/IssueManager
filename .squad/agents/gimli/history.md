@@ -168,4 +168,36 @@ Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, Te
 
 **Commit:** `4ad9e6f` — test: standardize all integration tests to mongo:latest image
 
+### 2026-03-01: xUnit1051 Integration Test CancellationToken Fix
+**Task:** Fix xUnit1051 warnings across all 10 Integration.Tests files by passing `TestContext.Current.CancellationToken` to async repository and handler calls.
+
+**Files Fixed (10 total):**
+- `tests/Integration.Tests/Data/CategoryRepositoryTests.cs` — 12 async calls fixed
+- `tests/Integration.Tests/Data/IssueRepositoryTests.cs` — 9 async calls fixed
+- `tests/Integration.Tests/Handlers/CreateIssueHandlerTests.cs` — 7 async calls fixed
+- `tests/Integration.Tests/Handlers/DeleteIssueHandlerIntegrationTests.cs` — 18 async calls fixed
+- `tests/Integration.Tests/Handlers/DeleteIssueHandlerTests.cs` — 7 async calls fixed
+- `tests/Integration.Tests/Handlers/GetIssueHandlerTests.cs` — 8 async calls fixed
+- `tests/Integration.Tests/Handlers/IssueRepositorySearchTests.cs` — 35 async calls fixed
+- `tests/Integration.Tests/Handlers/ListIssuesHandlerIntegrationTests.cs` — 13 async calls fixed
+- `tests/Integration.Tests/Handlers/UpdateIssueHandlerIntegrationTests.cs` — 14 async calls fixed (including `Task.Delay(100)` → `Task.Delay(100, ct)`)
+- `tests/Integration.Tests/Handlers/UpdateIssueStatusHandlerTests.cs` — 8 async calls fixed
+
+**Patterns Applied:**
+1. **Repository calls**: `_repository.CreateAsync(entity)` → `_repository.CreateAsync(entity, TestContext.Current.CancellationToken)`
+2. **Handler calls**: `_handler.Handle(command)` → `_handler.Handle(command, TestContext.Current.CancellationToken)`
+3. **Pagination calls**: `GetAllAsync(page: 1, pageSize: 20)` → `GetAllAsync(page: 1, pageSize: 20, cancellationToken: TestContext.Current.CancellationToken)` (named param required due to optional searchTerm/authorName params)
+4. **Exception tests**: `Assert.ThrowsAsync<T>(() => _handler.Handle(cmd))` → `Assert.ThrowsAsync<T>(() => _handler.Handle(cmd, TestContext.Current.CancellationToken))`
+5. **Task.Delay**: `await Task.Delay(100)` → `await Task.Delay(100, TestContext.Current.CancellationToken)`
+
+**Not Fixed (Intentional):**
+- `InitializeAsync` / `DisposeAsync` lifecycle hooks: TestContext.Current is null in lifecycle methods, so container lifecycle calls (`_mongoContainer.StartAsync()`, `StopAsync()`, `DisposeAsync()`) remain without CT. xUnit1051 does NOT apply to lifecycle hooks.
+
+**Build Results:**
+- Before: 103+ xUnit1051 warnings, 0 errors
+- After: ✅ 0 xUnit1051 warnings, 0 errors, Build succeeded
+
+**Commit:** `4f67ddb` — test: pass TestContext.Current.CancellationToken in integration tests (xUnit1051)
+
+**Rationale:** xUnit v3 provides `TestContext.Current.CancellationToken` as the recommended cancellation token for all async test operations. Using it enables more responsive test cancellation when tests timeout or are manually aborted. This aligns with xUnit v3 best practices and eliminates analyzer warnings.
 
