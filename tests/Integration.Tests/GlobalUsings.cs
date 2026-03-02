@@ -7,6 +7,9 @@ global using MongoDB.Driver;
 
 global using Api.Data;
 global using Api.Handlers;
+global using Api.Handlers.Categories;
+global using Api.Handlers.Comments;
+global using Api.Handlers.Statuses;
 
 global using MongoDB.Bson;
 
