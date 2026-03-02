@@ -17,15 +17,18 @@ public class CategoryEndpointsTests : IDisposable
 {
 	private readonly ApiWebApplicationFactory _factory;
 	private readonly HttpClient _client;
+	private readonly HttpClient _authenticatedClient;
 
 	public CategoryEndpointsTests()
 	{
 		_factory = new ApiWebApplicationFactory();
 		_client = _factory.CreateClient();
+		_authenticatedClient = _factory.CreateAuthenticatedClient();
 	}
 
 	public void Dispose()
 	{
+		_authenticatedClient.Dispose();
 		_client.Dispose();
 		_factory.Dispose();
 	}
@@ -116,10 +119,23 @@ public class CategoryEndpointsTests : IDisposable
 		var command = new { CategoryName = "Test Category", CategoryDescription = "Description" };
 
 		// Act
-		var response = await _client.PostAsJsonAsync("/api/v1/categories", command);
+		var response = await _authenticatedClient.PostAsJsonAsync("/api/v1/categories", command);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Created);
+	}
+
+	[Fact]
+	public async Task CreateCategory_WithoutAuthentication_ReturnsUnauthorized()
+	{
+		// Arrange
+		var command = new { CategoryName = "Test Category", CategoryDescription = "Description" };
+
+		// Act
+		var response = await _client.PostAsJsonAsync("/api/v1/categories", command);
+
+		// Assert
+		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 	}
 
 	[Fact]
@@ -145,10 +161,24 @@ public class CategoryEndpointsTests : IDisposable
 		var command = new { CategoryName = "Updated Category", CategoryDescription = "Description" };
 
 		// Act
-		var response = await _client.PatchAsJsonAsync($"/api/v1/categories/{categoryId}", command);
+		var response = await _authenticatedClient.PatchAsJsonAsync($"/api/v1/categories/{categoryId}", command);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.OK);
+	}
+
+	[Fact]
+	public async Task UpdateCategory_WithoutAuthentication_ReturnsUnauthorized()
+	{
+		// Arrange
+		var categoryId = ObjectId.GenerateNewId();
+		var command = new { CategoryName = "Updated Category", CategoryDescription = "Description" };
+
+		// Act
+		var response = await _client.PatchAsJsonAsync($"/api/v1/categories/{categoryId}", command);
+
+		// Assert
+		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 	}
 
 	[Fact]
@@ -172,9 +202,22 @@ public class CategoryEndpointsTests : IDisposable
 			.Returns(Result.Ok());
 
 		// Act
-		var response = await _client.DeleteAsync($"/api/v1/categories/{categoryId}");
+		var response = await _authenticatedClient.DeleteAsync($"/api/v1/categories/{categoryId}");
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+	}
+
+	[Fact]
+	public async Task DeleteCategory_WithoutAuthentication_ReturnsUnauthorized()
+	{
+		// Arrange
+		var categoryId = ObjectId.GenerateNewId();
+
+		// Act
+		var response = await _client.DeleteAsync($"/api/v1/categories/{categoryId}");
+
+		// Assert
+		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 	}
 }
