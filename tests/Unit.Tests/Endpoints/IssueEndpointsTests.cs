@@ -17,15 +17,18 @@ public class IssueEndpointsTests : IDisposable
 {
 	private readonly ApiWebApplicationFactory _factory;
 	private readonly HttpClient _client;
+	private readonly HttpClient _authenticatedClient;
 
 	public IssueEndpointsTests()
 	{
 		_factory = new ApiWebApplicationFactory();
 		_client = _factory.CreateClient();
+		_authenticatedClient = _factory.CreateAuthenticatedClient();
 	}
 
 	public void Dispose()
 	{
+		_authenticatedClient.Dispose();
 		_client.Dispose();
 		_factory.Dispose();
 	}
@@ -126,10 +129,23 @@ public class IssueEndpointsTests : IDisposable
 		var command = new { Title = "Test Issue", Description = "Description" };
 
 		// Act
-		var response = await _client.PostAsJsonAsync("/api/v1/issues", command);
+		var response = await _authenticatedClient.PostAsJsonAsync("/api/v1/issues", command);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Created);
+	}
+
+	[Fact]
+	public async Task CreateIssue_WithoutAuthentication_ReturnsUnauthorized()
+	{
+		// Arrange
+		var command = new { Title = "Test Issue", Description = "Description" };
+
+		// Act
+		var response = await _client.PostAsJsonAsync("/api/v1/issues", command);
+
+		// Assert
+		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 	}
 
 	[Fact]
@@ -160,10 +176,24 @@ public class IssueEndpointsTests : IDisposable
 		var command = new { Title = "Updated Issue", Description = "Description" };
 
 		// Act
-		var response = await _client.PatchAsJsonAsync($"/api/v1/issues/{issueId}", command);
+		var response = await _authenticatedClient.PatchAsJsonAsync($"/api/v1/issues/{issueId}", command);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.OK);
+	}
+
+	[Fact]
+	public async Task UpdateIssue_WithoutAuthentication_ReturnsUnauthorized()
+	{
+		// Arrange
+		var issueId = ObjectId.GenerateNewId();
+		var command = new { Title = "Updated Issue", Description = "Description" };
+
+		// Act
+		var response = await _client.PatchAsJsonAsync($"/api/v1/issues/{issueId}", command);
+
+		// Assert
+		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 	}
 
 	[Fact]
@@ -192,9 +222,22 @@ public class IssueEndpointsTests : IDisposable
 			.Returns(Result.Ok());
 
 		// Act
-		var response = await _client.DeleteAsync($"/api/v1/issues/{issueId}");
+		var response = await _authenticatedClient.DeleteAsync($"/api/v1/issues/{issueId}");
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+	}
+
+	[Fact]
+	public async Task DeleteIssue_WithoutAuthentication_ReturnsUnauthorized()
+	{
+		// Arrange
+		var issueId = ObjectId.GenerateNewId();
+
+		// Act
+		var response = await _client.DeleteAsync($"/api/v1/issues/{issueId}");
+
+		// Assert
+		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 	}
 }

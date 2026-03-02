@@ -9,7 +9,9 @@ public static class AuthExtensions
 {
 	/// <summary>
 	/// Adds Auth0 JWT Bearer authentication to the API services.
-	/// Only wires up authentication when AUTH0_DOMAIN and AUTH0_AUDIENCE configuration values are present.
+	/// Only wires up real authentication when Auth0:Domain and Auth0:Audience configuration values are present.
+	/// When those values are absent, falls back to a no-op scheme only if the environment is "Testing"
+	/// or if <c>Auth:EnableNoAuthForTesting=true</c> is set; otherwise throws.
 	/// </summary>
 	/// <remarks>
 	/// Required configuration (set via user secrets or environment variables):
@@ -28,11 +30,23 @@ public static class AuthExtensions
 
 		if (string.IsNullOrEmpty(domain) || string.IsNullOrEmpty(audience))
 		{
-			// Auth0 is not yet configured — add a no-op authentication scheme for testing
-			// Set Auth0:Domain and Auth0:Audience in user secrets or environment to enable.
-			builder.Services.AddAuthentication("NoAuth")
-				.AddScheme<NoAuthOptions, NoAuthHandler>("NoAuth", options => { });
-			return builder;
+			var isTestingEnvironment = builder.Environment.IsEnvironment("Testing");
+			var enableNoAuthForTesting = builder.Configuration["Auth:EnableNoAuthForTesting"];
+			var noAuthEnabled = isTestingEnvironment ||
+				string.Equals(enableNoAuthForTesting, "true", System.StringComparison.OrdinalIgnoreCase);
+
+			if (noAuthEnabled)
+			{
+				// Auth0 is not configured — add a no-op authentication scheme only for safe testing environments.
+				builder.Services.AddAuthentication("NoAuth")
+					.AddScheme<NoAuthOptions, NoAuthHandler>("NoAuth", options => { });
+				return builder;
+			}
+
+			throw new System.InvalidOperationException(
+				"Auth0 configuration is missing (Auth0:Domain and/or Auth0:Audience). " +
+				"Configure Auth0 for this environment, or set 'Auth:EnableNoAuthForTesting=true' " +
+				"only in safe testing environments to bypass authentication.");
 		}
 
 		builder.Services.AddAuthentication("Bearer")
