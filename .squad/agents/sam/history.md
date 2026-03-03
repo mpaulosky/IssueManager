@@ -69,6 +69,12 @@ Backend Developer on IssueManager (.NET 10, MongoDB, EF Core, CQRS, MediatR, Min
 - **Scope:** `ListStatusesHandler` was already correct; only `ListCategoriesHandler` was affected
 - **Interface check:** `ICategoryRepository.GetAllAsync(CancellationToken = default)` already had the right signature — purely a call-site omission
 
+### mongodb-dba-patterns skill created (2026-03-03)
+- Created `.squad/skills/mongodb-dba-patterns/SKILL.md` to replace the deleted `.github/instructions/mongo-dba.instructions.md`
+- Skill covers: replica set management, database/collection creation, backup/restore (mongodump/mongorestore), performance tuning (indexes, profiling), security (SCRAM-SHA-256, roles, TLS), and MongoDB 7.x+ upgrade guidance
+- Confidence set to `low` (first formal establishment of this skill)
+- Preferred tooling: VS Code MongoDB extension and MongoDB Compass over raw shell commands
+
 ### Sprint 4 API Authorization Policies (2026-02-28)
 - **Authorization applied:** Added `.RequireAuthorization()` to all 12 write endpoints (POST, PATCH, DELETE) across IssueEndpoints, CategoryEndpoints, StatusEndpoints, and CommentEndpoints
 - **Read-only endpoints:** GET endpoints (list, getById) remain public — no authorization required for read operations

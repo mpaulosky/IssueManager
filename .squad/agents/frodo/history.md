@@ -15,3 +15,8 @@ Tech Writer on IssueManager (.NET 10, XML docs, Markdown). User: Matthew Paulosk
 ### Build repair documentation
 - Build repair runs documented in `docs/build-repair-log.md` or `docs/build-log.txt`
 - Format: date, errors found, resolutions, final status
+
+### Squad skills
+- Created `copilot-sdk-csharp-usage` skill as replacement for removed `.github/instructions/copilot-sdk-csharp.instructions.md`
+- Skills are on-demand reference material; instruction files load globally on every .cs file
+- Format: Overview → When to Use → Key Patterns → Best Practices → Gotchas → References
