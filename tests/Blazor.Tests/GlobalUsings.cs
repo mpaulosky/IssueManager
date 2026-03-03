@@ -1,13 +1,14 @@
 global using Xunit;
 global using FluentAssertions;
 global using Bunit;
+global using Bunit.TestDoubles;
 global using NSubstitute;
-
 global using Web.Components;
 global using System.Diagnostics.CodeAnalysis;
 global using Microsoft.AspNetCore.Components;
 global using Microsoft.AspNetCore.Components.Rendering;
 global using Microsoft.AspNetCore.Components.Web;
+global using Microsoft.Extensions.DependencyInjection;
 global using MongoDB.Bson;
 global using Shared.DTOs;
 global using Shared.Validators;
