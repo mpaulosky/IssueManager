@@ -33,6 +33,7 @@ public static class StatusMapper
 	public static Status ToModel(this StatusDto dto) =>
 		new()
 		{
+			Id = dto.Id,
 			StatusName = dto.StatusName,
 			StatusDescription = dto.StatusDescription,
 			DateCreated = dto.DateCreated,
