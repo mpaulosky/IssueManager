@@ -81,7 +81,7 @@ await using var resumedSession = await client.ResumeSessionAsync(sessionId, conf
 ```csharp
 var done = new TaskCompletionSource();
 
-session.On(evt =>
+using var subscription = session.On(evt =>
 {
     if (evt is AssistantMessageEvent msg)
     {
@@ -159,6 +159,7 @@ var providerConfig = new ProviderConfig
 var session = await client.CreateSessionAsync(new SessionConfig
 {
     Provider = "openai",
+    ProviderConfig = providerConfig,
     // ... other config
 });
 ```

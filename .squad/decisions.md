@@ -937,3 +937,5 @@ Boromir (DevOps) — responsible for CI/CD, Git hooks, build infrastructure
 **What:** Created `.squad/skills/mongodb-dba-patterns/SKILL.md` covering MongoDB DBA administration patterns
 
 **Why:** Replaced `.github/instructions/mongo-dba.instructions.md` which was removed. Skill is on-demand; instruction file was loading globally on every `.cs` file.
+
+**Status:** Complete. Skill available at `.squad/skills/mongodb-dba-patterns/SKILL.md`
