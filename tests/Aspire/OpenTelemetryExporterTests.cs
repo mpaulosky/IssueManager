@@ -6,7 +6,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using OpenTelemetry;
+using OpenTelemetry.Metrics;
 using ServiceDefaults;
 using Xunit;
 
@@ -27,9 +27,9 @@ public class OpenTelemetryExporterTests
 		var app = builder.Build();
 
 		// Assert
-		// OpenTelemetry SDK registers services when OTLP is configured
-		var openTelemetryBuilder = app.Services.GetService<OpenTelemetryBuilder>();
-		openTelemetryBuilder.Should().NotBeNull("OpenTelemetry should be configured");
+		// OpenTelemetry SDK registers MeterProvider when configured
+		var meterProvider = app.Services.GetService<MeterProvider>();
+		meterProvider.Should().NotBeNull("OpenTelemetry metrics should be configured");
 	}
 
 	[Fact]
@@ -62,9 +62,9 @@ public class OpenTelemetryExporterTests
 		var app = builder.Build();
 
 		// Assert
-		// Should not throw and should still register OpenTelemetry
-		var openTelemetryBuilder = app.Services.GetService<OpenTelemetryBuilder>();
-		openTelemetryBuilder.Should().NotBeNull("OpenTelemetry should still be configured");
+		// Should not throw and should still register OpenTelemetry metrics
+		var meterProvider = app.Services.GetService<MeterProvider>();
+		meterProvider.Should().NotBeNull("OpenTelemetry should still be configured without OTLP endpoint");
 	}
 
 	[Fact]
@@ -79,8 +79,8 @@ public class OpenTelemetryExporterTests
 		var app = builder.Build();
 
 		// Assert
-		// Should not throw and should still register OpenTelemetry
-		var openTelemetryBuilder = app.Services.GetService<OpenTelemetryBuilder>();
-		openTelemetryBuilder.Should().NotBeNull("OpenTelemetry should still be configured");
+		// Should not throw and should still register OpenTelemetry metrics
+		var meterProvider = app.Services.GetService<MeterProvider>();
+		meterProvider.Should().NotBeNull("OpenTelemetry should still be configured with whitespace OTLP endpoint");
 	}
 }
