@@ -323,16 +323,6 @@ jobs:
         with:
           global-json-file: global.json
 
-      - name: Restore build artifacts
-        uses: actions/cache@v5
-        with:
-          path: |
-            **/bin/Release/
-            **/obj/
-          key: ${{ runner.os }}-build-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props', 'global.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-
-
       - name: Cache NuGet packages
         uses: actions/cache@v5
         with:
@@ -344,6 +334,14 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
+      - name: Build Aspire Tests
+        run: |
+          if [ ! -d "tests/Aspire" ] || [ -z "$(find tests/Aspire -name '*.csproj' -maxdepth 2 2>/dev/null)" ]; then
+            echo "::notice::Aspire test project not found at tests/Aspire — skipping build"
+            exit 0
+          fi
+          dotnet build tests/Aspire --configuration Release --no-restore
+
       - name: Run Aspire Tests
         id: aspire-tests
         run: |
@@ -352,15 +350,12 @@ jobs:
             echo "::notice::Aspire test project not found at tests/Aspire — skipping"
             exit 0
           fi
-          dotnet test tests/Aspire \
-            --configuration Release \
-            --no-build \
-            --no-restore \
-            --collect:"XPlat Code Coverage" \
-            --logger "trx;LogFileName=aspire.trx" \
-            --results-directory test-results \
-            --verbosity minimal
+
+          # Run test executable directly (xUnit v3 workaround for test process launcher compatibility)
+          cd tests/Aspire/bin/Release/net10.0
+          ./Aspire.Tests -xml "$GITHUB_WORKSPACE/test-results/aspire.xml" -nunit "$GITHUB_WORKSPACE/test-results/aspire-nunit.xml"
           exit_code=$?
+
           if [ $exit_code -ne 0 ]; then
             echo "::error::Aspire tests failed"
           fi
