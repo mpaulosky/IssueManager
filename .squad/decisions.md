@@ -906,3 +906,36 @@ fi
 ## Owner
 
 Boromir (DevOps) — responsible for CI/CD, Git hooks, build infrastructure
+
+---
+
+## 2026-03-03: Created copilot-sdk-csharp-usage skill
+
+**By:** Frodo
+
+**What:** Created `.squad/skills/copilot-sdk-csharp-usage/SKILL.md` from removed instruction file
+
+**Why:** Replaced `.github/instructions/copilot-sdk-csharp.instructions.md`. Instruction files load globally on every .cs file; skills are on-demand reference material. This reduces cognitive load for developers while preserving specialized SDK guidance for when IssueManager integrates Copilot features.
+
+**Structure:**
+- Overview: SDK purpose for .NET 10+ applications
+- When to Use: IssueManager integration scenarios
+- Installation: NuGet package + requirements
+- Key Patterns: Client init, sessions, events, tools, BYOK, connectivity, lifecycle
+- Best Practices: 10 focused guidelines
+- Gotchas: 8 technical preview caveats
+- References: Official docs and best practices
+
+**Status:** Complete. Skill available at `.squad/skills/copilot-sdk-csharp-usage/SKILL.md`
+
+---
+
+## 2026-03-03: Created mongodb-dba-patterns skill
+
+**By:** Sam
+
+**What:** Created `.squad/skills/mongodb-dba-patterns/SKILL.md` covering MongoDB DBA administration patterns
+
+**Why:** Replaced `.github/instructions/mongo-dba.instructions.md` which was removed. Skill is on-demand; instruction file was loading globally on every `.cs` file.
+
+**Status:** Complete. Skill available at `.squad/skills/mongodb-dba-patterns/SKILL.md`
