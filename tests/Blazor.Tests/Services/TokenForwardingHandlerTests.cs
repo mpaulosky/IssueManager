@@ -18,9 +18,15 @@ public class TokenForwardingHandlerTests
 		const string accessToken = "test-access-token";
 		var context = new DefaultHttpContext();
 		var authService = Substitute.For<IAuthenticationService>();
+
+		// GetTokenAsync is an extension method — cannot be mocked directly.
+		// Store the token in AuthenticationProperties so the real extension reads it.
+		var authProperties = new AuthenticationProperties();
+		authProperties.StoreTokens([new AuthenticationToken { Name = "access_token", Value = accessToken }]);
 		authService.AuthenticateAsync(context, null)
-			.Returns(AuthenticateResult.Success(new Microsoft.AspNetCore.Authentication.AuthenticationTicket(
+			.Returns(AuthenticateResult.Success(new AuthenticationTicket(
 				new System.Security.Claims.ClaimsPrincipal(),
+				authProperties,
 				"TestScheme")));
 
 		context.RequestServices = new ServiceCollection()
@@ -29,10 +35,6 @@ public class TokenForwardingHandlerTests
 
 		var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
 		httpContextAccessor.HttpContext.Returns(context);
-
-		// Mock GetTokenAsync by setting up the auth service
-		authService.GetTokenAsync(context, "access_token")
-			.Returns(Task.FromResult<string?>(accessToken));
 
 		var innerHandler = new TestHttpMessageHandler(req => new HttpResponseMessage(HttpStatusCode.OK));
 		var handler = new TokenForwardingHandler(httpContextAccessor) { InnerHandler = innerHandler };
@@ -56,16 +58,18 @@ public class TokenForwardingHandlerTests
 		// Arrange
 		var context = new DefaultHttpContext();
 		var authService = Substitute.For<IAuthenticationService>();
+		// No token stored → GetTokenAsync returns null via real extension method logic
+		authService.AuthenticateAsync(context, null)
+			.Returns(AuthenticateResult.Success(new AuthenticationTicket(
+				new System.Security.Claims.ClaimsPrincipal(),
+				new AuthenticationProperties(),
+				"TestScheme")));
 		context.RequestServices = new ServiceCollection()
 			.AddSingleton(authService)
 			.BuildServiceProvider();
 
 		var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
 		httpContextAccessor.HttpContext.Returns(context);
-
-		// Return null token
-		authService.GetTokenAsync(context, "access_token")
-			.Returns(Task.FromResult<string?>(null));
 
 		var innerHandler = new TestHttpMessageHandler(req => new HttpResponseMessage(HttpStatusCode.OK));
 		var handler = new TokenForwardingHandler(httpContextAccessor) { InnerHandler = innerHandler };
@@ -107,6 +111,12 @@ public class TokenForwardingHandlerTests
 	{
 		// Arrange
 		var context = new DefaultHttpContext();
+		var authService = Substitute.For<IAuthenticationService>();
+		authService.AuthenticateAsync(context, null)
+			.Returns(AuthenticateResult.Fail("no token"));
+		context.RequestServices = new ServiceCollection()
+			.AddSingleton(authService)
+			.BuildServiceProvider();
 		var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
 		httpContextAccessor.HttpContext.Returns(context);
 
