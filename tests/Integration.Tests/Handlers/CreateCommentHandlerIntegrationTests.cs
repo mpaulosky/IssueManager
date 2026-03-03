@@ -1,6 +1,6 @@
 // =======================================================
 // Copyright (c) 2026. All rights reserved.
-// File Name :     CreateStatusHandlerIntegrationTests.cs
+// File Name :     CreateCommentHandlerIntegrationTests.cs
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
@@ -10,19 +10,19 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for CreateStatusHandler with real MongoDB database.
+/// Integration tests for CreateCommentHandler with real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
-public class CreateStatusHandlerIntegrationTests : IAsyncLifetime
+public class CreateCommentHandlerIntegrationTests : IAsyncLifetime
 {
 	private const string MongodbImage = "mongo:latest";
 	private const string TestDatabase = "IssueManagerTestDb";
 	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage)
 		.Build();
 
-	private IStatusRepository _repository = null!;
-	private CreateStatusHandler _handler = null!;
+	private ICommentRepository _repository = null!;
+	private CreateCommentHandler _handler = null!;
 
 	/// <summary>
 	/// Initializes the test container and repository.
@@ -31,8 +31,12 @@ public class CreateStatusHandlerIntegrationTests : IAsyncLifetime
 	{
 		await _mongoContainer.StartAsync();
 		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new StatusRepository(connectionString, TestDatabase);
-		_handler = new CreateStatusHandler(_repository, new CreateStatusValidator());
+		_repository = new CommentRepository(connectionString, TestDatabase);
+		
+		var currentUserService = Substitute.For<ICurrentUserService>();
+		currentUserService.IsAuthenticated.Returns(false);
+		
+		_handler = new CreateCommentHandler(_repository, new CreateCommentValidator(), currentUserService);
 	}
 
 	/// <summary>
@@ -45,13 +49,14 @@ public class CreateStatusHandlerIntegrationTests : IAsyncLifetime
 	}
 
 	[Fact]
-	public async Task Handle_ValidCommand_CreatesStatus()
+	public async Task Handle_ValidCommand_CreatesComment()
 	{
 		// Arrange
-		var command = new CreateStatusCommand
+		var command = new CreateCommentCommand
 		{
-			StatusName = "New Status",
-			StatusDescription = "New Description"
+			Title = "New Comment",
+			CommentText = "New comment text",
+			IssueId = ObjectId.GenerateNewId().ToString()
 		};
 
 		// Act
@@ -59,8 +64,8 @@ public class CreateStatusHandlerIntegrationTests : IAsyncLifetime
 
 		// Assert
 		result.Should().NotBeNull();
-		result.StatusName.Should().Be("New Status");
-		result.StatusDescription.Should().Be("New Description");
+		result.Title.Should().Be("New Comment");
+		result.Description.Should().Be("New comment text");
 		result.Id.Should().NotBe(ObjectId.Empty);
 		result.Archived.Should().BeFalse();
 	}
@@ -68,11 +73,11 @@ public class CreateStatusHandlerIntegrationTests : IAsyncLifetime
 	[Fact]
 	public async Task Handle_InvalidCommand_ThrowsValidationException()
 	{
-		// Arrange - Empty status name is invalid
-		var command = new CreateStatusCommand
+		// Arrange - Empty title is invalid
+		var command = new CreateCommentCommand
 		{
-			StatusName = string.Empty,
-			StatusDescription = "Description"
+			Title = string.Empty,
+			CommentText = "Some text"
 		};
 
 		// Act
@@ -83,22 +88,23 @@ public class CreateStatusHandlerIntegrationTests : IAsyncLifetime
 	}
 
 	[Fact]
-	public async Task Handle_CreatedStatus_CanBeRetrieved()
+	public async Task Handle_CreatedComment_CanBeRetrieved()
 	{
 		// Arrange
-		var command = new CreateStatusCommand
+		var command = new CreateCommentCommand
 		{
-			StatusName = "Retrievable Status",
-			StatusDescription = "Test Description"
+			Title = "Retrievable Comment",
+			CommentText = "Test comment text",
+			IssueId = ObjectId.GenerateNewId().ToString()
 		};
 
-		// Act - Create status
+		// Act - Create comment
 		var created = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert - Verify it can be retrieved
 		var retrieved = await _repository.GetByIdAsync(created.Id, TestContext.Current.CancellationToken);
 		retrieved.Should().NotBeNull();
-		retrieved.Value.StatusName.Should().Be("Retrievable Status");
-		retrieved.Value.StatusDescription.Should().Be("Test Description");
+		retrieved.Value.Title.Should().Be("Retrievable Comment");
+		retrieved.Value.Description.Should().Be("Test comment text");
 	}
 }

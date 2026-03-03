@@ -1,6 +1,6 @@
 // =======================================================
 // Copyright (c) 2026. All rights reserved.
-// File Name :     UpdateStatusHandlerIntegrationTests.cs
+// File Name :     UpdateCommentHandlerIntegrationTests.cs
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
@@ -10,19 +10,19 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for UpdateStatusHandler with real MongoDB database.
+/// Integration tests for UpdateCommentHandler with real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
-public class UpdateStatusHandlerIntegrationTests : IAsyncLifetime
+public class UpdateCommentHandlerIntegrationTests : IAsyncLifetime
 {
 	private const string MongodbImage = "mongo:latest";
 	private const string TestDatabase = "IssueManagerTestDb";
 	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage)
 		.Build();
 
-	private IStatusRepository _repository = null!;
-	private UpdateStatusHandler _handler = null!;
+	private ICommentRepository _repository = null!;
+	private UpdateCommentHandler _handler = null!;
 
 	/// <summary>
 	/// Initializes the test container and repository.
@@ -31,8 +31,8 @@ public class UpdateStatusHandlerIntegrationTests : IAsyncLifetime
 	{
 		await _mongoContainer.StartAsync();
 		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new StatusRepository(connectionString, TestDatabase);
-		_handler = new UpdateStatusHandler(_repository, new UpdateStatusValidator());
+		_repository = new CommentRepository(connectionString, TestDatabase);
+		_handler = new UpdateCommentHandler(_repository, new UpdateCommentValidator());
 	}
 
 	/// <summary>
@@ -44,21 +44,22 @@ public class UpdateStatusHandlerIntegrationTests : IAsyncLifetime
 		await _mongoContainer.DisposeAsync();
 	}
 
-	private static StatusDto CreateTestStatusDto(string name, string description = "Test description") =>
-		new(ObjectId.GenerateNewId(), name, description, DateTime.UtcNow, null, false, UserDto.Empty);
+	private static CommentDto CreateTestCommentDto(string title, string description = "Test description") =>
+		new(ObjectId.GenerateNewId(), title, description, DateTime.UtcNow, null, IssueDto.Empty,
+			UserDto.Empty, [], false, UserDto.Empty, false, UserDto.Empty);
 
 	[Fact]
-	public async Task Handle_ExistingStatus_UpdatesSuccessfully()
+	public async Task Handle_ExistingComment_UpdatesSuccessfully()
 	{
-		// Arrange - Create a status
-		var status = CreateTestStatusDto("Original Name", "Original Description");
-		var created = await _repository.CreateAsync(status, TestContext.Current.CancellationToken);
+		// Arrange - Create a comment
+		var comment = CreateTestCommentDto("Original Title", "Original Description");
+		var created = await _repository.CreateAsync(comment, TestContext.Current.CancellationToken);
 
-		var command = new UpdateStatusCommand
+		var command = new UpdateCommentCommand
 		{
 			Id = created.Value.Id.ToString(),
-			StatusName = "Updated Name",
-			StatusDescription = "Updated Description"
+			Title = "Updated Title",
+			CommentText = "Updated comment text"
 		};
 
 		// Act
@@ -66,21 +67,20 @@ public class UpdateStatusHandlerIntegrationTests : IAsyncLifetime
 
 		// Assert
 		result.Should().NotBeNull();
-		result.StatusName.Should().Be("Updated Name");
-		result.StatusDescription.Should().Be("Updated Description");
+		result.Title.Should().Be("Updated Title");
 		result.Id.Should().Be(created.Value.Id);
 	}
 
 	[Fact]
-	public async Task Handle_NonExistentStatus_ThrowsNotFoundException()
+	public async Task Handle_NonExistentComment_ThrowsNotFoundException()
 	{
 		// Arrange
 		var nonExistentId = ObjectId.GenerateNewId().ToString();
-		var command = new UpdateStatusCommand
+		var command = new UpdateCommentCommand
 		{
 			Id = nonExistentId,
-			StatusName = "Updated Name",
-			StatusDescription = "Updated Description"
+			Title = "Updated Title",
+			CommentText = "Non-existent comment text"
 		};
 
 		// Act
@@ -88,21 +88,20 @@ public class UpdateStatusHandlerIntegrationTests : IAsyncLifetime
 
 		// Assert
 		await act.Should().ThrowAsync<NotFoundException>()
-			.WithMessage($"Status with ID '{nonExistentId}' was not found.");
+			.WithMessage($"Comment with ID '{nonExistentId}' was not found.");
 	}
 
 	[Fact]
 	public async Task Handle_InvalidCommand_ThrowsValidationException()
 	{
-		// Arrange - Empty name is invalid
-		var status = CreateTestStatusDto("Test Status", "Test Description");
-		var created = await _repository.CreateAsync(status, TestContext.Current.CancellationToken);
+		// Arrange - Empty title is invalid
+		var comment = CreateTestCommentDto("Test Comment", "Test Description");
+		var created = await _repository.CreateAsync(comment, TestContext.Current.CancellationToken);
 
-		var command = new UpdateStatusCommand
+		var command = new UpdateCommentCommand
 		{
 			Id = created.Value.Id.ToString(),
-			StatusName = string.Empty,
-			StatusDescription = "Updated Description"
+			Title = string.Empty
 		};
 
 		// Act

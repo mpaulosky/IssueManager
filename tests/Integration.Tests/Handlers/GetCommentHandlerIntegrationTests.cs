@@ -1,6 +1,6 @@
 // =======================================================
 // Copyright (c) 2026. All rights reserved.
-// File Name :     GetStatusHandlerIntegrationTests.cs
+// File Name :     GetCommentHandlerIntegrationTests.cs
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
@@ -10,19 +10,19 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for GetStatusHandler with real MongoDB database.
+/// Integration tests for GetCommentHandler with real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
-public class GetStatusHandlerIntegrationTests : IAsyncLifetime
+public class GetCommentHandlerIntegrationTests : IAsyncLifetime
 {
 	private const string MongodbImage = "mongo:latest";
 	private const string TestDatabase = "IssueManagerTestDb";
 	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage)
 		.Build();
 
-	private IStatusRepository _repository = null!;
-	private GetStatusHandler _handler = null!;
+	private ICommentRepository _repository = null!;
+	private GetCommentHandler _handler = null!;
 
 	/// <summary>
 	/// Initializes the test container and repository.
@@ -31,8 +31,8 @@ public class GetStatusHandlerIntegrationTests : IAsyncLifetime
 	{
 		await _mongoContainer.StartAsync();
 		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new StatusRepository(connectionString, TestDatabase);
-		_handler = new GetStatusHandler(_repository);
+		_repository = new CommentRepository(connectionString, TestDatabase);
+		_handler = new GetCommentHandler(_repository);
 	}
 
 	/// <summary>
@@ -44,33 +44,34 @@ public class GetStatusHandlerIntegrationTests : IAsyncLifetime
 		await _mongoContainer.DisposeAsync();
 	}
 
-	private static StatusDto CreateTestStatusDto(string name, string description = "Test description") =>
-		new(ObjectId.GenerateNewId(), name, description, DateTime.UtcNow, null, false, UserDto.Empty);
+	private static CommentDto CreateTestCommentDto(string title, string description = "Test description") =>
+		new(ObjectId.GenerateNewId(), title, description, DateTime.UtcNow, null, IssueDto.Empty,
+			UserDto.Empty, [], false, UserDto.Empty, false, UserDto.Empty);
 
 	[Fact]
-	public async Task Handle_ExistingStatus_ReturnsStatus()
+	public async Task Handle_ExistingComment_ReturnsComment()
 	{
-		// Arrange - Create a status
-		var status = CreateTestStatusDto("Test Status", "Test Description");
-		var created = await _repository.CreateAsync(status, TestContext.Current.CancellationToken);
+		// Arrange - Create a comment
+		var comment = CreateTestCommentDto("Test Comment", "Test Description");
+		var created = await _repository.CreateAsync(comment, TestContext.Current.CancellationToken);
 
-		var query = new GetStatusQuery(created.Value.Id.ToString());
+		var query = new GetCommentQuery(created.Value.Id.ToString());
 
 		// Act
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
-		result!.StatusName.Should().Be("Test Status");
-		result.StatusDescription.Should().Be("Test Description");
+		result!.Title.Should().Be("Test Comment");
+		result.Description.Should().Be("Test Description");
 	}
 
 	[Fact]
-	public async Task Handle_NonExistentStatus_ReturnsNull()
+	public async Task Handle_NonExistentComment_ReturnsNull()
 	{
 		// Arrange
 		var nonExistentId = ObjectId.GenerateNewId().ToString();
-		var query = new GetStatusQuery(nonExistentId);
+		var query = new GetCommentQuery(nonExistentId);
 
 		// Act
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
@@ -83,7 +84,7 @@ public class GetStatusHandlerIntegrationTests : IAsyncLifetime
 	public async Task Handle_InvalidObjectIdFormat_ReturnsNull()
 	{
 		// Arrange
-		var query = new GetStatusQuery("invalid-id-format");
+		var query = new GetCommentQuery("invalid-id-format");
 
 		// Act
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
@@ -96,13 +97,13 @@ public class GetStatusHandlerIntegrationTests : IAsyncLifetime
 	public async Task Handle_EmptyId_ThrowsArgumentException()
 	{
 		// Arrange
-		var query = new GetStatusQuery(string.Empty);
+		var query = new GetCommentQuery(string.Empty);
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		await act.Should().ThrowAsync<ArgumentException>()
-			.WithMessage("Status ID cannot be empty.*");
+			.WithMessage("Comment ID cannot be empty.*");
 	}
 }
