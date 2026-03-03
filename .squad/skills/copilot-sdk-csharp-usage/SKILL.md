@@ -81,7 +81,7 @@ await using var resumedSession = await client.ResumeSessionAsync(sessionId, conf
 ```csharp
 var done = new TaskCompletionSource();
 
-using var subscription = session.On(evt =>
+using IDisposable subscription = session.On(evt =>
 {
     if (evt is AssistantMessageEvent msg)
     {
