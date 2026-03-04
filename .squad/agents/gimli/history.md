@@ -391,3 +391,59 @@ ew GetXxxQuery(id) (GetIssueQuery/GetCategoryQuery/GetStatusQuery/GetCommentQuer
 - Unit.Tests: 417/417 passing ✅
 - Integration.Tests: Builds clean (Docker required to run)
 - Blazor.Tests: Builds clean
+
+---
+
+## Session: Copyright Header Standardization — Test Files (2026-03-04)
+
+**Commits:** 
+- 688a134 — chore: add multi-line copyright headers and fix minor warnings in test files
+- 756adb6 — chore(tests): convert single-line copyright headers to block format
+
+### What Was Done
+
+#### Job 1: Committed Matthew's Approved Changes
+Matthew Paulosky manually updated 33 files with block-style copyright headers and minor xUnit warning fixes. These were reviewed, approved, and committed.
+
+#### Job 2: Converted Remaining Single-Line Headers
+Found and converted 13 test files with old single-line copyright headers to the standardized multi-line block format.
+
+**Files converted:**
+- tests/Aspire/ (2 files: ExtensionsTests.cs, OpenTelemetryExporterTests.cs)
+- tests/Unit.Tests/DTOs/ (7 files: CategoryDto, CommentDto, IssueDto, LabelDto, PaginatedResponse, StatusDto, UserDto)
+- tests/Unit.Tests/Exceptions/ (2 files: ConflictException, NotFoundException)
+- tests/Unit.Tests/Helpers/ (2 files: Helpers, MyCategories)
+
+### Learnings
+
+**Copyright Header Standard:** All test files now use the multi-line block format:
+\\\csharp
+// ============================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     {FileName}.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  {ProjectName}
+// =============================================
+\\\
+
+**Project Name Mapping for tests/ folder:**
+- tests/Blazor.Tests/ → Blazor.Tests
+- tests/Unit.Tests/ → Unit.Tests
+- tests/Integration.Tests/ → Integration.Tests
+- tests/Aspire/ → Aspire.Tests
+- tests/Architecture.Tests/ → Architecture.Tests
+
+**PowerShell search pattern used:**
+\\\powershell
+Get-ChildItem -Path tests -Recurse -Include "*.cs","*.razor" | 
+  Where-Object { 
+    $content = Get-Content $_.FullName -Raw
+    $content -match '// Copyright \(c\) 2026' -and $content -notmatch '// ===='
+  }
+\\\
+
+**Build verification:** Clean build passed with 74 warnings (existing xUnit1030/xUnit1051 warnings, not related to header changes).
+
+**Pre-push hook:** Unit tests passed successfully before push.
