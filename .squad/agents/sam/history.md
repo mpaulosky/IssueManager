@@ -91,3 +91,15 @@ Backend Developer on IssueManager (.NET 10, MongoDB, EF Core, CQRS, MediatR, Min
 - **Edit tool unreliability:** The dit tool reports "File updated with changes" even when old_str doesn't match. Use PowerShell Set-Content with regex (-replace) for reliable bulk text replacement across many files
 - **Pre-push gate note:** Test files (Gimli scope) had cascading compilation errors; pushed with --no-verify per issue instructions that test failures are expected and assigned to #82-88
 - **PR:** #91 — do NOT merge until Gimli's test issues (#82, #84, #86, #88) are resolved
+
+### Database Seeding Implementation (2026-03-04)
+- **DatabaseSeeder.cs:** Created `src/Api/Data/DatabaseSeeder.cs` to seed default Category and Status data at API startup
+- **Seeding pattern:** Check `CountAsync()` on repository; if count > 0, skip seeding (idempotent). Log info for both seeded and skipped scenarios
+- **Default categories:** Bug, Feature, Enhancement, Documentation, Question
+- **Default statuses:** Open, In Progress, Resolved, Closed, Won't Fix
+- **DTO construction:** CategoryDto and StatusDto are records with positional constructor. Seed data uses: `new CategoryDto(ObjectId.Empty, "Name", "Description", DateTime.UtcNow, null, false, UserDto.Empty)`
+- **IStatusRepository.CountAsync:** Added `CountAsync()` method to interface (was missing but implementation had it)
+- **DI registration:** Registered `DatabaseSeeder` as Transient in `ServiceCollectionExtensions.AddRepositories()` (after repository registrations)
+- **Program.cs startup:** After `var app = builder.Build()`, create scope, resolve `DatabaseSeeder`, call `SeedAsync()`. Runs BEFORE middleware pipeline setup
+- **Result<T> API:** Properties are `Success` (not IsSuccess), `Failure`, `Error` (not ErrorMessage), `Value`. Check `result.Success` before accessing `result.Value`. Log `result.Error` on failure
+- **Program.cs partial class:** Added `public partial class Program { }` at end of file for WebApplicationFactory test access (standard backend pattern)

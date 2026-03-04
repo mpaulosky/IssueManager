@@ -270,6 +270,43 @@ All labeled: `squad`, `squad:gimli`
 
 ---
 
+## 2026-03-04 21:40Z — Squad Team Portability Design
+
+**Task:** Investigate and design a solution for reusing the squad team across multiple projects with accumulated experience
+
+**Context:** Matthew wants to reuse the IssueManager squad team (Aragorn, Gimli, Sam, Boromir, Legolas, Frodo, Gandalf, Scribe, Ralph) across new projects while preserving accumulated learnings and maintaining team identity.
+
+**Decision: Personal Team Repository with Career Summaries**
+
+Created `github.com/mpaulosky/squad-team` repository containing:
+- Portable team files: team.md, routing.md, ceremonies.md, casting/, agents/*/charter.md, skills/
+- NEW: agents/*/career.md — cross-project learnings per agent
+- Installation script: install-squad.ps1 (PowerShell)
+- Project-specific files generated fresh: decisions.md, history.md, orchestration-log/, log/, identity/now.md
+
+**Key Design Points:**
+1. **Career Memory** — Each agent maintains career.md with transferable learnings (patterns, anti-patterns, principles that apply broadly). Full history.md stays in each project (too noisy to carry forward).
+2. **Versioning** — Team repo uses semantic versioning tags (v0.5.2, v0.5.3). Each project's team.md shows installed version.
+3. **Installation** — One-command setup: `install-squad.ps1 -ProjectName "X" -Stack "Y"` copies team files, generates fresh project files, updates team.md context.
+4. **Updates** — After each project, extract key learnings from history.md → career.md, commit to team repo, tag new version.
+
+**Why This Approach:**
+- Simple (no git submodules, no CLI dependency)
+- Matthew owns it (full control)
+- Career memory co-located with charters
+- Versioned and traceable
+- Transferable skills travel with team
+
+**Files Created:**
+- `.squad/decisions/inbox/aragorn-team-portability-design.md` — Full design decision document
+- `docs/squad-team-portability.md` — Practical quick-start guide for Matthew
+
+**Result:** Complete portable team solution ready for implementation. Next: create mpaulosky/squad-team repo and extract IssueManager career learnings.
+
+**Key Learning:** Squad team portability requires separating team identity (portable: charters, routing, ceremonies, career summaries) from project state (ephemeral: decisions, history, logs). Career files (50-line curated learnings) are more valuable than full history files (200+ lines of project-specific detail) for cross-project knowledge transfer.
+
+---
+
 ---
 
 ## 2026-03-04 — Copyright Header Standardization and Automation

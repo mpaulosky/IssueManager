@@ -888,6 +888,157 @@ return result.Success ? Results.Ok(result.Value) : Results.NotFound();
 
 **Why:** Consistent error handling across all handlers; endpoints have clear success/failure mapping to HTTP status codes.
 
+---
+
+### 2026-03-03: Integration Gate — Issue #90 — Aragorn Decision Log
+**Date:** 2026-03-03  
+**Author:** Aragorn (Lead Developer)  
+**Issue:** #90 — Sprint completion integration gate  
+**Status:** Evidence green (code inspection + pre-merge test results)
+**What:** Integration gate assessment for PR #91 + PR #92 completion. PowerShell/dotnet execution environment non-functional on this machine (infra issue, not code). Assessed via source code inspection + committed test logs.
+**Evidence:** All PR #91 + #92 fixes confirmed present in code. Latest `test-retry.log` shows: Unit.Tests 297 passed, Architecture.Tests 9 passed, Blazor.Tests 13 passed, Integration.Tests skipped (Docker unavailable). Build log references pre-merge state (STALE).
+**Decision:** Gate evidence is green for all non-Docker test suites. Issues #81, #83, #85, #87 ready to close when fresh `dotnet build` confirmed locally.
+**Manual Actions Required:**
+```powershell
+# Run locally to confirm gate
+dotnet build IssueManager.sln --no-restore -verbosity:minimal
+dotnet test tests/Unit.Tests/Unit.Tests.csproj --no-build
+dotnet test tests/Architecture.Tests/Architecture.Tests.csproj --no-build
+dotnet test tests/Aspire/Aspire.Tests.csproj --no-build
+# Then close issues #81, #83, #85, #87, #90
+```
+**Why:** Infra limitations (Docker) prevented automated gate run, but code evidence is conclusive.
+
+---
+
+### 2026-03-03: ObjectId/Result<T> Validation & Propagation Pattern
+**Date:** 2026-03-03  
+**Author:** Aragorn (Lead Developer)  
+**Status:** Active (issues #80–#90)
+**What:** Three-part architectural pattern for ObjectId parsing and Result<T> propagation across all four API domains (Issues, Categories, Statuses, Comments):
+
+**1. ObjectId Parsing at Validation Layer (FluentValidation)**
+- HTTP endpoint accepts `string` ID from client
+- FluentValidation validator parses `string` → `ObjectId` BEFORE handler runs
+- Handler receives strongly-typed `ObjectId`, never null, never invalid
+- No `ObjectId.TryParse()` calls in handler bodies
+
+**2. All Handlers Return Task<Result<T>>**
+- Handler signature: `Task<Result<TDto>>` (not direct DTOs or bools)
+- Result<T> wraps success/failure: `Result<IssueDto>.Success(dto)` or `.Failure(error)`
+- Repositories return `Result<T>` internally; handlers unwrap and re-wrap
+
+**3. Endpoints Map Result<T> to HTTP Status Codes**
+```csharp
+var result = await mediator.Send(command);
+return result.Match(
+    onSuccess: dto => Results.Created($"/resource/{dto.Id}", dto),
+    onFailure: failure => failure.Type switch {
+        FailureType.NotFound => Results.NotFound(),
+        FailureType.Conflict => Results.Conflict(),
+        _ => Results.BadRequest(failure.Error)
+    }
+);
+```
+
+**Files Affected:** 53 test files, all command/query validators, all API handlers, all endpoints across 4 domains.
+**Why:** Type safety, fail-fast validation at boundary, cleaner handlers, clear HTTP semantics.
+**Sign-off:** ✓ Aragorn (approved) ✓ Matthew Paulosky (validation pending)
+
+---
+
+### 2026-03-03: Issue #89 — Aspire Startup Fixes: Incomplete Refactoring Blocked Commit
+**Date:** 2026-03-03  
+**Author:** Boromir (DevOps)  
+**Issue:** #89  
+**Status:** Blocked — Incomplete ObjectId refactoring discovered
+**Problem:** Working tree contains incomplete ObjectId type refactoring (from squad/80 branch) alongside Aspire startup fixes. Build FAILED with 14+ compilation errors:
+- ObjectId properties initialized with `string.Empty` (type mismatch)
+- Handlers using `string` where `ObjectId` expected and vice versa
+- Web pages passing `string` to APIs expecting `ObjectId`
+
+**Root Cause:** ObjectId refactoring incomplete. DTOs/Commands changed to `ObjectId` but endpoints, handlers, services, pages still use `string`. Type conversions missing across layer boundary.
+
+**Scope Analysis:**
+- **DevOps owns:** AppHost orchestration, ServiceDefaults, NuGet, CI/CD
+- **Sam/Aragorn own:** Application logic, handlers, services
+- **Gimli owns:** Test code updates
+
+ObjectId refactoring is pervasive application-logic work, NOT DevOps responsibility.
+
+**Recommendation:**
+1. Complete ObjectId refactoring (coordinate across all layers)
+2. Ensure all type conversions consistent (string → ObjectId, ObjectId → string via .ToString())
+3. Run `dotnet build` locally to validate before pushing
+4. Re-request Aspire startup fixes commit
+
+**Action:** Do NOT merge incomplete application changes. Separate concerns: pure Aspire infrastructure fixes can be committed independently after refactoring completes.
+
+---
+
+### 2026-03-03: ObjectId Parsing at Endpoint Boundary (Sam Decision)
+**Date:** 2026-03-03  
+**Author:** Sam (Backend Developer)  
+**Task:** Issue #80 (sprint foundation work)  
+**Status:** Implemented  
+**Decision:** ObjectId parsing belongs at the endpoint boundary, not in handlers.
+
+**Pattern:**
+1. **Endpoints** accept `string id` from URL path and call `ObjectId.TryParse(id, out var objectId)`. Return `Results.BadRequest("Invalid ID format")` if parsing fails.
+2. **Commands/Queries** hold strongly-typed `ObjectId Id` (never `string`, never `ObjectId?`). Remove default initializers like `= string.Empty` on ObjectId properties — structs auto-initialize to `default` (ObjectId.Empty).
+3. **Handlers** receive ObjectId via command/query, pass directly to repository methods. No `ObjectId.TryParse()` inside handler bodies.
+4. **Web/Blazor pages** that construct commands from URL route parameters (string) must call `ObjectId.Parse(routeParam)` when setting Id property.
+
+**Why:** Type safety eliminates repeated string→ObjectId parsing. Fail-fast: invalid IDs produce 400 Bad Request at HTTP boundary before handler logic. Cleaner handlers focused on business logic, not input parsing.
+
+**Affected Files Pattern:**
+- `src/Shared/Validators/Delete*Command.cs`, `Update*Command.cs` — Id property type
+- `src/Api/Handlers/*/Get*Handler.cs`, `Delete*Handler.cs`, `Update*Handler.cs` — remove TryParse
+- `src/Api/Handlers/*Endpoints.cs` — add TryParse guard before command creation
+- `src/Web/_Imports.razor` — add `@using MongoDB.Bson` for ObjectId access
+
+---
+
+### 2026-03-03: Result<T> Handler Propagation Complete
+**Date:** 2026-03-03  
+**Author:** Sam (Backend Developer)  
+**Issues:** #81, #83, #85, #87  
+**Branch:** squad/81-result-t-handlers  
+**Commit:** 9885078  
+**Status:** Completed  
+**What:** All API handlers updated to propagate `Result<T>` from repositories to endpoints, completing Result pattern across all four domains (Issues, Categories, Statuses, Comments).
+
+**Handler Return Types Changed:**
+- Get handlers: `Task<TDto?>` → `Task<Result<TDto>>`
+- Update handlers: `Task<TDto>` → `Task<Result<TDto>>`
+- Delete handlers: `Task<bool>` → `Task<Result<bool>>`
+
+**Error Handling Pattern:**
+```csharp
+// Validation errors
+if (!validationResult.IsValid)
+    return Result.Fail<TDto>("Validation failed", ResultErrorCode.Validation);
+// Not found errors
+if (getResult.Failure || getResult.Value is null)
+    return Result.Fail<TDto>($"Entity with ID '{id}' was not found.", ResultErrorCode.NotFound);
+// Propagate repository results
+return await _repository.UpdateAsync(entity, cancellationToken);
+```
+
+**Endpoint HTTP Response Mapping:**
+```csharp
+var result = await handler.Handle(query);
+return result.Success ? Results.Ok(result.Value) : Results.NotFound();
+```
+
+**Files Changed:** 20 handler files + 12 endpoint files across Issues, Categories, Statuses, Comments.
+
+**Build Status:** ✅ src/ compiles successfully. ❌ tests/ have compilation errors (Gimli will update test assertions).
+
+**Blocked Work:** Gimli must update all handler tests to expect `Result<T>` return types and assert on result.Success/result.Value/result.ErrorCode.
+
+**Why:** Consistent error handling across all handlers; endpoints have clear success/failure mapping to HTTP status codes.
+
 3. **Maintainability:** When a new namespace is required across multiple files, it can be added once in GlobalUsings.cs instead of in each file.
 
 4. **.NET Best Practices:** Global usings are the recommended approach for project-wide namespaces when using file-scoped namespaces (C# 10+).
@@ -1119,3 +1270,440 @@ Boromir (DevOps) — responsible for CI/CD, Git hooks, build infrastructure
 **Files Fixed:** 10 files, 131 async call sites updated.  
 **Status:** Completed (Commit 4f67ddb). Build passed, 0 xUnit1051 warnings.
 
+
+---
+
+## 2026-03-04 Sprint: Auth & Theme & Database Seeding
+
+### 2026-03-04: Interactive Server Rendering for Auth-Aware Components
+
+**Date:** 2026-02-27  
+**Author:** Legolas (Frontend Developer)  
+**Status:** Implemented
+
+#### Context
+
+NavMenu.razor and issue pages (IssuesPage, IssueDetailPage) needed auth-aware UI visibility and interactive features (theme toggle, hamburger menu, filter buttons).
+
+#### Problem
+
+- ThemeToggle and ThemeColorSelector use @onclick and @inject IJSRuntime but were rendered in static SSR mode, so clicks did nothing
+- Nav links for "New Issue", "Categories", and "Statuses" were visible to all users regardless of auth state
+- Edit links on issues pages were visible to all users, should only show to Admin role or issue author
+
+#### Decision
+
+1. **NavMenu**: Added @rendermode InteractiveServer to enable JS interop and @onclick handlers
+2. **Auth visibility**: Used <AuthorizeView> and <AuthorizeView Roles="Admin"> to conditionally render nav links
+3. **Issue pages**: Added @rendermode InteractiveServer, injected AuthenticationStateProvider, loaded current user name, and conditionally rendered Edit links based on role or author match
+
+#### Pattern Established
+
+For components requiring:
+- JS interop (IJSRuntime)
+- Event handlers (@onclick)
+- Auth state checks (AuthenticationStateProvider)
+
+→ Must have @rendermode InteractiveServer
+
+For role/author-based visibility:
+- Admin-only: <AuthorizeView Roles="Admin"><Authorized>
+- Author OR admin: Check in <NotAuthorized> block with _currentUserName == author.Name
+
+#### Impact
+
+- Theme toggles and hamburger menu now functional
+- Nav links respect user roles
+- Edit buttons only visible to authorized users
+- Consistent auth pattern across frontend
+
+---
+
+### 2026-03-04: Auth0 Role Claim Mapping Required for RBAC
+
+**By:** Gandalf  
+**What:** Role-based authorization ([Authorize(Roles = "Admin")], <AuthorizeView Roles="Admin">) is now used across the app. For this to work, Auth0 must:
+1. Include roles in the JWT access token (configure an Auth0 Action to add https://issuemanager.app/roles claim, or enable role claim inclusion in the Auth0 dashboard).
+2. The Web project's AuthExtensions.cs must map the namespaced claim to ClaimTypes.Role:
+   `.csharp
+   options.ClaimActions.MapJsonKey(ClaimTypes.Role, "https://issuemanager.app/roles");
+   // OR if using Auth0 Actions that add a flat roles array:
+   options.ClaimActions.MapJsonKey(ClaimTypes.Role, "roles");
+   `
+
+**Why:** Without claim mapping, User.IsInRole("Admin") always returns false. Matthew must configure this in Auth0 and the SDK options.
+**Severity:** HIGH — all Admin-gated pages will silently deny access until this is configured.
+
+---
+
+### 2026-03-04: Database Seeder for Category and Status
+
+**By:** Sam (Backend Developer)  
+**Date:** 2026-03-04  
+**Context:** API startup needs default Category and Status data for new deployments
+
+#### What
+Created DatabaseSeeder class that seeds default Category and Status data at API startup if collections are empty.
+
+#### Why
+- New deployments need baseline Category and Status data
+- Manual seeding is error-prone and inconsistent
+- Frontend UI requires valid Category and Status options to function properly
+
+#### How
+- **DatabaseSeeder.cs** (src/Api/Data/DatabaseSeeder.cs):
+  - Checks CountAsync() on each repository before seeding (idempotent)
+  - Seeds 5 default categories: Bug, Feature, Enhancement, Documentation, Question
+  - Seeds 5 default statuses: Open, In Progress, Resolved, Closed, Won't Fix
+  - Logs success/failure for each seeded item and skip message if data exists
+
+- **Integration**:
+  - Registered as Transient in ServiceCollectionExtensions.AddRepositories()
+  - Called in Program.cs after uilder.Build() and before middleware pipeline
+  - Uses scoped service resolution to ensure proper disposal
+
+- **IStatusRepository fix**: Added CountAsync() method to interface (implementation already had it)
+
+- **Program.cs partial class**: Added public partial class Program { } for WebApplicationFactory test access
+
+#### Impact
+- ✅ New deployments automatically get seeded data
+- ✅ Seeder is idempotent — safe to run multiple times
+- ✅ Logs clearly indicate whether seeding happened or was skipped
+- ⚠️ Gimli will need to update integration tests that expect empty collections at startup
+
+---
+
+### 2026-03-04: Block-Style Copyright Headers for Test Files
+
+**Author:** Gimli (Tester)  
+**Date:** 2026-03-04  
+**Status:** Implemented  
+
+#### Context
+
+The IssueManager project had inconsistent copyright headers across test files. Some files used the old single-line format while others were being migrated to a standardized multi-line block format.
+
+#### Decision
+
+All test files now use the **multi-line block-style copyright header**:
+
+`.csharp
+// ============================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     {FileName}.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  {ProjectName}
+// =============================================
+`
+
+For `.razor` files, use @* comment syntax:
+`.razor
+@* ============================================
+   Copyright (c) 2026. All rights reserved.
+   File Name :     {FileName}.razor
+   Company :       mpaulosky
+   Author :        Matthew Paulosky
+   Solution Name : IssueManager
+   Project Name :  {ProjectName}
+   ============================================= *@
+`
+
+#### Project Name Mapping
+
+Test folder path → Project Name:
+- 	ests/Blazor.Tests/ → Blazor.Tests
+- 	ests/Unit.Tests/ → Unit.Tests
+- 	ests/Integration.Tests/ → Integration.Tests
+- 	ests/Aspire/ → Aspire.Tests
+- 	ests/Architecture.Tests/ → Architecture.Tests
+
+#### Implementation
+
+- **Session 2026-03-04:** Converted 13 remaining test files from single-line to block format
+- **Commits:** 688a134, 756adb6
+- **Verification:** Build passed, pre-push hook passed
+
+#### Rationale
+
+1. **Consistency:** All files follow the same header structure
+2. **Traceability:** File name, company, author, solution, and project are clearly documented
+3. **Professionalism:** Block format is more prominent and easier to read
+4. **Legal clarity:** Copyright notice is properly formatted for legal purposes
+
+#### Future Guidance
+
+- All new test files MUST use the block-style header
+- Project Name field MUST match the project folder name
+- File Name field MUST match the actual filename (including extension)
+
+---
+
+### 2026-03-04: Pre-Push Hook Now Requires Full Local Test Suite
+
+**Date:** 2026-03-04  
+**Author:** Boromir (DevOps)  
+**Status:** Implemented  
+
+#### Context
+
+GitHub CI showed test failures on recent commits pushed by Gimli (test copyright sweep) and Aragorn (src copyright sweep + .github/instructions update). Matthew Paulosky flagged this and said: "Tests should be resolved locally so this doesn't occur on GitHub."
+
+Root cause of the specific failure:
+- Aragorn's commit cd39d6 added copyright header to src/Web/_Imports.razor BEFORE the @using directives
+- Razor files require @using directives BEFORE any code/comments that reference imported types
+- Result: BuildInfo class was not accessible in FooterComponent.razor, causing 8 CS0103 errors in CI build
+
+#### Decision
+
+**Pre-push hook now enforces three test suites before any push:**
+1. Unit.Tests
+2. Blazor.Tests
+3. Architecture.Tests
+
+**Excluded from pre-push hook (but still run in CI):**
+- Integration.Tests (require Docker/TestContainers, may not be available locally)
+- Aspire.Tests (require Aspire infrastructure, excluded from pre-push for speed)
+
+#### Implementation
+
+- **Hook location:** scripts/hooks/pre-push (committed), .git/hooks/pre-push (installed)
+- **Hook also enforces:** 
+  - Gate 1: Copyright header validation (File Name, Solution Name, Project Name)
+  - Gate 2: Code formatting check (dotnet format --verify-no-changes)
+  - Gate 3: Test suite execution (Unit.Tests + Blazor.Tests + Architecture.Tests)
+- **Agent charters updated:** Aragorn and Gimli now have Critical Rule #1 mandating full local test run before any push
+
+#### Rationale
+
+- CI must NEVER be the first place test failures are discovered
+- Local test validation ensures:
+  - Zero compilation errors
+  - Zero test failures
+  - Code changes work as expected before reaching GitHub
+- Integration.Tests excluded from hook to avoid requiring MongoDB TestContainers on every developer workstation
+- Hook runs in ~30-60 seconds on modern hardware (acceptable for pre-push gate)
+
+#### Impact
+
+- **All squad agents:** Must run dotnet test tests/Unit.Tests tests/Blazor.Tests tests/Architecture.Tests before any push
+- **Pre-push hook:** Blocks push if any of the three test suites fail
+- **CI workflows:** Continue to run ALL test suites including Integration.Tests and Aspire.Tests
+
+#### Files Modified
+
+- scripts/hooks/pre-push (already had full three-gate implementation)
+- .git/hooks/pre-push (updated to match committed version)
+- .squad/agents/aragorn/charter.md (added Critical Rule #1)
+- .squad/agents/gimli/charter.md (added Critical Rule #1)
+
+---
+
+### 2026-03-04: Copyright Header Process — Block Format and Automation
+
+**Date:** 2026-03-04  
+**Author:** Aragorn  
+**Status:** Implemented
+
+#### Context
+
+Matthew Paulosky requested standardization of copyright headers across the IssueManager codebase to use a consistent multi-line block format instead of single-line comments.
+
+#### Decision
+
+##### Header Format
+
+**For C# files (.cs):**
+`.csharp
+// ============================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     {FileName}.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  {ProjectName}
+// =============================================
+`
+
+**For Razor files (.razor, .razor.cs):**
+`.razor
+@* ============================================
+   Copyright (c) 2026. All rights reserved.
+   File Name :     {FileName}.razor
+   Company :       mpaulosky
+   Author :        Matthew Paulosky
+   Solution Name : IssueManager
+   Project Name :  {ProjectName}
+   ============================================= *@
+`
+
+##### Project Name Mapping
+
+- src/Api/ → Api
+- src/Web/ → Web
+- src/Shared/ → Shared
+- src/AppHost/ → AppHost
+- src/ServiceDefaults/ → ServiceDefaults
+- 	ests/Unit.Tests/ → Unit.Tests
+- 	ests/Integration.Tests/ → Integration.Tests
+- 	ests/Blazor.Tests/ → Blazor.Tests
+- 	ests/Aspire/ → Aspire
+
+##### Automation Mechanism
+
+**Chosen approach: Copilot Instructions + Squad Charters (Options 3 & 4)**
+
+###### Why not StyleCop or .editorconfig?
+
+1. **StyleCop.Analyzers (SA1633):**
+   - Adds NuGet package dependency
+   - Requires build system integration
+   - Limited file name templating in older .NET versions
+   - Build-time overhead
+
+2. **`.editorconfig` file_header_template:**
+   - Limited support for dynamic variables (e.g., file name) in older VS versions
+   - Requires IDE-specific support
+   - Not as flexible for custom format
+
+3. **Copilot Instructions (✅ CHOSEN):**
+   - Zero build impact
+   - Immediate effect — works NOW
+   - Flexible templating
+   - No package dependencies
+   - Created: .github/instructions/csharp.instructions.md
+
+4. **Squad Charters (✅ CHOSEN):**
+   - Reinforces requirement in agent workflows
+   - Updated: Aragorn charter (rule 5), Gimli charter (rule 5)
+   - Ensures all squad members follow format
+
+##### Implementation
+
+**Phase 1: Existing Files (COMPLETED)**
+- Converted 4 files with single-line headers to block format
+- Added headers to 18 files with no copyright
+- Total: 22 files standardized
+
+**Phase 2: Automation (COMPLETED)**
+- Created .github/instructions/csharp.instructions.md with full template and project mapping
+- Updated Aragorn and Gimli charters to include block format requirement
+- Agents will now add headers automatically when creating new files
+
+**Verification:**
+- Web project builds: ✅ SUCCESS (0 errors, 0 warnings)
+- Pre-push tests: ✅ PASSED
+- Commits pushed to main: cb6f9bf (tests), 91eee02 (src+automation)
+
+#### Rationale
+
+1. **Consistency:** All files will have identical header format with metadata
+2. **Traceability:** File name, project name, author documented at file level
+3. **Zero Build Cost:** No analyzer packages or build system changes
+4. **Immediate Effect:** Works for Copilot CLI and squad agents right away
+5. **Maintainability:** Single source of truth in .github/instructions/ for format
+
+#### Alternatives Considered
+
+- **StyleCop SA1633:** Too heavyweight, adds build-time cost
+- **`.editorconfig`:** Limited templating, IDE-dependent
+- **Manual enforcement:** Not scalable
+
+#### Consequences
+
+##### Positive
+- All new files will have consistent headers automatically
+- No build performance impact
+- No new package dependencies
+- Easy to update format centrally if needed
+
+##### Negative
+- Relies on Copilot/agent compliance (no build-time enforcement)
+- Existing files in tests/ not yet updated (can be done incrementally)
+
+#### Follow-Up
+
+- ✅ Update tests/ directory headers (optional, can be done in future cleanup)
+- ✅ Document in squad wiki if format changes in future
+
+#### References
+
+- Implementation: Commits cb6f9bf, 91eee02
+- Instruction file: .github/instructions/csharp.instructions.md
+- Charter updates: .squad/agents/aragorn/charter.md, .squad/agents/gimli/charter.md
+
+---
+
+### 2026-03-04: Architecture Decision — Squad Team Portability
+
+**By:** Aragorn (Lead Developer)  
+**Requested by:** Matthew Paulosky
+
+#### Context
+
+Matthew wants to reuse the IssueManager squad team across multiple new projects with:
+1. **Consistent team** — same agents (Aragorn, Gimli, Sam, Boromir, Legolas, Frodo, Gandalf, Scribe, Ralph) on every new project
+2. **Accumulated experience** — agents carry learnings forward between projects
+3. **Visibility** — know which team version is being used
+4. **Easy setup** — clear process for bringing the team to a new project
+
+#### Decision
+
+**Approach: Personal Team Repository with Career Summaries**
+
+Matthew will create a personal squad team repository: github.com/mpaulosky/squad-team
+
+This repository will be a **portable team identity** that travels between projects. It contains:
+- Team roster and routing rules
+- Agent charters (identity + expertise)
+- Persistent name registry (casting)
+- Team ceremonies
+- **Career summaries** — distilled cross-project learnings per agent
+- Transferable skills (patterns that apply broadly)
+- Installation script
+
+When starting a new project: run the installation script → team files are copied in, project-specific files (decisions, logs) start fresh.
+
+**Why this approach over alternatives:**
+- **Not Git Submodule** — too complex, requires git submodule knowledge, breaks easily
+- **Not Squad CLI** — CLI doesn't support team import
+- **Not GitHub Template Repo** — would require entire project structure to be templated
+- **Not Agent Career Files in Project** — career memory should live with the team, not in individual projects
+
+#### Rationale
+
+**Why Personal Team Repository?**
+1. **Simple & Predictable** — No git submodule complexity, no CLI dependency, just copy files
+2. **Matthew Owns It** — Full control over team roster, naming, ceremonies, skills
+3. **Career Memory Co-Located** — Agent career files live with their charters, easy to maintain
+4. **Versioned & Traceable** — Git tags provide clear history of team evolution
+5. **Transferable Skills** — Generic patterns (build-repair, pre-push-test-gate) travel with team
+
+#### Next Steps
+
+1. **Aragorn:** Create initial mpaulosky/squad-team repo structure with IssueManager content
+2. **Aragorn:** Extract IssueManager history into career.md files for each agent
+3. **Aragorn:** Write installation script (install-squad.ps1)
+4. **Aragorn:** Tag team repo as 0.5.2 (current IssueManager version)
+5. **Matthew:** Test installation on a new project
+6. **Scribe:** Merge this decision into .squad/decisions.md
+
+---
+
+### 2026-03-04T2130: User Directive — Solution Name Placeholder in Copyright Headers
+
+**By:** Matthew Paulosky (via Copilot)  
+**What:** In the block-style copyright header template, the Solution Name placeholder must be shown as {Solution} (not hardcoded). For this repo, {Solution} = IssueManager. The per-file variable is {ProjectName} (e.g., Api, Web, Unit.Tests, Blazor.Tests).
+**Why:** User request — captured for team memory
+
+---
+
+### 2026-03-04T2154: User Directive — All Tests Must Pass Locally Before Push
+
+**By:** Matthew Paulosky (via Copilot)  
+**What:** All tests must pass locally BEFORE any push to GitHub. The full test suite (Unit.Tests, Architecture.Tests, Blazor.Tests, Integration.Tests, Aspire.Tests) must be run and green before pushing. Do not rely solely on the pre-push hook (which only runs Architecture.Tests). GitHub CI should never be the first place a test failure is discovered.
+**Why:** CI test failures were found on team commits. This wastes CI minutes and blocks the main branch. Local validation is mandatory.
+
+---

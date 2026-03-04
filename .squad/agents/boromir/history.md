@@ -146,3 +146,34 @@ DevOps on IssueManager (.NET 10, GitHub Actions, Aspire, NuGet centralized packa
 - Do NOT commit incomplete application refactoring
 - Escalated to .squad/decisions/inbox/boromir-issue89-incomplete-refactoring.md
 - Request: Matthew/application team must complete refactoring, test locally, then resubmit
+
+### 2026-03-04: CI Test Failures — _Imports.razor Copyright Header Placement
+
+**Issue:** GitHub CI Test Suite workflow failing with 8 CS0103 errors on `FooterComponent.razor` after copyright header sweep by Aragorn and Gimli.
+
+**Root Cause:**
+- Aragorn's commit `acd39d6` added copyright header to `src/Web/_Imports.razor` BEFORE the `@using` directives
+- In Razor files, copyright comments that reference imported types CANNOT precede the `@using` directives that import those types
+- When copyright header was placed at line 1-8, all subsequent `@using` statements were parsed but the BuildInfo class (from `@using Web`) was not accessible in FooterComponent.razor
+- Result: 8 errors like `error CS0103: The name 'BuildInfo' does not exist in the current context`
+
+**Fix:**
+- Moved copyright header in `_Imports.razor` to END of file (after all `@using` directives)
+- For `_Imports.razor` specifically: copyright header must come AFTER imports, not before
+- Build + all tests now pass locally (Unit.Tests: 417 passed, Blazor.Tests: 164 passed, Architecture.Tests: 9 passed, Aspire.Tests: 18 passed)
+
+**Pre-Push Hook Validation:**
+- Pre-push hook in `scripts/hooks/pre-push` already enforces Unit.Tests + Blazor.Tests + Architecture.Tests before any push
+- Updated `.git/hooks/pre-push` to match committed version from `scripts/hooks/`
+- Updated Aragorn and Gimli charters: added Critical Rule #1 mandating full local test run before push
+
+**Key Learning:**
+- CI must NEVER be the first place test failures are discovered
+- Local validation: `dotnet test tests/Unit.Tests tests/Blazor.Tests tests/Architecture.Tests` before every push
+- Razor `_Imports.razor` files: copyright header MUST come after `@using` directives if header text references any imported types
+
+**Commit:** `100cb77` on main
+**Files Modified:**
+- src/Web/_Imports.razor (copyright header moved to end)
+- .squad/agents/aragorn/charter.md (added mandatory full test run rule)
+- .squad/agents/gimli/charter.md (added mandatory full test run rule)

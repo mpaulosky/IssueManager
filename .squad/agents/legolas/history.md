@@ -43,3 +43,12 @@ Frontend Developer on IssueManager (.NET 10, Blazor Interactive Server Rendering
 - Added global usings: Microsoft.AspNetCore.Authorization and Microsoft.AspNetCore.Components.Authorization in _Imports.razor
 - Auth endpoints: /auth/login and /auth/logout already wired by Sam (backend)
 - List/view pages intentionally left public: IssuesPage, IssueDetailPage, CategoriesPage, StatusesPage
+
+### Auth UI Visibility Fixes (2026-02-27)
+- Added `@rendermode InteractiveServer` to NavMenu.razor: Enables ThemeToggle, ThemeColorSelector, and mobile hamburger to work (previously static SSR made @onclick non-functional)
+- NavMenu auth visibility: Wrapped "New Issue" links (desktop + mobile) in `<AuthorizeView><Authorized>` blocks
+- NavMenu admin visibility: Wrapped "Categories" and "Statuses" links (desktop + mobile) in `<AuthorizeView Roles="Admin"><Authorized>` blocks
+- IssuesPage: Added `@rendermode InteractiveServer`, injected AuthenticationStateProvider, loaded current user name, and restricted Edit links to Admin role OR issue author
+- IssueDetailPage: Added `@rendermode InteractiveServer`, injected AuthenticationStateProvider, loaded current user name, and restricted Edit Issue button to Admin role OR issue author
+- Auth pattern: Use `<AuthorizeView Roles="Admin"><Authorized>` for admin-only, and `<NotAuthorized>` with manual author name check (`_currentUserName == issue.Author.Name`) for author access
+- Interactive components must have `@rendermode InteractiveServer` to support @onclick handlers and JS interop (IJSRuntime)
