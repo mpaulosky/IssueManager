@@ -65,10 +65,10 @@ public class UpdateStatusHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.StatusName.Should().Be("Updated Name");
-		result.StatusDescription.Should().Be("Updated Description");
-		result.Id.Should().Be(created.Value.Id);
+		result.Success.Should().BeTrue();
+		result.Value!.StatusName.Should().Be("Updated Name");
+		result.Value!.StatusDescription.Should().Be("Updated Description");
+		result.Value!.Id.Should().Be(created.Value.Id);
 	}
 
 	[Fact]
@@ -84,11 +84,10 @@ public class UpdateStatusHandlerIntegrationTests : IAsyncLifetime
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
-		await act.Should().ThrowAsync<NotFoundException>()
-			.WithMessage($"Status with ID '{nonExistentId}' was not found.");
+		result.Success.Should().BeFalse();
 	}
 
 	[Fact]
@@ -106,9 +105,9 @@ public class UpdateStatusHandlerIntegrationTests : IAsyncLifetime
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>();
+		result.Success.Should().BeFalse();
 	}
 }

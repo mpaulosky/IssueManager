@@ -58,10 +58,10 @@ public class GetIssueHandlerTests : IAsyncLifetime
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().NotBeNull();
-		result!.Id.Should().Be(created.Value.Id);
-		result.Title.Should().Be("Test Issue");
-		result.Description.Should().Be("Test Description");
+		result.Success.Should().BeTrue();
+		result.Value!.Id.Should().Be(created.Value.Id);
+		result.Value!.Title.Should().Be("Test Issue");
+		result.Value!.Description.Should().Be("Test Description");
 	}
 
 	[Fact]
@@ -74,7 +74,7 @@ public class GetIssueHandlerTests : IAsyncLifetime
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().BeNull();
+		result.Success.Should().BeFalse();
 	}
 
 	[Fact]
@@ -87,7 +87,7 @@ public class GetIssueHandlerTests : IAsyncLifetime
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().BeNull();
+		result.Success.Should().BeFalse();
 	}
 
 	[Fact]

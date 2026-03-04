@@ -56,14 +56,14 @@ public class UpdateIssueStatusHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Should().NotBeNull();
-		result!.Status.StatusName.Should().Be("Closed");
+		result.Success.Should().BeTrue();
+		result.Value!.Status.StatusName.Should().Be("Closed");
 		await _repository.Received(1).GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
 		await _repository.Received(1).UpdateAsync(Arg.Is<IssueDto>(i => i.Status.StatusName == "Closed"), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_NonExistentIssue_ReturnsNull()
+	public async Task Handle_NonExistentIssue_ReturnsNotFoundFailure()
 	{
 		// Arrange
 		var issueId = ObjectId.GenerateNewId();
@@ -80,13 +80,14 @@ public class UpdateIssueStatusHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Should().BeNull();
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.NotFound);
 		await _repository.Received(1).GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
 		await _repository.DidNotReceive().UpdateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_EmptyIssueId_ThrowsValidationException()
+	public async Task Handle_EmptyIssueId_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new UpdateIssueStatusCommand
@@ -96,15 +97,15 @@ public class UpdateIssueStatusHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Issue ID*required*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
-	public async Task Handle_EmptyStatusName_ThrowsValidationException()
+	public async Task Handle_EmptyStatusName_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new UpdateIssueStatusCommand
@@ -114,11 +115,11 @@ public class UpdateIssueStatusHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Status name*required*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]

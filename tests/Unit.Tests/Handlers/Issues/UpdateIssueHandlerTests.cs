@@ -52,7 +52,7 @@ public class UpdateIssueHandlerTests
 		};
 
 		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
-			.Returns(Result<IssueDto>.Ok(existingIssue));
+			.Returns(Result.Ok(existingIssue));
 
 		var updatedIssue = existingIssue with
 		{
@@ -61,15 +61,15 @@ public class UpdateIssueHandlerTests
 		};
 
 		_repository.UpdateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>())
-			.Returns(Result<IssueDto>.Ok(updatedIssue));
+			.Returns(Result.Ok(updatedIssue));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.Title.Should().Be("Updated Title");
-		result.Description.Should().Be("Updated Description");
+		result.Success.Should().BeTrue();
+		result.Value!.Title.Should().Be("Updated Title");
+		result.Value!.Description.Should().Be("Updated Description");
 
 		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
 		await _repository.Received(1).UpdateAsync(Arg.Is<IssueDto>(i =>
@@ -78,7 +78,7 @@ public class UpdateIssueHandlerTests
 	}
 
 	[Fact]
-	public async Task Handle_EmptyTitle_ThrowsValidationException()
+	public async Task Handle_EmptyTitle_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new UpdateIssueCommand
@@ -89,15 +89,15 @@ public class UpdateIssueHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Title*required*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
-	public async Task Handle_TitleTooLong_ThrowsValidationException()
+	public async Task Handle_TitleTooLong_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new UpdateIssueCommand
@@ -108,15 +108,15 @@ public class UpdateIssueHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Title*256*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
-	public async Task Handle_DescriptionTooLong_ThrowsValidationException()
+	public async Task Handle_DescriptionTooLong_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new UpdateIssueCommand
@@ -127,15 +127,15 @@ public class UpdateIssueHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Description*4096*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
-	public async Task Handle_NonExistentIssue_ThrowsNotFoundException()
+	public async Task Handle_NonExistentIssue_ReturnsNotFoundFailure()
 	{
 		// Arrange
 		var issueId = ObjectId.GenerateNewId();
@@ -147,18 +147,18 @@ public class UpdateIssueHandlerTests
 		};
 
 		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
-			.Returns(Result<IssueDto>.Fail("Not found"));
+			.Returns(Result.Fail<IssueDto>("Not found"));
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<NotFoundException>()
-			.WithMessage($"*{issueId}*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.NotFound);
 	}
 
 	[Fact]
-	public async Task Handle_ArchivedIssue_ThrowsConflictException()
+	public async Task Handle_ArchivedIssue_ReturnsConflictFailure()
 	{
 		// Arrange
 		var issueId = ObjectId.GenerateNewId();
@@ -184,14 +184,14 @@ public class UpdateIssueHandlerTests
 		};
 
 		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
-			.Returns(Result<IssueDto>.Ok(archivedIssue));
+			.Returns(Result.Ok(archivedIssue));
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ConflictException>()
-			.WithMessage("*archived*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Conflict);
 	}
 
 	[Fact]
@@ -221,19 +221,19 @@ public class UpdateIssueHandlerTests
 		};
 
 		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
-			.Returns(Result<IssueDto>.Ok(existingIssue));
+			.Returns(Result.Ok(existingIssue));
 
 		var updatedIssue = existingIssue with { };
 
 		_repository.UpdateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>())
-			.Returns(Result<IssueDto>.Ok(updatedIssue));
+			.Returns(Result.Ok(updatedIssue));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.Title.Should().Be("Same Title");
+		result.Success.Should().BeTrue();
+		result.Value!.Title.Should().Be("Same Title");
 	}
 
 	[Fact]
@@ -263,7 +263,7 @@ public class UpdateIssueHandlerTests
 		};
 
 		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
-			.Returns(Result<IssueDto>.Ok(existingIssue));
+			.Returns(Result.Ok(existingIssue));
 
 		var updatedIssue = existingIssue with
 		{
@@ -272,12 +272,12 @@ public class UpdateIssueHandlerTests
 		};
 
 		_repository.UpdateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>())
-			.Returns(Result<IssueDto>.Ok(updatedIssue));
+			.Returns(Result.Ok(updatedIssue));
 
 		// Act
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Description.Should().BeEmpty();
+		result.Value!.Description.Should().BeEmpty();
 	}
 }

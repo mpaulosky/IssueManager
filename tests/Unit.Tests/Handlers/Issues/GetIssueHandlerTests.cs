@@ -45,14 +45,14 @@ public class GetIssueHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Should().NotBeNull();
-		result!.Id.ToString().Should().Be(issueId.ToString());
-		result.Title.Should().Be("Test Issue");
+		result.Success.Should().BeTrue();
+		result.Value!.Id.ToString().Should().Be(issueId.ToString());
+		result.Value!.Title.Should().Be("Test Issue");
 		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_NonExistentIssueId_ReturnsNull()
+	public async Task Handle_NonExistentIssueId_ReturnsFailure()
 	{
 		// Arrange
 		var issueId = ObjectId.GenerateNewId();
@@ -65,12 +65,13 @@ public class GetIssueHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Should().BeNull();
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Not found");
 		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_EmptyObjectId_ReturnsNull()
+	public async Task Handle_EmptyObjectId_ReturnsFailure()
 	{
 		// Arrange
 		_repository.GetByIdAsync(ObjectId.Empty, Arg.Any<CancellationToken>())
@@ -81,7 +82,7 @@ public class GetIssueHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Should().BeNull();
+		result.Success.Should().BeFalse();
 	}
 
 	[Fact]

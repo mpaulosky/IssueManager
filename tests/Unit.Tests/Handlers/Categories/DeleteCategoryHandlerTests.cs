@@ -45,13 +45,14 @@ public class DeleteCategoryHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Should().BeTrue();
+		result.Success.Should().BeTrue();
+		result.Value.Should().BeTrue();
 		await _repository.Received(1).GetByIdAsync(categoryId, Arg.Any<CancellationToken>());
 		await _repository.Received(1).ArchiveAsync(categoryId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_NonExistentCategory_ThrowsNotFoundException()
+	public async Task Handle_NonExistentCategory_ReturnsNotFoundResult()
 	{
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
@@ -61,11 +62,11 @@ public class DeleteCategoryHandlerTests
 			.Returns(Result<CategoryDto>.Fail("Not found"));
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<NotFoundException>()
-			.WithMessage($"*{categoryId}*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.NotFound);
 	}
 
 	[Fact]
@@ -84,23 +85,24 @@ public class DeleteCategoryHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Should().BeTrue();
+		result.Success.Should().BeTrue();
+		result.Value.Should().BeTrue();
 		await _repository.Received(1).GetByIdAsync(categoryId, Arg.Any<CancellationToken>());
 		await _repository.DidNotReceive().ArchiveAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_InvalidId_ThrowsValidationException()
+	public async Task Handle_InvalidId_ReturnsValidationResult()
 	{
 		// Arrange
 		var command = new DeleteCategoryCommand { Id = ObjectId.Empty };
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Category ID*required*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]

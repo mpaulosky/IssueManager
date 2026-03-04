@@ -51,14 +51,14 @@ public class UpdateCommentHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.Title.Should().Be("Updated Title");
+		result.Success.Should().BeTrue();
+		result.Value!.Title.Should().Be("Updated Title");
 		await _repository.Received(1).UpdateAsync(Arg.Is<CommentDto>(c =>
 			c.Title == command.Title), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_EmptyId_ThrowsValidationException()
+	public async Task Handle_EmptyId_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new UpdateCommentCommand
@@ -69,15 +69,15 @@ public class UpdateCommentHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Comment ID*required*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
-	public async Task Handle_EmptyCommentText_ThrowsValidationException()
+	public async Task Handle_EmptyCommentText_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new UpdateCommentCommand
@@ -88,15 +88,15 @@ public class UpdateCommentHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Comment text*required*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
-	public async Task Handle_CommentTextTooLong_ThrowsValidationException()
+	public async Task Handle_CommentTextTooLong_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new UpdateCommentCommand
@@ -107,15 +107,15 @@ public class UpdateCommentHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Comment text*5000 characters*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
-	public async Task Handle_NonExistentComment_ThrowsNotFoundException()
+	public async Task Handle_NonExistentComment_ReturnsNotFoundResult()
 	{
 		// Arrange
 		var commentId = ObjectId.GenerateNewId();
@@ -130,15 +130,15 @@ public class UpdateCommentHandlerTests
 			.Returns(Result<CommentDto>.Fail("Not found"));
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<NotFoundException>()
-			.WithMessage($"*{commentId}*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.NotFound);
 	}
 
 	[Fact]
-	public async Task Handle_RepositoryUpdateFails_ThrowsNotFoundException()
+	public async Task Handle_RepositoryUpdateFails_ReturnsFailureResult()
 	{
 		// Arrange
 		var commentId = ObjectId.GenerateNewId();
@@ -158,10 +158,10 @@ public class UpdateCommentHandlerTests
 			.Returns(Result<CommentDto>.Fail("Update failed"));
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<NotFoundException>()
-			.WithMessage("*could not be updated*");
+		result.Success.Should().BeFalse();
+		result.Error.Should().Contain("Update failed");
 	}
 }

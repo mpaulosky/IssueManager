@@ -64,10 +64,10 @@ Description = "Updated Description"
 var result = await _handler.Handle(command, CancellationToken.None);
 
 // Assert
-result.Should().NotBeNull();
-result.Id.Should().Be(created.Value!.Id);
-result.Title.Should().Be("Updated Title");
-result.Description.Should().Be("Updated Description");
+result.Success.Should().BeTrue();
+result.Value!.Id.Should().Be(created.Value!.Id);
+result.Value!.Title.Should().Be("Updated Title");
+result.Value!.Description.Should().Be("Updated Description");
 
 // Verify in database
 var dbIssueResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
@@ -115,10 +115,10 @@ Description = "Description"
 };
 
 // Act
-Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+var result = await _handler.Handle(command, CancellationToken.None);
 
 // Assert
-await act.Should().ThrowAsync<NotFoundException>();
+result.Success.Should().BeFalse();
 }
 
 [Fact]
@@ -170,10 +170,10 @@ Description = "Should fail"
 };
 
 // Act
-Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+var result = await _handler.Handle(command, CancellationToken.None);
 
 // Assert
-await act.Should().ThrowAsync<ConflictException>();
+result.Success.Should().BeFalse();
 
 // Verify the issue wasn't updated
 var dbIssueResult = await _repository.GetByIdAsync(created.Value!.Id, TestContext.Current.CancellationToken);

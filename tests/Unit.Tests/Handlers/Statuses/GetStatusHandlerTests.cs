@@ -41,8 +41,9 @@ public class GetStatusHandlerTests
 
 		// Assert
 		result.Should().NotBeNull();
-		result!.StatusName.Should().Be("Open");
-		result.StatusDescription.Should().Be("Issue is open");
+		result.Success.Should().BeTrue();
+		result.Value!.StatusName.Should().Be("Open");
+		result.Value.StatusDescription.Should().Be("Issue is open");
 		await _repository.Received(1).GetByIdAsync(statusId, Arg.Any<CancellationToken>());
 	}
 
@@ -60,7 +61,9 @@ public class GetStatusHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Should().BeNull();
+		result.Should().NotBeNull();
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Not found");
 	}
 
 	[Fact]
@@ -75,7 +78,9 @@ public class GetStatusHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Should().BeNull();
+		result.Should().NotBeNull();
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Not found");
 		await _repository.Received(1).GetByIdAsync(ObjectId.Empty, Arg.Any<CancellationToken>());
 	}
 

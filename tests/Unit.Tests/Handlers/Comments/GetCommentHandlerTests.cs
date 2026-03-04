@@ -52,9 +52,9 @@ public class GetCommentHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Should().NotBeNull();
-		result!.Title.Should().Be("Test Comment");
-		result.Description.Should().Be("This is a test comment.");
+		result.Success.Should().BeTrue();
+		result.Value!.Title.Should().Be("Test Comment");
+		result.Value.Description.Should().Be("This is a test comment.");
 		await _repository.Received(1).GetByIdAsync(commentId, Arg.Any<CancellationToken>());
 	}
 
@@ -72,7 +72,8 @@ public class GetCommentHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Should().BeNull();
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Not found");
 	}
 
 	[Fact]
@@ -87,7 +88,8 @@ public class GetCommentHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Should().BeNull();
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Not found");
 		await _repository.Received(1).GetByIdAsync(ObjectId.Empty, Arg.Any<CancellationToken>());
 	}
 

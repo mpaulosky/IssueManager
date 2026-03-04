@@ -60,7 +60,8 @@ public class DeleteStatusHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().BeTrue();
+		result.Success.Should().BeTrue();
+		result.Value.Should().BeTrue();
 
 		// Verify Archived is set in a database
 		var getResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
@@ -76,10 +77,10 @@ public class DeleteStatusHandlerIntegrationTests : IAsyncLifetime
 		var command = new DeleteStatusCommand { Id = nonExistentId };
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
-		await act.Should().ThrowAsync<NotFoundException>();
+		result.Success.Should().BeFalse();
 	}
 
 	[Fact]
@@ -95,7 +96,8 @@ public class DeleteStatusHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert - Should still return true
-		result.Should().BeTrue();
+		result.Success.Should().BeTrue();
+		result.Value.Should().BeTrue();
 
 		var dbStatusResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 		dbStatusResult.Should().NotBeNull();

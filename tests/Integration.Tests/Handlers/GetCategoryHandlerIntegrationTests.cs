@@ -60,9 +60,9 @@ public class GetCategoryHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.CategoryName.Should().Be("Test Category");
-		result.CategoryDescription.Should().Be("Test Description");
+		result.Success.Should().BeTrue();
+		result.Value!.CategoryName.Should().Be("Test Category");
+		result.Value!.CategoryDescription.Should().Be("Test Description");
 	}
 
 	[Fact]
@@ -76,7 +76,7 @@ public class GetCategoryHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().BeNull();
+		result.Success.Should().BeFalse();
 	}
 
 	[Fact]
@@ -89,6 +89,6 @@ public class GetCategoryHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().BeNull();
+		result.Success.Should().BeFalse();
 	}
 }
