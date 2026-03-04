@@ -38,11 +38,12 @@ Preferred: auto
 - Triage, planning, issue routing → claude-haiku-4.5
 
 ## Critical Rules
-1. Before any push: run build-repair prompt. Zero tolerance for errors or warnings.
-2. PRs on `feature/*` branches must NEVER include `.squad/` files in their diff.
-3. Integration tests MUST have `[Collection("Integration")]` attribute.
-4. `IssueDto.Empty` is not a singleton — never compare two `.Empty` instances.
-5. **File header REQUIRED** — All new C#/Razor files must use block copyright format:
+1. **Before any push: run the FULL local test suite** — `dotnet test tests/Unit.Tests tests/Blazor.Tests tests/Architecture.Tests`. Zero failures required. Pre-push hook gates on these three test suites. CI must never be the first place test failures are discovered.
+2. Before any push: run build-repair prompt. Zero tolerance for errors or warnings.
+3. PRs on `feature/*` branches must NEVER include `.squad/` files in their diff.
+4. Integration tests MUST have `[Collection("Integration")]` attribute.
+5. `IssueDto.Empty` is not a singleton — never compare two `.Empty` instances.
+6. **File header REQUIRED** — All new C#/Razor files must use block copyright format:
    ```csharp
    // ============================================
    // Copyright (c) 2026. All rights reserved.
