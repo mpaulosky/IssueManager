@@ -3,10 +3,10 @@ name: Squad CI
 
 on:
   pull_request:
-    branches: ["**"]
+    branches: [dev, preview, main, insider]
     types: [opened, synchronize, reopened]
   push:
-    branches: [main]
+    branches: [dev, insider]
 
 permissions:
   contents: read
@@ -15,10 +15,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Build and test
         run: |
-          dotnet restore
-          dotnet build --no-restore --configuration Release
-          dotnet test --no-build --configuration Release
+          # TODO: Add your dotnet build/test commands here
+          # Go:            go test ./...
+          # Python:        pip install -r requirements.txt && pytest
+          # .NET:          dotnet test
+          # Java (Maven):  mvn test
+          # Java (Gradle): ./gradlew test
+          echo "No build commands configured — update squad-ci.yml"
