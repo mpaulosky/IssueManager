@@ -939,3 +939,32 @@ Boromir (DevOps) — responsible for CI/CD, Git hooks, build infrastructure
 **Why:** Replaced `.github/instructions/mongo-dba.instructions.md` which was removed. Skill is on-demand; instruction file was loading globally on every `.cs` file.
 
 **Status:** Complete. Skill available at `.squad/skills/mongodb-dba-patterns/SKILL.md`
+
+---
+
+## 2026-03-01: API Test Coverage Gap Scope
+
+**By:** Aragorn  
+**What:** Comprehensive scope analysis of API test coverage gaps. ZERO endpoint unit tests exist, integration handler tests missing for 3/4 resources, and integration repository tests missing for 2/4 resources.  
+**Status:** Scoped. Four GitHub issues created and assigned to Gimli.  
+**Impact:** 20 endpoints, 12 integration handlers, 2 repositories require test coverage.  
+**Scope Document:** See full details in archived decision.
+
+---
+
+## 2026-03-03: Remove redundant .github/instructions files
+
+**By:** Matthew (confirmed) + Aragorn (executed)  
+**What:** Removed copilot-sdk-csharp.instructions.md and mongo-dba.instructions.md. Both fully covered by squad skills.  
+**Why:** Reduce context overhead on .cs file interactions (~17 KB saved).  
+**Status:** Completed. New skills added: copilot-sdk-csharp-usage, mongodb-dba-patterns.
+
+---
+
+## 2026-03-01: xUnit1051 CancellationToken Integration Test Fix
+
+**By:** Gimli  
+**What:** Fixed all xUnit1051 analyzer warnings across 10 Integration.Tests files by passing TestContext.Current.CancellationToken.  
+**Files Fixed:** 10 files, 131 async call sites updated.  
+**Status:** Completed (Commit 4f67ddb). Build passed, 0 xUnit1051 warnings.
+
