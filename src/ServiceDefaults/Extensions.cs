@@ -1,3 +1,11 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     Extensions.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  ServiceDefaults
+// =======================================================
 namespace ServiceDefaults;
 
 using Microsoft.AspNetCore.Builder;
