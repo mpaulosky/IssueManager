@@ -85,17 +85,18 @@ allIssues.Should().NotContain(i => i.Id == created.Value.Id);
 }
 
 [Fact]
-public async Task Handle_NonExistentIssue_ThrowsNotFoundException()
+public async Task Handle_NonExistentIssue_ReturnsNotFoundFailure()
 {
 // Arrange
 var nonExistentId = ObjectId.GenerateNewId();
 var command = new DeleteIssueCommand { Id = nonExistentId };
 
 // Act
-Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+var result = await _handler.Handle(command, CancellationToken.None);
 
 // Assert
-await act.Should().ThrowAsync<NotFoundException>();
+result.Success.Should().BeFalse();
+result.ErrorCode.Should().Be(ResultErrorCode.NotFound);
 }
 
 [Fact]

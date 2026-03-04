@@ -95,12 +95,12 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 	}
 
 	[Fact]
-	public async Task Handle_EmptyIssueId_ThrowsValidationException()
+	public async Task Handle_EmptyIssueId_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new UpdateIssueStatusCommand
 		{
-			IssueId = new ObjectId(""),
+			IssueId = ObjectId.Empty,
 			Status = new StatusDto(ObjectId.GenerateNewId(), "InProgress", "Issue is in progress", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
