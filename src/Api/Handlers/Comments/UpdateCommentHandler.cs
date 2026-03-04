@@ -40,28 +40,24 @@ public class UpdateCommentHandler
 	/// </summary>
 	/// <param name="command">The command containing the updated comment information.</param>
 	/// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
-	/// <returns>A task that represents the asynchronous operation. The task result contains the updated comment as a <see cref="CommentDto"/>.</returns>
+	/// <returns>A task that represents the asynchronous operation. The task result contains the result with updated comment as a <see cref="CommentDto"/>.</returns>
 	/// <exception cref="ValidationException">Thrown when the command fails validation.</exception>
 	/// <exception cref="NotFoundException">Thrown when the comment is not found or cannot be updated.</exception>
-	public async Task<CommentDto> Handle(UpdateCommentCommand command, CancellationToken cancellationToken = default)
+	public async Task<Result<CommentDto>> Handle(UpdateCommentCommand command, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
 		if (!validationResult.IsValid)
-			throw new ValidationException(validationResult.Errors);
+			return Result.Fail<CommentDto>("Validation failed", ResultErrorCode.Validation);
 
 		var getResult = await _repository.GetByIdAsync(command.Id, cancellationToken);
 		if (getResult.Failure || getResult.Value is null)
-			throw new NotFoundException($"Comment with ID '{command.Id}' was not found.");
+			return Result.Fail<CommentDto>($"Comment with ID '{command.Id}' was not found.", ResultErrorCode.NotFound);
 
 		var updatedComment = getResult.Value with
 		{
 			Title = command.Title
 		};
 
-		var updateResult = await _repository.UpdateAsync(updatedComment, cancellationToken);
-		if (updateResult.Failure)
-			throw new NotFoundException($"Comment with ID '{command.Id}' could not be updated.");
-
-		return updateResult.Value!;
+		return await _repository.UpdateAsync(updatedComment, cancellationToken);
 	}
 }

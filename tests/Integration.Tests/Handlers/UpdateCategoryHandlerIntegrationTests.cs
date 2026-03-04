@@ -65,10 +65,10 @@ public class UpdateCategoryHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.CategoryName.Should().Be("Updated Name");
-		result.CategoryDescription.Should().Be("Updated Description");
-		result.Id.Should().Be(created.Value.Id);
+		result.Success.Should().BeTrue();
+		result.Value!.CategoryName.Should().Be("Updated Name");
+		result.Value!.CategoryDescription.Should().Be("Updated Description");
+		result.Value!.Id.Should().Be(created.Value.Id);
 	}
 
 	[Fact]
@@ -84,11 +84,10 @@ public class UpdateCategoryHandlerIntegrationTests : IAsyncLifetime
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
-		await act.Should().ThrowAsync<NotFoundException>()
-			.WithMessage($"Category with ID '{nonExistentId}' was not found.");
+		result.Success.Should().BeFalse();
 	}
 
 	[Fact]
@@ -106,9 +105,9 @@ public class UpdateCategoryHandlerIntegrationTests : IAsyncLifetime
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>();
+		result.Success.Should().BeFalse();
 	}
 }

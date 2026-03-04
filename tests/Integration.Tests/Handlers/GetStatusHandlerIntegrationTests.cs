@@ -60,9 +60,9 @@ public class GetStatusHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.StatusName.Should().Be("Test Status");
-		result.StatusDescription.Should().Be("Test Description");
+		result.Success.Should().BeTrue();
+		result.Value!.StatusName.Should().Be("Test Status");
+		result.Value!.StatusDescription.Should().Be("Test Description");
 	}
 
 	[Fact]
@@ -76,7 +76,7 @@ public class GetStatusHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().BeNull();
+		result.Success.Should().BeFalse();
 	}
 
 	[Fact]
@@ -89,6 +89,6 @@ public class GetStatusHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().BeNull();
+		result.Success.Should().BeFalse();
 	}
 }

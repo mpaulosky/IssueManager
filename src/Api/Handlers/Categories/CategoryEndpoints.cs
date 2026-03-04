@@ -25,8 +25,8 @@ public static class CategoryEndpoints
 if (!ObjectId.TryParse(id, out var objectId))
 return Results.BadRequest("Invalid ID format");
 var query = new GetCategoryQuery(objectId);
-			var category = await handler.Handle(query);
-			return category is not null ? Results.Ok(category) : Results.NotFound();
+			var result = await handler.Handle(query);
+			return result.Success ? Results.Ok(result.Value) : Results.NotFound();
 		})
 		.WithName("GetCategory")
 		.WithSummary("Get a category by ID")
@@ -50,7 +50,9 @@ if (!ObjectId.TryParse(id, out var objectId))
 return Results.BadRequest("Invalid ID format");
 var commandWithId = command with { Id = objectId };
 			var result = await handler.Handle(commandWithId);
-			return result is not null ? Results.Ok(result) : Results.NotFound();
+			if (!result.Success)
+				return result.ErrorCode == ResultErrorCode.NotFound ? Results.NotFound() : Results.BadRequest(result.Error);
+			return Results.Ok(result.Value);
 		})
 		.WithName("UpdateCategory")
 		.WithSummary("Update an existing category")
@@ -65,7 +67,7 @@ if (!ObjectId.TryParse(id, out var objectId))
 return Results.BadRequest("Invalid ID format");
 var command = new DeleteCategoryCommand { Id = objectId };
 			var result = await handler.Handle(command);
-			return result ? Results.NoContent() : Results.NotFound();
+			return result.Success ? Results.NoContent() : Results.NotFound();
 		})
 		.WithName("DeleteCategory")
 		.WithSummary("Delete (archive) a category")

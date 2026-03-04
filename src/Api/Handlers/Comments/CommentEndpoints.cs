@@ -25,8 +25,8 @@ public static class CommentEndpoints
 if (!ObjectId.TryParse(id, out var objectId))
 return Results.BadRequest("Invalid ID format");
 var query = new GetCommentQuery(objectId);
-			var comment = await handler.Handle(query);
-			return comment is not null ? Results.Ok(comment) : Results.NotFound();
+			var result = await handler.Handle(query);
+			return result.Success ? Results.Ok(result.Value) : Results.NotFound();
 		})
 		.WithName("GetComment")
 		.WithSummary("Get a comment by ID")
@@ -50,7 +50,9 @@ if (!ObjectId.TryParse(id, out var objectId))
 return Results.BadRequest("Invalid ID format");
 var commandWithId = command with { Id = objectId };
 			var result = await handler.Handle(commandWithId);
-			return result is not null ? Results.Ok(result) : Results.NotFound();
+			if (!result.Success)
+				return result.ErrorCode == ResultErrorCode.NotFound ? Results.NotFound() : Results.BadRequest(result.Error);
+			return Results.Ok(result.Value);
 		})
 		.WithName("UpdateComment")
 		.WithSummary("Update an existing comment")
@@ -65,7 +67,7 @@ if (!ObjectId.TryParse(id, out var objectId))
 return Results.BadRequest("Invalid ID format");
 var command = new DeleteCommentCommand { Id = objectId };
 			var result = await handler.Handle(command);
-			return result ? Results.NoContent() : Results.NotFound();
+			return result.Success ? Results.NoContent() : Results.NotFound();
 		})
 		.WithName("DeleteComment")
 		.WithSummary("Delete (archive) a comment")

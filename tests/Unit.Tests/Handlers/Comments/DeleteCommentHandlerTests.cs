@@ -57,13 +57,14 @@ public class DeleteCommentHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Should().BeTrue();
+		result.Success.Should().BeTrue();
+		result.Value.Should().BeTrue();
 		await _repository.Received(1).GetByIdAsync(commentId, Arg.Any<CancellationToken>());
 		await _repository.Received(1).ArchiveAsync(commentId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_NonExistentComment_ThrowsNotFoundException()
+	public async Task Handle_NonExistentComment_ReturnsNotFoundResult()
 	{
 		// Arrange
 		var commentId = ObjectId.GenerateNewId();
@@ -73,11 +74,11 @@ public class DeleteCommentHandlerTests
 			.Returns(Result<CommentDto>.Fail("Not found"));
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<NotFoundException>()
-			.WithMessage($"*{commentId}*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.NotFound);
 	}
 
 	[Fact]
@@ -108,23 +109,24 @@ public class DeleteCommentHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Should().BeTrue();
+		result.Success.Should().BeTrue();
+		result.Value.Should().BeTrue();
 		await _repository.Received(1).GetByIdAsync(commentId, Arg.Any<CancellationToken>());
 		await _repository.DidNotReceive().ArchiveAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_EmptyId_ThrowsValidationException()
+	public async Task Handle_EmptyId_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new DeleteCommentCommand { Id = ObjectId.Empty };
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Comment ID*required*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]

@@ -52,7 +52,9 @@ public class DeleteStatusHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Should().BeTrue();
+		result.Should().NotBeNull();
+		result.Success.Should().BeTrue();
+		result.Value.Should().BeTrue();
 		await _repository.Received(1).GetByIdAsync(statusId, Arg.Any<CancellationToken>());
 		await _repository.Received(1).ArchiveAsync(statusId, Arg.Any<CancellationToken>());
 	}
@@ -68,11 +70,12 @@ public class DeleteStatusHandlerTests
 			.Returns(Result<StatusDto>.Fail("Not found"));
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<NotFoundException>()
-			.WithMessage($"*{statusId}*");
+		result.Should().NotBeNull();
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.NotFound);
 	}
 
 	[Fact]
@@ -98,7 +101,8 @@ public class DeleteStatusHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Should().BeTrue();
+		result.Success.Should().BeTrue();
+		result.Value.Should().BeTrue();
 		await _repository.Received(1).GetByIdAsync(statusId, Arg.Any<CancellationToken>());
 		await _repository.DidNotReceive().ArchiveAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
 	}
@@ -110,11 +114,12 @@ public class DeleteStatusHandlerTests
 		var command = new DeleteStatusCommand { Id = ObjectId.Empty };
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Status ID*required*");
+		result.Should().NotBeNull();
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]

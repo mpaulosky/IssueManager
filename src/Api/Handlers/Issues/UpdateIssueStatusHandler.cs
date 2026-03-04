@@ -29,18 +29,17 @@ public class UpdateIssueStatusHandler
 	/// <summary>
 	/// Handles the update of issue status.
 	/// </summary>
-	public async Task<IssueDto?> Handle(UpdateIssueStatusCommand command, CancellationToken cancellationToken = default)
+	public async Task<Result<IssueDto>> Handle(UpdateIssueStatusCommand command, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
 		if (!validationResult.IsValid)
-			throw new ValidationException(validationResult.Errors);
+			return Result.Fail<IssueDto>("Validation failed", ResultErrorCode.Validation);
 
 		var result = await _repository.GetByIdAsync(command.IssueId, cancellationToken);
 		if (!result.Success || result.Value is null)
-			return null;
+			return Result.Fail<IssueDto>($"Issue with ID '{command.IssueId}' was not found.", ResultErrorCode.NotFound);
 
 		var updatedIssue = result.Value with { Status = command.Status };
-		var updateResult = await _repository.UpdateAsync(updatedIssue, cancellationToken);
-		return updateResult.Value;
+		return await _repository.UpdateAsync(updatedIssue, cancellationToken);
 	}
 }

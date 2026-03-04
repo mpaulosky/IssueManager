@@ -40,14 +40,14 @@ public class GetCategoryHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Should().NotBeNull();
-		result!.CategoryName.Should().Be("Bug");
-		result.CategoryDescription.Should().Be("Bug reports");
+		result.Success.Should().BeTrue();
+		result.Value!.CategoryName.Should().Be("Bug");
+		result.Value.CategoryDescription.Should().Be("Bug reports");
 		await _repository.Received(1).GetByIdAsync(categoryId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_NonExistentCategoryId_ReturnsNull()
+	public async Task Handle_NonExistentCategoryId_ReturnsFailResult()
 	{
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
@@ -60,11 +60,12 @@ public class GetCategoryHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Should().BeNull();
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Not found");
 	}
 
 	[Fact]
-	public async Task Handle_EmptyObjectId_ReturnsNull()
+	public async Task Handle_EmptyObjectId_ReturnsFailResult()
 	{
 		// Arrange
 		_repository.GetByIdAsync(ObjectId.Empty, Arg.Any<CancellationToken>())
@@ -75,7 +76,8 @@ public class GetCategoryHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Should().BeNull();
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Not found");
 		await _repository.Received(1).GetByIdAsync(ObjectId.Empty, Arg.Any<CancellationToken>());
 	}
 

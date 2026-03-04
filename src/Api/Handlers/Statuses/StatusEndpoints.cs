@@ -25,8 +25,8 @@ public static class StatusEndpoints
 if (!ObjectId.TryParse(id, out var objectId))
 return Results.BadRequest("Invalid ID format");
 var query = new GetStatusQuery(objectId);
-			var status = await handler.Handle(query);
-			return status is not null ? Results.Ok(status) : Results.NotFound();
+			var result = await handler.Handle(query);
+			return result.Success ? Results.Ok(result.Value) : Results.NotFound();
 		})
 		.WithName("GetStatus")
 		.WithSummary("Get a status by ID")
@@ -50,7 +50,9 @@ if (!ObjectId.TryParse(id, out var objectId))
 return Results.BadRequest("Invalid ID format");
 var commandWithId = command with { Id = objectId };
 			var result = await handler.Handle(commandWithId);
-			return result is not null ? Results.Ok(result) : Results.NotFound();
+			if (!result.Success)
+				return result.ErrorCode == ResultErrorCode.NotFound ? Results.NotFound() : Results.BadRequest(result.Error);
+			return Results.Ok(result.Value);
 		})
 		.WithName("UpdateStatus")
 		.WithSummary("Update an existing status")
@@ -65,7 +67,7 @@ if (!ObjectId.TryParse(id, out var objectId))
 return Results.BadRequest("Invalid ID format");
 var command = new DeleteStatusCommand { Id = objectId };
 			var result = await handler.Handle(command);
-			return result ? Results.NoContent() : Results.NotFound();
+			return result.Success ? Results.NoContent() : Results.NotFound();
 		})
 		.WithName("DeleteStatus")
 		.WithSummary("Delete (archive) a status")

@@ -66,9 +66,9 @@ public class UpdateCommentHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.Title.Should().Be("Updated Title");
-		result.Id.Should().Be(created.Value.Id);
+		result.Success.Should().BeTrue();
+		result.Value!.Title.Should().Be("Updated Title");
+		result.Value!.Id.Should().Be(created.Value.Id);
 	}
 
 	[Fact]
@@ -84,11 +84,10 @@ public class UpdateCommentHandlerIntegrationTests : IAsyncLifetime
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
-		await act.Should().ThrowAsync<NotFoundException>()
-			.WithMessage($"Comment with ID '{nonExistentId}' was not found.");
+		result.Success.Should().BeFalse();
 	}
 
 	[Fact]
@@ -105,9 +104,9 @@ public class UpdateCommentHandlerIntegrationTests : IAsyncLifetime
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>();
+		result.Success.Should().BeFalse();
 	}
 }

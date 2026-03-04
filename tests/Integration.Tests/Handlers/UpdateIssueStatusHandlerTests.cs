@@ -66,8 +66,8 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 			var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 			// Assert
-			result.Should().NotBeNull();
-			result.Status.StatusName.Should().Be("InProgress");
+			result.Success.Should().BeTrue();
+			result.Value!.Status.StatusName.Should().Be("InProgress");
 		}
 
 		// Verify persistence
@@ -91,7 +91,7 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().BeNull();
+		result.Success.Should().BeFalse();
 	}
 
 	[Fact]
@@ -104,8 +104,11 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 			Status = new StatusDto(ObjectId.GenerateNewId(), "InProgress", "Issue is in progress", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
-		// Act & Assert
-		await Assert.ThrowsAsync<ValidationException>(() => _handler.Handle(command, TestContext.Current.CancellationToken));
+		// Act
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Success.Should().BeFalse();
 	}
 
 	[Fact]
@@ -124,8 +127,8 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 		var inProgressResult = await _handler.Handle(inProgressCommand, TestContext.Current.CancellationToken);
 
 		// Assert InProgress
-		inProgressResult.Should().NotBeNull();
-		inProgressResult.Status.StatusName.Should().Be("InProgress");
+		inProgressResult.Success.Should().BeTrue();
+		inProgressResult.Value!.Status.StatusName.Should().Be("InProgress");
 
 		// Act - Transition to Closed
 		var closedCommand = new UpdateIssueStatusCommand
@@ -136,8 +139,8 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 		var closedResult = await _handler.Handle(closedCommand, TestContext.Current.CancellationToken);
 
 		// Assert Closed
-		closedResult.Should().NotBeNull();
-		closedResult.Status.StatusName.Should().Be("Closed");
+		closedResult.Success.Should().BeTrue();
+		closedResult.Value!.Status.StatusName.Should().Be("Closed");
 
 		// Verify the final state in a database
 		var retrievedResult = await _repository.GetByIdAsync(created.Value!.Id, TestContext.Current.CancellationToken);

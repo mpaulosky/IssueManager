@@ -51,16 +51,16 @@ public class UpdateCategoryHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.CategoryName.Should().Be("Updated Name");
-		result.CategoryDescription.Should().Be("Updated Description");
+		result.Success.Should().BeTrue();
+		result.Value!.CategoryName.Should().Be("Updated Name");
+		result.Value.CategoryDescription.Should().Be("Updated Description");
 		await _repository.Received(1).UpdateAsync(Arg.Is<CategoryDto>(c =>
 			c.CategoryName == command.CategoryName &&
 			c.CategoryDescription == command.CategoryDescription), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_EmptyCategoryName_ThrowsValidationException()
+	public async Task Handle_EmptyCategoryName_ReturnsValidationResult()
 	{
 		// Arrange
 		var command = new UpdateCategoryCommand
@@ -71,15 +71,15 @@ public class UpdateCategoryHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Category name*required*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
-	public async Task Handle_CategoryNameTooLong_ThrowsValidationException()
+	public async Task Handle_CategoryNameTooLong_ReturnsValidationResult()
 	{
 		// Arrange
 		var command = new UpdateCategoryCommand
@@ -90,15 +90,15 @@ public class UpdateCategoryHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Category name*100 characters*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
-	public async Task Handle_NonExistentCategory_ThrowsNotFoundException()
+	public async Task Handle_NonExistentCategory_ReturnsNotFoundResult()
 	{
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
@@ -113,15 +113,15 @@ public class UpdateCategoryHandlerTests
 			.Returns(Result<CategoryDto>.Fail("Not found"));
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<NotFoundException>()
-			.WithMessage($"*{categoryId}*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.NotFound);
 	}
 
 	[Fact]
-	public async Task Handle_RepositoryUpdateFails_ThrowsNotFoundException()
+	public async Task Handle_RepositoryUpdateFails_ReturnsFailResult()
 	{
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
@@ -141,11 +141,11 @@ public class UpdateCategoryHandlerTests
 			.Returns(Result<CategoryDto>.Fail("Update failed"));
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<NotFoundException>()
-			.WithMessage("*could not be updated*");
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Update failed");
 	}
 
 	[Fact]
@@ -173,6 +173,7 @@ public class UpdateCategoryHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.CategoryDescription.Should().BeEmpty();
+		result.Success.Should().BeTrue();
+		result.Value!.CategoryDescription.Should().BeEmpty();
 	}
 }

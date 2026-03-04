@@ -40,23 +40,23 @@ public class DeleteCommentHandler
 	/// </summary>
 	/// <param name="command">The command containing the comment ID to delete.</param>
 	/// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
-	/// <returns><see langword="true"/> if the comment was successfully archived; otherwise, <see langword="false"/>.</returns>
+	/// <returns>A task that represents the asynchronous operation. The task result contains a result indicating success or failure.</returns>
 	/// <exception cref="ValidationException">Thrown when the command fails validation.</exception>
 	/// <exception cref="NotFoundException">Thrown when the comment is not found.</exception>
-	public async Task<bool> Handle(DeleteCommentCommand command, CancellationToken cancellationToken = default)
+	public async Task<Result<bool>> Handle(DeleteCommentCommand command, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
 		if (!validationResult.IsValid)
-			throw new ValidationException(validationResult.Errors);
+			return Result.Fail<bool>("Validation failed", ResultErrorCode.Validation);
 
 		var getResult = await _repository.GetByIdAsync(command.Id, cancellationToken);
 		if (getResult.Failure || getResult.Value is null)
-			throw new NotFoundException($"Comment with ID '{command.Id}' was not found.");
+			return Result.Fail<bool>($"Comment with ID '{command.Id}' was not found.", ResultErrorCode.NotFound);
 
 		if (getResult.Value.Archived)
-			return true;
+			return Result.Ok(true);
 
 		var archiveResult = await _repository.ArchiveAsync(command.Id, cancellationToken);
-		return archiveResult.Success;
+		return archiveResult.Success ? Result.Ok(true) : Result.Fail<bool>(archiveResult.Error!, archiveResult.ErrorCode);
 	}
 }

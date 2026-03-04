@@ -39,11 +39,10 @@ public class GetCategoryHandler
 	/// </summary>
 	/// <param name="query">The query containing the category ID to retrieve.</param>
 	/// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
-	/// <returns>A task that represents the asynchronous operation. The task result contains the category as a <see cref="CategoryDto"/>, or <see langword="null"/> if not found.</returns>
+	/// <returns>A task that represents the asynchronous operation. The task result contains the result with category as a <see cref="CategoryDto"/>, or an error if not found.</returns>
 	/// <exception cref="ArgumentException">Thrown when the category ID is null or empty.</exception>
-	public async Task<CategoryDto?> Handle(GetCategoryQuery query, CancellationToken cancellationToken = default)
+	public async Task<Result<CategoryDto>> Handle(GetCategoryQuery query, CancellationToken cancellationToken = default)
 	{
-		var result = await _repository.GetByIdAsync(query.CategoryId, cancellationToken);
-		return result.Success ? result.Value : null;
+		return await _repository.GetByIdAsync(query.CategoryId, cancellationToken);
 	}
 }

@@ -61,9 +61,9 @@ public class GetCommentHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.Title.Should().Be("Test Comment");
-		result.Description.Should().Be("Test Description");
+		result.Success.Should().BeTrue();
+		result.Value!.Title.Should().Be("Test Comment");
+		result.Value!.Description.Should().Be("Test Description");
 	}
 
 	[Fact]
@@ -77,7 +77,7 @@ public class GetCommentHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().BeNull();
+		result.Success.Should().BeFalse();
 	}
 
 	[Fact]
@@ -90,7 +90,7 @@ public class GetCommentHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().BeNull();
+		result.Success.Should().BeFalse();
 	}
 
 	[Fact]
@@ -100,10 +100,9 @@ public class GetCommentHandlerIntegrationTests : IAsyncLifetime
 		var query = new GetCommentQuery(ObjectId.Empty);
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(query, TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		await act.Should().ThrowAsync<ArgumentException>()
-			.WithMessage("Comment ID cannot be empty.*");
+		result.Success.Should().BeFalse();
 	}
 }

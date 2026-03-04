@@ -64,8 +64,9 @@ public class UpdateStatusHandlerTests
 
 		// Assert
 		result.Should().NotBeNull();
-		result.StatusName.Should().Be("Updated Name");
-		result.StatusDescription.Should().Be("Updated Description");
+		result.Success.Should().BeTrue();
+		result.Value!.StatusName.Should().Be("Updated Name");
+		result.Value.StatusDescription.Should().Be("Updated Description");
 		await _repository.Received(1).UpdateAsync(Arg.Is<StatusDto>(s =>
 				s.StatusName == command.StatusName &&
 				s.StatusDescription == command.StatusDescription), Arg.Any<CancellationToken>());
@@ -83,11 +84,12 @@ public class UpdateStatusHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Status name*required*");
+		result.Should().NotBeNull();
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
@@ -102,11 +104,12 @@ public class UpdateStatusHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Status name*100 characters*");
+		result.Should().NotBeNull();
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
@@ -125,11 +128,12 @@ public class UpdateStatusHandlerTests
 			.Returns(Result<StatusDto>.Fail("Not found"));
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<NotFoundException>()
-			.WithMessage($"*{statusId}*");
+		result.Should().NotBeNull();
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.NotFound);
 	}
 
 	[Fact]
@@ -160,11 +164,12 @@ public class UpdateStatusHandlerTests
 			.Returns(Result<StatusDto>.Fail("Update failed"));
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<NotFoundException>()
-			.WithMessage("*could not be updated*");
+		result.Should().NotBeNull();
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Update failed");
 	}
 
 	[Fact]
@@ -204,6 +209,8 @@ public class UpdateStatusHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.StatusDescription.Should().BeEmpty();
+		result.Should().NotBeNull();
+		result.Success.Should().BeTrue();
+		result.Value!.StatusDescription.Should().BeEmpty();
 	}
 }
