@@ -267,3 +267,52 @@ All labeled: `squad`, `squad:gimli`
 **Result:** ✅ Design-time compilation issue resolved, build passes 0 errors
 
 **Key Learning:** MSBuild target conditions can prevent design-time compilation if they block source file discovery. Always ensure source files are discoverable by the compiler regardless of target execution conditions.
+
+---
+
+---
+
+## 2026-03-04 — Copyright Header Standardization and Automation
+
+**Task:** Convert all single-line copyright headers in src/ to block format, establish automated process for new files
+
+**Job 1 — Header Conversion (22 files):**
+1. **Converted 4 files** with single-line format `// Copyright (c) 2026. All rights reserved.` to block format
+   - src/Api/Extensions/ApiVersioningExtensions.cs, AuthExtensions.cs
+   - src/Web/Extensions/AuthExtensions.cs, Services/TokenForwardingHandler.cs
+
+2. **Added headers to 18 files** with no copyright:
+   - 4 API endpoint files (CategoryEndpoints, CommentEndpoints, IssueEndpoints, StatusEndpoints)
+   - 14 Blazor .razor files (Components, Layout, Pages, App.razor, Routes.razor, _Imports.razor)
+
+**Block Format:**
+```csharp
+// ============================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     {FileName}.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  {ProjectName}
+// =============================================
+```
+
+For `.razor` files: `@* ... *@` comment syntax
+
+**Job 2 — Automated Header Creation:**
+1. **Created `.github/instructions/csharp.instructions.md`** — Copilot CLI reads this when creating C#/Razor files
+2. **Updated squad charters:**
+   - Aragorn (rule 5): Block format required for all new files
+   - Gimli (rule 5): Block format required for test files with project name mapping
+
+**Project Name Mapping:**
+- src/Api/ → Api, src/Web/ → Web, src/Shared/ → Shared
+- tests/Unit.Tests/ → Unit.Tests, tests/Integration.Tests/ → Integration.Tests
+- tests/Blazor.Tests/ → Blazor.Tests, tests/Aspire/ → Aspire
+
+**Verification:**
+- Build: src/Web/Web.csproj ✅ SUCCESS (0 errors, 0 warnings)
+- Pre-push tests: ✅ PASSED (Unit.Tests + Architecture.Tests)
+- Pushed to main: 2 commits (cb6f9bf tests, 91eee02 src+automation)
+
+**Key Learning:** Lightweight automation (Copilot instructions + charter rules) provides immediate value without build system complexity. No StyleCop or .editorconfig changes needed — instructions file is sufficient for consistent headers on new files.
