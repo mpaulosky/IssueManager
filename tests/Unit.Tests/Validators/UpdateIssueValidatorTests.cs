@@ -22,7 +22,7 @@ public class UpdateIssueValidatorTests
 		// Arrange
 		var command = new UpdateIssueCommand
 		{
-			Id = Guid.NewGuid().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = "Updated Bug Fix",
 			Description = "Fixed the authentication issue"
 		};
@@ -41,7 +41,7 @@ public class UpdateIssueValidatorTests
 		// Arrange
 		var command = new UpdateIssueCommand
 		{
-			Id = "",
+			Id = ObjectId.Empty,
 			Title = "Valid Title",
 			Description = "Valid Description"
 		};
@@ -62,7 +62,7 @@ public class UpdateIssueValidatorTests
 		// Arrange
 		var command = new UpdateIssueCommand
 		{
-			Id = Guid.NewGuid().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = "",
 			Description = "Some description"
 		};
@@ -82,7 +82,7 @@ public class UpdateIssueValidatorTests
 		// Arrange
 		var command = new UpdateIssueCommand
 		{
-			Id = Guid.NewGuid().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = "AB",
 			Description = "Some description"
 		};
@@ -103,7 +103,7 @@ public class UpdateIssueValidatorTests
 		// Arrange
 		var command = new UpdateIssueCommand
 		{
-			Id = Guid.NewGuid().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = "Bug",
 			Description = "Description"
 		};
@@ -121,7 +121,7 @@ public class UpdateIssueValidatorTests
 		// Arrange
 		var command = new UpdateIssueCommand
 		{
-			Id = Guid.NewGuid().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = new string('A', 256),
 			Description = "Description"
 		};
@@ -139,7 +139,7 @@ public class UpdateIssueValidatorTests
 		// Arrange
 		var command = new UpdateIssueCommand
 		{
-			Id = Guid.NewGuid().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = new string('A', 257),
 			Description = "Some description"
 		};
@@ -160,7 +160,7 @@ public class UpdateIssueValidatorTests
 		// Arrange
 		var command = new UpdateIssueCommand
 		{
-			Id = Guid.NewGuid().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = "Valid Title",
 			Description = null
 		};
@@ -178,7 +178,7 @@ public class UpdateIssueValidatorTests
 		// Arrange
 		var command = new UpdateIssueCommand
 		{
-			Id = Guid.NewGuid().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = "Valid Title",
 			Description = new string('X', 4096)
 		};
@@ -196,7 +196,7 @@ public class UpdateIssueValidatorTests
 		// Arrange
 		var command = new UpdateIssueCommand
 		{
-			Id = Guid.NewGuid().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = "Valid Title",
 			Description = new string('X', 4097)
 		};

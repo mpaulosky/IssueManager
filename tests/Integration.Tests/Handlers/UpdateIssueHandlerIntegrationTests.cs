@@ -55,7 +55,7 @@ var created = await _repository.CreateAsync(originalIssue, TestContext.Current.C
 
 var command = new UpdateIssueCommand
 {
-Id = created.Value?.Id,
+Id = created.Value!.Id,
 Title = "Updated Title",
 Description = "Updated Description"
 };
@@ -86,7 +86,7 @@ var created = await _repository.CreateAsync(originalIssue, TestContext.Current.C
 
 var command = new UpdateIssueCommand
 {
-Id = created.Value?.Id,
+Id = created.Value!.Id,
 Title = "New Title",
 Description = "New Description"
 };
@@ -130,14 +130,14 @@ var created = await _repository.CreateAsync(issue, TestContext.Current.Cancellat
 
 var command1 = new UpdateIssueCommand
 {
-Id = created.Value?.Id,
+Id = created.Value!.Id,
 Title = "First Update",
 Description = "First Description"
 };
 
 var command2 = new UpdateIssueCommand
 {
-Id = created.Value?.Id,
+Id = created.Value!.Id,
 Title = "Second Update",
 Description = "Second Description"
 };
@@ -164,7 +164,7 @@ var created = await _repository.CreateAsync(archivedIssue, TestContext.Current.C
 
 var command = new UpdateIssueCommand
 {
-Id = created.Value?.Id,
+Id = created.Value!.Id,
 Title = "Attempt Update",
 Description = "Should fail"
 };

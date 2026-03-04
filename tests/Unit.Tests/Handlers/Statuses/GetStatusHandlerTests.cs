@@ -34,7 +34,7 @@ public class GetStatusHandlerTests
 			.Returns(Result<StatusDto>.Ok(new StatusDto(
 				statusId, "Open", "Issue is open", DateTime.UtcNow, null, false, UserDto.Empty)));
 
-		var query = new GetStatusQuery(statusId.ToString());
+		var query = new GetStatusQuery(statusId);
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
@@ -54,7 +54,7 @@ public class GetStatusHandlerTests
 		_repository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
 			.Returns(Result<StatusDto>.Fail("Not found"));
 
-		var query = new GetStatusQuery(statusId.ToString());
+		var query = new GetStatusQuery(statusId);
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
@@ -64,45 +64,19 @@ public class GetStatusHandlerTests
 	}
 
 	[Fact]
-	public async Task Handle_EmptyStatusId_ThrowsArgumentException()
+	public async Task Handle_EmptyObjectId_ReturnsNull()
 	{
 		// Arrange
-		var query = new GetStatusQuery("");
-
-		// Act
-		Func<Task> act = async () => await _handler.Handle(query, CancellationToken.None);
-
-		// Assert
-		await act.Should().ThrowAsync<ArgumentException>()
-			.WithMessage("*Status ID cannot be empty*");
-	}
-
-	[Fact]
-	public async Task Handle_WhitespaceStatusId_ThrowsArgumentException()
-	{
-		// Arrange
-		var query = new GetStatusQuery("   ");
-
-		// Act
-		Func<Task> act = async () => await _handler.Handle(query, CancellationToken.None);
-
-		// Assert
-		await act.Should().ThrowAsync<ArgumentException>()
-			.WithMessage("*Status ID cannot be empty*");
-	}
-
-	[Fact]
-	public async Task Handle_InvalidObjectId_ReturnsNull()
-	{
-		// Arrange
-		var query = new GetStatusQuery("invalid-object-id");
+		_repository.GetByIdAsync(ObjectId.Empty, Arg.Any<CancellationToken>())
+			.Returns(Result<StatusDto>.Fail("Not found"));
+		var query = new GetStatusQuery(ObjectId.Empty);
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
 		result.Should().BeNull();
-		await _repository.DidNotReceive().GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
+		await _repository.Received(1).GetByIdAsync(ObjectId.Empty, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -116,7 +90,7 @@ public class GetStatusHandlerTests
 			.Returns(Result<StatusDto>.Ok(new StatusDto(
 				statusId, "Closed", "Issue is closed", DateTime.UtcNow, null, false, UserDto.Empty)));
 
-		var query = new GetStatusQuery(statusId.ToString());
+		var query = new GetStatusQuery(statusId);
 
 		// Act
 		await _handler.Handle(query, cancellationToken);

@@ -45,7 +45,7 @@ public class DeleteCommentHandlerTests
 			false,
 			UserDto.Empty);
 
-		var command = new DeleteCommentCommand { Id = commentId.ToString() };
+		var command = new DeleteCommentCommand { Id = commentId };
 
 		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
 			.Returns(Result<CommentDto>.Ok(comment));
@@ -67,7 +67,7 @@ public class DeleteCommentHandlerTests
 	{
 		// Arrange
 		var commentId = ObjectId.GenerateNewId();
-		var command = new DeleteCommentCommand { Id = commentId.ToString() };
+		var command = new DeleteCommentCommand { Id = commentId };
 
 		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
 			.Returns(Result<CommentDto>.Fail("Not found"));
@@ -99,7 +99,7 @@ public class DeleteCommentHandlerTests
 			false,
 			UserDto.Empty);
 
-		var command = new DeleteCommentCommand { Id = commentId.ToString() };
+		var command = new DeleteCommentCommand { Id = commentId };
 
 		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
 			.Returns(Result<CommentDto>.Ok(archivedComment));
@@ -117,7 +117,7 @@ public class DeleteCommentHandlerTests
 	public async Task Handle_EmptyId_ThrowsValidationException()
 	{
 		// Arrange
-		var command = new DeleteCommentCommand { Id = "" };
+		var command = new DeleteCommentCommand { Id = ObjectId.Empty };
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
@@ -125,19 +125,6 @@ public class DeleteCommentHandlerTests
 		// Assert
 		await act.Should().ThrowAsync<ValidationException>()
 			.WithMessage("*Comment ID*required*");
-	}
-
-	[Fact]
-	public async Task Handle_InvalidObjectId_ThrowsNotFoundException()
-	{
-		// Arrange
-		var command = new DeleteCommentCommand { Id = "invalid-objectid" };
-
-		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
-
-		// Assert
-		await act.Should().ThrowAsync<NotFoundException>();
 	}
 
 	[Fact]
@@ -160,7 +147,7 @@ public class DeleteCommentHandlerTests
 			false,
 			UserDto.Empty);
 
-		var command = new DeleteCommentCommand { Id = commentId.ToString() };
+		var command = new DeleteCommentCommand { Id = commentId };
 
 		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
 			.Returns(Result<CommentDto>.Ok(comment));

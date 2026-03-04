@@ -22,7 +22,7 @@ public class UpdateCommentValidatorTests
 		// Arrange
 		var command = new UpdateCommentCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = "Updated Title",
 			CommentText = "Updated comment text"
 		};
@@ -41,7 +41,7 @@ public class UpdateCommentValidatorTests
 		// Arrange
 		var command = new UpdateCommentCommand
 		{
-			Id = "",
+			Id = ObjectId.Empty,
 			Title = "Title",
 			CommentText = "Comment text"
 		};
@@ -60,7 +60,7 @@ public class UpdateCommentValidatorTests
 		// Arrange
 		var command = new UpdateCommentCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = "Title",
 			CommentText = ""
 		};
@@ -79,7 +79,7 @@ public class UpdateCommentValidatorTests
 		// Arrange
 		var command = new UpdateCommentCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = "Title",
 			CommentText = new string('X', 5001)
 		};

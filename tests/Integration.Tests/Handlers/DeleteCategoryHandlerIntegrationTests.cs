@@ -89,7 +89,7 @@ public class DeleteCategoryHandlerIntegrationTests : IAsyncLifetime
 		var archivedCategory = CreateTestCategoryDto("Already Archived", "Already archived", archived: true);
 		var created = await _repository.CreateAsync(archivedCategory, TestContext.Current.CancellationToken);
 
-		var command = new DeleteCategoryCommand { Id = created.Value?.Id };
+		var command = new DeleteCategoryCommand { Id = created.Value!.Id };
 
 		// Act - Delete already archived category (should be idempotent)
 		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);

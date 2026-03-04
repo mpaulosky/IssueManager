@@ -54,7 +54,7 @@ public class GetCategoryHandlerIntegrationTests : IAsyncLifetime
 		var category = CreateTestCategoryDto("Test Category", "Test Description");
 		var created = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
 
-		var query = new GetCategoryQuery(created.Value!.Id.ToString());
+		var query = new GetCategoryQuery(created.Value!.Id);
 
 		// Act
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
@@ -69,7 +69,7 @@ public class GetCategoryHandlerIntegrationTests : IAsyncLifetime
 	public async Task Handle_NonExistentCategory_ReturnsNull()
 	{
 		// Arrange
-		var nonExistentId = ObjectId.GenerateNewId().ToString();
+		var nonExistentId = ObjectId.GenerateNewId();
 		var query = new GetCategoryQuery(nonExistentId);
 
 		// Act
@@ -80,29 +80,15 @@ public class GetCategoryHandlerIntegrationTests : IAsyncLifetime
 	}
 
 	[Fact]
-	public async Task Handle_InvalidObjectIdFormat_ReturnsNull()
+	public async Task Handle_EmptyObjectId_ReturnsNull()
 	{
 		// Arrange
-		var query = new GetCategoryQuery("invalid-id-format");
+		var query = new GetCategoryQuery(ObjectId.Empty);
 
 		// Act
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeNull();
-	}
-
-	[Fact]
-	public async Task Handle_EmptyId_ThrowsArgumentException()
-	{
-		// Arrange
-		var query = new GetCategoryQuery(string.Empty);
-
-		// Act
-		Func<Task> act = async () => await _handler.Handle(query, TestContext.Current.CancellationToken);
-
-		// Assert
-		await act.Should().ThrowAsync<ArgumentException>()
-			.WithMessage("Category ID cannot be empty.*");
 	}
 }

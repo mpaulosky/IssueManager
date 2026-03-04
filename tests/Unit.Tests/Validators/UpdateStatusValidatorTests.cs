@@ -22,7 +22,7 @@ public class UpdateStatusValidatorTests
 		// Arrange
 		var command = new UpdateStatusCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			StatusName = "In Progress",
 			StatusDescription = "Currently being worked on"
 		};
@@ -41,7 +41,7 @@ public class UpdateStatusValidatorTests
 		// Arrange
 		var command = new UpdateStatusCommand
 		{
-			Id = "",
+			Id = ObjectId.Empty,
 			StatusName = "Open"
 		};
 
@@ -59,7 +59,7 @@ public class UpdateStatusValidatorTests
 		// Arrange
 		var command = new UpdateStatusCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			StatusName = ""
 		};
 
@@ -77,7 +77,7 @@ public class UpdateStatusValidatorTests
 		// Arrange
 		var command = new UpdateStatusCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			StatusName = "A"
 		};
 
@@ -95,7 +95,7 @@ public class UpdateStatusValidatorTests
 		// Arrange
 		var command = new UpdateStatusCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			StatusName = new string('A', 101)
 		};
 
@@ -113,7 +113,7 @@ public class UpdateStatusValidatorTests
 		// Arrange
 		var command = new UpdateStatusCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			StatusName = "Open",
 			StatusDescription = new string('X', 501)
 		};

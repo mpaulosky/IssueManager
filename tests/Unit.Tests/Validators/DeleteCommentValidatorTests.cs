@@ -22,7 +22,7 @@ public class DeleteCommentValidatorTests
 		// Arrange
 		var command = new DeleteCommentCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString()
+			Id = ObjectId.GenerateNewId()
 		};
 
 		// Act
@@ -37,7 +37,7 @@ public class DeleteCommentValidatorTests
 	public void DeleteCommentValidator_EmptyId_ReturnsValidationError()
 	{
 		// Arrange
-		var command = new DeleteCommentCommand { Id = "" };
+		var command = new DeleteCommentCommand { Id = ObjectId.Empty };
 
 		// Act
 		var result = _validator.Validate(command);
@@ -51,7 +51,7 @@ public class DeleteCommentValidatorTests
 	public void DeleteCommentValidator_NullId_ReturnsValidationError()
 	{
 		// Arrange
-		var command = new DeleteCommentCommand { Id = null! };
+		var command = new DeleteCommentCommand { Id = ObjectId.Empty };
 
 		// Act
 		var result = _validator.Validate(command);

@@ -32,9 +32,9 @@ public class UpdateIssueStatusHandlerTests
 	public async Task Handle_ValidCommand_ReturnsUpdatedIssue()
 	{
 		// Arrange
-		var issueId = ObjectId.GenerateNewId().ToString();
+		var issueId = ObjectId.GenerateNewId();
 		var existingIssue = IssueBuilder.Default()
-			.WithId(issueId)
+			.WithId(issueId.ToString())
 			.WithStatus(new StatusDto(ObjectId.GenerateNewId(), "Open", "Issue is open", DateTime.UtcNow, null, false, UserDto.Empty))
 			.Build();
 
@@ -66,7 +66,7 @@ public class UpdateIssueStatusHandlerTests
 	public async Task Handle_NonExistentIssue_ReturnsNull()
 	{
 		// Arrange
-		var issueId = ObjectId.GenerateNewId().ToString();
+		var issueId = ObjectId.GenerateNewId();
 		var command = new UpdateIssueStatusCommand
 		{
 			IssueId = issueId,
@@ -91,7 +91,7 @@ public class UpdateIssueStatusHandlerTests
 		// Arrange
 		var command = new UpdateIssueStatusCommand
 		{
-			IssueId = "",
+			IssueId = ObjectId.Empty,
 			Status = new StatusDto(ObjectId.GenerateNewId(), "Closed", "Issue is closed", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
@@ -109,7 +109,7 @@ public class UpdateIssueStatusHandlerTests
 		// Arrange
 		var command = new UpdateIssueStatusCommand
 		{
-			IssueId = ObjectId.GenerateNewId().ToString(),
+			IssueId = ObjectId.GenerateNewId(),
 			Status = new StatusDto(ObjectId.GenerateNewId(), "", "Description", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
@@ -125,9 +125,9 @@ public class UpdateIssueStatusHandlerTests
 	public async Task Handle_ValidCommand_PassesCancellationToken()
 	{
 		// Arrange
-		var issueId = ObjectId.GenerateNewId().ToString();
+		var issueId = ObjectId.GenerateNewId();
 		var cancellationToken = new CancellationToken();
-		var existingIssue = IssueBuilder.Default().WithId(issueId).Build();
+		var existingIssue = IssueBuilder.Default().WithId(issueId.ToString()).Build();
 		var newStatus = new StatusDto(ObjectId.GenerateNewId(), "In Progress", "Work in progress", DateTime.UtcNow, null, false, UserDto.Empty);
 
 		var command = new UpdateIssueStatusCommand

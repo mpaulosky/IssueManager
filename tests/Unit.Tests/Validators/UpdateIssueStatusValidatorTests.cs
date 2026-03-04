@@ -22,7 +22,7 @@ public class UpdateIssueStatusValidatorTests
 		// Arrange
 		var command = new UpdateIssueStatusCommand
 		{
-			IssueId = "issue-123",
+			IssueId = ObjectId.GenerateNewId(),
 			Status = new StatusDto(ObjectId.GenerateNewId(), "InProgress", "Issue is in progress", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
@@ -43,7 +43,7 @@ public class UpdateIssueStatusValidatorTests
 		// Arrange
 		var command = new UpdateIssueStatusCommand
 		{
-			IssueId = "issue-456",
+			IssueId = ObjectId.GenerateNewId(),
 			Status = new StatusDto(ObjectId.GenerateNewId(), statusName, statusDesc, DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
@@ -60,7 +60,7 @@ public class UpdateIssueStatusValidatorTests
 		// Arrange
 		var command = new UpdateIssueStatusCommand
 		{
-			IssueId = "",
+			IssueId = ObjectId.Empty,
 			Status = new StatusDto(ObjectId.GenerateNewId(), "Closed", "Issue is closed", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
@@ -80,7 +80,7 @@ public class UpdateIssueStatusValidatorTests
 		// Arrange
 		var command = new UpdateIssueStatusCommand
 		{
-			IssueId = "issue-789",
+			IssueId = ObjectId.GenerateNewId(),
 			Status = new StatusDto(ObjectId.GenerateNewId(), "", "some description", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 

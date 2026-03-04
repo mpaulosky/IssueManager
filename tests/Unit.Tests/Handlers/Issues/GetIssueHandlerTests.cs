@@ -30,13 +30,13 @@ public class GetIssueHandlerTests
 	public async Task Handle_ValidIssueId_ReturnsIssue()
 	{
 		// Arrange
-		var issueId = ObjectId.GenerateNewId().ToString();
+		var issueId = ObjectId.GenerateNewId();
 		var expectedIssue = IssueBuilder.Default()
-			.WithId(issueId)
+			.WithId(issueId.ToString())
 			.WithTitle("Test Issue")
 			.Build();
 
-		_repository.GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>())
+		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
 			.Returns(Result.Ok(expectedIssue));
 
 		var query = new GetIssueQuery(issueId);
@@ -46,17 +46,17 @@ public class GetIssueHandlerTests
 
 		// Assert
 		result.Should().NotBeNull();
-		result!.Id.ToString().Should().Be(issueId);
+		result!.Id.ToString().Should().Be(issueId.ToString());
 		result.Title.Should().Be("Test Issue");
-		await _repository.Received(1).GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>());
+		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
 	public async Task Handle_NonExistentIssueId_ReturnsNull()
 	{
 		// Arrange
-		var issueId = ObjectId.GenerateNewId().ToString();
-		_repository.GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>())
+		var issueId = ObjectId.GenerateNewId();
+		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
 			.Returns(Result.Fail<IssueDto>("Not found"));
 
 		var query = new GetIssueQuery(issueId);
@@ -66,46 +66,33 @@ public class GetIssueHandlerTests
 
 		// Assert
 		result.Should().BeNull();
-		await _repository.Received(1).GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>());
+		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_EmptyIssueId_ThrowsArgumentException()
+	public async Task Handle_EmptyObjectId_ReturnsNull()
 	{
 		// Arrange
-		var query = new GetIssueQuery("");
+		_repository.GetByIdAsync(ObjectId.Empty, Arg.Any<CancellationToken>())
+			.Returns(Result.Fail<IssueDto>("Not found"));
+		var query = new GetIssueQuery(ObjectId.Empty);
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ArgumentException>()
-			.WithMessage("*Issue ID cannot be empty*");
-	}
-
-	[Fact]
-	public async Task Handle_WhitespaceIssueId_ThrowsArgumentException()
-	{
-		// Arrange
-		var query = new GetIssueQuery("   ");
-
-		// Act
-		Func<Task> act = async () => await _handler.Handle(query, CancellationToken.None);
-
-		// Assert
-		await act.Should().ThrowAsync<ArgumentException>()
-			.WithMessage("*Issue ID cannot be empty*");
+		result.Should().BeNull();
 	}
 
 	[Fact]
 	public async Task Handle_ValidIssueId_PassesCancellationToken()
 	{
 		// Arrange
-		var issueId = ObjectId.GenerateNewId().ToString();
+		var issueId = ObjectId.GenerateNewId();
 		var cancellationToken = new CancellationToken();
-		var expectedIssue = IssueBuilder.Default().WithId(issueId).Build();
+		var expectedIssue = IssueBuilder.Default().WithId(issueId.ToString()).Build();
 
-		_repository.GetByIdAsync(ObjectId.Parse(issueId), cancellationToken)
+		_repository.GetByIdAsync(issueId, cancellationToken)
 			.Returns(Result.Ok(expectedIssue));
 
 		var query = new GetIssueQuery(issueId);
@@ -114,7 +101,7 @@ public class GetIssueHandlerTests
 		await _handler.Handle(query, cancellationToken);
 
 		// Assert
-		await _repository.Received(1).GetByIdAsync(ObjectId.Parse(issueId), cancellationToken);
+		await _repository.Received(1).GetByIdAsync(issueId, cancellationToken);
 	}
 
 	[Fact]

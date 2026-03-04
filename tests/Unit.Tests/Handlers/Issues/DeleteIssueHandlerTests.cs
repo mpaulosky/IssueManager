@@ -27,10 +27,9 @@ public class DeleteIssueHandlerTests
 	public async Task Handle_ValidIssue_SetsIsArchivedToTrue()
 	{
 		// Arrange
-		var issueId = ObjectId.GenerateNewId().ToString();
-		var objectId = ObjectId.Parse(issueId);
+		var issueId = ObjectId.GenerateNewId();
 		var existingIssue = new IssueDto(
-			objectId,
+			issueId,
 			"Issue to Delete",
 			"This will be archived",
 			DateTime.UtcNow.AddDays(-1),
@@ -45,29 +44,28 @@ public class DeleteIssueHandlerTests
 
 		var command = new DeleteIssueCommand { Id = issueId };
 
-		_repository.GetByIdAsync(objectId, Arg.Any<CancellationToken>())
+		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
 			.Returns(Result.Ok(existingIssue));
 
-		_repository.ArchiveAsync(objectId, Arg.Any<CancellationToken>())
+		_repository.ArchiveAsync(issueId, Arg.Any<CancellationToken>())
 			.Returns(Result.Ok());
 
 		// Act
 		await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await _repository.Received(1).GetByIdAsync(objectId, Arg.Any<CancellationToken>());
-		await _repository.Received(1).ArchiveAsync(objectId, Arg.Any<CancellationToken>());
+		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
+		await _repository.Received(1).ArchiveAsync(issueId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
 	public async Task Handle_NonExistentIssue_ThrowsNotFoundException()
 	{
 		// Arrange
-		var issueId = ObjectId.GenerateNewId().ToString();
-		var objectId = ObjectId.Parse(issueId);
+		var issueId = ObjectId.GenerateNewId();
 		var command = new DeleteIssueCommand { Id = issueId };
 
-		_repository.GetByIdAsync(objectId, Arg.Any<CancellationToken>())
+		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
 			.Returns(Result.Fail<IssueDto>("not found"));
 
 		// Act
@@ -82,10 +80,9 @@ public class DeleteIssueHandlerTests
 	public async Task Handle_AlreadyArchivedIssue_IsIdempotent()
 	{
 		// Arrange
-		var issueId = ObjectId.GenerateNewId().ToString();
-		var objectId = ObjectId.Parse(issueId);
+		var issueId = ObjectId.GenerateNewId();
 		var archivedIssue = new IssueDto(
-			objectId,
+			issueId,
 			"Already Archived",
 			"Already archived",
 			DateTime.UtcNow.AddDays(-1),
@@ -100,13 +97,13 @@ public class DeleteIssueHandlerTests
 
 		var command = new DeleteIssueCommand { Id = issueId };
 
-		_repository.GetByIdAsync(objectId, Arg.Any<CancellationToken>())
+		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
 			.Returns(Result.Ok(archivedIssue));
 
 		// Act — should succeed idempotently without calling ArchiveAsync
 		await _handler.Handle(command, CancellationToken.None);
 
-		await _repository.Received(1).GetByIdAsync(objectId, Arg.Any<CancellationToken>());
+		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
 		// Should NOT call ArchiveAsync since already archived
 		await _repository.DidNotReceive().ArchiveAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
 	}
@@ -115,10 +112,9 @@ public class DeleteIssueHandlerTests
 	public async Task Handle_ValidIssue_CallsArchive()
 	{
 		// Arrange
-		var issueId = ObjectId.GenerateNewId().ToString();
-		var objectId = ObjectId.Parse(issueId);
+		var issueId = ObjectId.GenerateNewId();
 		var existingIssue = new IssueDto(
-			objectId,
+			issueId,
 			"Issue to Delete",
 			"This will be archived",
 			DateTime.UtcNow.AddDays(-1),
@@ -133,10 +129,10 @@ public class DeleteIssueHandlerTests
 
 		var command = new DeleteIssueCommand { Id = issueId };
 
-		_repository.GetByIdAsync(objectId, Arg.Any<CancellationToken>())
+		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
 			.Returns(Result.Ok(existingIssue));
 
-		_repository.ArchiveAsync(objectId, Arg.Any<CancellationToken>())
+		_repository.ArchiveAsync(issueId, Arg.Any<CancellationToken>())
 			.Returns(Result.Ok());
 
 		// Act
@@ -144,14 +140,14 @@ public class DeleteIssueHandlerTests
 
 		// Assert
 		result.Should().BeTrue();
-		await _repository.Received(1).ArchiveAsync(objectId, Arg.Any<CancellationToken>());
+		await _repository.Received(1).ArchiveAsync(issueId, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
 	public async Task Handle_InvalidId_ThrowsValidationException()
 	{
 		// Arrange
-		var command = new DeleteIssueCommand { Id = "" };
+		var command = new DeleteIssueCommand { Id = ObjectId.Empty };
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);

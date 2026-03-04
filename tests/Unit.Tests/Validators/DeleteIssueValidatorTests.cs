@@ -22,7 +22,7 @@ public class DeleteIssueValidatorTests
 		// Arrange
 		var command = new DeleteIssueCommand
 		{
-			Id = Guid.NewGuid().ToString()
+			Id = ObjectId.GenerateNewId()
 		};
 
 		// Act
@@ -37,7 +37,7 @@ public class DeleteIssueValidatorTests
 	public void DeleteIssueValidator_EmptyId_ReturnsValidationError()
 	{
 		// Arrange
-		var command = new DeleteIssueCommand { Id = "" };
+		var command = new DeleteIssueCommand { Id = ObjectId.Empty };
 
 		// Act
 		var result = _validator.Validate(command);
@@ -53,7 +53,7 @@ public class DeleteIssueValidatorTests
 	public void DeleteIssueValidator_NullId_ReturnsValidationError()
 	{
 		// Arrange
-		var command = new DeleteIssueCommand { Id = null! };
+		var command = new DeleteIssueCommand { Id = ObjectId.Empty };
 
 		// Act
 		var result = _validator.Validate(command);
@@ -67,7 +67,7 @@ public class DeleteIssueValidatorTests
 	public void DeleteIssueValidator_WhitespaceId_ReturnsValidationError()
 	{
 		// Arrange
-		var command = new DeleteIssueCommand { Id = "   " };
+		var command = new DeleteIssueCommand { Id = ObjectId.Empty };
 
 		// Act
 		var result = _validator.Validate(command);

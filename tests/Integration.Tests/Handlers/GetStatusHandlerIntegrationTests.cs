@@ -54,7 +54,7 @@ public class GetStatusHandlerIntegrationTests : IAsyncLifetime
 		var status = CreateTestStatusDto("Test Status", "Test Description");
 		var created = await _repository.CreateAsync(status, TestContext.Current.CancellationToken);
 
-		var query = new GetStatusQuery(created.Value!.Id.ToString());
+		var query = new GetStatusQuery(created.Value!.Id);
 
 		// Act
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
@@ -69,7 +69,7 @@ public class GetStatusHandlerIntegrationTests : IAsyncLifetime
 	public async Task Handle_NonExistentStatus_ReturnsNull()
 	{
 		// Arrange
-		var nonExistentId = ObjectId.GenerateNewId().ToString();
+		var nonExistentId = ObjectId.GenerateNewId();
 		var query = new GetStatusQuery(nonExistentId);
 
 		// Act
@@ -80,29 +80,15 @@ public class GetStatusHandlerIntegrationTests : IAsyncLifetime
 	}
 
 	[Fact]
-	public async Task Handle_InvalidObjectIdFormat_ReturnsNull()
+	public async Task Handle_EmptyObjectId_ReturnsNull()
 	{
 		// Arrange
-		var query = new GetStatusQuery("invalid-id-format");
+		var query = new GetStatusQuery(ObjectId.Empty);
 
 		// Act
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeNull();
-	}
-
-	[Fact]
-	public async Task Handle_EmptyId_ThrowsArgumentException()
-	{
-		// Arrange
-		var query = new GetStatusQuery(string.Empty);
-
-		// Act
-		Func<Task> act = async () => await _handler.Handle(query, TestContext.Current.CancellationToken);
-
-		// Assert
-		await act.Should().ThrowAsync<ArgumentException>()
-			.WithMessage("Status ID cannot be empty.*");
 	}
 }

@@ -46,7 +46,7 @@ public class GetCommentHandlerTests
 		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
 			.Returns(Result<CommentDto>.Ok(comment));
 
-		var query = new GetCommentQuery(commentId.ToString());
+		var query = new GetCommentQuery(commentId);
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
@@ -66,7 +66,7 @@ public class GetCommentHandlerTests
 		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
 			.Returns(Result<CommentDto>.Fail("Not found"));
 
-		var query = new GetCommentQuery(commentId.ToString());
+		var query = new GetCommentQuery(commentId);
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
@@ -76,45 +76,19 @@ public class GetCommentHandlerTests
 	}
 
 	[Fact]
-	public async Task Handle_EmptyCommentId_ThrowsArgumentException()
+	public async Task Handle_EmptyObjectId_ReturnsNull()
 	{
 		// Arrange
-		var query = new GetCommentQuery("");
-
-		// Act
-		Func<Task> act = async () => await _handler.Handle(query, CancellationToken.None);
-
-		// Assert
-		await act.Should().ThrowAsync<ArgumentException>()
-			.WithMessage("*Comment ID cannot be empty*");
-	}
-
-	[Fact]
-	public async Task Handle_WhitespaceCommentId_ThrowsArgumentException()
-	{
-		// Arrange
-		var query = new GetCommentQuery("   ");
-
-		// Act
-		Func<Task> act = async () => await _handler.Handle(query, CancellationToken.None);
-
-		// Assert
-		await act.Should().ThrowAsync<ArgumentException>()
-			.WithMessage("*Comment ID cannot be empty*");
-	}
-
-	[Fact]
-	public async Task Handle_InvalidObjectId_ReturnsNull()
-	{
-		// Arrange
-		var query = new GetCommentQuery("invalid-object-id");
+		_repository.GetByIdAsync(ObjectId.Empty, Arg.Any<CancellationToken>())
+			.Returns(Result<CommentDto>.Fail("Not found"));
+		var query = new GetCommentQuery(ObjectId.Empty);
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
 		result.Should().BeNull();
-		await _repository.DidNotReceive().GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
+		await _repository.Received(1).GetByIdAsync(ObjectId.Empty, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -140,7 +114,7 @@ public class GetCommentHandlerTests
 		_repository.GetByIdAsync(commentId, Arg.Any<CancellationToken>())
 			.Returns(Result<CommentDto>.Ok(comment));
 
-		var query = new GetCommentQuery(commentId.ToString());
+		var query = new GetCommentQuery(commentId);
 
 		// Act
 		await _handler.Handle(query, cancellationToken);

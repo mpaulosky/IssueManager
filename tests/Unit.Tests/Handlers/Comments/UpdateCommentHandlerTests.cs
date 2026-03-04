@@ -36,7 +36,7 @@ public class UpdateCommentHandlerTests
 
 		var command = new UpdateCommentCommand
 		{
-			Id = commentId.ToString(),
+			Id = commentId,
 			Title = "Updated Title",
 			CommentText = "Updated comment text."
 		};
@@ -63,7 +63,7 @@ public class UpdateCommentHandlerTests
 		// Arrange
 		var command = new UpdateCommentCommand
 		{
-			Id = "",
+			Id = ObjectId.Empty,
 			Title = "Updated Title",
 			CommentText = "Updated comment text."
 		};
@@ -82,7 +82,7 @@ public class UpdateCommentHandlerTests
 		// Arrange
 		var command = new UpdateCommentCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = "Updated Title",
 			CommentText = ""
 		};
@@ -101,7 +101,7 @@ public class UpdateCommentHandlerTests
 		// Arrange
 		var command = new UpdateCommentCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = "Updated Title",
 			CommentText = new string('A', 5001)
 		};
@@ -121,7 +121,7 @@ public class UpdateCommentHandlerTests
 		var commentId = ObjectId.GenerateNewId();
 		var command = new UpdateCommentCommand
 		{
-			Id = commentId.ToString(),
+			Id = commentId,
 			Title = "Updated Title",
 			CommentText = "Updated comment text."
 		};
@@ -138,24 +138,6 @@ public class UpdateCommentHandlerTests
 	}
 
 	[Fact]
-	public async Task Handle_InvalidObjectId_ThrowsNotFoundException()
-	{
-		// Arrange
-		var command = new UpdateCommentCommand
-		{
-			Id = "invalid-objectid",
-			Title = "Updated Title",
-			CommentText = "Updated comment text."
-		};
-
-		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
-
-		// Assert
-		await act.Should().ThrowAsync<NotFoundException>();
-	}
-
-	[Fact]
 	public async Task Handle_RepositoryUpdateFails_ThrowsNotFoundException()
 	{
 		// Arrange
@@ -164,7 +146,7 @@ public class UpdateCommentHandlerTests
 
 		var command = new UpdateCommentCommand
 		{
-			Id = commentId.ToString(),
+			Id = commentId,
 			Title = "Updated Title",
 			CommentText = "Updated comment text."
 		};

@@ -53,7 +53,7 @@ public async Task Handle_ValidIssue_SetsArchivedInDatabase()
 var issue = CreateTestIssueDto("Issue to Delete", "This will be archived");
 var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 
-var command = new DeleteIssueCommand { Id = created.Value.Id.ToString() };
+var command = new DeleteIssueCommand { Id = created.Value.Id };
 
 // Act
 await _handler.Handle(command, CancellationToken.None);
@@ -72,7 +72,7 @@ public async Task Handle_ArchivedIssue_ExcludedFromListByDefault()
 var issue = CreateTestIssueDto("Issue to Archive", "Test");
 var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 
-var command = new DeleteIssueCommand { Id = created.Value.Id.ToString() };
+var command = new DeleteIssueCommand { Id = created.Value.Id };
 
 // Act - Archive the issue
 await _handler.Handle(command, CancellationToken.None);
@@ -87,7 +87,7 @@ allIssues.Should().NotContain(i => i.Id == created.Value.Id);
 public async Task Handle_NonExistentIssue_ThrowsNotFoundException()
 {
 // Arrange
-var nonExistentId = ObjectId.GenerateNewId().ToString();
+var nonExistentId = ObjectId.GenerateNewId();
 var command = new DeleteIssueCommand { Id = nonExistentId };
 
 // Act
@@ -104,7 +104,7 @@ public async Task Handle_IssueNotDeleted_RecordStillExists()
 var issue = CreateTestIssueDto("Issue to Archive", "Should still exist in DB");
 var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 
-var command = new DeleteIssueCommand { Id = created.Value.Id.ToString() };
+var command = new DeleteIssueCommand { Id = created.Value.Id };
 
 // Act - Soft delete
 await _handler.Handle(command, CancellationToken.None);
@@ -125,7 +125,7 @@ public async Task Handle_AlreadyArchivedIssue_IsIdempotent()
 var archivedIssue = CreateTestIssueDto("Already Archived", "Already archived", archived: true);
 var created = await _repository.CreateAsync(archivedIssue, TestContext.Current.CancellationToken);
 
-var command = new DeleteIssueCommand { Id = created.Value.Id.ToString() };
+var command = new DeleteIssueCommand { Id = created.Value.Id };
 
 // Act - Delete already archived issue (should be idempotent)
 await _handler.Handle(command, CancellationToken.None);
@@ -147,7 +147,7 @@ var issue2 = CreateTestIssueDto("Issue 2", "Should remain active");
 var created1 = await _repository.CreateAsync(issue1, TestContext.Current.CancellationToken);
 var created2 = await _repository.CreateAsync(issue2, TestContext.Current.CancellationToken);
 
-var command = new DeleteIssueCommand { Id = created1.Value.Id.ToString() };
+var command = new DeleteIssueCommand { Id = created1.Value.Id };
 
 // Act
 await _handler.Handle(command, CancellationToken.None);

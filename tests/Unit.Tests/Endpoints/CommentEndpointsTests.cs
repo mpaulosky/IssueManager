@@ -101,7 +101,7 @@ public class CommentEndpointsTests : IDisposable
 		var response = await _client.GetAsync("/api/v1/comments/not-a-valid-id");
 
 		// Assert
-		response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+		response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 	}
 
 	[Fact]

@@ -22,7 +22,7 @@ public class UpdateCategoryValidatorTests
 		// Arrange
 		var command = new UpdateCategoryCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			CategoryName = "Enhancement",
 			CategoryDescription = "Improvements to existing features"
 		};
@@ -41,7 +41,7 @@ public class UpdateCategoryValidatorTests
 		// Arrange
 		var command = new UpdateCategoryCommand
 		{
-			Id = "",
+			Id = ObjectId.Empty,
 			CategoryName = "Bug"
 		};
 
@@ -59,7 +59,7 @@ public class UpdateCategoryValidatorTests
 		// Arrange
 		var command = new UpdateCategoryCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			CategoryName = ""
 		};
 
@@ -77,7 +77,7 @@ public class UpdateCategoryValidatorTests
 		// Arrange
 		var command = new UpdateCategoryCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			CategoryName = "A"
 		};
 
@@ -95,7 +95,7 @@ public class UpdateCategoryValidatorTests
 		// Arrange
 		var command = new UpdateCategoryCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			CategoryName = new string('A', 101)
 		};
 
@@ -113,7 +113,7 @@ public class UpdateCategoryValidatorTests
 		// Arrange
 		var command = new UpdateCategoryCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			CategoryName = "Bug",
 			CategoryDescription = new string('X', 501)
 		};

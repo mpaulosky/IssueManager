@@ -22,7 +22,7 @@ public class DeleteStatusValidatorTests
 		// Arrange
 		var command = new DeleteStatusCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString()
+			Id = ObjectId.GenerateNewId()
 		};
 
 		// Act
@@ -37,7 +37,7 @@ public class DeleteStatusValidatorTests
 	public void DeleteStatusValidator_EmptyId_ReturnsValidationError()
 	{
 		// Arrange
-		var command = new DeleteStatusCommand { Id = "" };
+		var command = new DeleteStatusCommand { Id = ObjectId.Empty };
 
 		// Act
 		var result = _validator.Validate(command);
@@ -51,7 +51,7 @@ public class DeleteStatusValidatorTests
 	public void DeleteStatusValidator_NullId_ReturnsValidationError()
 	{
 		// Arrange
-		var command = new DeleteStatusCommand { Id = null! };
+		var command = new DeleteStatusCommand { Id = ObjectId.Empty };
 
 		// Act
 		var result = _validator.Validate(command);
