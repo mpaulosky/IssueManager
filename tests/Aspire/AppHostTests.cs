@@ -53,7 +53,7 @@ var builder = await DistributedApplicationTestingBuilder
 var resources = builder.Resources;
 
 // Assert
-  resources.Should().Contain(r => r.Name == DevDatabaseName, "MongoDB Atlas connection string resource should be registered");
+  resources.Should().Contain(r => r.Name == DatabaseName, "MongoDB Atlas connection string resource should be registered");
 }
 
 /// <summary>
@@ -87,7 +87,7 @@ var builder = await DistributedApplicationTestingBuilder
 var resources = builder.Resources;
 
 // Assert
-resources.Should().Contain(r => r.Name == "api", "API service should be registered");
+resources.Should().Contain(r => r.Name == ApiService, "API service should be registered");
 }
 
 /// <summary>
@@ -104,6 +104,6 @@ var builder = await DistributedApplicationTestingBuilder
 var resources = builder.Resources;
 
 // Assert
-resources.Should().Contain(r => r.Name == "web", "Web application should be registered");
+resources.Should().Contain(r => r.Name == Website, "Web application should be registered");
 }
 }
