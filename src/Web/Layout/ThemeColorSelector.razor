@@ -55,7 +55,7 @@
 	};
 
 	/// <summary>
-	/// Loads the persisted theme preference on first render.
+	/// Loads the persisted theme preference on the first render.
 	/// </summary>
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
@@ -68,7 +68,7 @@
 			}
 			catch (JSException)
 			{
-				// JS not ready, default to blue theme
+				// JS don't ready, default to blue theme
 			}
 		}
 	}

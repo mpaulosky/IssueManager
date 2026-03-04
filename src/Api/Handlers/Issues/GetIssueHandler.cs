@@ -12,7 +12,7 @@ namespace Api.Handlers.Issues;
 /// <summary>
 /// Query for retrieving a single issue.
 /// </summary>
-public record GetIssueQuery(string IssueId);
+public record GetIssueQuery(ObjectId IssueId);
 
 /// <summary>
 /// Handler for retrieving issues.
@@ -34,13 +34,7 @@ public class GetIssueHandler
 	/// </summary>
 	public async Task<IssueDto?> Handle(GetIssueQuery query, CancellationToken cancellationToken = default)
 	{
-		if (string.IsNullOrWhiteSpace(query.IssueId))
-			throw new ArgumentException("Issue ID cannot be empty.", nameof(query.IssueId));
-
-		if (!ObjectId.TryParse(query.IssueId, out var issueId))
-			return null;
-
-		var result = await _repository.GetByIdAsync(issueId, cancellationToken);
+		var result = await _repository.GetByIdAsync(query.IssueId, cancellationToken);
 		return result.Success ? result.Value : null;
 	}
 

@@ -10,7 +10,7 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for DeleteCommentHandler (soft-delete via Archived) with real MongoDB database.
+/// Integration tests for DeleteCommentHandler (soft-delete via Archived) with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -55,7 +55,7 @@ public class DeleteCommentHandlerIntegrationTests : IAsyncLifetime
 		var comment = CreateTestCommentDto("Comment to Delete", "This will be archived");
 		var created = await _repository.CreateAsync(comment, TestContext.Current.CancellationToken);
 
-		var command = new DeleteCommentCommand { Id = created.Value.Id.ToString() };
+		var command = new DeleteCommentCommand { Id = created.Value!.Id };
 
 		// Act
 		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -63,17 +63,17 @@ public class DeleteCommentHandlerIntegrationTests : IAsyncLifetime
 		// Assert
 		result.Should().BeTrue();
 
-		// Verify Archived is set in database
+		// Verify Archived is set in a database
 		var getResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 		getResult.Should().NotBeNull();
-		getResult.Value.Archived.Should().BeTrue();
+		getResult.Value?.Archived.Should().BeTrue();
 	}
 
 	[Fact]
 	public async Task Handle_NonExistentComment_ThrowsNotFoundException()
 	{
 		// Arrange
-		var nonExistentId = ObjectId.GenerateNewId().ToString();
+		var nonExistentId = ObjectId.GenerateNewId();
 		var command = new DeleteCommentCommand { Id = nonExistentId };
 
 		// Act
@@ -90,7 +90,7 @@ public class DeleteCommentHandlerIntegrationTests : IAsyncLifetime
 		var archivedComment = CreateTestCommentDto("Already Archived", "Already archived", archived: true);
 		var created = await _repository.CreateAsync(archivedComment, TestContext.Current.CancellationToken);
 
-		var command = new DeleteCommentCommand { Id = created.Value.Id.ToString() };
+		var command = new DeleteCommentCommand { Id = created.Value!.Id };
 
 		// Act - Delete already archived comment (should be idempotent)
 		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -100,7 +100,7 @@ public class DeleteCommentHandlerIntegrationTests : IAsyncLifetime
 
 		var dbCommentResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 		dbCommentResult.Should().NotBeNull();
-		dbCommentResult.Value.Archived.Should().BeTrue();
+		dbCommentResult.Value?.Archived.Should().BeTrue();
 	}
 
 	[Fact]
@@ -110,7 +110,7 @@ public class DeleteCommentHandlerIntegrationTests : IAsyncLifetime
 		var comment = CreateTestCommentDto("Comment to Archive", "Should still exist in DB");
 		var created = await _repository.CreateAsync(comment, TestContext.Current.CancellationToken);
 
-		var command = new DeleteCommentCommand { Id = created.Value.Id.ToString() };
+		var command = new DeleteCommentCommand { Id = created.Value!.Id };
 
 		// Act - Soft delete
 		await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -118,7 +118,7 @@ public class DeleteCommentHandlerIntegrationTests : IAsyncLifetime
 		// Assert - Record should still exist (soft delete)
 		var dbComment = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 		dbComment.Should().NotBeNull();
-		dbComment.Value.Id.Should().Be(created.Value.Id);
-		dbComment.Value.Archived.Should().BeTrue();
+		dbComment.Value?.Id.Should().Be(created.Value.Id);
+		dbComment.Value?.Archived.Should().BeTrue();
 	}
 }

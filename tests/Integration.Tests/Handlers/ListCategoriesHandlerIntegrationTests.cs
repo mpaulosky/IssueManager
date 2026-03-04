@@ -10,7 +10,7 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for ListCategoriesHandler with real MongoDB database.
+/// Integration tests for ListCategoriesHandler with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -75,10 +75,11 @@ public class ListCategoriesHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().HaveCount(3);
-		result.Should().Contain(c => c.CategoryName == "Category 1");
-		result.Should().Contain(c => c.CategoryName == "Category 2");
-		result.Should().Contain(c => c.CategoryName == "Category 3");
+		IEnumerable<CategoryDto> categoryDtos = result.ToList();
+		categoryDtos.Should().HaveCount(3);
+		categoryDtos.Should().Contain(c => c.CategoryName == "Category 1");
+		categoryDtos.Should().Contain(c => c.CategoryName == "Category 2");
+		categoryDtos.Should().Contain(c => c.CategoryName == "Category 3");
 	}
 
 	[Fact]
@@ -90,7 +91,7 @@ public class ListCategoriesHandlerIntegrationTests : IAsyncLifetime
 		{
 			var category = CreateTestCategoryDto($"Category {i}", $"Description {i}");
 			var created = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
-			categoriesToCreate.Add(created.Value);
+			categoriesToCreate.Add(created.Value!);
 		}
 
 		// Archive first 2 categories

@@ -7,7 +7,7 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-namespace Tests.Unit.Handlers.Categories;
+namespace Unit.Handlers.Categories;
 
 /// <summary>
 /// Unit tests for ListCategoriesHandler.
@@ -39,7 +39,7 @@ public class ListCategoriesHandlerTests
 			.Returns(Result<IReadOnlyList<CategoryDto>>.Ok(categories));
 
 		// Act
-		var result = await _handler.Handle(Xunit.TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().HaveCount(3);
@@ -56,7 +56,7 @@ public class ListCategoriesHandlerTests
 			.Returns(Result<IReadOnlyList<CategoryDto>>.Ok((IReadOnlyList<CategoryDto>)new List<CategoryDto>()));
 
 		// Act
-		var result = await _handler.Handle(Xunit.TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeEmpty();
@@ -70,7 +70,7 @@ public class ListCategoriesHandlerTests
 			.Returns(Result<IReadOnlyList<CategoryDto>>.Fail("Database error"));
 
 		// Act
-		var result = await _handler.Handle(Xunit.TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeEmpty();
@@ -84,7 +84,7 @@ public class ListCategoriesHandlerTests
 			.Returns(Result<IReadOnlyList<CategoryDto>>.Ok((IReadOnlyList<CategoryDto>)null!));
 
 		// Act
-		var result = await _handler.Handle(Xunit.TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().BeEmpty();
@@ -103,7 +103,7 @@ public class ListCategoriesHandlerTests
 			.Returns(Result<IReadOnlyList<CategoryDto>>.Ok(categories));
 
 		// Act
-		await _handler.Handle(Xunit.TestContext.Current.CancellationToken);
+		await _handler.Handle(TestContext.Current.CancellationToken);
 
 		// Assert
 		await _repository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());

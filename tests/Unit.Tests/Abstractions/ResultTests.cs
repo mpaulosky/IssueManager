@@ -7,7 +7,7 @@
 // Project Name :  Unit.Tests
 // =======================================================
 
-namespace Tests.Unit.Abstractions;
+namespace Unit.Abstractions;
 
 /// <summary>
 /// Unit tests for <see cref="Result"/> and <see cref="Result{T}"/> classes.

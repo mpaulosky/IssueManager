@@ -1,4 +1,12 @@
-namespace Tests.Unit.Validators;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     UpdateStatusValidatorTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Unit.Tests
+// =======================================================
+namespace Unit.Validators;
 
 /// <summary>
 /// Unit tests for <see cref="UpdateStatusValidator"/>.
@@ -14,7 +22,7 @@ public class UpdateStatusValidatorTests
 		// Arrange
 		var command = new UpdateStatusCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			StatusName = "In Progress",
 			StatusDescription = "Currently being worked on"
 		};
@@ -33,7 +41,7 @@ public class UpdateStatusValidatorTests
 		// Arrange
 		var command = new UpdateStatusCommand
 		{
-			Id = "",
+			Id = ObjectId.Empty,
 			StatusName = "Open"
 		};
 
@@ -51,7 +59,7 @@ public class UpdateStatusValidatorTests
 		// Arrange
 		var command = new UpdateStatusCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			StatusName = ""
 		};
 
@@ -69,7 +77,7 @@ public class UpdateStatusValidatorTests
 		// Arrange
 		var command = new UpdateStatusCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			StatusName = "A"
 		};
 
@@ -87,7 +95,7 @@ public class UpdateStatusValidatorTests
 		// Arrange
 		var command = new UpdateStatusCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			StatusName = new string('A', 101)
 		};
 
@@ -105,7 +113,7 @@ public class UpdateStatusValidatorTests
 		// Arrange
 		var command = new UpdateStatusCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			StatusName = "Open",
 			StatusDescription = new string('X', 501)
 		};

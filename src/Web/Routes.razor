@@ -2,7 +2,7 @@
 
 <Router AppAssembly="typeof(App).Assembly">
 	<Found Context="routeData">
-		<AuthorizeRouteView RouteData="@routeData" DefaultLayout="typeof(Web.Layout.MainLayout)">
+		<AuthorizeRouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)">
 			<NotAuthorized>
 				<RedirectToLoginPage />
 			</NotAuthorized>
@@ -10,7 +10,7 @@
 	</Found>
 	<NotFound>
 		<PageTitle>Not found</PageTitle>
-		<LayoutView Layout="typeof(Web.Layout.MainLayout)">
+		<LayoutView Layout="typeof(MainLayout)">
 			<p role="alert">Sorry, there's nothing at this address.</p>
 		</LayoutView>
 	</NotFound>

@@ -1,6 +1,8 @@
 // Copyright (c) 2026. All rights reserved.
 
-namespace Tests.BlazorTests.Pages.Issues;
+using BlazorTests.Fixtures;
+
+namespace BlazorTests.Pages.Issues;
 
 /// <summary>
 /// bUnit tests for the <see cref="EditIssuePage"/> Blazor page.
@@ -22,7 +24,7 @@ public class EditIssuePageTests : ComponentTestBase
 		_mockIssueClient
 			.UpdateAsync(Arg.Any<string>(), Arg.Any<UpdateIssueCommand>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IssueDto?>(null));
-		TestContext.Services.AddSingleton<IIssueApiClient>(_mockIssueClient);
+		TestContext.Services.AddSingleton(_mockIssueClient);
 	}
 
 	private static IssueDto MakeIssue(string title = "Existing Issue") => new(
@@ -113,7 +115,7 @@ public class EditIssuePageTests : ComponentTestBase
 		var cut = TestContext.Render<EditIssuePage>(p =>
 			p.Add(c => c.Id, issue.Id.ToString()));
 
-		// Assert — edit mode shows "Update Issue" on the submit button
+		// Assert — edit mode shows "Update Issue" on the Submit button
 		cut.Find("button[type='submit']").TextContent.Should().Contain("Update Issue");
 	}
 
@@ -129,7 +131,7 @@ public class EditIssuePageTests : ComponentTestBase
 			p.Add(c => c.Id, issue.Id.ToString()));
 
 		// Act — update the title and submit
-		cut.Find("#title").Change("Updated Issue Title");
+		await cut.Find("#title").ChangeAsync("Updated Issue Title");
 		await cut.Find("form").SubmitAsync();
 
 		// Assert
@@ -148,7 +150,7 @@ public class EditIssuePageTests : ComponentTestBase
 		var cut = TestContext.Render<EditIssuePage>(p =>
 			p.Add(c => c.Id, issue.Id.ToString()));
 
-		cut.Find("#title").Change("Updated Title");
+		await cut.Find("#title").ChangeAsync("Updated Title");
 
 		// Act
 		await cut.Find("form").SubmitAsync();

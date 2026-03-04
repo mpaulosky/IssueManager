@@ -49,10 +49,7 @@ public class UpdateCommentHandler
 		if (!validationResult.IsValid)
 			throw new ValidationException(validationResult.Errors);
 
-		if (!MongoDB.Bson.ObjectId.TryParse(command.Id, out var objectId))
-			throw new NotFoundException($"Comment with ID '{command.Id}' was not found.");
-
-		var getResult = await _repository.GetByIdAsync(objectId, cancellationToken);
+		var getResult = await _repository.GetByIdAsync(command.Id, cancellationToken);
 		if (getResult.Failure || getResult.Value is null)
 			throw new NotFoundException($"Comment with ID '{command.Id}' was not found.");
 

@@ -1,3 +1,11 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     UpdateIssueHandlerIntegrationTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Integration.Tests
+// =======================================================
 namespace Integration.Handlers;
 
 /// <summary>
@@ -47,7 +55,7 @@ var created = await _repository.CreateAsync(originalIssue, TestContext.Current.C
 
 var command = new UpdateIssueCommand
 {
-Id = created.Value.Id.ToString(),
+Id = created.Value!.Id,
 Title = "Updated Title",
 Description = "Updated Description"
 };
@@ -57,7 +65,7 @@ var result = await _handler.Handle(command, CancellationToken.None);
 
 // Assert
 result.Should().NotBeNull();
-result.Id.Should().Be(created.Value.Id);
+result.Id.Should().Be(created.Value!.Id);
 result.Title.Should().Be("Updated Title");
 result.Description.Should().Be("Updated Description");
 
@@ -65,8 +73,8 @@ result.Description.Should().Be("Updated Description");
 var dbIssueResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 dbIssueResult.Should().NotBeNull();
 var dbIssue = dbIssueResult.Value;
-dbIssue.Title.Should().Be("Updated Title");
-dbIssue.Description.Should().Be("Updated Description");
+dbIssue?.Title.Should().Be("Updated Title");
+dbIssue?.Description.Should().Be("Updated Description");
 }
 
 [Fact]
@@ -78,27 +86,27 @@ var created = await _repository.CreateAsync(originalIssue, TestContext.Current.C
 
 var command = new UpdateIssueCommand
 {
-Id = created.Value.Id.ToString(),
+Id = created.Value!.Id,
 Title = "New Title",
 Description = "New Description"
 };
 
 // Act
-var result = await _handler.Handle(command, CancellationToken.None);
+await _handler.Handle(command, CancellationToken.None);
 
 // Assert - Both fields should be updated atomically
-var dbIssueResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
+var dbIssueResult = await _repository.GetByIdAsync(created.Value!.Id, TestContext.Current.CancellationToken);
 dbIssueResult.Should().NotBeNull();
 var dbIssue = dbIssueResult.Value;
-dbIssue.Title.Should().Be("New Title");
-dbIssue.Description.Should().Be("New Description");
+dbIssue?.Title.Should().Be("New Title");
+dbIssue?.Description.Should().Be("New Description");
 }
 
 [Fact]
 public async Task Handle_NonExistentIssue_ThrowsNotFoundException()
 {
 // Arrange
-var nonExistentId = ObjectId.GenerateNewId().ToString();
+var nonExistentId = ObjectId.GenerateNewId();
 var command = new UpdateIssueCommand
 {
 Id = nonExistentId,
@@ -122,14 +130,14 @@ var created = await _repository.CreateAsync(issue, TestContext.Current.Cancellat
 
 var command1 = new UpdateIssueCommand
 {
-Id = created.Value.Id.ToString(),
+Id = created.Value!.Id,
 Title = "First Update",
 Description = "First Description"
 };
 
 var command2 = new UpdateIssueCommand
 {
-Id = created.Value.Id.ToString(),
+Id = created.Value!.Id,
 Title = "Second Update",
 Description = "Second Description"
 };
@@ -140,11 +148,11 @@ await Task.Delay(100, TestContext.Current.CancellationToken); // Small delay to 
 await _handler.Handle(command2, TestContext.Current.CancellationToken);
 
 // Assert - Last write wins
-var dbIssueResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
+var dbIssueResult = await _repository.GetByIdAsync(created.Value!.Id, TestContext.Current.CancellationToken);
 dbIssueResult.Should().NotBeNull();
 var dbIssue = dbIssueResult.Value;
-dbIssue.Title.Should().Be("Second Update");
-dbIssue.Description.Should().Be("Second Description");
+dbIssue?.Title.Should().Be("Second Update");
+dbIssue?.Description.Should().Be("Second Description");
 }
 
 [Fact]
@@ -156,7 +164,7 @@ var created = await _repository.CreateAsync(archivedIssue, TestContext.Current.C
 
 var command = new UpdateIssueCommand
 {
-Id = created.Value.Id.ToString(),
+Id = created.Value!.Id,
 Title = "Attempt Update",
 Description = "Should fail"
 };
@@ -168,8 +176,8 @@ Func<Task> act = async () => await _handler.Handle(command, CancellationToken.No
 await act.Should().ThrowAsync<ConflictException>();
 
 // Verify the issue wasn't updated
-var dbIssueResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
+var dbIssueResult = await _repository.GetByIdAsync(created.Value!.Id, TestContext.Current.CancellationToken);
 var dbIssue = dbIssueResult.Value;
-dbIssue.Title.Should().Be("Archived Issue");
+dbIssue?.Title.Should().Be("Archived Issue");
 }
 }

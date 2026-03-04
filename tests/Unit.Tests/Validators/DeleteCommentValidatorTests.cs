@@ -1,4 +1,12 @@
-namespace Tests.Unit.Validators;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     DeleteCommentValidatorTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Unit.Tests
+// =======================================================
+namespace Unit.Validators;
 
 /// <summary>
 /// Unit tests for <see cref="DeleteCommentValidator"/>.
@@ -14,7 +22,7 @@ public class DeleteCommentValidatorTests
 		// Arrange
 		var command = new DeleteCommentCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString()
+			Id = ObjectId.GenerateNewId()
 		};
 
 		// Act
@@ -29,7 +37,7 @@ public class DeleteCommentValidatorTests
 	public void DeleteCommentValidator_EmptyId_ReturnsValidationError()
 	{
 		// Arrange
-		var command = new DeleteCommentCommand { Id = "" };
+		var command = new DeleteCommentCommand { Id = ObjectId.Empty };
 
 		// Act
 		var result = _validator.Validate(command);
@@ -43,7 +51,7 @@ public class DeleteCommentValidatorTests
 	public void DeleteCommentValidator_NullId_ReturnsValidationError()
 	{
 		// Arrange
-		var command = new DeleteCommentCommand { Id = null! };
+		var command = new DeleteCommentCommand { Id = ObjectId.Empty };
 
 		// Act
 		var result = _validator.Validate(command);

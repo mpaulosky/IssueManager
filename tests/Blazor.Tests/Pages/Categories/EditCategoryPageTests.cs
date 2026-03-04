@@ -1,6 +1,6 @@
 // Copyright (c) 2026. All rights reserved.
 
-namespace Tests.BlazorTests.Pages.Categories;
+namespace BlazorTests.Pages.Categories;
 
 /// <summary>
 /// bUnit tests for the <see cref="EditCategoryPage"/> Blazor page.
@@ -22,13 +22,13 @@ public class EditCategoryPageTests : IDisposable
 			.Returns(Task.FromResult<CategoryDto?>(null));
 		_mockCategoryClient.UpdateAsync(Arg.Any<string>(), Arg.Any<UpdateCategoryCommand>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<CategoryDto?>(null));
-		_ctx.Services.AddSingleton<ICategoryApiClient>(_mockCategoryClient);
+		_ctx.Services.AddSingleton(_mockCategoryClient);
 	}
 
 	/// <inheritdoc/>
 	public void Dispose()
 	{
-		_ctx?.Dispose();
+		_ctx.Dispose();
 		GC.SuppressFinalize(this);
 	}
 
@@ -115,7 +115,7 @@ public class EditCategoryPageTests : IDisposable
 			p.Add(c => c.Id, category.Id.ToString()));
 
 		// Act — change the name and submit
-		cut.Find("#category-name").Change("Updated Security");
+		await cut.Find("#category-name").ChangeAsync("Updated Security");
 		await cut.Find("form").SubmitAsync();
 
 		// Assert
@@ -134,7 +134,7 @@ public class EditCategoryPageTests : IDisposable
 		var cut = _ctx.Render<EditCategoryPage>(p =>
 			p.Add(c => c.Id, category.Id.ToString()));
 
-		cut.Find("#category-name").Change("Updated Network");
+		await cut.Find("#category-name").ChangeAsync("Updated Network");
 
 		// Act
 		await cut.Find("form").SubmitAsync();

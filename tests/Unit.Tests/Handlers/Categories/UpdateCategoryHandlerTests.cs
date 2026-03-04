@@ -7,7 +7,7 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-namespace Tests.Unit.Handlers.Categories;
+namespace Unit.Handlers.Categories;
 
 /// <summary>
 /// Unit tests for UpdateCategoryHandler.
@@ -36,7 +36,7 @@ public class UpdateCategoryHandlerTests
 
 		var command = new UpdateCategoryCommand
 		{
-			Id = categoryId.ToString(),
+			Id = categoryId,
 			CategoryName = "Updated Name",
 			CategoryDescription = "Updated Description"
 		};
@@ -65,7 +65,7 @@ public class UpdateCategoryHandlerTests
 		// Arrange
 		var command = new UpdateCategoryCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			CategoryName = "",
 			CategoryDescription = "Description"
 		};
@@ -84,7 +84,7 @@ public class UpdateCategoryHandlerTests
 		// Arrange
 		var command = new UpdateCategoryCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			CategoryName = new string('A', 101),
 			CategoryDescription = "Description"
 		};
@@ -104,7 +104,7 @@ public class UpdateCategoryHandlerTests
 		var categoryId = ObjectId.GenerateNewId();
 		var command = new UpdateCategoryCommand
 		{
-			Id = categoryId.ToString(),
+			Id = categoryId,
 			CategoryName = "Updated Name",
 			CategoryDescription = "Updated Description"
 		};
@@ -121,24 +121,6 @@ public class UpdateCategoryHandlerTests
 	}
 
 	[Fact]
-	public async Task Handle_InvalidObjectId_ThrowsNotFoundException()
-	{
-		// Arrange
-		var command = new UpdateCategoryCommand
-		{
-			Id = "invalid-objectid",
-			CategoryName = "Updated Name",
-			CategoryDescription = "Updated Description"
-		};
-
-		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
-
-		// Assert
-		await act.Should().ThrowAsync<NotFoundException>();
-	}
-
-	[Fact]
 	public async Task Handle_RepositoryUpdateFails_ThrowsNotFoundException()
 	{
 		// Arrange
@@ -147,7 +129,7 @@ public class UpdateCategoryHandlerTests
 
 		var command = new UpdateCategoryCommand
 		{
-			Id = categoryId.ToString(),
+			Id = categoryId,
 			CategoryName = "Updated Name",
 			CategoryDescription = "Updated Description"
 		};
@@ -176,7 +158,7 @@ public class UpdateCategoryHandlerTests
 
 		var command = new UpdateCategoryCommand
 		{
-			Id = categoryId.ToString(),
+			Id = categoryId,
 			CategoryName = "Updated Name",
 			CategoryDescription = null
 		};

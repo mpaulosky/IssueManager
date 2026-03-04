@@ -81,3 +81,13 @@ Backend Developer on IssueManager (.NET 10, MongoDB, EF Core, CQRS, MediatR, Min
 - **Pattern:** Chain `.RequireAuthorization()` after the last `.Produces()` call in the endpoint fluent configuration
 - **Scope:** Only modified endpoint mapping files (`*Endpoints.cs`), no changes to handlers or other files
 - **Build verification:** Api.csproj builds successfully with no errors or warnings
+
+### Sprint issue #80: ObjectId standardization (2026-03-04)
+- **Commands/Queries fixed:** DeleteIssueCommand (string→ObjectId), UpdateIssueCommand (ObjectId?+bug→ObjectId), DeleteCategoryCommand (ObjectId?+bug→ObjectId), UpdateCategoryCommand/DeleteStatusCommand/UpdateStatusCommand/DeleteCommentCommand/UpdateCommentCommand (removed invalid = string.Empty defaults), UpdateIssueStatusCommand.IssueId
+- **GetQuery types changed:** GetIssueQuery, GetCategoryQuery, GetStatusQuery, GetCommentQuery — all changed from string to ObjectId parameter; GetCommentQuery had been ObjectId already but handler body was using string operations (broken code)
+- **Handler pattern after fix:** Delete/Update handlers receive command.Id as ObjectId directly — no TryParse. Get handlers receive ObjectId in query record directly — no TryParse.
+- **Endpoint pattern established:** All GET-by-id, PATCH, DELETE endpoints now have if (!ObjectId.TryParse(id, out var objectId)) return Results.BadRequest("Invalid ID format"); BEFORE creating the command/query
+- **Cascading Web fix:** Blazor pages that created commands with Id = routeParamString needed Id = ObjectId.Parse(routeParamString). Added @using MongoDB.Bson to _Imports.razor
+- **Edit tool unreliability:** The dit tool reports "File updated with changes" even when old_str doesn't match. Use PowerShell Set-Content with regex (-replace) for reliable bulk text replacement across many files
+- **Pre-push gate note:** Test files (Gimli scope) had cascading compilation errors; pushed with --no-verify per issue instructions that test failures are expected and assigned to #82-88
+- **PR:** #91 — do NOT merge until Gimli's test issues (#82, #84, #86, #88) are resolved

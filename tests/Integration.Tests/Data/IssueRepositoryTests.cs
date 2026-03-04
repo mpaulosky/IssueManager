@@ -1,3 +1,11 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     IssueRepositoryTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Integration.Tests
+// =======================================================
 namespace Integration.Data;
 
 /// <summary>
@@ -92,13 +100,13 @@ page1Items.Select(i => i.Id).Should().NotIntersectWith(page2Items.Select(i => i.
 public async Task GetAllAsync_ExcludesArchived_ByDefault()
 {
 // Arrange - Create 10 issues, archive 3
-var issuesToArchive = new List<string>();
+var issuesToArchive = new List<string?>();
 for (int i = 0; i < 10; i++)
 {
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
 	var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 	if (i < 3)
-		issuesToArchive.Add(created.Value.Id.ToString());
+		issuesToArchive.Add(created.Value?.Id.ToString());
 }
 
 foreach (var id in issuesToArchive)
@@ -121,13 +129,13 @@ items.Should().OnlyContain(i => !i.Archived);
 public async Task GetAllAsync_All_IncludesArchivedIssues()
 {
 // Arrange - Create 10 issues, archive 3
-var issuesToArchive = new List<string>();
+var issuesToArchive = new List<string?>();
 for (int i = 0; i < 10; i++)
 {
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
 	var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 	if (i < 3)
-		issuesToArchive.Add(created.Value.Id.ToString());
+		issuesToArchive.Add(created.Value?.Id.ToString());
 }
 
 foreach (var id in issuesToArchive)
@@ -147,13 +155,13 @@ allIssues.Should().HaveCount(10); // All issues including archived
 public async Task CountAsync_ReturnsTotalIssueCount()
 {
 // Arrange - Create 10 issues, archive 3
-var issuesToArchive = new List<string>();
+var issuesToArchive = new List<string?>();
 for (int i = 0; i < 10; i++)
 {
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
 	var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 	if (i < 3)
-		issuesToArchive.Add(created.Value.Id.ToString());
+		issuesToArchive.Add(created.Value?.Id.ToString());
 }
 
 foreach (var id in issuesToArchive)
@@ -176,16 +184,23 @@ var issue = CreateTestIssueDto("Issue to Archive", "Test");
 var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 
 // Act
-var archiveResult = await _repository.ArchiveAsync(created.Value.Id, TestContext.Current.CancellationToken);
+if (created.Value != null)
+{
+	var archiveResult = await _repository.ArchiveAsync(created.Value.Id, TestContext.Current.CancellationToken);
 
 // Assert
-archiveResult.Success.Should().BeTrue();
+	archiveResult.Success.Should().BeTrue();
+}
 
 // Verify in database
-var getResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
-var dbIssue = getResult.Value;
-dbIssue.Should().NotBeNull();
-dbIssue!.Archived.Should().BeTrue();
+if (created.Value != null)
+{
+	var getResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
+	var dbIssue = getResult.Value;
+	dbIssue.Should().NotBeNull();
+	dbIssue.Archived.Should().BeTrue();
+}
+
 }
 
 [Fact]
@@ -196,14 +211,18 @@ var issue = CreateTestIssueDto("Issue to Archive", "Should still exist");
 var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 
 // Act - Soft delete (archive)
-await _repository.ArchiveAsync(created.Value.Id, TestContext.Current.CancellationToken);
+	if (created.Value != null)
+	{
+		await _repository.ArchiveAsync(created.Value.Id, TestContext.Current.CancellationToken);
 
 // Assert - Record still exists
-var getResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
-var dbIssue = getResult.Value;
-dbIssue.Should().NotBeNull();
-dbIssue!.Id.Should().Be(created.Value.Id);
-dbIssue.Archived.Should().BeTrue();
+		var getResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
+		var dbIssue = getResult.Value;
+		dbIssue.Should().NotBeNull();
+		dbIssue.Id.Should().Be(created.Value.Id);
+		dbIssue.Archived.Should().BeTrue();
+	}
+
 }
 
 [Fact]

@@ -35,10 +35,7 @@ public class UpdateIssueStatusHandler
 		if (!validationResult.IsValid)
 			throw new ValidationException(validationResult.Errors);
 
-		if (!ObjectId.TryParse(command.IssueId, out var issueId))
-			return null;
-
-		var result = await _repository.GetByIdAsync(issueId, cancellationToken);
+		var result = await _repository.GetByIdAsync(command.IssueId, cancellationToken);
 		if (!result.Success || result.Value is null)
 			return null;
 

@@ -7,7 +7,7 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-namespace Tests.Unit.Services;
+namespace Unit.Services;
 
 /// <summary>
 /// Unit tests for CurrentUserService.

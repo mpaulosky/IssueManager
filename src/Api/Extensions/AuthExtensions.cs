@@ -9,15 +9,15 @@ public static class AuthExtensions
 {
 	/// <summary>
 	/// Adds Auth0 JWT Bearer authentication to the API services.
-	/// Only wires up real authentication when Auth0:Domain and Auth0:Audience configuration values are present.
+	/// Only wires up real authentication when Auth0: Domain and Auth0: Audience configuration values are present.
 	/// When those values are absent, falls back to a no-op scheme only if the environment is "Testing"
 	/// or if <c>Auth:EnableNoAuthForTesting=true</c> is set; otherwise throws.
 	/// </summary>
 	/// <remarks>
 	/// Required configuration (set via user secrets or environment variables):
 	/// <list type="bullet">
-	///   <item><description>Auth0:Domain — your Auth0 tenant domain (e.g. your-tenant.auth0.com)</description></item>
-	///   <item><description>Auth0:Audience — the API identifier registered in your Auth0 dashboard</description></item>
+	///   <item><description>Auth0: Domain — your Auth0 tenant domain (e.g., your-tenant.auth0.com)</description></item>
+	///   <item><description>Auth0: Audience — the API identifier registered in your Auth0 dashboard</description></item>
 	/// </list>
 	/// </remarks>
 	public static WebApplicationBuilder AddAuth0(this WebApplicationBuilder builder)
@@ -33,17 +33,17 @@ public static class AuthExtensions
 			var isTestingEnvironment = builder.Environment.IsEnvironment("Testing");
 			var enableNoAuthForTesting = builder.Configuration["Auth:EnableNoAuthForTesting"];
 			var noAuthEnabled = isTestingEnvironment ||
-				string.Equals(enableNoAuthForTesting, "true", System.StringComparison.OrdinalIgnoreCase);
+				string.Equals(enableNoAuthForTesting, "true", StringComparison.OrdinalIgnoreCase);
 
 			if (noAuthEnabled)
 			{
 				// Auth0 is not configured — add a no-op authentication scheme only for safe testing environments.
 				builder.Services.AddAuthentication("NoAuth")
-					.AddScheme<NoAuthOptions, NoAuthHandler>("NoAuth", options => { });
+					.AddScheme<NoAuthOptions, NoAuthHandler>("NoAuth", _ => { });
 				return builder;
 			}
 
-			throw new System.InvalidOperationException(
+			throw new InvalidOperationException(
 				"Auth0 configuration is missing (Auth0:Domain and/or Auth0:Audience). " +
 				"Configure Auth0 for this environment, or set 'Auth:EnableNoAuthForTesting=true' " +
 				"only in safe testing environments to bypass authentication.");
@@ -82,7 +82,7 @@ public class NoAuthHandler : Microsoft.AspNetCore.Authentication.AuthenticationH
 {
 	public NoAuthHandler(
 		Microsoft.Extensions.Options.IOptionsMonitor<NoAuthOptions> options,
-		Microsoft.Extensions.Logging.ILoggerFactory logger,
+		ILoggerFactory logger,
 		System.Text.Encodings.Web.UrlEncoder encoder)
 		: base(options, logger, encoder)
 	{

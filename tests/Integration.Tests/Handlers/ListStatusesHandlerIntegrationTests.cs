@@ -10,7 +10,7 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for ListStatusesHandler with real MongoDB database.
+/// Integration tests for ListStatusesHandler with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -75,10 +75,11 @@ public class ListStatusesHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().HaveCount(3);
-		result.Should().Contain(s => s.StatusName == "Status 1");
-		result.Should().Contain(s => s.StatusName == "Status 2");
-		result.Should().Contain(s => s.StatusName == "Status 3");
+		IEnumerable<StatusDto> statusDtos = result.ToList();
+		statusDtos.Should().HaveCount(3);
+		statusDtos.Should().Contain(s => s.StatusName == "Status 1");
+		statusDtos.Should().Contain(s => s.StatusName == "Status 2");
+		statusDtos.Should().Contain(s => s.StatusName == "Status 3");
 	}
 
 	[Fact]
@@ -90,7 +91,7 @@ public class ListStatusesHandlerIntegrationTests : IAsyncLifetime
 		{
 			var status = CreateTestStatusDto($"Status {i}", $"Description {i}");
 			var created = await _repository.CreateAsync(status, TestContext.Current.CancellationToken);
-			statusesToCreate.Add(created.Value);
+			statusesToCreate.Add(created.Value!);
 		}
 
 		// Archive first 2 statuses

@@ -5,7 +5,7 @@
 // Solution Name : IssueManager
 // Project Name :  Unit.Tests
 
-namespace Tests.Unit.Helpers;
+namespace Unit.Helpers;
 
 /// <summary>
 /// Unit tests for <see cref="MyCategories"/>.

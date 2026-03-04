@@ -7,7 +7,7 @@
 // Project Name :  Blazor.Tests
 // =============================================
 
-namespace Tests.BlazorTests.Services;
+namespace BlazorTests.Services;
 
 /// <summary>
 /// Unit tests for the <see cref="CommentApiClient"/> HTTP client.
@@ -55,8 +55,9 @@ public class CommentApiClientTests
 		var result = await client.GetAllAsync(cancellationToken: Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.Should().HaveCount(2);
+		IEnumerable<CommentDto> commentDtos = result as CommentDto[] ?? result.ToArray();
+		commentDtos.Should().NotBeNull();
+		commentDtos.Should().HaveCount(2);
 	}
 
 	[Fact]
@@ -70,8 +71,9 @@ public class CommentApiClientTests
 		var result = await client.GetAllAsync(cancellationToken: Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.Should().BeEmpty();
+		IEnumerable<CommentDto> commentDtos = result as CommentDto[] ?? result.ToArray();
+		commentDtos.Should().NotBeNull();
+		commentDtos.Should().BeEmpty();
 	}
 
 	[Fact]
@@ -93,7 +95,7 @@ public class CommentApiClientTests
 
 		// Assert
 		result.Should().NotBeNull();
-		result!.Title.Should().Be("New Comment");
+		result.Title.Should().Be("New Comment");
 	}
 
 	[Fact]

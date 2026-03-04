@@ -7,7 +7,7 @@
 // Project Name :  Blazor.Tests
 // =============================================
 
-namespace Tests.BlazorTests.Services;
+namespace BlazorTests.Services;
 
 /// <summary>
 /// Unit tests for the <see cref="CategoryApiClient"/> HTTP client.
@@ -50,8 +50,9 @@ public class CategoryApiClientTests
 		var result = await client.GetAllAsync(Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.Should().HaveCount(2);
+		IEnumerable<CategoryDto> categoryDtos = result as CategoryDto[] ?? result.ToArray();
+		categoryDtos.Should().NotBeNull();
+		categoryDtos.Should().HaveCount(2);
 	}
 
 	[Fact]
@@ -65,8 +66,9 @@ public class CategoryApiClientTests
 		var result = await client.GetAllAsync(Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.Should().BeEmpty();
+		IEnumerable<CategoryDto> categoryDtos = result as CategoryDto[] ?? result.ToArray();
+		categoryDtos.Should().NotBeNull();
+		categoryDtos.Should().BeEmpty();
 	}
 
 	[Fact]
@@ -83,7 +85,7 @@ public class CategoryApiClientTests
 
 		// Assert
 		result.Should().NotBeNull();
-		result!.CategoryName.Should().Be("New Category");
+		result.CategoryName.Should().Be("New Category");
 	}
 
 	[Fact]

@@ -1,7 +1,15 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     UpdateIssueStatusHandlerTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Integration.Tests
+// =======================================================
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for UpdateIssueStatusHandler with real MongoDB database.
+/// Integration tests for UpdateIssueStatusHandler with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -46,24 +54,27 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 		var created = await _repository.CreateAsync(issueDto, TestContext.Current.CancellationToken);
 		var newStatus = new StatusDto(ObjectId.GenerateNewId(), "InProgress", "Issue is in progress", DateTime.UtcNow, null, false, UserDto.Empty);
 
-		var command = new UpdateIssueStatusCommand
+		if (created.Value != null)
 		{
-			IssueId = created.Value.Id.ToString(),
-			Status = newStatus
-		};
+			var command = new UpdateIssueStatusCommand
+			{
+					IssueId = created.Value.Id,
+					Status = newStatus
+			};
 
-		// Act
-		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+			// Act
+			var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
-		// Assert
-		result.Should().NotBeNull();
-		result!.Status.StatusName.Should().Be("InProgress");
+			// Assert
+			result.Should().NotBeNull();
+			result.Status.StatusName.Should().Be("InProgress");
+		}
 
 		// Verify persistence
-		var retrievedResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
+		var retrievedResult = await _repository.GetByIdAsync(created.Value!.Id, TestContext.Current.CancellationToken);
 		retrievedResult.Should().NotBeNull();
 		var retrieved = retrievedResult.Value;
-		retrieved.Status.StatusName.Should().Be("InProgress");
+		retrieved?.Status.StatusName.Should().Be("InProgress");
 	}
 
 	[Fact]
@@ -72,7 +83,7 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 		// Arrange
 		var command = new UpdateIssueStatusCommand
 		{
-			IssueId = ObjectId.GenerateNewId().ToString(),
+			IssueId = new ObjectId(ObjectId.GenerateNewId().ToString()),
 			Status = new StatusDto(ObjectId.GenerateNewId(), "Closed", "Issue is closed", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
@@ -89,7 +100,7 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 		// Arrange
 		var command = new UpdateIssueStatusCommand
 		{
-			IssueId = "",
+			IssueId = new ObjectId(""),
 			Status = new StatusDto(ObjectId.GenerateNewId(), "InProgress", "Issue is in progress", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
@@ -107,31 +118,31 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 		// Act - Transition to InProgress
 		var inProgressCommand = new UpdateIssueStatusCommand
 		{
-			IssueId = created.Value.Id.ToString(),
+			IssueId = new ObjectId(created.Value?.Id.ToString()),
 			Status = new StatusDto(ObjectId.GenerateNewId(), "InProgress", "Issue is in progress", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 		var inProgressResult = await _handler.Handle(inProgressCommand, TestContext.Current.CancellationToken);
 
 		// Assert InProgress
 		inProgressResult.Should().NotBeNull();
-		inProgressResult!.Status.StatusName.Should().Be("InProgress");
+		inProgressResult.Status.StatusName.Should().Be("InProgress");
 
 		// Act - Transition to Closed
 		var closedCommand = new UpdateIssueStatusCommand
 		{
-			IssueId = created.Value.Id.ToString(),
+			IssueId = new ObjectId(created.Value?.Id.ToString()),
 			Status = new StatusDto(ObjectId.GenerateNewId(), "Closed", "Issue is closed", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 		var closedResult = await _handler.Handle(closedCommand, TestContext.Current.CancellationToken);
 
 		// Assert Closed
 		closedResult.Should().NotBeNull();
-		closedResult!.Status.StatusName.Should().Be("Closed");
+		closedResult.Status.StatusName.Should().Be("Closed");
 
-		// Verify final state in database
-		var retrievedResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
+		// Verify the final state in a database
+		var retrievedResult = await _repository.GetByIdAsync(created.Value!.Id, TestContext.Current.CancellationToken);
 		retrievedResult.Should().NotBeNull();
 		var retrieved = retrievedResult.Value;
-		retrieved.Status.StatusName.Should().Be("Closed");
+		retrieved?.Status.StatusName.Should().Be("Closed");
 	}
 }

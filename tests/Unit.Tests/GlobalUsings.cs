@@ -1,3 +1,11 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     GlobalUsings.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Unit.Tests
+// =======================================================
 global using Xunit;
 global using FluentAssertions;
 global using NSubstitute;
@@ -35,4 +43,3 @@ global using System.Net.Http.Json;
 global using System.Reflection;
 global using System.Security.Claims;
 global using System.Text.Encodings.Web;
-global using Tests.Unit.Builders;

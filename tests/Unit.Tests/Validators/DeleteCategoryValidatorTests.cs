@@ -1,4 +1,12 @@
-namespace Tests.Unit.Validators;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     DeleteCategoryValidatorTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Unit.Tests
+// =======================================================
+namespace Unit.Validators;
 
 /// <summary>
 /// Unit tests for <see cref="DeleteCategoryValidator"/>.
@@ -14,7 +22,7 @@ public class DeleteCategoryValidatorTests
 		// Arrange
 		var command = new DeleteCategoryCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString()
+			Id = ObjectId.GenerateNewId()
 		};
 
 		// Act
@@ -29,7 +37,7 @@ public class DeleteCategoryValidatorTests
 	public void DeleteCategoryValidator_EmptyId_ReturnsValidationError()
 	{
 		// Arrange
-		var command = new DeleteCategoryCommand { Id = "" };
+		var command = new DeleteCategoryCommand { Id = ObjectId.Empty };
 
 		// Act
 		var result = _validator.Validate(command);
@@ -43,7 +51,7 @@ public class DeleteCategoryValidatorTests
 	public void DeleteCategoryValidator_NullId_ReturnsValidationError()
 	{
 		// Arrange
-		var command = new DeleteCategoryCommand { Id = null! };
+		var command = new DeleteCategoryCommand { Id = ObjectId.Empty };
 
 		// Act
 		var result = _validator.Validate(command);

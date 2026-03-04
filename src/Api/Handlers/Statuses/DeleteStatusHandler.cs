@@ -49,17 +49,14 @@ public class DeleteStatusHandler
 		if (!validationResult.IsValid)
 			throw new ValidationException(validationResult.Errors);
 
-		if (!MongoDB.Bson.ObjectId.TryParse(command.Id, out var objectId))
-			throw new NotFoundException($"Status with ID '{command.Id}' was not found.");
-
-		var getResult = await _repository.GetByIdAsync(objectId, cancellationToken);
+		var getResult = await _repository.GetByIdAsync(command.Id, cancellationToken);
 		if (getResult.Failure || getResult.Value is null)
 			throw new NotFoundException($"Status with ID '{command.Id}' was not found.");
 
 		if (getResult.Value.Archived)
 			return true;
 
-		var archiveResult = await _repository.ArchiveAsync(objectId, cancellationToken);
+		var archiveResult = await _repository.ArchiveAsync(command.Id, cancellationToken);
 		return archiveResult.Success;
 	}
 }

@@ -7,7 +7,7 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-namespace Tests.Unit.Handlers.Categories;
+namespace Unit.Handlers.Categories;
 
 /// <summary>
 /// Unit tests for GetCategoryHandler.
@@ -34,7 +34,7 @@ public class GetCategoryHandlerTests
 		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
 			.Returns(Result<CategoryDto>.Ok(category));
 
-		var query = new GetCategoryQuery(categoryId.ToString());
+		var query = new GetCategoryQuery(categoryId);
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
@@ -54,7 +54,7 @@ public class GetCategoryHandlerTests
 		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
 			.Returns(Result<CategoryDto>.Fail("Not found"));
 
-		var query = new GetCategoryQuery(categoryId.ToString());
+		var query = new GetCategoryQuery(categoryId);
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
@@ -64,45 +64,19 @@ public class GetCategoryHandlerTests
 	}
 
 	[Fact]
-	public async Task Handle_EmptyCategoryId_ThrowsArgumentException()
+	public async Task Handle_EmptyObjectId_ReturnsNull()
 	{
 		// Arrange
-		var query = new GetCategoryQuery("");
-
-		// Act
-		Func<Task> act = async () => await _handler.Handle(query, CancellationToken.None);
-
-		// Assert
-		await act.Should().ThrowAsync<ArgumentException>()
-			.WithMessage("*Category ID cannot be empty*");
-	}
-
-	[Fact]
-	public async Task Handle_WhitespaceCategoryId_ThrowsArgumentException()
-	{
-		// Arrange
-		var query = new GetCategoryQuery("   ");
-
-		// Act
-		Func<Task> act = async () => await _handler.Handle(query, CancellationToken.None);
-
-		// Assert
-		await act.Should().ThrowAsync<ArgumentException>()
-			.WithMessage("*Category ID cannot be empty*");
-	}
-
-	[Fact]
-	public async Task Handle_InvalidObjectId_ReturnsNull()
-	{
-		// Arrange
-		var query = new GetCategoryQuery("invalid-object-id");
+		_repository.GetByIdAsync(ObjectId.Empty, Arg.Any<CancellationToken>())
+			.Returns(Result<CategoryDto>.Fail("Not found"));
+		var query = new GetCategoryQuery(ObjectId.Empty);
 
 		// Act
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
 		result.Should().BeNull();
-		await _repository.DidNotReceive().GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>());
+		await _repository.Received(1).GetByIdAsync(ObjectId.Empty, Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -116,7 +90,7 @@ public class GetCategoryHandlerTests
 		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
 			.Returns(Result<CategoryDto>.Ok(category));
 
-		var query = new GetCategoryQuery(categoryId.ToString());
+		var query = new GetCategoryQuery(categoryId);
 
 		// Act
 		await _handler.Handle(query, cancellationToken);

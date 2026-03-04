@@ -1,4 +1,12 @@
-namespace Tests.Unit.Handlers.Issues;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     UpdateIssueHandlerTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Unit.Tests
+// =======================================================
+namespace Unit.Handlers.Issues;
 
 /// <summary>
 /// Unit tests for UpdateIssueHandler.
@@ -21,9 +29,9 @@ public class UpdateIssueHandlerTests
 	public async Task Handle_ValidCommand_ReturnsUpdatedIssue()
 	{
 		// Arrange
-		var issueId = ObjectId.GenerateNewId().ToString();
+		var issueId = ObjectId.GenerateNewId();
 		var existingIssue = new IssueDto(
-			ObjectId.Parse(issueId),
+			issueId,
 			"Original Title",
 			"Original Description",
 			DateTime.UtcNow.AddDays(-1),
@@ -43,7 +51,7 @@ public class UpdateIssueHandlerTests
 			Description = "Updated Description"
 		};
 
-		_repository.GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>())
+		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
 			.Returns(Result<IssueDto>.Ok(existingIssue));
 
 		var updatedIssue = existingIssue with
@@ -63,7 +71,7 @@ public class UpdateIssueHandlerTests
 		result.Title.Should().Be("Updated Title");
 		result.Description.Should().Be("Updated Description");
 
-		await _repository.Received(1).GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>());
+		await _repository.Received(1).GetByIdAsync(issueId, Arg.Any<CancellationToken>());
 		await _repository.Received(1).UpdateAsync(Arg.Is<IssueDto>(i =>
 				i.Title == command.Title &&
 				i.Description == command.Description), Arg.Any<CancellationToken>());
@@ -75,7 +83,7 @@ public class UpdateIssueHandlerTests
 		// Arrange
 		var command = new UpdateIssueCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = "",
 			Description = "Some description"
 		};
@@ -94,7 +102,7 @@ public class UpdateIssueHandlerTests
 		// Arrange
 		var command = new UpdateIssueCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = new string('A', 257),
 			Description = "Some description"
 		};
@@ -113,7 +121,7 @@ public class UpdateIssueHandlerTests
 		// Arrange
 		var command = new UpdateIssueCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			Title = "Valid Title",
 			Description = new string('X', 4097)
 		};
@@ -130,7 +138,7 @@ public class UpdateIssueHandlerTests
 	public async Task Handle_NonExistentIssue_ThrowsNotFoundException()
 	{
 		// Arrange
-		var issueId = ObjectId.GenerateNewId().ToString();
+		var issueId = ObjectId.GenerateNewId();
 		var command = new UpdateIssueCommand
 		{
 			Id = issueId,
@@ -138,7 +146,7 @@ public class UpdateIssueHandlerTests
 			Description = "Updated Description"
 		};
 
-		_repository.GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>())
+		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
 			.Returns(Result<IssueDto>.Fail("Not found"));
 
 		// Act
@@ -153,9 +161,9 @@ public class UpdateIssueHandlerTests
 	public async Task Handle_ArchivedIssue_ThrowsConflictException()
 	{
 		// Arrange
-		var issueId = ObjectId.GenerateNewId().ToString();
+		var issueId = ObjectId.GenerateNewId();
 		var archivedIssue = new IssueDto(
-			ObjectId.Parse(issueId),
+			issueId,
 			"Archived Issue",
 			"This is archived",
 			DateTime.UtcNow.AddDays(-1),
@@ -175,7 +183,7 @@ public class UpdateIssueHandlerTests
 			Description = "Updated Description"
 		};
 
-		_repository.GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>())
+		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
 			.Returns(Result<IssueDto>.Ok(archivedIssue));
 
 		// Act
@@ -190,9 +198,9 @@ public class UpdateIssueHandlerTests
 	public async Task Handle_IdempotentUpdate_ReturnsUpdatedIssue()
 	{
 		// Arrange
-		var issueId = ObjectId.GenerateNewId().ToString();
+		var issueId = ObjectId.GenerateNewId();
 		var existingIssue = new IssueDto(
-			ObjectId.Parse(issueId),
+			issueId,
 			"Same Title",
 			"Same Description",
 			DateTime.UtcNow.AddDays(-1),
@@ -212,7 +220,7 @@ public class UpdateIssueHandlerTests
 			Description = "Same Description"
 		};
 
-		_repository.GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>())
+		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
 			.Returns(Result<IssueDto>.Ok(existingIssue));
 
 		var updatedIssue = existingIssue with { };
@@ -232,9 +240,9 @@ public class UpdateIssueHandlerTests
 	public async Task Handle_NullDescription_UsesEmptyString()
 	{
 		// Arrange
-		var issueId = ObjectId.GenerateNewId().ToString();
+		var issueId = ObjectId.GenerateNewId();
 		var existingIssue = new IssueDto(
-			ObjectId.Parse(issueId),
+			issueId,
 			"Original Title",
 			"Original Description",
 			DateTime.UtcNow.AddDays(-1),
@@ -254,7 +262,7 @@ public class UpdateIssueHandlerTests
 			Description = null
 		};
 
-		_repository.GetByIdAsync(ObjectId.Parse(issueId), Arg.Any<CancellationToken>())
+		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
 			.Returns(Result<IssueDto>.Ok(existingIssue));
 
 		var updatedIssue = existingIssue with

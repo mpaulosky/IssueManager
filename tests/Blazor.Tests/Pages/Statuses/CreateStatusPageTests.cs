@@ -1,6 +1,6 @@
 // Copyright (c) 2026. All rights reserved.
 
-namespace Tests.BlazorTests.Pages.Statuses;
+namespace BlazorTests.Pages.Statuses;
 
 /// <summary>
 /// bUnit tests for the <see cref="CreateStatusPage"/> Blazor page.
@@ -21,13 +21,13 @@ public class CreateStatusPageTests : IDisposable
 		_mockStatusClient
 			.CreateAsync(Arg.Any<CreateStatusCommand>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<StatusDto?>(null));
-		_ctx.Services.AddSingleton<IStatusApiClient>(_mockStatusClient);
+		_ctx.Services.AddSingleton(_mockStatusClient);
 	}
 
 	/// <inheritdoc/>
 	public void Dispose()
 	{
-		_ctx?.Dispose();
+		_ctx.Dispose();
 		GC.SuppressFinalize(this);
 	}
 
@@ -90,7 +90,7 @@ public class CreateStatusPageTests : IDisposable
 	{
 		// Arrange
 		var cut = _ctx.Render<CreateStatusPage>();
-		cut.Find("#status-name").Change("New Status Name");
+		await cut.Find("#status-name").ChangeAsync("New Status Name");
 
 		// Act
 		await cut.Find("form").SubmitAsync();
@@ -105,7 +105,7 @@ public class CreateStatusPageTests : IDisposable
 	{
 		// Arrange
 		var cut = _ctx.Render<CreateStatusPage>();
-		cut.Find("#status-name").Change("Valid Status");
+		await cut.Find("#status-name").ChangeAsync("Valid Status");
 
 		// Act
 		await cut.Find("form").SubmitAsync();

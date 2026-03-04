@@ -1,4 +1,12 @@
-namespace Tests.Unit.Validators;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     UpdateIssueStatusValidatorTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Unit.Tests
+// =======================================================
+namespace Unit.Validators;
 
 /// <summary>
 /// Unit tests for <see cref="UpdateIssueStatusValidator"/>.
@@ -14,7 +22,7 @@ public class UpdateIssueStatusValidatorTests
 		// Arrange
 		var command = new UpdateIssueStatusCommand
 		{
-			IssueId = "issue-123",
+			IssueId = ObjectId.GenerateNewId(),
 			Status = new StatusDto(ObjectId.GenerateNewId(), "InProgress", "Issue is in progress", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
@@ -35,7 +43,7 @@ public class UpdateIssueStatusValidatorTests
 		// Arrange
 		var command = new UpdateIssueStatusCommand
 		{
-			IssueId = "issue-456",
+			IssueId = ObjectId.GenerateNewId(),
 			Status = new StatusDto(ObjectId.GenerateNewId(), statusName, statusDesc, DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
@@ -52,7 +60,7 @@ public class UpdateIssueStatusValidatorTests
 		// Arrange
 		var command = new UpdateIssueStatusCommand
 		{
-			IssueId = "",
+			IssueId = ObjectId.Empty,
 			Status = new StatusDto(ObjectId.GenerateNewId(), "Closed", "Issue is closed", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 
@@ -72,7 +80,7 @@ public class UpdateIssueStatusValidatorTests
 		// Arrange
 		var command = new UpdateIssueStatusCommand
 		{
-			IssueId = "issue-789",
+			IssueId = ObjectId.GenerateNewId(),
 			Status = new StatusDto(ObjectId.GenerateNewId(), "", "some description", DateTime.UtcNow, null, false, UserDto.Empty)
 		};
 

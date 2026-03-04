@@ -1,4 +1,12 @@
-namespace Tests.Unit.Validators;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     UpdateCategoryValidatorTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Unit.Tests
+// =======================================================
+namespace Unit.Validators;
 
 /// <summary>
 /// Unit tests for <see cref="UpdateCategoryValidator"/>.
@@ -14,7 +22,7 @@ public class UpdateCategoryValidatorTests
 		// Arrange
 		var command = new UpdateCategoryCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			CategoryName = "Enhancement",
 			CategoryDescription = "Improvements to existing features"
 		};
@@ -33,7 +41,7 @@ public class UpdateCategoryValidatorTests
 		// Arrange
 		var command = new UpdateCategoryCommand
 		{
-			Id = "",
+			Id = ObjectId.Empty,
 			CategoryName = "Bug"
 		};
 
@@ -51,7 +59,7 @@ public class UpdateCategoryValidatorTests
 		// Arrange
 		var command = new UpdateCategoryCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			CategoryName = ""
 		};
 
@@ -69,7 +77,7 @@ public class UpdateCategoryValidatorTests
 		// Arrange
 		var command = new UpdateCategoryCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			CategoryName = "A"
 		};
 
@@ -87,7 +95,7 @@ public class UpdateCategoryValidatorTests
 		// Arrange
 		var command = new UpdateCategoryCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			CategoryName = new string('A', 101)
 		};
 
@@ -105,7 +113,7 @@ public class UpdateCategoryValidatorTests
 		// Arrange
 		var command = new UpdateCategoryCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			CategoryName = "Bug",
 			CategoryDescription = new string('X', 501)
 		};

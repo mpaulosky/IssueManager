@@ -1,6 +1,6 @@
 // Copyright (c) 2026. All rights reserved.
 
-namespace Tests.BlazorTests.Pages.Categories;
+namespace BlazorTests.Pages.Categories;
 
 /// <summary>
 /// bUnit tests for the <see cref="CategoriesPage"/> Blazor page.
@@ -20,13 +20,13 @@ public class CategoriesPageTests : IDisposable
 		_mockCategoryClient = Substitute.For<ICategoryApiClient>();
 		_mockCategoryClient.GetAllAsync(Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IEnumerable<CategoryDto>>([]));
-		_ctx.Services.AddSingleton<ICategoryApiClient>(_mockCategoryClient);
+		_ctx.Services.AddSingleton(_mockCategoryClient);
 	}
 
 	/// <inheritdoc/>
 	public void Dispose()
 	{
-		_ctx?.Dispose();
+		_ctx.Dispose();
 		GC.SuppressFinalize(this);
 	}
 
@@ -80,7 +80,7 @@ public class CategoriesPageTests : IDisposable
 		// Arrange
 		var category = MakeCategory("Performance");
 		_mockCategoryClient.GetAllAsync(Arg.Any<CancellationToken>())
-			.Returns(Task.FromResult<IEnumerable<CategoryDto>>(new[] { category }));
+			.Returns(Task.FromResult<IEnumerable<CategoryDto>>([ category ]));
 
 		// Act
 		var cut = _ctx.Render<CategoriesPage>();
@@ -95,7 +95,7 @@ public class CategoriesPageTests : IDisposable
 		// Arrange
 		var category = MakeCategory("Security");
 		_mockCategoryClient.GetAllAsync(Arg.Any<CancellationToken>())
-			.Returns(Task.FromResult<IEnumerable<CategoryDto>>(new[] { category }));
+			.Returns(Task.FromResult<IEnumerable<CategoryDto>>([ category ]));
 
 		// Act
 		var cut = _ctx.Render<CategoriesPage>();
@@ -111,7 +111,7 @@ public class CategoriesPageTests : IDisposable
 		// Arrange
 		var category = MakeCategory("UI");
 		_mockCategoryClient.GetAllAsync(Arg.Any<CancellationToken>())
-			.Returns(Task.FromResult<IEnumerable<CategoryDto>>(new[] { category }));
+			.Returns(Task.FromResult<IEnumerable<CategoryDto>>([ category ]));
 
 		// Act
 		var cut = _ctx.Render<CategoriesPage>();

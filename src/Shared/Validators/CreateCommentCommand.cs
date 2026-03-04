@@ -53,7 +53,7 @@ public class CreateCommentValidator : AbstractValidator<CreateCommentCommand>
 		RuleFor(x => x.IssueId)
 			.NotEmpty()
 			.WithMessage("Issue ID is required.")
-			.Must(id => MongoDB.Bson.ObjectId.TryParse(id, out _))
+			.Must(id => ObjectId.TryParse(id, out _))
 			.WithMessage("Issue ID must be a valid ObjectId.");
 	}
 }

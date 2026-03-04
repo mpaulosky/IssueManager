@@ -7,7 +7,7 @@
 // Project Name :  Blazor.Tests
 // =============================================
 
-namespace Tests.BlazorTests.Services;
+namespace BlazorTests.Services;
 
 /// <summary>
 /// Unit tests for the <see cref="StatusApiClient"/> HTTP client.
@@ -42,7 +42,7 @@ public class StatusApiClientTests
 	public async Task GetAllAsync_ReturnsStatuses_OnSuccess()
 	{
 		// Arrange
-		var statuses = new List<StatusDto> { MakeStatus("Open"), MakeStatus("Closed") };
+		var statuses = new List<StatusDto> { MakeStatus(), MakeStatus("Closed") };
 		var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(statuses) };
 		var client = new StatusApiClient(CreateMockClient(response));
 
@@ -50,8 +50,9 @@ public class StatusApiClientTests
 		var result = await client.GetAllAsync(Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.Should().HaveCount(2);
+		IEnumerable<StatusDto> statusDtos = result as StatusDto[] ?? result.ToArray();
+		statusDtos.Should().NotBeNull();
+		statusDtos.Should().HaveCount(2);
 	}
 
 	[Fact]
@@ -65,8 +66,9 @@ public class StatusApiClientTests
 		var result = await client.GetAllAsync(Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.Should().BeEmpty();
+		IEnumerable<StatusDto> statusDtos = result as StatusDto[] ?? result.ToArray();
+		statusDtos.Should().NotBeNull();
+		statusDtos.Should().BeEmpty();
 	}
 
 	[Fact]
@@ -83,7 +85,7 @@ public class StatusApiClientTests
 
 		// Assert
 		result.Should().NotBeNull();
-		result!.StatusName.Should().Be("In Progress");
+		result.StatusName.Should().Be("In Progress");
 	}
 
 	[Fact]

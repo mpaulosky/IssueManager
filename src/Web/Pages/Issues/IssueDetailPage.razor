@@ -260,7 +260,7 @@
 		{
 			var command = new UpdateCommentCommand
 			{
-				Id = _editingCommentId,
+				Id = ObjectId.Parse(_editingCommentId),
 				Title = "Comment",
 				CommentText = _editCommentText
 			};

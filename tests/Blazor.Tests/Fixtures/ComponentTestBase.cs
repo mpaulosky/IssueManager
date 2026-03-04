@@ -1,4 +1,12 @@
-namespace Tests.BlazorTests.Fixtures;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     ComponentTestBase.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Blazor.Tests
+// =======================================================
+namespace BlazorTests.Fixtures;
 
 /// <summary>
 /// Base class for Blazor component tests providing common bUnit setup and utilities.
@@ -21,12 +29,12 @@ public abstract class ComponentTestBase : IDisposable
 		var categoryClient = Substitute.For<ICategoryApiClient>();
 		categoryClient.GetAllAsync(Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IEnumerable<CategoryDto>>([]));
-		TestContext.Services.AddSingleton<ICategoryApiClient>(categoryClient);
+		TestContext.Services.AddSingleton(categoryClient);
 
 		var statusClient = Substitute.For<IStatusApiClient>();
 		statusClient.GetAllAsync(Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IEnumerable<StatusDto>>([]));
-		TestContext.Services.AddSingleton<IStatusApiClient>(statusClient);
+		TestContext.Services.AddSingleton(statusClient);
 	}
 
 	/// <summary>
@@ -34,7 +42,7 @@ public abstract class ComponentTestBase : IDisposable
 	/// </summary>
 	public void Dispose()
 	{
-		TestContext?.Dispose();
+		TestContext.Dispose();
 		GC.SuppressFinalize(this);
 	}
 }

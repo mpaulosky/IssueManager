@@ -1,3 +1,11 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     LabelDto.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Shared
+// =======================================================
 namespace Shared.DTOs;
 
 public record LabelDto(string Name, string Color)

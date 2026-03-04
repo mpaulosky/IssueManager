@@ -83,8 +83,7 @@
 		{
 			var command = new UpdateIssueCommand
 			{
-				Id = Id,
-				Title = request.Title,
+				Id = ObjectId.Parse(Id),
 				Description = request.Description
 			};
 			await IssueClient.UpdateAsync(Id, command);

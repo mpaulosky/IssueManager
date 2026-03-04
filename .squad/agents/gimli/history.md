@@ -326,3 +326,49 @@ Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, Te
 
 **Rationale:** Test code should be excluded from code coverage metrics. Consolidating `using` directives at the project level via GlobalUsings.cs reduces repetition, improves maintainability, and follows .NET best practices for file-scoped namespaces and global usings.
 
+
+---
+
+## Session: ObjectId Type Standardization Test Fixes (refs #82, #84, #86, #88)
+**Branch:** squad/80-foundation-objectid-standardization
+**Commit:** 10668be
+
+### What Was Done
+Fixed all compilation errors in Unit.Tests and Integration.Tests caused by Sam's PR #91 (ObjectId type standardization across 31 src files).
+
+### Files Fixed (33 total)
+
+**Unit.Tests — Handler tests (13 files):**
+- DeleteIssueHandlerTests.cs, DeleteCategoryHandlerTests.cs, DeleteStatusHandlerTests.cs, DeleteCommentHandlerTests.cs
+- UpdateIssueHandlerTests.cs, UpdateCategoryHandlerTests.cs, UpdateStatusHandlerTests.cs, UpdateCommentHandlerTests.cs, UpdateIssueStatusHandlerTests.cs
+- GetIssueHandlerTests.cs, GetCategoryHandlerTests.cs, GetStatusHandlerTests.cs, GetCommentHandlerTests.cs
+
+**Unit.Tests — Validator tests (9 files):**
+- DeleteCommentValidatorTests, DeleteCategoryValidatorTests, DeleteIssueValidatorTests, DeleteStatusValidatorTests
+- UpdateCategoryValidatorTests, UpdateCommentValidatorTests, UpdateIssueValidatorTests, UpdateStatusValidatorTests, UpdateIssueStatusValidatorTests
+
+**Unit.Tests — Endpoint tests (4 files):**
+- IssueEndpointsTests, CategoryEndpointsTests, CommentEndpointsTests, StatusEndpointsTests
+
+**Integration.Tests (7 files):**
+- DeleteIssueHandlerIntegrationTests, GetIssueHandlerTests, GetCategoryHandlerIntegrationTests, GetStatusHandlerIntegrationTests
+- DeleteCategoryHandlerIntegrationTests, UpdateIssueHandlerIntegrationTests, CreateCommentHandlerIntegrationTests
+
+### Patterns of Changes Made
+
+1. **Command Id type** — Id = objectId.ToString() → Id = objectId (use ObjectId directly, no string conversion)
+2. **Query constructors** — 
+ew GetXxxQuery(id.ToString()) → 
+ew GetXxxQuery(id) (GetIssueQuery/GetCategoryQuery/GetStatusQuery/GetCommentQuery now take ObjectId)
+3. **Variable type** — ar issueId = ObjectId.GenerateNewId().ToString() → ar issueId = ObjectId.GenerateNewId() (eliminate parse in test)
+4. **Empty value** — Id = "" / Id = null! / Id = "   " → Id = ObjectId.Empty (ObjectId is a struct, FluentValidation NotEmpty() catches ObjectId.Empty)
+5. **Validator valid-case** — Guid.NewGuid().ToString() → ObjectId.GenerateNewId() in Id fields
+6. **Removed obsolete tests** — Handle_InvalidObjectId_ThrowsNotFoundException in Delete/Update handlers (endpoint now parses, handler receives ObjectId directly)
+7. **Replaced obsolete tests** — Handle_Empty/WhitespaceId_ThrowsArgumentException + Handle_InvalidObjectId_ReturnsNull in Get handlers → single Handle_EmptyObjectId_ReturnsNull
+8. **Integration: nullable fix** — Id = created.Value?.Id (ObjectId?) → Id = created.Value!.Id (ObjectId)
+9. **Integration: CreateComment** — IssueId = ObjectId.GenerateNewId() → IssueId = ObjectId.GenerateNewId().ToString() (CreateCommentCommand.IssueId is still string)
+
+### Test Results
+- Unit.Tests: 417/417 passing ✅
+- Integration.Tests: Builds clean (Docker required to run)
+- Blazor.Tests: Builds clean

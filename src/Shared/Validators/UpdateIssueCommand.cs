@@ -1,3 +1,11 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     UpdateIssueCommand.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Shared
+// =======================================================
 namespace Shared.Validators;
 
 /// <summary>
@@ -8,7 +16,7 @@ public record UpdateIssueCommand
 	/// <summary>
 	/// Gets or sets the issue ID.
 	/// </summary>
-	public string Id { get; init; } = string.Empty;
+	public ObjectId Id { get; init; }
 
 	/// <summary>
 	/// Gets or sets the title of the issue.

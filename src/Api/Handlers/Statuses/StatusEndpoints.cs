@@ -22,7 +22,9 @@ public static class StatusEndpoints
 
 		group.MapGet("{id}", async (string id, GetStatusHandler handler) =>
 		{
-			var query = new GetStatusQuery(id);
+if (!ObjectId.TryParse(id, out var objectId))
+return Results.BadRequest("Invalid ID format");
+var query = new GetStatusQuery(objectId);
 			var status = await handler.Handle(query);
 			return status is not null ? Results.Ok(status) : Results.NotFound();
 		})
@@ -44,7 +46,9 @@ public static class StatusEndpoints
 
 		group.MapPatch("{id}", async (string id, UpdateStatusCommand command, UpdateStatusHandler handler) =>
 		{
-			var commandWithId = command with { Id = id };
+if (!ObjectId.TryParse(id, out var objectId))
+return Results.BadRequest("Invalid ID format");
+var commandWithId = command with { Id = objectId };
 			var result = await handler.Handle(commandWithId);
 			return result is not null ? Results.Ok(result) : Results.NotFound();
 		})
@@ -57,7 +61,9 @@ public static class StatusEndpoints
 
 		group.MapDelete("{id}", async (string id, DeleteStatusHandler handler) =>
 		{
-			var command = new DeleteStatusCommand { Id = id };
+if (!ObjectId.TryParse(id, out var objectId))
+return Results.BadRequest("Invalid ID format");
+var command = new DeleteStatusCommand { Id = objectId };
 			var result = await handler.Handle(command);
 			return result ? Results.NoContent() : Results.NotFound();
 		})

@@ -1,8 +1,8 @@
 // Copyright (c) 2026. All rights reserved.
 
-using Microsoft.JSInterop;
+using BlazorTests.Fixtures;
 
-namespace Tests.BlazorTests.Layout;
+namespace BlazorTests.Layout;
 
 /// <summary>
 /// bUnit tests for the <see cref="ThemeColorSelector"/> Blazor component.
@@ -35,7 +35,7 @@ public class ThemeColorSelectorTests : ComponentTestBase
 		var button = cut.Find("button[aria-label='Change color theme']");
 		button.Click();
 
-		// Assert — dropdown menu should now be visible
+		// Assert — a dropdown menu should now be visible
 		var menu = cut.Find("[role='menu']");
 		menu.Should().NotBeNull();
 		cut.Markup.Should().Contain("Blue");

@@ -1,4 +1,12 @@
-namespace Tests.Architecture;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     ArchitectureTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Architecture.Tests
+// =======================================================
+namespace Architecture;
 
 /// <summary>
 /// Architecture tests that enforce project structure and dependencies.
@@ -55,9 +63,9 @@ public class ArchitectureTests
 			.HaveDependencyOn("MongoDB")
 			.GetResult();
 
-		// Assert - MongoDB driver attributes are allowed on models (BsonId etc), so skip if fails
+		// Assert - MongoDB driver attributes are allowed on models (BsonId etc.), so skip if fails
 		// The important thing is domain logic doesn't depend on MongoDB infrastructure
-		_ = result; // acknowledge result without asserting strictly
+		_ = result; // acknowledge a result without asserting strictly
 	}
 
 	/// <summary>
@@ -197,7 +205,7 @@ public class ArchitectureTests
 	}
 
 	/// <summary>
-	/// Ensures that ServiceDefaults layer has minimal dependencies.
+	/// Ensures that the ServiceDefaults layer has minimal dependencies.
 	/// It should only depend on Aspire and OpenTelemetry infrastructure.
 	/// </summary>
 	[Fact]

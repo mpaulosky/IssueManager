@@ -5,7 +5,7 @@
 // Solution Name : IssueManager
 // Project Name :  Unit.Tests
 
-namespace Tests.Unit.DTOs;
+namespace Unit.DTOs;
 
 /// <summary>
 /// Unit tests for <see cref="StatusDto"/>.

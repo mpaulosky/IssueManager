@@ -7,8 +7,6 @@
 // Project Name :  Web
 // =============================================
 
-using System.Net.Http.Json;
-
 using Shared.DTOs;
 using Shared.Validators;
 

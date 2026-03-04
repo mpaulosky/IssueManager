@@ -1,3 +1,11 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     GetIssueHandlerTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Integration.Tests
+// =======================================================
 namespace Integration.Handlers;
 
 /// <summary>
@@ -44,7 +52,7 @@ public class GetIssueHandlerTests : IAsyncLifetime
 		// Arrange
 		var issue = CreateTestIssueDto("Test Issue", "Test Description");
 		var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
-		var query = new GetIssueQuery(created.Value.Id.ToString());
+		var query = new GetIssueQuery(created.Value.Id);
 
 		// Act
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
@@ -60,7 +68,7 @@ public class GetIssueHandlerTests : IAsyncLifetime
 	public async Task Handle_NonExistingIssueId_ReturnsNull()
 	{
 		// Arrange
-		var query = new GetIssueQuery(ObjectId.GenerateNewId().ToString());
+		var query = new GetIssueQuery(ObjectId.GenerateNewId());
 
 		// Act
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
@@ -70,13 +78,16 @@ public class GetIssueHandlerTests : IAsyncLifetime
 	}
 
 	[Fact]
-	public async Task Handle_EmptyIssueId_ThrowsArgumentException()
+	public async Task Handle_EmptyObjectId_ReturnsNull()
 	{
 		// Arrange
-		var query = new GetIssueQuery("");
+		var query = new GetIssueQuery(ObjectId.Empty);
 
-		// Act & Assert
-		await Assert.ThrowsAsync<ArgumentException>(() => _handler.Handle(query, TestContext.Current.CancellationToken));
+		// Act
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Should().BeNull();
 	}
 
 	[Fact]

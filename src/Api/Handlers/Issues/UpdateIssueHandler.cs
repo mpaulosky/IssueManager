@@ -35,10 +35,7 @@ public class UpdateIssueHandler
 		if (!validationResult.IsValid)
 			throw new ValidationException(validationResult.Errors);
 
-		if (!ObjectId.TryParse(command.Id, out var issueId))
-			throw new NotFoundException($"Issue with ID '{command.Id}' has invalid format.");
-
-		var getResult = await _repository.GetByIdAsync(issueId, cancellationToken);
+		var getResult = await _repository.GetByIdAsync(command.Id, cancellationToken);
 		if (!getResult.Success || getResult.Value is null)
 			throw new NotFoundException($"Issue with ID '{command.Id}' was not found.");
 

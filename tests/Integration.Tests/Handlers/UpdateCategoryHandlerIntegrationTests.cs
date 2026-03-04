@@ -10,7 +10,7 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for UpdateCategoryHandler with real MongoDB database.
+/// Integration tests for UpdateCategoryHandler with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -56,7 +56,7 @@ public class UpdateCategoryHandlerIntegrationTests : IAsyncLifetime
 
 		var command = new UpdateCategoryCommand
 		{
-			Id = created.Value.Id.ToString(),
+			Id = created.Value!.Id,
 			CategoryName = "Updated Name",
 			CategoryDescription = "Updated Description"
 		};
@@ -75,7 +75,7 @@ public class UpdateCategoryHandlerIntegrationTests : IAsyncLifetime
 	public async Task Handle_NonExistentCategory_ThrowsNotFoundException()
 	{
 		// Arrange
-		var nonExistentId = ObjectId.GenerateNewId().ToString();
+		var nonExistentId = ObjectId.GenerateNewId();
 		var command = new UpdateCategoryCommand
 		{
 			Id = nonExistentId,
@@ -100,7 +100,7 @@ public class UpdateCategoryHandlerIntegrationTests : IAsyncLifetime
 
 		var command = new UpdateCategoryCommand
 		{
-			Id = created.Value.Id.ToString(),
+			Id = created.Value!.Id,
 			CategoryName = string.Empty,
 			CategoryDescription = "Updated Description"
 		};

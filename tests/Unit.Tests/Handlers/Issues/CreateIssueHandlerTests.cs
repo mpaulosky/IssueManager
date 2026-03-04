@@ -7,7 +7,7 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-namespace Tests.Unit.Handlers.Issues;
+namespace Unit.Handlers.Issues;
 
 /// <summary>
 /// Unit tests for CreateIssueHandler.

@@ -7,7 +7,7 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-namespace Tests.Unit.Handlers.Statuses;
+namespace Unit.Handlers.Statuses;
 
 /// <summary>
 /// Unit tests for DeleteStatusHandler (soft-delete via Archived).
@@ -40,7 +40,7 @@ public class DeleteStatusHandlerTests
 			false,
 			UserDto.Empty);
 
-		var command = new DeleteStatusCommand { Id = statusId.ToString() };
+		var command = new DeleteStatusCommand { Id = statusId };
 
 		_repository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
 			.Returns(Result<StatusDto>.Ok(status));
@@ -62,7 +62,7 @@ public class DeleteStatusHandlerTests
 	{
 		// Arrange
 		var statusId = ObjectId.GenerateNewId();
-		var command = new DeleteStatusCommand { Id = statusId.ToString() };
+		var command = new DeleteStatusCommand { Id = statusId };
 
 		_repository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
 			.Returns(Result<StatusDto>.Fail("Not found"));
@@ -89,7 +89,7 @@ public class DeleteStatusHandlerTests
 			true,
 			UserDto.Empty);
 
-		var command = new DeleteStatusCommand { Id = statusId.ToString() };
+		var command = new DeleteStatusCommand { Id = statusId };
 
 		_repository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
 			.Returns(Result<StatusDto>.Ok(archivedStatus));
@@ -107,7 +107,7 @@ public class DeleteStatusHandlerTests
 	public async Task Handle_InvalidId_ThrowsValidationException()
 	{
 		// Arrange
-		var command = new DeleteStatusCommand { Id = "" };
+		var command = new DeleteStatusCommand { Id = ObjectId.Empty };
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
@@ -115,19 +115,6 @@ public class DeleteStatusHandlerTests
 		// Assert
 		await act.Should().ThrowAsync<ValidationException>()
 			.WithMessage("*Status ID*required*");
-	}
-
-	[Fact]
-	public async Task Handle_InvalidObjectId_ThrowsNotFoundException()
-	{
-		// Arrange
-		var command = new DeleteStatusCommand { Id = "invalid-objectid" };
-
-		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
-
-		// Assert
-		await act.Should().ThrowAsync<NotFoundException>();
 	}
 
 	[Fact]
@@ -145,7 +132,7 @@ public class DeleteStatusHandlerTests
 			false,
 			UserDto.Empty);
 
-		var command = new DeleteStatusCommand { Id = statusId.ToString() };
+		var command = new DeleteStatusCommand { Id = statusId };
 
 		_repository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
 			.Returns(Result<StatusDto>.Ok(status));

@@ -13,7 +13,7 @@ namespace Api.Handlers.Comments;
 /// Query for retrieving a single comment.
 /// </summary>
 /// <param name="CommentId">The unique identifier of the comment to retrieve.</param>
-public record GetCommentQuery(string CommentId);
+public record GetCommentQuery(ObjectId CommentId);
 
 /// <summary>
 /// Handler for retrieving comments.
@@ -43,13 +43,7 @@ public class GetCommentHandler
 	/// <exception cref="ArgumentException">Thrown when the comment ID is null or empty.</exception>
 	public async Task<CommentDto?> Handle(GetCommentQuery query, CancellationToken cancellationToken = default)
 	{
-		if (string.IsNullOrWhiteSpace(query.CommentId))
-			throw new ArgumentException("Comment ID cannot be empty.", nameof(query.CommentId));
-
-		if (!MongoDB.Bson.ObjectId.TryParse(query.CommentId, out var objectId))
-			return null;
-
-		var result = await _repository.GetByIdAsync(objectId, cancellationToken);
+		var result = await _repository.GetByIdAsync(query.CommentId, cancellationToken);
 		return result.Success ? result.Value : null;
 	}
 }

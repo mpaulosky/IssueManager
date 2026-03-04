@@ -7,7 +7,9 @@
 // Project Name :  Blazor.Tests
 // =============================================
 
-namespace Tests.BlazorTests.Components.Shared;
+using BlazorTests.Fixtures;
+
+namespace BlazorTests.Components.Shared;
 
 /// <summary>
 /// Unit tests for the <see cref="ConfirmDialog"/> Blazor component.

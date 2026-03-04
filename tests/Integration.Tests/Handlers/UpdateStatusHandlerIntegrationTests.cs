@@ -10,7 +10,7 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for UpdateStatusHandler with real MongoDB database.
+/// Integration tests for UpdateStatusHandler with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -56,7 +56,7 @@ public class UpdateStatusHandlerIntegrationTests : IAsyncLifetime
 
 		var command = new UpdateStatusCommand
 		{
-			Id = created.Value.Id.ToString(),
+			Id = created.Value!.Id,
 			StatusName = "Updated Name",
 			StatusDescription = "Updated Description"
 		};
@@ -75,7 +75,7 @@ public class UpdateStatusHandlerIntegrationTests : IAsyncLifetime
 	public async Task Handle_NonExistentStatus_ThrowsNotFoundException()
 	{
 		// Arrange
-		var nonExistentId = ObjectId.GenerateNewId().ToString();
+		ObjectId nonExistentId = ObjectId.GenerateNewId();
 		var command = new UpdateStatusCommand
 		{
 			Id = nonExistentId,
@@ -100,7 +100,7 @@ public class UpdateStatusHandlerIntegrationTests : IAsyncLifetime
 
 		var command = new UpdateStatusCommand
 		{
-			Id = created.Value.Id.ToString(),
+			Id = created.Value!.Id,
 			StatusName = string.Empty,
 			StatusDescription = "Updated Description"
 		};

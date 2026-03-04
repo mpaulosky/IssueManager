@@ -7,7 +7,7 @@
 // Project Name :  Integration.Tests
 // =======================================================
 
-namespace Tests.Integration.Data;
+namespace Integration.Data;
 
 /// <summary>
 /// Integration tests for CategoryRepository using a real MongoDB container.
@@ -15,17 +15,12 @@ namespace Tests.Integration.Data;
 [ExcludeFromCodeCoverage]
 public class CategoryRepositoryTests : IAsyncLifetime
 {
-	private const string MONGODB_IMAGE = "mongo:latest";
-	private const string TEST_DATABASE = "IssueManagerTestDb";
-	private readonly MongoDbContainer _mongoContainer;
+	private const string MongodbImage = "mongo:latest";
+	private const string TestDatabase = "IssueManagerTestDb";
+	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage)
+			.Build();
 
 	private ICategoryRepository _repository = null!;
-
-	public CategoryRepositoryTests()
-	{
-		_mongoContainer = new MongoDbBuilder(MONGODB_IMAGE)
-			.Build();
-	}
 
 	/// <summary>
 	/// Initializes the test container and repository.
@@ -34,7 +29,7 @@ public class CategoryRepositoryTests : IAsyncLifetime
 	{
 		await _mongoContainer.StartAsync();
 		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new CategoryRepository(connectionString, TEST_DATABASE);
+		_repository = new CategoryRepository(connectionString, TestDatabase);
 	}
 
 	/// <summary>
@@ -80,7 +75,7 @@ public class CategoryRepositoryTests : IAsyncLifetime
 
 		// Assert
 		result.Success.Should().BeTrue();
-		result.Value.CategoryName.Should().Be("New Category");
+		result.Value?.CategoryName.Should().Be("New Category");
 	}
 
 	[Fact]
@@ -91,11 +86,11 @@ public class CategoryRepositoryTests : IAsyncLifetime
 		var created = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
 
 		// Act
-		var result = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
+		var result = await _repository.GetByIdAsync(created.Value!.Id, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
-		result.Value.CategoryName.Should().Be(category.CategoryName);
+		result.Value?.CategoryName.Should().Be(category.CategoryName);
 	}
 
 	[Fact]
@@ -147,7 +142,7 @@ public class CategoryRepositoryTests : IAsyncLifetime
 		var created = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
 
 		// Act
-		var result = await _repository.ArchiveAsync(created.Value.Id, TestContext.Current.CancellationToken);
+		var result = await _repository.ArchiveAsync(created.Value!.Id, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
@@ -161,11 +156,11 @@ public class CategoryRepositoryTests : IAsyncLifetime
 		var created = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
 
 		// Act
-		await _repository.ArchiveAsync(created.Value.Id, TestContext.Current.CancellationToken);
+		await _repository.ArchiveAsync(created.Value!.Id, TestContext.Current.CancellationToken);
 		var getResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 
 		// Assert
-		getResult.Value.Archived.Should().BeTrue();
+		getResult.Value?.Archived.Should().BeTrue();
 	}
 
 	[Fact]
@@ -188,7 +183,7 @@ public class CategoryRepositoryTests : IAsyncLifetime
 		// Arrange
 		var category = CreateTestCategory();
 		var created = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
-		var updated = created.Value with { CategoryName = "Updated Name" };
+		var updated = created.Value! with { CategoryName = "Updated Name" };
 
 		// Act
 		var result = await _repository.UpdateAsync(updated, TestContext.Current.CancellationToken);
@@ -203,14 +198,14 @@ public class CategoryRepositoryTests : IAsyncLifetime
 		// Arrange
 		var category = CreateTestCategory();
 		var created = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
-		var updated = created.Value with { CategoryName = "Updated Name" };
+		var updated = created.Value! with { CategoryName = "Updated Name" };
 
 		// Act
 		await _repository.UpdateAsync(updated, TestContext.Current.CancellationToken);
 		var getResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 
 		// Assert
-		getResult.Value.CategoryName.Should().Be("Updated Name");
+		getResult.Value?.CategoryName.Should().Be("Updated Name");
 	}
 
 	[Fact]

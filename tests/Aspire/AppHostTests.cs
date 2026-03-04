@@ -9,6 +9,7 @@
 
 using Aspire.Hosting.Testing;
 using FluentAssertions;
+using static Shared.Constants.Constants;
 
 namespace Aspire.Tests;
 
@@ -30,9 +31,9 @@ public async Task AppHost_CanBeCreatedAndBuilt()
 {
 // Arrange & Act
 var builder = await DistributedApplicationTestingBuilder
-.CreateAsync<Projects.AppHost>(Xunit.TestContext.Current.CancellationToken);
+.CreateAsync<Projects.AppHost>(TestContext.Current.CancellationToken);
 
-await using var app = await builder.BuildAsync(Xunit.TestContext.Current.CancellationToken);
+await using var app = await builder.BuildAsync(TestContext.Current.CancellationToken);
 
 // Assert
 app.Should().NotBeNull();
@@ -46,13 +47,13 @@ public async Task AppHost_RegistersMongoDbResource()
 {
 // Arrange
 var builder = await DistributedApplicationTestingBuilder
-.CreateAsync<Projects.AppHost>(Xunit.TestContext.Current.CancellationToken);
+.CreateAsync<Projects.AppHost>(TestContext.Current.CancellationToken);
 
 // Act
 var resources = builder.Resources;
 
 // Assert
-resources.Should().Contain(r => r.Name == "Server", "MongoDB server resource should be registered");
+  resources.Should().Contain(r => r.Name == DevDatabaseName, "MongoDB Atlas connection string resource should be registered");
 }
 
 /// <summary>
@@ -63,7 +64,7 @@ public async Task AppHost_RegistersRedisResource()
 {
 // Arrange
 var builder = await DistributedApplicationTestingBuilder
-.CreateAsync<Projects.AppHost>(Xunit.TestContext.Current.CancellationToken);
+.CreateAsync<Projects.AppHost>(TestContext.Current.CancellationToken);
 
 // Act
 var resources = builder.Resources;
@@ -80,7 +81,7 @@ public async Task AppHost_RegistersApiService()
 {
 // Arrange
 var builder = await DistributedApplicationTestingBuilder
-.CreateAsync<Projects.AppHost>(Xunit.TestContext.Current.CancellationToken);
+.CreateAsync<Projects.AppHost>(TestContext.Current.CancellationToken);
 
 // Act
 var resources = builder.Resources;
@@ -97,7 +98,7 @@ public async Task AppHost_RegistersWebService()
 {
 // Arrange
 var builder = await DistributedApplicationTestingBuilder
-.CreateAsync<Projects.AppHost>(Xunit.TestContext.Current.CancellationToken);
+.CreateAsync<Projects.AppHost>(TestContext.Current.CancellationToken);
 
 // Act
 var resources = builder.Resources;

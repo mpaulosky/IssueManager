@@ -1,4 +1,15 @@
-namespace Tests.BlazorTests.Components;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     IssueFormTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Blazor.Tests
+// =======================================================
+
+using BlazorTests.Fixtures;
+
+namespace BlazorTests.Components;
 
 /// <summary>
 /// Tests for the IssueForm Blazor component.
@@ -91,10 +102,10 @@ public class IssueFormTests : ComponentTestBase
 
 		// Act - Fill in form fields
 		var titleInput = component.Find("#title");
-		titleInput.Change("Test Issue Title");
+		await titleInput.ChangeAsync("Test Issue Title");
 
 		var descriptionInput = component.Find("#description");
-		descriptionInput.Change("Test description");
+		await descriptionInput.ChangeAsync("Test description");
 
 		// Submit form
 		var form = component.Find("form");
@@ -119,8 +130,8 @@ public class IssueFormTests : ComponentTestBase
 		);
 
 		// Act
-		var cancelButton = component.FindAll("button")[1]; // Second button is cancel
-		await cancelButton.ClickAsync(new Microsoft.AspNetCore.Components.Web.MouseEventArgs());
+		var cancelButton = component.FindAll("button")[1]; // The second button is canceled
+		await cancelButton.ClickAsync(new MouseEventArgs());
 
 		// Assert
 		cancelInvoked.Should().BeTrue();
@@ -158,16 +169,6 @@ public class IssueFormTests : ComponentTestBase
 	public void IssueForm_UpdatesFormFields_WhenInitialValuesParameterChanges()
 	{
 		// Arrange
-		var initialValues = new CreateIssueRequest
-		{
-			Title = "Initial Title",
-			Description = "Initial Description",
-			Status = "Open"
-		};
-
-		var component = TestContext.Render<IssueForm>(
-			parameters => parameters.Add(c => c.InitialValues, initialValues)
-		);
 
 		// Act - Update initial values parameter
 		var updatedValues = new CreateIssueRequest
@@ -178,8 +179,8 @@ public class IssueFormTests : ComponentTestBase
 		};
 
 		// bUnit 2.x: Re-render component entirely with new parameters
-		component = TestContext.Render<IssueForm>(
-			parameters => parameters.Add(c => c.InitialValues, updatedValues)
+		IRenderedComponent<IssueForm> component = TestContext.Render<IssueForm>(
+				parameters => parameters.Add(c => c.InitialValues, updatedValues)
 		);
 
 		// Assert - Verify form fields updated

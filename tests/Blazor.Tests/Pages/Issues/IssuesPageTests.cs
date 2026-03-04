@@ -1,6 +1,8 @@
 // Copyright (c) 2026. All rights reserved.
 
-namespace Tests.BlazorTests.Pages.Issues;
+using BlazorTests.Fixtures;
+
+namespace BlazorTests.Pages.Issues;
 
 /// <summary>
 /// bUnit tests for the <see cref="IssuesPage"/> Blazor page.
@@ -20,7 +22,7 @@ public class IssuesPageTests : ComponentTestBase
 		_mockIssueClient
 			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(PaginatedResponse<IssueDto>.Empty));
-		TestContext.Services.AddSingleton<IIssueApiClient>(_mockIssueClient);
+		TestContext.Services.AddSingleton(_mockIssueClient);
 	}
 
 	private static IssueDto MakeIssue(string title = "Test Issue") => new(
@@ -99,7 +101,7 @@ public class IssuesPageTests : ComponentTestBase
 		// Arrange
 		var issue = MakeIssue("My Integration Bug");
 		var response = new PaginatedResponse<IssueDto>(
-			new[] { issue },
+				[ issue ],
 			1,
 			1,
 			20);

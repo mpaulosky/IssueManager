@@ -7,7 +7,7 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-namespace Tests.Unit.Handlers.Statuses;
+namespace Unit.Handlers.Statuses;
 
 /// <summary>
 /// Unit tests for UpdateStatusHandler.
@@ -48,7 +48,7 @@ public class UpdateStatusHandlerTests
 
 		var command = new UpdateStatusCommand
 		{
-			Id = statusId.ToString(),
+			Id = statusId,
 			StatusName = "Updated Name",
 			StatusDescription = "Updated Description"
 		};
@@ -77,7 +77,7 @@ public class UpdateStatusHandlerTests
 		// Arrange
 		var command = new UpdateStatusCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			StatusName = "",
 			StatusDescription = "Description"
 		};
@@ -96,7 +96,7 @@ public class UpdateStatusHandlerTests
 		// Arrange
 		var command = new UpdateStatusCommand
 		{
-			Id = ObjectId.GenerateNewId().ToString(),
+			Id = ObjectId.GenerateNewId(),
 			StatusName = new string('A', 101),
 			StatusDescription = "Description"
 		};
@@ -116,7 +116,7 @@ public class UpdateStatusHandlerTests
 		var statusId = ObjectId.GenerateNewId();
 		var command = new UpdateStatusCommand
 		{
-			Id = statusId.ToString(),
+			Id = statusId,
 			StatusName = "Updated Name",
 			StatusDescription = "Updated Description"
 		};
@@ -130,24 +130,6 @@ public class UpdateStatusHandlerTests
 		// Assert
 		await act.Should().ThrowAsync<NotFoundException>()
 			.WithMessage($"*{statusId}*");
-	}
-
-	[Fact]
-	public async Task Handle_InvalidObjectId_ThrowsNotFoundException()
-	{
-		// Arrange
-		var command = new UpdateStatusCommand
-		{
-			Id = "invalid-objectid",
-			StatusName = "Updated Name",
-			StatusDescription = "Updated Description"
-		};
-
-		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
-
-		// Assert
-		await act.Should().ThrowAsync<NotFoundException>();
 	}
 
 	[Fact]
@@ -166,7 +148,7 @@ public class UpdateStatusHandlerTests
 
 		var command = new UpdateStatusCommand
 		{
-			Id = statusId.ToString(),
+			Id = statusId,
 			StatusName = "Updated Name",
 			StatusDescription = "Updated Description"
 		};
@@ -207,7 +189,7 @@ public class UpdateStatusHandlerTests
 
 		var command = new UpdateStatusCommand
 		{
-			Id = statusId.ToString(),
+			Id = statusId,
 			StatusName = "Updated Name",
 			StatusDescription = null
 		};

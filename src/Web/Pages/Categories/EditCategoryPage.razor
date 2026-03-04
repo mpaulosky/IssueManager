@@ -137,8 +137,7 @@
 		{
 			var command = new UpdateCategoryCommand
 			{
-				Id = Id,
-				CategoryName = _formModel.CategoryName,
+				Id = ObjectId.Parse(Id),
 				CategoryDescription = _formModel.CategoryDescription
 			};
 			await CategoryClient.UpdateAsync(Id, command);

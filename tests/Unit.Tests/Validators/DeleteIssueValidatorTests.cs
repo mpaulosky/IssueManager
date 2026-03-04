@@ -1,4 +1,12 @@
-namespace Tests.Unit.Validators;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     DeleteIssueValidatorTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Unit.Tests
+// =======================================================
+namespace Unit.Validators;
 
 /// <summary>
 /// Unit tests for DeleteIssueValidator (for soft-delete/archive operation).
@@ -14,7 +22,7 @@ public class DeleteIssueValidatorTests
 		// Arrange
 		var command = new DeleteIssueCommand
 		{
-			Id = Guid.NewGuid().ToString()
+			Id = ObjectId.GenerateNewId()
 		};
 
 		// Act
@@ -29,7 +37,7 @@ public class DeleteIssueValidatorTests
 	public void DeleteIssueValidator_EmptyId_ReturnsValidationError()
 	{
 		// Arrange
-		var command = new DeleteIssueCommand { Id = "" };
+		var command = new DeleteIssueCommand { Id = ObjectId.Empty };
 
 		// Act
 		var result = _validator.Validate(command);
@@ -45,7 +53,7 @@ public class DeleteIssueValidatorTests
 	public void DeleteIssueValidator_NullId_ReturnsValidationError()
 	{
 		// Arrange
-		var command = new DeleteIssueCommand { Id = null! };
+		var command = new DeleteIssueCommand { Id = ObjectId.Empty };
 
 		// Act
 		var result = _validator.Validate(command);
@@ -59,7 +67,7 @@ public class DeleteIssueValidatorTests
 	public void DeleteIssueValidator_WhitespaceId_ReturnsValidationError()
 	{
 		// Arrange
-		var command = new DeleteIssueCommand { Id = "   " };
+		var command = new DeleteIssueCommand { Id = ObjectId.Empty };
 
 		// Act
 		var result = _validator.Validate(command);

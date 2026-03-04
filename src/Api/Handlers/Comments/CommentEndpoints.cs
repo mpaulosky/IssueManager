@@ -22,7 +22,9 @@ public static class CommentEndpoints
 
 		group.MapGet("{id}", async (string id, GetCommentHandler handler) =>
 		{
-			var query = new GetCommentQuery(id);
+if (!ObjectId.TryParse(id, out var objectId))
+return Results.BadRequest("Invalid ID format");
+var query = new GetCommentQuery(objectId);
 			var comment = await handler.Handle(query);
 			return comment is not null ? Results.Ok(comment) : Results.NotFound();
 		})
@@ -44,7 +46,9 @@ public static class CommentEndpoints
 
 		group.MapPatch("{id}", async (string id, UpdateCommentCommand command, UpdateCommentHandler handler) =>
 		{
-			var commandWithId = command with { Id = id };
+if (!ObjectId.TryParse(id, out var objectId))
+return Results.BadRequest("Invalid ID format");
+var commandWithId = command with { Id = objectId };
 			var result = await handler.Handle(commandWithId);
 			return result is not null ? Results.Ok(result) : Results.NotFound();
 		})
@@ -57,7 +61,9 @@ public static class CommentEndpoints
 
 		group.MapDelete("{id}", async (string id, DeleteCommentHandler handler) =>
 		{
-			var command = new DeleteCommentCommand { Id = id };
+if (!ObjectId.TryParse(id, out var objectId))
+return Results.BadRequest("Invalid ID format");
+var command = new DeleteCommentCommand { Id = objectId };
 			var result = await handler.Handle(command);
 			return result ? Results.NoContent() : Results.NotFound();
 		})

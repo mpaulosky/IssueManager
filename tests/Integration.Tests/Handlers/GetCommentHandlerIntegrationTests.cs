@@ -10,7 +10,7 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for GetCommentHandler with real MongoDB database.
+/// Integration tests for GetCommentHandler with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -55,14 +55,14 @@ public class GetCommentHandlerIntegrationTests : IAsyncLifetime
 		var comment = CreateTestCommentDto("Test Comment", "Test Description");
 		var created = await _repository.CreateAsync(comment, TestContext.Current.CancellationToken);
 
-		var query = new GetCommentQuery(created.Value.Id.ToString());
+		var query = new GetCommentQuery(created.Value!.Id);
 
 		// Act
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
-		result!.Title.Should().Be("Test Comment");
+		result.Title.Should().Be("Test Comment");
 		result.Description.Should().Be("Test Description");
 	}
 
@@ -70,7 +70,7 @@ public class GetCommentHandlerIntegrationTests : IAsyncLifetime
 	public async Task Handle_NonExistentComment_ReturnsNull()
 	{
 		// Arrange
-		var nonExistentId = ObjectId.GenerateNewId().ToString();
+		var nonExistentId = ObjectId.GenerateNewId();
 		var query = new GetCommentQuery(nonExistentId);
 
 		// Act
@@ -84,7 +84,7 @@ public class GetCommentHandlerIntegrationTests : IAsyncLifetime
 	public async Task Handle_InvalidObjectIdFormat_ReturnsNull()
 	{
 		// Arrange
-		var query = new GetCommentQuery("invalid-id-format");
+		var query = new GetCommentQuery(ObjectId.Empty);
 
 		// Act
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
@@ -97,7 +97,7 @@ public class GetCommentHandlerIntegrationTests : IAsyncLifetime
 	public async Task Handle_EmptyId_ThrowsArgumentException()
 	{
 		// Arrange
-		var query = new GetCommentQuery(string.Empty);
+		var query = new GetCommentQuery(ObjectId.Empty);
 
 		// Act
 		Func<Task> act = async () => await _handler.Handle(query, TestContext.Current.CancellationToken);

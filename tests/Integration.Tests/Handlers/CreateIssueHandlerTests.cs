@@ -1,7 +1,15 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     CreateIssueHandlerTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Integration.Tests
+// =======================================================
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for CreateIssueHandler with real MongoDB database.
+/// Integration tests for CreateIssueHandler with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -55,7 +63,7 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 
 		// Assert
 		result.Should().NotBeNull();
-		result.Id.Should().NotBe(MongoDB.Bson.ObjectId.Empty);
+		result.Id.Should().NotBe(ObjectId.Empty);
 		result.Title.Should().Be("Test Issue");
 		result.Description.Should().Be("This is a test issue description.");
 
@@ -63,7 +71,7 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 		var retrievedResult = await _repository.GetByIdAsync(result.Id, TestContext.Current.CancellationToken);
 		retrievedResult.Should().NotBeNull();
 		var retrieved = retrievedResult.Value;
-		retrieved.Title.Should().Be("Test Issue");
+		retrieved?.Title.Should().Be("Test Issue");
 	}
 
 	[Fact]
@@ -112,9 +120,9 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 	public async Task Handle_MultipleIssues_AllPersistedCorrectly()
 	{
 		// Arrange & Act
-		var issue1 = await _handler.Handle(new CreateIssueCommand { Title = "First Issue" }, TestContext.Current.CancellationToken);
-		var issue2 = await _handler.Handle(new CreateIssueCommand { Title = "Second Issue" }, TestContext.Current.CancellationToken);
-		var issue3 = await _handler.Handle(new CreateIssueCommand { Title = "Third Issue" }, TestContext.Current.CancellationToken);
+		await _handler.Handle(new CreateIssueCommand { Title = "First Issue" }, TestContext.Current.CancellationToken);
+		await _handler.Handle(new CreateIssueCommand { Title = "Second Issue" }, TestContext.Current.CancellationToken);
+		await _handler.Handle(new CreateIssueCommand { Title = "Third Issue" }, TestContext.Current.CancellationToken);
 
 		// Assert
 		var count = await _repository.CountAsync(TestContext.Current.CancellationToken);
@@ -151,7 +159,7 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 		var retrievedResult = await _repository.GetByIdAsync(result.Id, TestContext.Current.CancellationToken);
 		retrievedResult.Should().NotBeNull();
 		var retrieved = retrievedResult.Value;
-		retrieved.Description.Should().BeEmpty();
+		retrieved?.Description.Should().BeEmpty();
 	}
 
 	[Fact]

@@ -1,8 +1,8 @@
 // Copyright (c) 2026. All rights reserved.
 
-using Microsoft.JSInterop;
+using BlazorTests.Fixtures;
 
-namespace Tests.BlazorTests.Layout;
+namespace BlazorTests.Layout;
 
 /// <summary>
 /// bUnit tests for the <see cref="ThemeToggle"/> Blazor component.
@@ -34,7 +34,7 @@ public class ThemeToggleTests : ComponentTestBase
 		// Act — wait for OnAfterRenderAsync
 		cut.WaitForState(() => cut.Markup.Contains("M20.354"), timeout: TimeSpan.FromSeconds(2));
 
-		// Assert — moon icon path should be present
+		// Assert — a moon icon path should be present
 		cut.Markup.Should().Contain("M20.354");
 	}
 
@@ -51,7 +51,7 @@ public class ThemeToggleTests : ComponentTestBase
 		var button = cut.Find("button");
 		button.Click();
 
-		// Assert — sun icon path should now be present
+		// Assert — a sun icon path should now be present
 		cut.Markup.Should().Contain("M12 3v1m0 16v1m9-9h-1M4 12H3");
 	}
 
