@@ -249,3 +249,21 @@ All labeled: `squad`, `squad:gimli`
 
 **Learning:** When multiple PRs touch shared infrastructure, consolidate into single branch early to avoid conflict resolution later
 
+---
+
+## 2026-03-04 21:25Z — BuildInfo Design-Time Fix (Web.csproj)
+
+**Task:** Investigate and fix BuildInfo code generation design-time compilation issue
+
+**Root Cause:** BuildInfo target was running inside an MSBuild `<Target>` with an `Exists()` condition that evaluated to false during design-time builds. The GeneratedCode directory check failed at design time, preventing Visual Studio from recognizing BuildInfo.cs as a source file.
+
+**Solution:** Moved the Compile Include statement outside the conditional Target to ensure BuildInfo.cs is always included in compilation, even during design-time operations.
+
+**Files Modified:**
+- `src/Web/Web.csproj` — Separated Build target condition from Include statement
+
+**Commit:** `1119a2e` (main branch)
+
+**Result:** ✅ Design-time compilation issue resolved, build passes 0 errors
+
+**Key Learning:** MSBuild target conditions can prevent design-time compilation if they block source file discovery. Always ensure source files are discoverable by the compiler regardless of target execution conditions.
