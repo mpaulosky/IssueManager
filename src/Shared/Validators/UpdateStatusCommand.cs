@@ -19,7 +19,7 @@ public record UpdateStatusCommand
 	/// <summary>
 	/// Gets or sets the status ID.
 	/// </summary>
-	public string Id { get; init; } = string.Empty;
+	public ObjectId Id { get; init; } = string.Empty;
 
 	/// <summary>
 	/// Gets or sets the name of the status.

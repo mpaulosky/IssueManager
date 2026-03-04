@@ -19,7 +19,7 @@ public record UpdateCategoryCommand
 	/// <summary>
 	/// Gets or sets the category ID.
 	/// </summary>
-	public string Id { get; init; } = string.Empty;
+	public ObjectId Id { get; init; } = string.Empty;
 
 	/// <summary>
 	/// Gets or sets the name of the category.

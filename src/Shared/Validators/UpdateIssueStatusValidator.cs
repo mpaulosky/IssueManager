@@ -8,7 +8,6 @@
 // =============================================
 
 using FluentValidation;
-using Shared.DTOs;
 
 namespace Shared.Validators;
 
@@ -20,7 +19,7 @@ public record UpdateIssueStatusCommand
 	/// <summary>
 	/// Gets or sets the ID of the issue to update.
 	/// </summary>
-	public string IssueId { get; init; } = string.Empty;
+	public ObjectId IssueId { get; init; } = string.Empty;
 
 	/// <summary>
 	/// Gets or sets the new status for the issue.

@@ -1,3 +1,11 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     CreateIssueRequest.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Web
+// =======================================================
 using System.ComponentModel.DataAnnotations;
 
 namespace Web.Components;

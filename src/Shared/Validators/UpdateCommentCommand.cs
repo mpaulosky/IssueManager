@@ -19,7 +19,7 @@ public record UpdateCommentCommand
 	/// <summary>
 	/// Gets or sets the comment ID.
 	/// </summary>
-	public string Id { get; init; } = string.Empty;
+	public ObjectId Id { get; init; } = string.Empty;
 
 	/// <summary>
 	/// Gets or sets the title of the comment.
