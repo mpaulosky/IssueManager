@@ -61,6 +61,10 @@
 		    Lines="@(_BuildInfoLine)"
 		    Overwrite="true"
 		    WriteOnlyWhenDifferent="true" />
+		<ItemGroup>
+			<Compile Remove="$(IntermediateOutputPath)BuildInfo.g.cs" />
+			<Compile Include="$(IntermediateOutputPath)BuildInfo.g.cs" />
+		</ItemGroup>
 	</Target>
 
 	<ItemGroup>
