@@ -43,7 +43,7 @@ public class CategoryEndpointsTests : IDisposable
 			.Returns(Result<IReadOnlyList<CategoryDto>>.Ok(items));
 
 		// Act
-		var response = await _client.GetAsync("/api/v1/categories");
+		var response = await _client.GetAsync("/api/v1/categories").ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -67,7 +67,7 @@ public class CategoryEndpointsTests : IDisposable
 			.Returns(Result<CategoryDto>.Ok(categoryDto));
 
 		// Act
-		var response = await _client.GetAsync($"/api/v1/categories/{id}");
+		var response = await _client.GetAsync($"/api/v1/categories/{id}").ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -83,7 +83,7 @@ public class CategoryEndpointsTests : IDisposable
 			.Returns(Result<CategoryDto>.Fail("Not found"));
 
 		// Act
-		var response = await _client.GetAsync($"/api/v1/categories/{id}");
+		var response = await _client.GetAsync($"/api/v1/categories/{id}").ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -93,7 +93,7 @@ public class CategoryEndpointsTests : IDisposable
 	public async Task GetCategory_WithInvalidId_ReturnsNotFound()
 	{
 		// Act
-		var response = await _client.GetAsync("/api/v1/categories/not-a-valid-id");
+		var response = await _client.GetAsync("/api/v1/categories/not-a-valid-id").ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -119,7 +119,7 @@ public class CategoryEndpointsTests : IDisposable
 		var command = new { CategoryName = "Test Category", CategoryDescription = "Description" };
 
 		// Act
-		var response = await _authenticatedClient.PostAsJsonAsync("/api/v1/categories", command);
+		var response = await _authenticatedClient.PostAsJsonAsync("/api/v1/categories", command).ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -132,7 +132,7 @@ public class CategoryEndpointsTests : IDisposable
 		var command = new { CategoryName = "Test Category", CategoryDescription = "Description" };
 
 		// Act
-		var response = await _client.PostAsJsonAsync("/api/v1/categories", command);
+		var response = await _client.PostAsJsonAsync("/api/v1/categories", command).ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -161,7 +161,7 @@ public class CategoryEndpointsTests : IDisposable
 		var command = new { CategoryName = "Updated Category", CategoryDescription = "Description" };
 
 		// Act
-		var response = await _authenticatedClient.PatchAsJsonAsync($"/api/v1/categories/{categoryId}", command);
+		var response = await _authenticatedClient.PatchAsJsonAsync($"/api/v1/categories/{categoryId}", command).ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -175,7 +175,7 @@ public class CategoryEndpointsTests : IDisposable
 		var command = new { CategoryName = "Updated Category", CategoryDescription = "Description" };
 
 		// Act
-		var response = await _client.PatchAsJsonAsync($"/api/v1/categories/{categoryId}", command);
+		var response = await _client.PatchAsJsonAsync($"/api/v1/categories/{categoryId}", command).ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -202,7 +202,7 @@ public class CategoryEndpointsTests : IDisposable
 			.Returns(Result.Ok());
 
 		// Act
-		var response = await _authenticatedClient.DeleteAsync($"/api/v1/categories/{categoryId}");
+		var response = await _authenticatedClient.DeleteAsync($"/api/v1/categories/{categoryId}").ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -215,7 +215,7 @@ public class CategoryEndpointsTests : IDisposable
 		var categoryId = ObjectId.GenerateNewId();
 
 		// Act
-		var response = await _client.DeleteAsync($"/api/v1/categories/{categoryId}");
+		var response = await _client.DeleteAsync($"/api/v1/categories/{categoryId}").ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);

@@ -43,7 +43,7 @@ public class CommentEndpointsTests : IDisposable
 			.Returns(Result<IReadOnlyList<CommentDto>>.Ok(items));
 
 		// Act
-		var response = await _client.GetAsync("/api/v1/comments");
+		var response = await _client.GetAsync("/api/v1/comments").ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -72,7 +72,7 @@ public class CommentEndpointsTests : IDisposable
 			.Returns(Result<CommentDto>.Ok(commentDto));
 
 		// Act
-		var response = await _client.GetAsync($"/api/v1/comments/{id}");
+		var response = await _client.GetAsync($"/api/v1/comments/{id}").ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -88,7 +88,7 @@ public class CommentEndpointsTests : IDisposable
 			.Returns(Result<CommentDto>.Fail("Not found"));
 
 		// Act
-		var response = await _client.GetAsync($"/api/v1/comments/{id}");
+		var response = await _client.GetAsync($"/api/v1/comments/{id}").ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -98,7 +98,7 @@ public class CommentEndpointsTests : IDisposable
 	public async Task GetComment_WithInvalidId_ReturnsNotFound()
 	{
 		// Act
-		var response = await _client.GetAsync("/api/v1/comments/not-a-valid-id");
+		var response = await _client.GetAsync("/api/v1/comments/not-a-valid-id").ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -129,7 +129,7 @@ public class CommentEndpointsTests : IDisposable
 		var command = new { Title = "Test Comment", CommentText = "Test comment text", IssueId = ObjectId.GenerateNewId().ToString() };
 
 		// Act
-		var response = await _authenticatedClient.PostAsJsonAsync("/api/v1/comments", command);
+		var response = await _authenticatedClient.PostAsJsonAsync("/api/v1/comments", command).ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -142,7 +142,7 @@ public class CommentEndpointsTests : IDisposable
 		var command = new { Title = "Test Comment", CommentText = "Test comment text", IssueId = ObjectId.GenerateNewId().ToString() };
 
 		// Act
-		var response = await _client.PostAsJsonAsync("/api/v1/comments", command);
+		var response = await _client.PostAsJsonAsync("/api/v1/comments", command).ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -176,7 +176,7 @@ public class CommentEndpointsTests : IDisposable
 		var command = new { Title = "Updated Comment", CommentText = "Updated comment text" };
 
 		// Act
-		var response = await _authenticatedClient.PatchAsJsonAsync($"/api/v1/comments/{commentId}", command);
+		var response = await _authenticatedClient.PatchAsJsonAsync($"/api/v1/comments/{commentId}", command).ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -190,7 +190,7 @@ public class CommentEndpointsTests : IDisposable
 		var command = new { Title = "Updated Comment", CommentText = "Updated comment text" };
 
 		// Act
-		var response = await _client.PatchAsJsonAsync($"/api/v1/comments/{commentId}", command);
+		var response = await _client.PatchAsJsonAsync($"/api/v1/comments/{commentId}", command).ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -222,7 +222,7 @@ public class CommentEndpointsTests : IDisposable
 			.Returns(Result.Ok());
 
 		// Act
-		var response = await _authenticatedClient.DeleteAsync($"/api/v1/comments/{commentId}");
+		var response = await _authenticatedClient.DeleteAsync($"/api/v1/comments/{commentId}").ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -235,7 +235,7 @@ public class CommentEndpointsTests : IDisposable
 		var commentId = ObjectId.GenerateNewId();
 
 		// Act
-		var response = await _client.DeleteAsync($"/api/v1/comments/{commentId}");
+		var response = await _client.DeleteAsync($"/api/v1/comments/{commentId}").ConfigureAwait(false);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);

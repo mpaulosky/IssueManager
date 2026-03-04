@@ -40,10 +40,10 @@ public class StatusEndpointsTests : IDisposable
 		IReadOnlyList<StatusDto> items = [];
 		_factory.StatusRepository
 			.GetAllAsync(Arg.Any<CancellationToken>())
-			.Returns(Result<IReadOnlyList<StatusDto>>.Ok(items));
+			.Returns(Result.Ok(items));
 
 		// Act
-		var response = await _client.GetAsync("/api/v1/statuses");
+		var response = await _client.GetAsync("/api/v1/statuses", TestContext.Current.CancellationToken);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -64,10 +64,10 @@ public class StatusEndpointsTests : IDisposable
 			UserDto.Empty);
 		_factory.StatusRepository
 			.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
-			.Returns(Result<StatusDto>.Ok(statusDto));
+			.Returns(Result.Ok(statusDto));
 
 		// Act
-		var response = await _client.GetAsync($"/api/v1/statuses/{id}");
+		var response = await _client.GetAsync($"/api/v1/statuses/{id}", TestContext.Current.CancellationToken);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -83,7 +83,7 @@ public class StatusEndpointsTests : IDisposable
 			.Returns(Result<StatusDto>.Fail("Not found"));
 
 		// Act
-		var response = await _client.GetAsync($"/api/v1/statuses/{id}");
+		var response = await _client.GetAsync($"/api/v1/statuses/{id}", TestContext.Current.CancellationToken);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -93,7 +93,7 @@ public class StatusEndpointsTests : IDisposable
 	public async Task GetStatus_WithInvalidId_ReturnsNotFound()
 	{
 		// Act
-		var response = await _client.GetAsync("/api/v1/statuses/not-a-valid-id");
+		var response = await _client.GetAsync("/api/v1/statuses/not-a-valid-id", TestContext.Current.CancellationToken);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -114,12 +114,12 @@ public class StatusEndpointsTests : IDisposable
 			UserDto.Empty);
 		_factory.StatusRepository
 			.CreateAsync(Arg.Any<StatusDto>(), Arg.Any<CancellationToken>())
-			.Returns(Result<StatusDto>.Ok(statusDto));
+			.Returns(Result.Ok(statusDto));
 
 		var command = new { StatusName = "Test Status", StatusDescription = "Description" };
 
 		// Act
-		var response = await _authenticatedClient.PostAsJsonAsync("/api/v1/statuses", command);
+		var response = await _authenticatedClient.PostAsJsonAsync("/api/v1/statuses", command, cancellationToken: TestContext.Current.CancellationToken);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -132,7 +132,7 @@ public class StatusEndpointsTests : IDisposable
 		var command = new { StatusName = "Test Status", StatusDescription = "Description" };
 
 		// Act
-		var response = await _client.PostAsJsonAsync("/api/v1/statuses", command);
+		var response = await _client.PostAsJsonAsync("/api/v1/statuses", command, cancellationToken: TestContext.Current.CancellationToken);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -153,15 +153,15 @@ public class StatusEndpointsTests : IDisposable
 			UserDto.Empty);
 		_factory.StatusRepository
 			.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
-			.Returns(Result<StatusDto>.Ok(statusDto));
+			.Returns(Result.Ok(statusDto));
 		_factory.StatusRepository
 			.UpdateAsync(Arg.Any<StatusDto>(), Arg.Any<CancellationToken>())
-			.Returns(Result<StatusDto>.Ok(statusDto));
+			.Returns(Result.Ok(statusDto));
 
 		var command = new { StatusName = "Updated Status", StatusDescription = "Description" };
 
 		// Act
-		var response = await _authenticatedClient.PatchAsJsonAsync($"/api/v1/statuses/{statusId}", command);
+		var response = await _authenticatedClient.PatchAsJsonAsync($"/api/v1/statuses/{statusId}", command, cancellationToken: TestContext.Current.CancellationToken);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -175,7 +175,7 @@ public class StatusEndpointsTests : IDisposable
 		var command = new { StatusName = "Updated Status", StatusDescription = "Description" };
 
 		// Act
-		var response = await _client.PatchAsJsonAsync($"/api/v1/statuses/{statusId}", command);
+		var response = await _client.PatchAsJsonAsync($"/api/v1/statuses/{statusId}", command, cancellationToken: TestContext.Current.CancellationToken);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -196,13 +196,13 @@ public class StatusEndpointsTests : IDisposable
 			UserDto.Empty);
 		_factory.StatusRepository
 			.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
-			.Returns(Result<StatusDto>.Ok(statusDto));
+			.Returns(Result.Ok(statusDto));
 		_factory.StatusRepository
 			.ArchiveAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
 			.Returns(Result.Ok());
 
 		// Act
-		var response = await _authenticatedClient.DeleteAsync($"/api/v1/statuses/{statusId}");
+		var response = await _authenticatedClient.DeleteAsync($"/api/v1/statuses/{statusId}", TestContext.Current.CancellationToken);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -215,7 +215,7 @@ public class StatusEndpointsTests : IDisposable
 		var statusId = ObjectId.GenerateNewId();
 
 		// Act
-		var response = await _client.DeleteAsync($"/api/v1/statuses/{statusId}");
+		var response = await _client.DeleteAsync($"/api/v1/statuses/{statusId}", TestContext.Current.CancellationToken);
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);

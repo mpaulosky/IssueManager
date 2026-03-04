@@ -1,4 +1,11 @@
+// ============================================
 // Copyright (c) 2026. All rights reserved.
+// File Name :     ThemeColorSelectorTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Blazor.Tests
+// =============================================
 
 using BlazorTests.Fixtures;
 

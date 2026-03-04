@@ -6,10 +6,11 @@
 // Solution Name : IssueManager
 // Project Name :  Integration.Tests
 // =======================================================
+
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for GetIssueHandler with real MongoDB database.
+/// Integration tests for GetIssueHandler with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -52,7 +53,7 @@ public class GetIssueHandlerTests : IAsyncLifetime
 		// Arrange
 		var issue = CreateTestIssueDto("Test Issue", "Test Description");
 		var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
-		var query = new GetIssueQuery(created.Value.Id);
+		var query = new GetIssueQuery(created.Value!.Id);
 
 		// Act
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);

@@ -1,9 +1,16 @@
+// =======================================================
 // Copyright (c) 2026. All rights reserved.
+// File Name :     IssueRepositorySearchTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Integration.Tests
+// =======================================================
 
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for IssueRepository search and filter functionality with real MongoDB database.
+/// Integration tests for IssueRepository search and filter functionality with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -101,7 +108,7 @@ public class IssueRepositorySearchTests : IAsyncLifetime
 	[Fact]
 	public async Task GetAllAsync_WithNoFilters_ReturnsAllNonArchivedIssues()
 	{
-		// Arrange - Create mix of issues and archive some
+		// Arrange - Create a mix of issues and archive some
 		var issue1 = CreateTestIssueDto("Issue 1", "Description 1");
 		var issue2 = CreateTestIssueDto("Issue 2", "Description 2");
 		var issue3 = CreateTestIssueDto("Issue 3", "Description 3");
@@ -111,7 +118,7 @@ public class IssueRepositorySearchTests : IAsyncLifetime
 		var created3 = await _repository.CreateAsync(issue3, TestContext.Current.CancellationToken);
 
 		// Archive one issue
-		await _repository.ArchiveAsync(ObjectId.Parse(created1.Value.Id.ToString()), TestContext.Current.CancellationToken);
+		await _repository.ArchiveAsync(ObjectId.Parse(created1.Value!.Id.ToString()), TestContext.Current.CancellationToken);
 
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
 

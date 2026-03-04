@@ -6,6 +6,7 @@
 // Solution Name : IssueManager
 // Project Name :  Integration.Tests
 // =======================================================
+
 namespace Integration.Handlers;
 
 /// <summary>
@@ -100,7 +101,7 @@ for (int i = 0; i < 10; i++)
 	var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
 	var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
 	if (i < 3)
-		issuesToArchive.Add(created.Value.Id.ToString());
+		issuesToArchive.Add(created.Value!.Id.ToString());
 }
 
 foreach (var id in issuesToArchive)
@@ -149,7 +150,7 @@ var query = new ListIssuesQuery { Page = 3, PageSize = 20 };
 var result = await _handler.Handle(query, CancellationToken.None);
 
 // Assert
-result.Items.Should().HaveCount(2); // 42 - 40 = 2 on last page
+result.Items.Should().HaveCount(2); // 42 - 40 = 2 on the last page
 result.Page.Should().Be(3);
 result.Total.Should().Be(42);
 result.TotalPages.Should().Be(3);
@@ -190,7 +191,7 @@ for (int i = 0; i < 20; i++)
 
 var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
 
-// Act - List while creating new issue
+// Act - List while creating a new issue
 var listTask = _handler.Handle(query, CancellationToken.None);
 
 var newIssue = CreateTestIssueDto("Concurrent Issue", "Created during list");
@@ -202,6 +203,6 @@ var result = await listTask;
 
 // Assert - List should be consistent (snapshot isolation)
 result.Items.Should().HaveCount(20);
-result.Total.Should().BeOneOf(20, 21); // Either before or after concurrent create
+result.Total.Should().BeOneOf(20, 21); // Either before or after concurrently create
 }
 }

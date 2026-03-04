@@ -6,10 +6,11 @@
 // Solution Name : IssueManager
 // Project Name :  Integration.Tests
 // =======================================================
+
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for DeleteIssueHandler (soft-delete via Archived) with real MongoDB database.
+/// Integration tests for DeleteIssueHandler (soft-delete via Archived) with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -58,7 +59,7 @@ var command = new DeleteIssueCommand { Id = created.Value.Id };
 // Act
 await _handler.Handle(command, CancellationToken.None);
 
-// Assert - Verify Archived is set in database
+// Assert - Verify Archived is set in a database
 var getResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 getResult.Should().NotBeNull();
 var dbIssue = getResult.Value;

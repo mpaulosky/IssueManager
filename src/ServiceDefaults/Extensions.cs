@@ -6,16 +6,8 @@
 // Solution Name : IssueManager
 // Project Name :  ServiceDefaults
 // =======================================================
-namespace ServiceDefaults;
 
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Hosting;
-using OpenTelemetry;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
+namespace ServiceDefaults;
 
 /// <summary>
 /// Extension methods for service defaults configuration.
@@ -30,7 +22,7 @@ public static class Extensions
 		builder.ConfigureOpenTelemetry();
 		builder.AddDefaultHealthChecks();
 		builder.Services.AddServiceDiscovery();
-		
+
 		return builder;
 	}
 

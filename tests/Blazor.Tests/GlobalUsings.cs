@@ -14,7 +14,6 @@ global using NSubstitute;
 global using Web.Components;
 global using System.Diagnostics.CodeAnalysis;
 global using Microsoft.AspNetCore.Components;
-global using Microsoft.AspNetCore.Components.Rendering;
 global using Microsoft.AspNetCore.Components.Web;
 global using Microsoft.Extensions.DependencyInjection;
 global using MongoDB.Bson;
@@ -23,7 +22,6 @@ global using Shared.Validators;
 global using System;
 global using System.Net;
 global using System.Net.Http.Json;
-global using System.Reflection;
 
 global using Web.Components.Shared;
 global using Web.Layout;
