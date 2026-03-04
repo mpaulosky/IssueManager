@@ -118,3 +118,31 @@ DevOps on IssueManager (.NET 10, GitHub Actions, Aspire, NuGet centralized packa
 - **Commit:** `094dab7` on main
 - **Files Modified:** `scripts/hooks/pre-push` (complete rewrite with three gate functions)
 
+
+### 2026-03-04: Issue #89 — Aspire Startup Fixes: Blocked by Incomplete ObjectId Refactoring
+
+**Attempted:** Commit Matthew's Aspire startup fixes for #89
+
+**Status:** BLOCKED — Build fails with 14 compilation errors
+
+**Root Cause:**
+- Working tree contains TWO separate concerns mixed together:
+  1. **Aspire infrastructure fixes** (AppHost, ServiceDefaults, API/Web startup) ✅ Sound
+  2. **ObjectId type refactoring** (across all layers) ❌ INCOMPLETE
+- ObjectId type changes made to DTOs/validators but NOT propagated to handlers, services, pages
+- Type conversion logic missing (string ↔ ObjectId marshaling)
+
+**Build Errors:**
+- 9 validator files: ObjectId initialized with \string.Empty\ (type mismatch)
+- API handlers: string parameters where ObjectId expected (CategoryEndpoints, StatusEndpoints, CommentEndpoints, UpdateIssueStatusHandler)
+- Web pages: string literals passed to ObjectId parameters (EditIssuePage, EditCategoryPage, EditStatusPage, IssueDetailPage)
+
+**Scope Issue:**
+- ObjectId refactoring is application logic (belongs to Sam/Aragorn, not DevOps)
+- Affects handlers, services, page components across entire application
+- Requires coordinated type conversion implementation
+
+**Decision:**
+- Do NOT commit incomplete application refactoring
+- Escalated to .squad/decisions/inbox/boromir-issue89-incomplete-refactoring.md
+- Request: Matthew/application team must complete refactoring, test locally, then resubmit
