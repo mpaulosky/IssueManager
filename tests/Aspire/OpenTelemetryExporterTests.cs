@@ -1,4 +1,11 @@
+// ============================================
 // Copyright (c) 2026. All rights reserved.
+// File Name :     OpenTelemetryExporterTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Aspire.Tests
+// =============================================
 
 namespace Aspire.Tests;
 

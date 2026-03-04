@@ -1,4 +1,11 @@
+// ============================================
 // Copyright (c) 2026. All rights reserved.
+// File Name :     NotFoundExceptionTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Unit.Tests
+// =============================================
 // File Name :     NotFoundExceptionTests.cs
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
