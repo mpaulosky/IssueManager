@@ -1,9 +1,11 @@
-using Api.Extensions;
-using Api.Handlers.Categories;
-using Api.Handlers.Comments;
-using Api.Handlers.Issues;
-using Api.Handlers.Statuses;
-using ServiceDefaults;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     Program.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Api
+// =======================================================
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,14 +20,15 @@ builder.Services.AddCors(options =>
 	options.AddDefaultPolicy(policy =>
 	{
 		var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-			?? ["https://localhost:7001", "http://localhost:5001"];
+			?? ["https://localhost:7480", "http://localhost:5542"];
+
 		policy.WithOrigins(allowedOrigins)
 			.AllowAnyHeader()
 			.AllowAnyMethod();
 	});
 });
 
-builder.Services.AddRepositories(builder.Configuration, builder.Environment);
+builder.Services.AddRepositories(builder.Configuration);
 builder.Services.AddValidators();
 builder.Services.AddHandlers();
 builder.Services.AddCurrentUser();
@@ -47,6 +50,3 @@ app.MapCommentEndpoints();
 app.MapDefaultEndpoints();
 
 app.Run();
-
-public partial class Program { }
-

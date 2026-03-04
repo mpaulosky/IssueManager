@@ -7,16 +7,6 @@
 // Project Name :  Api
 // =======================================================
 
-using Api.Handlers;
-using Api.Handlers.Categories;
-using Api.Handlers.Comments;
-using Api.Handlers.Issues;
-using Api.Handlers.Statuses;
-
-using Microsoft.Extensions.Hosting;
-
-using static Shared.Constants.Constants;
-
 namespace Api.Extensions;
 
 /// <summary>Extension methods for registering application services.</summary>
@@ -30,28 +20,20 @@ public static class ServiceCollectionExtensions
 	/// </summary>
 	public static IServiceCollection AddRepositories(
 		this IServiceCollection services,
-		IConfiguration configuration,
-		IHostEnvironment? environment = null)
+		IConfiguration configuration)
 	{
-		// Determine the database name based on the environment
-		var isDevelopment = environment?.IsDevelopment()
-			?? string.Equals(
-				configuration["ASPNETCORE_ENVIRONMENT"] ?? configuration["DOTNET_ENVIRONMENT"],
-				"Development",
-				StringComparison.OrdinalIgnoreCase);
 
-		var databaseName = isDevelopment ? DevDatabaseName : DatabaseName;
+		const string databaseName = DatabaseName;
 
-		var connectionString = configuration.GetConnectionString(databaseName)
-			?? "mongodb://localhost:27017";
+		var connectionString = configuration.GetConnectionString(databaseName) ?? "mongodb://localhost:27017";
 
-		services.AddSingleton<IIssueRepository>(sp =>
+		services.AddSingleton<IIssueRepository>(_ =>
 			new IssueRepository(connectionString, databaseName));
-		services.AddSingleton<IStatusRepository>(sp =>
+		services.AddSingleton<IStatusRepository>(_ =>
 			new StatusRepository(connectionString, databaseName));
-		services.AddSingleton<ICategoryRepository>(sp =>
+		services.AddSingleton<ICategoryRepository>(_ =>
 			new CategoryRepository(connectionString, databaseName));
-		services.AddSingleton<ICommentRepository>(sp =>
+		services.AddSingleton<ICommentRepository>(_ =>
 			new CommentRepository(connectionString, databaseName));
 
 		return services;
