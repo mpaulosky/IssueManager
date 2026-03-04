@@ -32,7 +32,9 @@ public static class IssueEndpoints
 		// Get Issue by ID
 		group.MapGet("{id}", async (string id, GetIssueHandler handler) =>
 		{
-			var query = new GetIssueQuery(id);
+if (!ObjectId.TryParse(id, out var objectId))
+return Results.BadRequest("Invalid ID format");
+var query = new GetIssueQuery(objectId);
 			var issue = await handler.Handle(query);
 			return issue is not null ? Results.Ok(issue) : Results.NotFound();
 		})
@@ -56,7 +58,9 @@ public static class IssueEndpoints
 		// Update Issue
 		group.MapPatch("{id}", async (string id, UpdateIssueCommand command, UpdateIssueHandler handler) =>
 		{
-			var commandWithId = command with { Id = id };
+if (!ObjectId.TryParse(id, out var objectId))
+return Results.BadRequest("Invalid ID format");
+var commandWithId = command with { Id = objectId };
 			var result = await handler.Handle(commandWithId);
 			return result is not null ? Results.Ok(result) : Results.NotFound();
 		})
@@ -70,7 +74,9 @@ public static class IssueEndpoints
 		// Delete Issue (soft-delete)
 		group.MapDelete("{id}", async (string id, DeleteIssueHandler handler) =>
 		{
-			var command = new DeleteIssueCommand { Id = id };
+if (!ObjectId.TryParse(id, out var objectId))
+return Results.BadRequest("Invalid ID format");
+var command = new DeleteIssueCommand { Id = objectId };
 			var result = await handler.Handle(command);
 			return result ? Results.NoContent() : Results.NotFound();
 		})

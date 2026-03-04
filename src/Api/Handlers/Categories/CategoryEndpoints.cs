@@ -22,7 +22,9 @@ public static class CategoryEndpoints
 
 		group.MapGet("{id}", async (string id, GetCategoryHandler handler) =>
 		{
-			var query = new GetCategoryQuery(id);
+if (!ObjectId.TryParse(id, out var objectId))
+return Results.BadRequest("Invalid ID format");
+var query = new GetCategoryQuery(objectId);
 			var category = await handler.Handle(query);
 			return category is not null ? Results.Ok(category) : Results.NotFound();
 		})
@@ -44,7 +46,9 @@ public static class CategoryEndpoints
 
 		group.MapPatch("{id}", async (string id, UpdateCategoryCommand command, UpdateCategoryHandler handler) =>
 		{
-			var commandWithId = command with { Id = id };
+if (!ObjectId.TryParse(id, out var objectId))
+return Results.BadRequest("Invalid ID format");
+var commandWithId = command with { Id = objectId };
 			var result = await handler.Handle(commandWithId);
 			return result is not null ? Results.Ok(result) : Results.NotFound();
 		})
@@ -57,7 +61,9 @@ public static class CategoryEndpoints
 
 		group.MapDelete("{id}", async (string id, DeleteCategoryHandler handler) =>
 		{
-			var command = new DeleteCategoryCommand { Id = id };
+if (!ObjectId.TryParse(id, out var objectId))
+return Results.BadRequest("Invalid ID format");
+var command = new DeleteCategoryCommand { Id = objectId };
 			var result = await handler.Handle(command);
 			return result ? Results.NoContent() : Results.NotFound();
 		})

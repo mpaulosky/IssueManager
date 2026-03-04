@@ -19,7 +19,7 @@ public record DeleteCommentCommand
 	/// <summary>
 	/// Gets or sets the comment ID.
 	/// </summary>
-	public ObjectId Id { get; init; } = string.Empty;
+	public ObjectId Id { get; init; }
 }
 
 /// <summary>

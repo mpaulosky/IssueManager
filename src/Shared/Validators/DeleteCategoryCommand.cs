@@ -19,7 +19,7 @@ public record DeleteCategoryCommand
 	/// <summary>
 	/// Gets or sets the category ID.
 	/// </summary>
-	public ObjectId? Id { get; init; } = string.Empty;
+	public ObjectId Id { get; init; }
 }
 
 /// <summary>

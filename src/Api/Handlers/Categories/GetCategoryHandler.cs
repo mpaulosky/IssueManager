@@ -13,7 +13,7 @@ namespace Api.Handlers.Categories;
 /// Query for retrieving a single category.
 /// </summary>
 /// <param name="CategoryId">The unique identifier of the category to retrieve.</param>
-public record GetCategoryQuery(string CategoryId);
+public record GetCategoryQuery(ObjectId CategoryId);
 
 /// <summary>
 /// Handler for retrieving categories.
@@ -43,13 +43,7 @@ public class GetCategoryHandler
 	/// <exception cref="ArgumentException">Thrown when the category ID is null or empty.</exception>
 	public async Task<CategoryDto?> Handle(GetCategoryQuery query, CancellationToken cancellationToken = default)
 	{
-		if (string.IsNullOrWhiteSpace(query.CategoryId))
-			throw new ArgumentException("Category ID cannot be empty.", nameof(query.CategoryId));
-
-		if (!MongoDB.Bson.ObjectId.TryParse(query.CategoryId, out var objectId))
-			return null;
-
-		var result = await _repository.GetByIdAsync(objectId, cancellationToken);
+		var result = await _repository.GetByIdAsync(query.CategoryId, cancellationToken);
 		return result.Success ? result.Value : null;
 	}
 }

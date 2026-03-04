@@ -137,8 +137,7 @@
 		{
 			var command = new UpdateStatusCommand
 			{
-				Id = Id,
-				StatusName = _formModel.StatusName,
+				Id = ObjectId.Parse(Id),
 				StatusDescription = _formModel.StatusDescription
 			};
 			await StatusClient.UpdateAsync(Id, command);

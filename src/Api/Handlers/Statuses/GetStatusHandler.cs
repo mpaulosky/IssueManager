@@ -13,7 +13,7 @@ namespace Api.Handlers.Statuses;
 /// Query for retrieving a single status.
 /// </summary>
 /// <param name="StatusId">The unique identifier of the status to retrieve.</param>
-public record GetStatusQuery(string StatusId);
+public record GetStatusQuery(ObjectId StatusId);
 
 /// <summary>
 /// Handler for retrieving statuses.
@@ -43,13 +43,7 @@ public class GetStatusHandler
 	/// <exception cref="ArgumentException">Thrown when the status ID is null or empty.</exception>
 	public async Task<StatusDto?> Handle(GetStatusQuery query, CancellationToken cancellationToken = default)
 	{
-		if (string.IsNullOrWhiteSpace(query.StatusId))
-			throw new ArgumentException("Status ID cannot be empty.", nameof(query.StatusId));
-
-		if (!MongoDB.Bson.ObjectId.TryParse(query.StatusId, out var objectId))
-			return null;
-
-		var result = await _repository.GetByIdAsync(objectId, cancellationToken);
+		var result = await _repository.GetByIdAsync(query.StatusId, cancellationToken);
 		return result.Success ? result.Value : null;
 	}
 }
