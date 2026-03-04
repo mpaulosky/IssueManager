@@ -7,7 +7,7 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-namespace Tests.Unit.Extensions;
+namespace Unit.Extensions;
 
 /// <summary>Unit tests for <see cref="ServiceCollectionExtensions"/>.</summary>
 [ExcludeFromCodeCoverage]

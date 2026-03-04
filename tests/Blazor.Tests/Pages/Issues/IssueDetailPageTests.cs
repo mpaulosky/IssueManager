@@ -1,6 +1,8 @@
 // Copyright (c) 2026. All rights reserved.
 
-namespace Tests.BlazorTests.Pages.Issues;
+using BlazorTests.Fixtures;
+
+namespace BlazorTests.Pages.Issues;
 
 /// <summary>
 /// bUnit tests for the <see cref="IssueDetailPage"/> Blazor page.
@@ -20,13 +22,13 @@ public class IssueDetailPageTests : ComponentTestBase
 		_mockIssueClient
 			.GetByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IssueDto?>(null));
-		TestContext.Services.AddSingleton<IIssueApiClient>(_mockIssueClient);
+		TestContext.Services.AddSingleton(_mockIssueClient);
 
 		_mockCommentClient = Substitute.For<ICommentApiClient>();
 		_mockCommentClient
 			.GetAllAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IEnumerable<CommentDto>>([]));
-		TestContext.Services.AddSingleton<ICommentApiClient>(_mockCommentClient);
+		TestContext.Services.AddSingleton(_mockCommentClient);
 	}
 
 	private static IssueDto MakeIssue(string title = "Detail Issue", string id = "") => new(
@@ -51,7 +53,7 @@ public class IssueDetailPageTests : ComponentTestBase
 		null,
 		issue,
 		new UserDto("user2", "Commenter", "commenter@test.com"),
-		new HashSet<string>(),
+		[],
 		false,
 		UserDto.Empty,
 		false,
@@ -145,7 +147,7 @@ public class IssueDetailPageTests : ComponentTestBase
 		_mockIssueClient.GetByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IssueDto?>(issue));
 		_mockCommentClient.GetAllAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
-			.Returns(Task.FromResult<IEnumerable<CommentDto>>(new[] { comment }));
+			.Returns(Task.FromResult<IEnumerable<CommentDto>>([ comment ]));
 
 		// Act
 		var cut = TestContext.Render<IssueDetailPage>(p =>

@@ -7,7 +7,7 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-namespace Tests.Unit.Handlers.Comments;
+namespace Unit.Handlers.Comments;
 
 /// <summary>
 /// Unit tests for CreateCommentHandler.

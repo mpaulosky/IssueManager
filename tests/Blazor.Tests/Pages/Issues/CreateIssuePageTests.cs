@@ -1,6 +1,8 @@
 // Copyright (c) 2026. All rights reserved.
 
-namespace Tests.BlazorTests.Pages.Issues;
+using BlazorTests.Fixtures;
+
+namespace BlazorTests.Pages.Issues;
 
 /// <summary>
 /// bUnit tests for the <see cref="CreateIssuePage"/> Blazor page.
@@ -19,7 +21,7 @@ public class CreateIssuePageTests : ComponentTestBase
 		_mockIssueClient
 			.CreateAsync(Arg.Any<CreateIssueCommand>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IssueDto?>(null));
-		TestContext.Services.AddSingleton<IIssueApiClient>(_mockIssueClient);
+		TestContext.Services.AddSingleton(_mockIssueClient);
 	}
 
 	[Fact]
@@ -59,8 +61,8 @@ public class CreateIssuePageTests : ComponentTestBase
 	{
 		// Arrange
 		var cut = TestContext.Render<CreateIssuePage>();
-		cut.Find("#title").Change("A Valid Issue Title");
-		cut.Find("#description").Change("Some description text");
+		await cut.Find("#title").ChangeAsync("A Valid Issue Title");
+		await cut.Find("#description").ChangeAsync("Some description text");
 
 		// Act
 		await cut.Find("form").SubmitAsync();
@@ -75,8 +77,8 @@ public class CreateIssuePageTests : ComponentTestBase
 	{
 		// Arrange
 		var cut = TestContext.Render<CreateIssuePage>();
-		cut.Find("#title").Change("A Valid Issue Title");
-		cut.Find("#description").Change("Some description");
+		await cut.Find("#title").ChangeAsync("A Valid Issue Title");
+		await cut.Find("#description").ChangeAsync("Some description");
 
 		// Act
 		await cut.Find("form").SubmitAsync();

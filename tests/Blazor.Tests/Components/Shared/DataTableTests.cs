@@ -7,7 +7,9 @@
 // Project Name :  Blazor.Tests
 // =============================================
 
-namespace Tests.BlazorTests.Components.Shared;
+using BlazorTests.Fixtures;
+
+namespace BlazorTests.Components.Shared;
 
 /// <summary>
 /// Unit tests for the <see cref="DataTable{TItem}"/> generic Blazor component.
@@ -30,7 +32,7 @@ public class DataTableTests : ComponentTestBase
 	{
 		// Act
 		var cut = TestContext.Render<DataTable<string>>(p => p
-			.Add(x => x.Items, Array.Empty<string>())
+			.Add(x => x.Items, [])
 			.Add(x => x.IsLoading, true));
 
 		// Assert
@@ -42,7 +44,7 @@ public class DataTableTests : ComponentTestBase
 	{
 		// Act
 		var cut = TestContext.Render<DataTable<string>>(p => p
-			.Add(x => x.Items, Array.Empty<string>())
+			.Add(x => x.Items, [])
 			.Add(x => x.EmptyMessage, "Nothing here yet"));
 
 		// Assert
@@ -54,7 +56,7 @@ public class DataTableTests : ComponentTestBase
 	{
 		// Act
 		var cut = TestContext.Render<DataTable<string>>(p => p
-			.Add(x => x.Items, Array.Empty<string>()));
+			.Add(x => x.Items, []));
 
 		// Assert
 		cut.Markup.Should().Contain("No items found.");

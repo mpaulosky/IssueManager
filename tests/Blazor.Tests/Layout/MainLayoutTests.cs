@@ -1,8 +1,8 @@
 // Copyright (c) 2026. All rights reserved.
 
-using Microsoft.JSInterop;
+using BlazorTests.Fixtures;
 
-namespace Tests.BlazorTests.Layout;
+namespace BlazorTests.Layout;
 
 /// <summary>
 /// bUnit tests for the <see cref="MainLayout"/> LayoutComponentBase.

@@ -7,7 +7,7 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-namespace Tests.Unit.Handlers.Categories;
+namespace Unit.Handlers.Categories;
 
 /// <summary>
 /// Unit tests for CreateCategoryHandler.

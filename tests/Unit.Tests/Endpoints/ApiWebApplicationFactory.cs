@@ -7,7 +7,7 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-namespace Tests.Unit.Endpoints;
+namespace Unit.Endpoints;
 
 /// <summary>
 /// WebApplicationFactory for endpoint tests. Replaces repository singletons with NSubstitute fakes

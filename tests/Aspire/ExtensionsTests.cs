@@ -58,7 +58,7 @@ public class ExtensionsTests
 		var healthCheckService = host.Services.GetRequiredService<HealthCheckService>();
 
 		// Act
-		var result = await healthCheckService.CheckHealthAsync(Xunit.TestContext.Current.CancellationToken);
+		var result = await healthCheckService.CheckHealthAsync(TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();

@@ -5,7 +5,7 @@
 // Solution Name : IssueManager
 // Project Name :  Unit.Tests
 
-namespace Tests.Unit.Exceptions;
+namespace Unit.Exceptions;
 
 /// <summary>
 /// Unit tests for <see cref="NotFoundException"/>.

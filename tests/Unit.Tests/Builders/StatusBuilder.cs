@@ -7,7 +7,7 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-namespace Tests.Unit.Builders;
+namespace Unit.Builders;
 
 /// <summary>
 /// Builder for creating StatusDto test data with fluent API.
@@ -15,7 +15,7 @@ namespace Tests.Unit.Builders;
 [ExcludeFromCodeCoverage]
 public class StatusBuilder
 {
-	private string? _id = MongoDB.Bson.ObjectId.GenerateNewId().ToString();
+	private string? _id = ObjectId.GenerateNewId().ToString();
 	private string _statusName = "Default Status";
 	private string _statusDescription = "Default status description";
 	private DateTime _dateCreated = DateTime.UtcNow;
@@ -53,7 +53,7 @@ public class StatusBuilder
 
 	public StatusDto Build() =>
 		new(
-			MongoDB.Bson.ObjectId.Parse(_id ?? MongoDB.Bson.ObjectId.GenerateNewId().ToString()),
+			ObjectId.Parse(_id ?? ObjectId.GenerateNewId().ToString()),
 			_statusName,
 			_statusDescription,
 			_dateCreated,

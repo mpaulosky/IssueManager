@@ -1,7 +1,15 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     GlobalUsings.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Blazor.Tests
+// =======================================================
 global using Xunit;
 global using FluentAssertions;
 global using Bunit;
-global using Bunit.TestDoubles;
+
 global using NSubstitute;
 global using Web.Components;
 global using System.Diagnostics.CodeAnalysis;
@@ -16,7 +24,7 @@ global using System;
 global using System.Net;
 global using System.Net.Http.Json;
 global using System.Reflection;
-global using Tests.BlazorTests.Fixtures;
+
 global using Web.Components.Shared;
 global using Web.Layout;
 global using Web.Pages.Categories;

@@ -10,7 +10,7 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for CreateCategoryHandler with real MongoDB database.
+/// Integration tests for CreateCategoryHandler with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -98,7 +98,7 @@ public class CreateCategoryHandlerIntegrationTests : IAsyncLifetime
 		// Assert - Verify it can be retrieved
 		var retrieved = await _repository.GetByIdAsync(created.Id, TestContext.Current.CancellationToken);
 		retrieved.Should().NotBeNull();
-		retrieved.Value.CategoryName.Should().Be("Retrievable Category");
-		retrieved.Value.CategoryDescription.Should().Be("Test Description");
+		retrieved.Value?.CategoryName.Should().Be("Retrievable Category");
+		retrieved.Value?.CategoryDescription.Should().Be("Test Description");
 	}
 }

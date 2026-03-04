@@ -4,7 +4,6 @@ namespace Aspire.Tests;
 
 using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Metrics;
 using ServiceDefaults;

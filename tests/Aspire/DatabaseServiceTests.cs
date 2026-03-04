@@ -9,7 +9,7 @@
 
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
-using FluentAssertions;
+
 using static Shared.Constants.Constants;
 
 namespace Aspire.Tests;
@@ -37,8 +37,8 @@ var result = AppHost.DatabaseService.AddMongoDbServices(builder);
 
 // Assert
 result.Should().NotBeNull("method should return a resource builder");
-result.Should().BeAssignableTo<IResourceBuilder<MongoDBDatabaseResource>>(
-"should return MongoDB database resource builder");
+result.Should().BeAssignableTo<IResourceBuilder<IResourceWithConnectionString>>(
+  "should return a connection string resource builder for the Atlas URI");
 }
 
 /// <summary>

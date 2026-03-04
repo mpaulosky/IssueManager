@@ -1,6 +1,8 @@
 // Copyright (c) 2026. All rights reserved.
 
-namespace Tests.BlazorTests.Layout;
+using BlazorTests.Fixtures;
+
+namespace BlazorTests.Layout;
 
 /// <summary>
 /// bUnit tests for the <see cref="FooterComponent"/> Blazor component.
@@ -58,7 +60,7 @@ public class FooterComponentTests : ComponentTestBase
 		var cut = TestContext.Render<FooterComponent>();
 
 		// Assert — footer always renders some version/commit text in the font-mono section
-		var monoLinks = cut.FindAll("a.hover\\:text-\\[var\\(--color-primary\\)\\]");
+		cut.FindAll("a.hover\\:text-\\[var\\(--color-primary\\)\\]");
 		cut.Markup.Should().Contain("github.com");
 	}
 

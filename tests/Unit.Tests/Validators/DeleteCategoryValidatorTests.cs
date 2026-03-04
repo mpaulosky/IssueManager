@@ -1,4 +1,12 @@
-namespace Tests.Unit.Validators;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     DeleteCategoryValidatorTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Unit.Tests
+// =======================================================
+namespace Unit.Validators;
 
 /// <summary>
 /// Unit tests for <see cref="DeleteCategoryValidator"/>.

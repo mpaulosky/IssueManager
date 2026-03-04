@@ -7,7 +7,7 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-namespace Tests.Unit.Handlers.Statuses;
+namespace Unit.Handlers.Statuses;
 
 /// <summary>
 /// Unit tests for GetStatusHandler.

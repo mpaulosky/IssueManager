@@ -10,7 +10,7 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for GetStatusHandler with real MongoDB database.
+/// Integration tests for GetStatusHandler with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -54,14 +54,14 @@ public class GetStatusHandlerIntegrationTests : IAsyncLifetime
 		var status = CreateTestStatusDto("Test Status", "Test Description");
 		var created = await _repository.CreateAsync(status, TestContext.Current.CancellationToken);
 
-		var query = new GetStatusQuery(created.Value.Id.ToString());
+		var query = new GetStatusQuery(created.Value!.Id.ToString());
 
 		// Act
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
-		result!.StatusName.Should().Be("Test Status");
+		result.StatusName.Should().Be("Test Status");
 		result.StatusDescription.Should().Be("Test Description");
 	}
 

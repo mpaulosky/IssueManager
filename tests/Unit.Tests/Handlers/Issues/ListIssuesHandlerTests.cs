@@ -1,4 +1,12 @@
-namespace Tests.Unit.Handlers.Issues;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     ListIssuesHandlerTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Unit.Tests
+// =======================================================
+namespace Unit.Handlers.Issues;
 
 /// <summary>
 /// Unit tests for ListIssuesHandler with pagination.

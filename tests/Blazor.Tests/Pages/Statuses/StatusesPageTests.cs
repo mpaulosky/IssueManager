@@ -1,6 +1,6 @@
 // Copyright (c) 2026. All rights reserved.
 
-namespace Tests.BlazorTests.Pages.Statuses;
+namespace BlazorTests.Pages.Statuses;
 
 /// <summary>
 /// bUnit tests for the <see cref="StatusesPage"/> Blazor page.
@@ -20,13 +20,13 @@ public class StatusesPageTests : IDisposable
 		_mockStatusClient = Substitute.For<IStatusApiClient>();
 		_mockStatusClient.GetAllAsync(Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IEnumerable<StatusDto>>([]));
-		_ctx.Services.AddSingleton<IStatusApiClient>(_mockStatusClient);
+		_ctx.Services.AddSingleton(_mockStatusClient);
 	}
 
 	/// <inheritdoc/>
 	public void Dispose()
 	{
-		_ctx?.Dispose();
+		_ctx.Dispose();
 		GC.SuppressFinalize(this);
 	}
 
@@ -80,7 +80,7 @@ public class StatusesPageTests : IDisposable
 		// Arrange
 		var status = MakeStatus("In Progress");
 		_mockStatusClient.GetAllAsync(Arg.Any<CancellationToken>())
-			.Returns(Task.FromResult<IEnumerable<StatusDto>>(new[] { status }));
+			.Returns(Task.FromResult<IEnumerable<StatusDto>>([ status ]));
 
 		// Act
 		var cut = _ctx.Render<StatusesPage>();
@@ -95,7 +95,7 @@ public class StatusesPageTests : IDisposable
 		// Arrange
 		var status = MakeStatus("Resolved");
 		_mockStatusClient.GetAllAsync(Arg.Any<CancellationToken>())
-			.Returns(Task.FromResult<IEnumerable<StatusDto>>(new[] { status }));
+			.Returns(Task.FromResult<IEnumerable<StatusDto>>([ status ]));
 
 		// Act
 		var cut = _ctx.Render<StatusesPage>();
@@ -111,7 +111,7 @@ public class StatusesPageTests : IDisposable
 		// Arrange
 		var status = MakeStatus("Closed");
 		_mockStatusClient.GetAllAsync(Arg.Any<CancellationToken>())
-			.Returns(Task.FromResult<IEnumerable<StatusDto>>(new[] { status }));
+			.Returns(Task.FromResult<IEnumerable<StatusDto>>([ status ]));
 
 		// Act
 		var cut = _ctx.Render<StatusesPage>();

@@ -1,6 +1,6 @@
 // Copyright (c) 2026. All rights reserved.
 
-namespace Tests.BlazorTests.Pages.Statuses;
+namespace BlazorTests.Pages.Statuses;
 
 /// <summary>
 /// bUnit tests for the <see cref="EditStatusPage"/> Blazor page.
@@ -22,13 +22,13 @@ public class EditStatusPageTests : IDisposable
 			.Returns(Task.FromResult<StatusDto?>(null));
 		_mockStatusClient.UpdateAsync(Arg.Any<string>(), Arg.Any<UpdateStatusCommand>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<StatusDto?>(null));
-		_ctx.Services.AddSingleton<IStatusApiClient>(_mockStatusClient);
+		_ctx.Services.AddSingleton(_mockStatusClient);
 	}
 
 	/// <inheritdoc/>
 	public void Dispose()
 	{
-		_ctx?.Dispose();
+		_ctx.Dispose();
 		GC.SuppressFinalize(this);
 	}
 
@@ -115,7 +115,7 @@ public class EditStatusPageTests : IDisposable
 			p.Add(c => c.Id, status.Id.ToString()));
 
 		// Act — change the name and submit
-		cut.Find("#status-name").Change("Updated Pending");
+		await cut.Find("#status-name").ChangeAsync("Updated Pending");
 		await cut.Find("form").SubmitAsync();
 
 		// Assert
@@ -134,7 +134,7 @@ public class EditStatusPageTests : IDisposable
 		var cut = _ctx.Render<EditStatusPage>(p =>
 			p.Add(c => c.Id, status.Id.ToString()));
 
-		cut.Find("#status-name").Change("Updated Wontfix");
+		await cut.Find("#status-name").ChangeAsync("Updated Wontfix");
 
 		// Act
 		await cut.Find("form").SubmitAsync();

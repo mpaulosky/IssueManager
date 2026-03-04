@@ -1,4 +1,12 @@
-namespace Tests.Unit.Handlers.Issues;
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     DeleteIssueHandlerTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Unit.Tests
+// =======================================================
+namespace Unit.Handlers.Issues;
 
 /// <summary>
 /// Unit tests for DeleteIssueHandler (soft-delete via Archived).

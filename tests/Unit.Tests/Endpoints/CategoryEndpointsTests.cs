@@ -7,7 +7,7 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-namespace Tests.Unit.Endpoints;
+namespace Unit.Endpoints;
 
 /// <summary>
 /// Endpoint tests for Category API routes.

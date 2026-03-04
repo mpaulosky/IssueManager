@@ -1,3 +1,11 @@
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     DeleteIssueHandlerTests.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Integration.Tests
+// =======================================================
 namespace Integration.Handlers;
 
 /// <summary>

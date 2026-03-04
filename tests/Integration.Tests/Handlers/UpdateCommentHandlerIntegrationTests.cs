@@ -10,7 +10,7 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for UpdateCommentHandler with real MongoDB database.
+/// Integration tests for UpdateCommentHandler with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -57,7 +57,7 @@ public class UpdateCommentHandlerIntegrationTests : IAsyncLifetime
 
 		var command = new UpdateCommentCommand
 		{
-			Id = created.Value.Id.ToString(),
+			Id = created.Value!.Id,
 			Title = "Updated Title",
 			CommentText = "Updated comment text"
 		};
@@ -75,7 +75,7 @@ public class UpdateCommentHandlerIntegrationTests : IAsyncLifetime
 	public async Task Handle_NonExistentComment_ThrowsNotFoundException()
 	{
 		// Arrange
-		var nonExistentId = ObjectId.GenerateNewId().ToString();
+		var nonExistentId = ObjectId.GenerateNewId();
 		var command = new UpdateCommentCommand
 		{
 			Id = nonExistentId,
@@ -100,7 +100,7 @@ public class UpdateCommentHandlerIntegrationTests : IAsyncLifetime
 
 		var command = new UpdateCommentCommand
 		{
-			Id = created.Value.Id.ToString(),
+			Id = created.Value!.Id,
 			Title = string.Empty
 		};
 

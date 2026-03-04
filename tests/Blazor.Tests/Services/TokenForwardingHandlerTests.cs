@@ -1,9 +1,8 @@
 // Copyright (c) 2026. All rights reserved.
 
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 
-namespace Tests.BlazorTests.Services;
+namespace BlazorTests.Services;
 
 /// <summary>
 /// Unit tests for the <see cref="TokenForwardingHandler"/> DelegatingHandler.
@@ -36,13 +35,13 @@ public class TokenForwardingHandlerTests
 		var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
 		httpContextAccessor.HttpContext.Returns(context);
 
-		var innerHandler = new TestHttpMessageHandler(req => new HttpResponseMessage(HttpStatusCode.OK));
+		var innerHandler = new TestHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.OK));
 		var handler = new TokenForwardingHandler(httpContextAccessor) { InnerHandler = innerHandler };
 		using var client = new HttpClient(handler);
 		var request = new HttpRequestMessage(HttpMethod.Get, "http://test.local/api");
 
 		// Act
-		var response = await client.SendAsync(request);
+		var response = await client.SendAsync(request, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -71,13 +70,13 @@ public class TokenForwardingHandlerTests
 		var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
 		httpContextAccessor.HttpContext.Returns(context);
 
-		var innerHandler = new TestHttpMessageHandler(req => new HttpResponseMessage(HttpStatusCode.OK));
+		var innerHandler = new TestHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.OK));
 		var handler = new TokenForwardingHandler(httpContextAccessor) { InnerHandler = innerHandler };
 		using var client = new HttpClient(handler);
 		var request = new HttpRequestMessage(HttpMethod.Get, "http://test.local/api");
 
 		// Act
-		var response = await client.SendAsync(request);
+		var response = await client.SendAsync(request, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -92,13 +91,13 @@ public class TokenForwardingHandlerTests
 		var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
 		httpContextAccessor.HttpContext.Returns((HttpContext)null!);
 
-		var innerHandler = new TestHttpMessageHandler(req => new HttpResponseMessage(HttpStatusCode.OK));
+		var innerHandler = new TestHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.OK));
 		var handler = new TokenForwardingHandler(httpContextAccessor) { InnerHandler = innerHandler };
 		using var client = new HttpClient(handler);
 		var request = new HttpRequestMessage(HttpMethod.Get, "http://test.local/api");
 
 		// Act
-		var response = await client.SendAsync(request);
+		var response = await client.SendAsync(request, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -120,13 +119,13 @@ public class TokenForwardingHandlerTests
 		var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
 		httpContextAccessor.HttpContext.Returns(context);
 
-		var innerHandler = new TestHttpMessageHandler(req => new HttpResponseMessage(HttpStatusCode.OK));
+		var innerHandler = new TestHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.OK));
 		var handler = new TokenForwardingHandler(httpContextAccessor) { InnerHandler = innerHandler };
 		using var client = new HttpClient(handler);
 		var request = new HttpRequestMessage(HttpMethod.Get, "http://test.local/api");
 
 		// Act
-		var response = await client.SendAsync(request);
+		var response = await client.SendAsync(request, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();

@@ -1,6 +1,6 @@
 // Copyright (c) 2026. All rights reserved.
 
-namespace Tests.BlazorTests.Pages.Categories;
+namespace BlazorTests.Pages.Categories;
 
 /// <summary>
 /// bUnit tests for the <see cref="CreateCategoryPage"/> Blazor page.
@@ -21,13 +21,13 @@ public class CreateCategoryPageTests : IDisposable
 		_mockCategoryClient
 			.CreateAsync(Arg.Any<CreateCategoryCommand>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<CategoryDto?>(null));
-		_ctx.Services.AddSingleton<ICategoryApiClient>(_mockCategoryClient);
+		_ctx.Services.AddSingleton(_mockCategoryClient);
 	}
 
 	/// <inheritdoc/>
 	public void Dispose()
 	{
-		_ctx?.Dispose();
+		_ctx.Dispose();
 		GC.SuppressFinalize(this);
 	}
 
@@ -90,7 +90,7 @@ public class CreateCategoryPageTests : IDisposable
 	{
 		// Arrange
 		var cut = _ctx.Render<CreateCategoryPage>();
-		cut.Find("#category-name").Change("New Category Name");
+		await cut.Find("#category-name").ChangeAsync("New Category Name");
 
 		// Act
 		await cut.Find("form").SubmitAsync();
@@ -105,7 +105,7 @@ public class CreateCategoryPageTests : IDisposable
 	{
 		// Arrange
 		var cut = _ctx.Render<CreateCategoryPage>();
-		cut.Find("#category-name").Change("Valid Category");
+		await cut.Find("#category-name").ChangeAsync("Valid Category");
 
 		// Act
 		await cut.Find("form").SubmitAsync();

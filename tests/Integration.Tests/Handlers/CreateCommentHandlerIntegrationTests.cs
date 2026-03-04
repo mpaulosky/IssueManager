@@ -10,7 +10,7 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for CreateCommentHandler with real MongoDB database.
+/// Integration tests for CreateCommentHandler with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -32,10 +32,10 @@ public class CreateCommentHandlerIntegrationTests : IAsyncLifetime
 		await _mongoContainer.StartAsync();
 		var connectionString = _mongoContainer.GetConnectionString();
 		_repository = new CommentRepository(connectionString, TestDatabase);
-		
+
 		var currentUserService = Substitute.For<ICurrentUserService>();
 		currentUserService.IsAuthenticated.Returns(false);
-		
+
 		_handler = new CreateCommentHandler(_repository, new CreateCommentValidator(), currentUserService);
 	}
 
@@ -56,7 +56,7 @@ public class CreateCommentHandlerIntegrationTests : IAsyncLifetime
 		{
 			Title = "New Comment",
 			CommentText = "New comment text",
-			IssueId = ObjectId.GenerateNewId().ToString()
+			IssueId = ObjectId.GenerateNewId()
 		};
 
 		// Act
@@ -95,7 +95,7 @@ public class CreateCommentHandlerIntegrationTests : IAsyncLifetime
 		{
 			Title = "Retrievable Comment",
 			CommentText = "Test comment text",
-			IssueId = ObjectId.GenerateNewId().ToString()
+			IssueId = ObjectId.GenerateNewId()
 		};
 
 		// Act - Create comment
@@ -104,7 +104,7 @@ public class CreateCommentHandlerIntegrationTests : IAsyncLifetime
 		// Assert - Verify it can be retrieved
 		var retrieved = await _repository.GetByIdAsync(created.Id, TestContext.Current.CancellationToken);
 		retrieved.Should().NotBeNull();
-		retrieved.Value.Title.Should().Be("Retrievable Comment");
-		retrieved.Value.Description.Should().Be("Test comment text");
+		retrieved.Value?.Title.Should().Be("Retrievable Comment");
+		retrieved.Value?.Description.Should().Be("Test comment text");
 	}
 }

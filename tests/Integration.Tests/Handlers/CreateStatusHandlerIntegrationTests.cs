@@ -10,7 +10,7 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for CreateStatusHandler with real MongoDB database.
+/// Integration tests for CreateStatusHandler with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -98,7 +98,7 @@ public class CreateStatusHandlerIntegrationTests : IAsyncLifetime
 		// Assert - Verify it can be retrieved
 		var retrieved = await _repository.GetByIdAsync(created.Id, TestContext.Current.CancellationToken);
 		retrieved.Should().NotBeNull();
-		retrieved.Value.StatusName.Should().Be("Retrievable Status");
+		retrieved.Value!.StatusName.Should().Be("Retrievable Status");
 		retrieved.Value.StatusDescription.Should().Be("Test Description");
 	}
 }

@@ -1,6 +1,8 @@
 // Copyright (c) 2026. All rights reserved.
 
-namespace Tests.BlazorTests.Layout;
+using BlazorTests.Fixtures;
+
+namespace BlazorTests.Layout;
 
 /// <summary>
 /// bUnit tests for the <see cref="NavMenu"/> Blazor component.

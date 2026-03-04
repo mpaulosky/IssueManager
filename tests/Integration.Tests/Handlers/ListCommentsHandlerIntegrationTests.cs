@@ -10,7 +10,7 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for ListCommentsHandler with real MongoDB database.
+/// Integration tests for ListCommentsHandler with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -77,10 +77,11 @@ public class ListCommentsHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(null, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().HaveCount(3);
-		result.Should().Contain(c => c.Title == "Comment 1");
-		result.Should().Contain(c => c.Title == "Comment 2");
-		result.Should().Contain(c => c.Title == "Comment 3");
+		IEnumerable<CommentDto> commentDtos = result.ToList();
+		commentDtos.Should().HaveCount(3);
+		commentDtos.Should().Contain(c => c.Title == "Comment 1");
+		commentDtos.Should().Contain(c => c.Title == "Comment 2");
+		commentDtos.Should().Contain(c => c.Title == "Comment 3");
 	}
 
 	[Fact]
@@ -102,10 +103,11 @@ public class ListCommentsHandlerIntegrationTests : IAsyncLifetime
 		var result = await _handler.Handle(issueId1.ToString(), TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().HaveCount(2);
-		result.Should().Contain(c => c.Title == "Comment 1");
-		result.Should().Contain(c => c.Title == "Comment 2");
-		result.Should().NotContain(c => c.Title == "Comment 3");
+		IEnumerable<CommentDto> commentDtos = result.ToList();
+		commentDtos.Should().HaveCount(2);
+		commentDtos.Should().Contain(c => c.Title == "Comment 1");
+		commentDtos.Should().Contain(c => c.Title == "Comment 2");
+		commentDtos.Should().NotContain(c => c.Title == "Comment 3");
 	}
 
 	[Fact]

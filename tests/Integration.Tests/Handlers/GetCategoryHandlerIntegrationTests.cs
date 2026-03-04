@@ -10,7 +10,7 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for GetCategoryHandler with real MongoDB database.
+/// Integration tests for GetCategoryHandler with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -54,14 +54,14 @@ public class GetCategoryHandlerIntegrationTests : IAsyncLifetime
 		var category = CreateTestCategoryDto("Test Category", "Test Description");
 		var created = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
 
-		var query = new GetCategoryQuery(created.Value.Id.ToString());
+		var query = new GetCategoryQuery(created.Value!.Id.ToString());
 
 		// Act
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
-		result!.CategoryName.Should().Be("Test Category");
+		result.CategoryName.Should().Be("Test Category");
 		result.CategoryDescription.Should().Be("Test Description");
 	}
 

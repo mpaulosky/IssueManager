@@ -10,7 +10,7 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for DeleteStatusHandler (soft-delete via Archived) with real MongoDB database.
+/// Integration tests for DeleteStatusHandler (soft-delete via Archived) with a real MongoDB database.
 /// </summary>
 [Collection("Integration")]
 [ExcludeFromCodeCoverage]
@@ -54,7 +54,7 @@ public class DeleteStatusHandlerIntegrationTests : IAsyncLifetime
 		var status = CreateTestStatusDto("Status to Delete", "This will be archived");
 		var created = await _repository.CreateAsync(status, TestContext.Current.CancellationToken);
 
-		var command = new DeleteStatusCommand { Id = created.Value.Id.ToString() };
+		var command = new DeleteStatusCommand { Id = created.Value!.Id };
 
 		// Act
 		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -62,17 +62,17 @@ public class DeleteStatusHandlerIntegrationTests : IAsyncLifetime
 		// Assert
 		result.Should().BeTrue();
 
-		// Verify Archived is set in database
+		// Verify Archived is set in a database
 		var getResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 		getResult.Should().NotBeNull();
-		getResult.Value.Archived.Should().BeTrue();
+		getResult.Value?.Archived.Should().BeTrue();
 	}
 
 	[Fact]
 	public async Task Handle_NonExistentStatus_ThrowsNotFoundException()
 	{
 		// Arrange
-		var nonExistentId = ObjectId.GenerateNewId().ToString();
+		var nonExistentId = ObjectId.GenerateNewId();
 		var command = new DeleteStatusCommand { Id = nonExistentId };
 
 		// Act
@@ -89,7 +89,7 @@ public class DeleteStatusHandlerIntegrationTests : IAsyncLifetime
 		var archivedStatus = CreateTestStatusDto("Already Archived", "Already archived", archived: true);
 		var created = await _repository.CreateAsync(archivedStatus, TestContext.Current.CancellationToken);
 
-		var command = new DeleteStatusCommand { Id = created.Value.Id.ToString() };
+		var command = new DeleteStatusCommand { Id = created.Value!.Id };
 
 		// Act - Delete already archived status (should be idempotent)
 		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -99,7 +99,7 @@ public class DeleteStatusHandlerIntegrationTests : IAsyncLifetime
 
 		var dbStatusResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 		dbStatusResult.Should().NotBeNull();
-		dbStatusResult.Value.Archived.Should().BeTrue();
+		dbStatusResult.Value?.Archived.Should().BeTrue();
 	}
 
 	[Fact]
@@ -109,7 +109,7 @@ public class DeleteStatusHandlerIntegrationTests : IAsyncLifetime
 		var status = CreateTestStatusDto("Status to Archive", "Should still exist in DB");
 		var created = await _repository.CreateAsync(status, TestContext.Current.CancellationToken);
 
-		var command = new DeleteStatusCommand { Id = created.Value.Id.ToString() };
+		var command = new DeleteStatusCommand { Id = created.Value!.Id };
 
 		// Act - Soft delete
 		await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -117,7 +117,7 @@ public class DeleteStatusHandlerIntegrationTests : IAsyncLifetime
 		// Assert - Record should still exist (soft delete)
 		var dbStatus = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 		dbStatus.Should().NotBeNull();
-		dbStatus.Value.Id.Should().Be(created.Value.Id);
+		dbStatus.Value!.Id.Should().Be(created.Value.Id);
 		dbStatus.Value.Archived.Should().BeTrue();
 	}
 }

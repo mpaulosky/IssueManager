@@ -7,7 +7,7 @@
 // Project Name :  Unit.Tests
 // =======================================================
 
-namespace Tests.Unit.Repositories;
+namespace Unit.Repositories;
 
 /// <summary>
 /// Unit tests for repository validation logic that can be tested without a database.
@@ -72,7 +72,7 @@ public sealed class RepositoryValidationTests
 		const string emptyUserId = "";
 
 		// Act
-		var result = await repo.GetByUserAsync(emptyUserId, Xunit.TestContext.Current.CancellationToken);
+		var result = await repo.GetByUserAsync(emptyUserId, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -87,7 +87,7 @@ public sealed class RepositoryValidationTests
 		const string whitespaceUserId = "   ";
 
 		// Act
-		var result = await repo.GetByUserAsync(whitespaceUserId, Xunit.TestContext.Current.CancellationToken);
+		var result = await repo.GetByUserAsync(whitespaceUserId, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -102,7 +102,7 @@ public sealed class RepositoryValidationTests
 		string? nullUserId = null;
 
 		// Act
-		var result = await repo.GetByUserAsync(nullUserId!, Xunit.TestContext.Current.CancellationToken);
+		var result = await repo.GetByUserAsync(nullUserId!, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -116,7 +116,7 @@ public sealed class RepositoryValidationTests
 		var repo = new CommentRepository("mongodb://localhost:27017", "TestDb");
 
 		// Act
-		var result = await repo.GetByIssueAsync(null!, Xunit.TestContext.Current.CancellationToken);
+		var result = await repo.GetByIssueAsync(null!, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -132,7 +132,7 @@ public sealed class RepositoryValidationTests
 		const string emptyUserId = "";
 
 		// Act
-		var result = await repo.UpVoteAsync(commentId, emptyUserId, Xunit.TestContext.Current.CancellationToken);
+		var result = await repo.UpVoteAsync(commentId, emptyUserId, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -148,7 +148,7 @@ public sealed class RepositoryValidationTests
 		const string whitespaceUserId = "  ";
 
 		// Act
-		var result = await repo.UpVoteAsync(commentId, whitespaceUserId, Xunit.TestContext.Current.CancellationToken);
+		var result = await repo.UpVoteAsync(commentId, whitespaceUserId, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -166,7 +166,7 @@ public sealed class RepositoryValidationTests
 		var repo = new CategoryRepository("mongodb://localhost:27017", "TestDb");
 
 		// Act
-		var result = await repo.CreateAsync(null!, Xunit.TestContext.Current.CancellationToken);
+		var result = await repo.CreateAsync(null!, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -213,7 +213,7 @@ public sealed class RepositoryValidationTests
 		var repo = new StatusRepository("mongodb://localhost:27017", "TestDb");
 
 		// Act
-		var result = await repo.CreateAsync(null!, Xunit.TestContext.Current.CancellationToken);
+		var result = await repo.CreateAsync(null!, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -260,7 +260,7 @@ public sealed class RepositoryValidationTests
 		var repo = new CommentRepository("mongodb://localhost:27017", "TestDb");
 
 		// Act
-		var result = await repo.CreateAsync(null!, Xunit.TestContext.Current.CancellationToken);
+		var result = await repo.CreateAsync(null!, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();

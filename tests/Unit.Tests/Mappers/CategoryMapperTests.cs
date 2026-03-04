@@ -7,7 +7,7 @@
 // Project Name :  Unit Tests
 // =======================================================
 
-namespace Tests.Unit.Mappers;
+namespace Unit.Mappers;
 
 /// <summary>
 /// Unit tests for CategoryMapper extension methods.
