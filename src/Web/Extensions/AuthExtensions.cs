@@ -1,4 +1,11 @@
+// ============================================
 // Copyright (c) 2026. All rights reserved.
+// File Name :     AuthExtensions.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Web
+// =============================================
 
 using Auth0.AspNetCore.Authentication;
 

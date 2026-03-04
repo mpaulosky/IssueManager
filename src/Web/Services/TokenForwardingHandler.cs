@@ -1,4 +1,11 @@
+// ============================================
 // Copyright (c) 2026. All rights reserved.
+// File Name :     TokenForwardingHandler.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Web
+// =============================================
 
 using Microsoft.AspNetCore.Authentication;
 

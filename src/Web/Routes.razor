@@ -1,5 +1,14 @@
 @namespace Web
 
+@* ============================================
+   Copyright (c) 2026. All rights reserved.
+   File Name :     Routes.razor
+   Company :       mpaulosky
+   Author :        Matthew Paulosky
+   Solution Name : IssueManager
+   Project Name :  Web
+   ============================================= *@
+
 <Router AppAssembly="typeof(App).Assembly">
 	<Found Context="routeData">
 		<AuthorizeRouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)">

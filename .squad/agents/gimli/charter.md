@@ -26,7 +26,18 @@ You are Gimli, the Tester on the IssueManager project. You own unit tests, integ
 2. **NEVER compare two `IssueDto.Empty` or `CommentDto.Empty` calls** — `Empty` calls `DateTime.UtcNow` each time; assert individual fields instead
 3. **`GenerateSlug` trailing underscore is correct** — `"C# Is Great!"` → `"c_is_great_"` (trailing underscore expected)
 4. Test namespace pattern: `Tests.Unit.{Folder}` for unit tests, `Tests.Integration.{Area}` for integration
-5. File header: `// Copyright (c) 2026. All rights reserved.`
+5. **File header REQUIRED** — Use block format:
+   ```csharp
+   // ============================================
+   // Copyright (c) 2026. All rights reserved.
+   // File Name :     {FileName}.cs
+   // Company :       mpaulosky
+   // Author :        Matthew Paulosky
+   // Solution Name : IssueManager
+   // Project Name :  {ProjectName}
+   // =============================================
+   ```
+   Project Name: `Unit.Tests`, `Integration.Tests`, `Blazor.Tests`, or `Aspire` based on test project directory.
 6. AAA pattern (Arrange / Act / Assert) with comments
 7. File-scoped namespaces, tab indentation
 

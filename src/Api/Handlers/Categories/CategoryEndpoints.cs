@@ -1,3 +1,12 @@
+// ============================================
+// Copyright (c) 2026. All rights reserved.
+// File Name :     CategoryEndpoints.cs
+// Company :       mpaulosky
+// Author :        Matthew Paulosky
+// Solution Name : IssueManager
+// Project Name :  Api
+// =============================================
+
 using Api.Handlers;
 
 using static Api.Handlers.Categories.GetCategoryHandler;
