@@ -29,18 +29,18 @@ public class UpdateIssueHandler
 	/// <summary>
 	/// Handles the update of an existing issue.
 	/// </summary>
-	public async Task<IssueDto> Handle(UpdateIssueCommand command, CancellationToken cancellationToken = default)
+	public async Task<Result<IssueDto>> Handle(UpdateIssueCommand command, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
 		if (!validationResult.IsValid)
-			throw new ValidationException(validationResult.Errors);
+			return Result.Fail<IssueDto>("Validation failed", ResultErrorCode.Validation);
 
 		var getResult = await _repository.GetByIdAsync(command.Id, cancellationToken);
 		if (!getResult.Success || getResult.Value is null)
-			throw new NotFoundException($"Issue with ID '{command.Id}' was not found.");
+			return Result.Fail<IssueDto>($"Issue with ID '{command.Id}' was not found.", ResultErrorCode.NotFound);
 
 		if (getResult.Value.Archived)
-			throw new ConflictException($"Issue with ID '{command.Id}' is archived and cannot be updated.");
+			return Result.Fail<IssueDto>($"Issue with ID '{command.Id}' is archived and cannot be updated.", ResultErrorCode.Conflict);
 
 		var updatedIssue = getResult.Value with
 		{
@@ -48,10 +48,6 @@ public class UpdateIssueHandler
 			Description = command.Description ?? string.Empty
 		};
 
-		var updateResult = await _repository.UpdateAsync(updatedIssue, cancellationToken);
-		if (!updateResult.Success || updateResult.Value is null)
-			throw new NotFoundException($"Issue with ID '{command.Id}' could not be updated.");
-
-		return updateResult.Value;
+		return await _repository.UpdateAsync(updatedIssue, cancellationToken);
 	}
 }

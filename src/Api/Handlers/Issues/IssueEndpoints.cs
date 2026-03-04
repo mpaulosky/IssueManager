@@ -35,8 +35,8 @@ public static class IssueEndpoints
 if (!ObjectId.TryParse(id, out var objectId))
 return Results.BadRequest("Invalid ID format");
 var query = new GetIssueQuery(objectId);
-			var issue = await handler.Handle(query);
-			return issue is not null ? Results.Ok(issue) : Results.NotFound();
+			var result = await handler.Handle(query);
+			return result.Success ? Results.Ok(result.Value) : Results.NotFound();
 		})
 		.WithName("GetIssue")
 		.WithSummary("Get an issue by ID")
@@ -62,7 +62,11 @@ if (!ObjectId.TryParse(id, out var objectId))
 return Results.BadRequest("Invalid ID format");
 var commandWithId = command with { Id = objectId };
 			var result = await handler.Handle(commandWithId);
-			return result is not null ? Results.Ok(result) : Results.NotFound();
+			if (!result.Success)
+				return result.ErrorCode == ResultErrorCode.NotFound ? Results.NotFound() 
+					: result.ErrorCode == ResultErrorCode.Conflict ? Results.Conflict(result.Error)
+					: Results.BadRequest(result.Error);
+			return Results.Ok(result.Value);
 		})
 		.WithName("UpdateIssue")
 		.WithSummary("Update an existing issue")
@@ -78,7 +82,7 @@ if (!ObjectId.TryParse(id, out var objectId))
 return Results.BadRequest("Invalid ID format");
 var command = new DeleteIssueCommand { Id = objectId };
 			var result = await handler.Handle(command);
-			return result ? Results.NoContent() : Results.NotFound();
+			return result.Success ? Results.NoContent() : Results.NotFound();
 		})
 		.WithName("DeleteIssue")
 		.WithSummary("Delete (archive) an issue")

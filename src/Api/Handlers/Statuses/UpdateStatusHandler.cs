@@ -40,18 +40,18 @@ public class UpdateStatusHandler
 	/// </summary>
 	/// <param name="command">The command containing the updated status information.</param>
 	/// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
-	/// <returns>A task that represents the asynchronous operation. The task result contains the updated status as a <see cref="StatusDto"/>.</returns>
+	/// <returns>A task that represents the asynchronous operation. The task result contains the result with updated status as a <see cref="StatusDto"/>.</returns>
 	/// <exception cref="ValidationException">Thrown when the command fails validation.</exception>
 	/// <exception cref="NotFoundException">Thrown when the status is not found or cannot be updated.</exception>
-	public async Task<StatusDto> Handle(UpdateStatusCommand command, CancellationToken cancellationToken = default)
+	public async Task<Result<StatusDto>> Handle(UpdateStatusCommand command, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
 		if (!validationResult.IsValid)
-			throw new ValidationException(validationResult.Errors);
+			return Result.Fail<StatusDto>("Validation failed", ResultErrorCode.Validation);
 
 		var getResult = await _repository.GetByIdAsync(command.Id, cancellationToken);
 		if (getResult.Failure || getResult.Value is null)
-			throw new NotFoundException($"Status with ID '{command.Id}' was not found.");
+			return Result.Fail<StatusDto>($"Status with ID '{command.Id}' was not found.", ResultErrorCode.NotFound);
 
 		var updatedStatus = getResult.Value with
 		{
@@ -59,10 +59,6 @@ public class UpdateStatusHandler
 			StatusDescription = command.StatusDescription ?? string.Empty
 		};
 
-		var updateResult = await _repository.UpdateAsync(updatedStatus, cancellationToken);
-		if (updateResult.Failure)
-			throw new NotFoundException($"Status with ID '{command.Id}' could not be updated.");
-
-		return updateResult.Value!;
+		return await _repository.UpdateAsync(updatedStatus, cancellationToken);
 	}
 }

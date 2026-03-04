@@ -39,11 +39,10 @@ public class GetStatusHandler
 	/// </summary>
 	/// <param name="query">The query containing the status ID to retrieve.</param>
 	/// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
-	/// <returns>A task that represents the asynchronous operation. The task result contains the status as a <see cref="StatusDto"/>, or <see langword="null"/> if not found.</returns>
+	/// <returns>A task that represents the asynchronous operation. The task result contains the result with status as a <see cref="StatusDto"/>, or an error if not found.</returns>
 	/// <exception cref="ArgumentException">Thrown when the status ID is null or empty.</exception>
-	public async Task<StatusDto?> Handle(GetStatusQuery query, CancellationToken cancellationToken = default)
+	public async Task<Result<StatusDto>> Handle(GetStatusQuery query, CancellationToken cancellationToken = default)
 	{
-		var result = await _repository.GetByIdAsync(query.StatusId, cancellationToken);
-		return result.Success ? result.Value : null;
+		return await _repository.GetByIdAsync(query.StatusId, cancellationToken);
 	}
 }

@@ -29,20 +29,20 @@ public class DeleteIssueHandler
 	/// <summary>
 	/// Handles the soft-deletion (archiving) of an issue.
 	/// </summary>
-	public async Task<bool> Handle(DeleteIssueCommand command, CancellationToken cancellationToken = default)
+	public async Task<Result<bool>> Handle(DeleteIssueCommand command, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
 		if (!validationResult.IsValid)
-			throw new ValidationException(validationResult.Errors);
+			return Result.Fail<bool>("Validation failed", ResultErrorCode.Validation);
 
 		var getResult = await _repository.GetByIdAsync(command.Id, cancellationToken);
 		if (getResult.Failure || getResult.Value is null)
-			throw new NotFoundException($"Issue with ID '{command.Id}' was not found.");
+			return Result.Fail<bool>($"Issue with ID '{command.Id}' was not found.", ResultErrorCode.NotFound);
 
 		if (getResult.Value.Archived)
-			return true;
+			return Result.Ok(true);
 
 		var archiveResult = await _repository.ArchiveAsync(command.Id, cancellationToken);
-		return archiveResult.Success;
+		return archiveResult.Success ? Result.Ok(true) : Result.Fail<bool>(archiveResult.Error!, archiveResult.ErrorCode);
 	}
 }

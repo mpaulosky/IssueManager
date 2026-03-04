@@ -40,18 +40,18 @@ public class UpdateCategoryHandler
 	/// </summary>
 	/// <param name="command">The command containing the updated category information.</param>
 	/// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
-	/// <returns>A task that represents the asynchronous operation. The task result contains the updated category as a <see cref="CategoryDto"/>.</returns>
+	/// <returns>A task that represents the asynchronous operation. The task result contains the result with updated category as a <see cref="CategoryDto"/>.</returns>
 	/// <exception cref="ValidationException">Thrown when the command fails validation.</exception>
 	/// <exception cref="NotFoundException">Thrown when the category is not found or cannot be updated.</exception>
-	public async Task<CategoryDto> Handle(UpdateCategoryCommand command, CancellationToken cancellationToken = default)
+	public async Task<Result<CategoryDto>> Handle(UpdateCategoryCommand command, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
 		if (!validationResult.IsValid)
-			throw new ValidationException(validationResult.Errors);
+			return Result.Fail<CategoryDto>("Validation failed", ResultErrorCode.Validation);
 
 		var getResult = await _repository.GetByIdAsync(command.Id, cancellationToken);
 		if (!getResult.Success || getResult.Value is null)
-			throw new NotFoundException($"Category with ID '{command.Id}' was not found.");
+			return Result.Fail<CategoryDto>($"Category with ID '{command.Id}' was not found.", ResultErrorCode.NotFound);
 
 		var updatedCategory = getResult.Value with
 		{
@@ -59,10 +59,6 @@ public class UpdateCategoryHandler
 			CategoryDescription = command.CategoryDescription ?? string.Empty
 		};
 
-		var updateResult = await _repository.UpdateAsync(updatedCategory, cancellationToken);
-		if (!updateResult.Success)
-			throw new NotFoundException($"Category with ID '{command.Id}' could not be updated.");
-
-		return updateResult.Value!;
+		return await _repository.UpdateAsync(updatedCategory, cancellationToken);
 	}
 }

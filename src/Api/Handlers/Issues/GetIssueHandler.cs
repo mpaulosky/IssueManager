@@ -32,10 +32,9 @@ public class GetIssueHandler
 	/// <summary>
 	/// Handles the retrieval of a single issue.
 	/// </summary>
-	public async Task<IssueDto?> Handle(GetIssueQuery query, CancellationToken cancellationToken = default)
+	public async Task<Result<IssueDto>> Handle(GetIssueQuery query, CancellationToken cancellationToken = default)
 	{
-		var result = await _repository.GetByIdAsync(query.IssueId, cancellationToken);
-		return result.Success ? result.Value : null;
+		return await _repository.GetByIdAsync(query.IssueId, cancellationToken);
 	}
 
 	/// <summary>
