@@ -21,6 +21,11 @@
 		Generate BuildInfo.g.cs at build time with the git tag and short commit hash.
 		FooterComponent reads BuildInfo.Version and BuildInfo.Commit at runtime.
 	-->
+	<ItemGroup>
+		<Compile Include="$(IntermediateOutputPath)BuildInfo.g.cs" 
+		         Condition="Exists('$(IntermediateOutputPath)BuildInfo.g.cs')" />
+	</ItemGroup>
+
 	<Target Name="GetGitBuildInfo" BeforeTargets="BeforeBuild" Condition="'$(DesignTimeBuild)' != 'true'">
 		<Exec Command="git describe --tags --abbrev=0"
 		      ConsoleToMSBuild="true"
@@ -56,9 +61,6 @@
 		    Lines="@(_BuildInfoLine)"
 		    Overwrite="true"
 		    WriteOnlyWhenDifferent="true" />
-		<ItemGroup>
-			<Compile Include="$(IntermediateOutputPath)BuildInfo.g.cs" />
-		</ItemGroup>
 	</Target>
 
 	<ItemGroup>
