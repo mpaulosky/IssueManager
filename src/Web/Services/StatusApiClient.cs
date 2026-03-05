@@ -26,9 +26,6 @@ public interface IStatusApiClient
 
 	/// <summary>Updates an existing status.</summary>
 	Task<StatusDto?> UpdateAsync(string id, UpdateStatusCommand command, CancellationToken cancellationToken = default);
-
-	/// <summary>Deletes a status by its identifier.</summary>
-	Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default);
 }
 
 /// <summary>Typed HTTP client for the Statuses API.</summary>
@@ -76,10 +73,4 @@ public class StatusApiClient : IStatusApiClient
 			: null;
 	}
 
-	/// <inheritdoc/>
-	public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
-	{
-		var response = await _httpClient.DeleteAsync($"/api/v1/statuses/{id}", cancellationToken).ConfigureAwait(false);
-		return response.IsSuccessStatusCode;
-	}
 }

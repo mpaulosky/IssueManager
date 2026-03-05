@@ -103,31 +103,4 @@ public class StatusApiClientTests
 		result.Should().BeNull();
 	}
 
-	[Fact]
-	public async Task DeleteAsync_ReturnsTrue_OnNoContent()
-	{
-		// Arrange
-		var response = new HttpResponseMessage(HttpStatusCode.NoContent);
-		var client = new StatusApiClient(CreateMockClient(response));
-
-		// Act
-		var result = await client.DeleteAsync(ObjectId.GenerateNewId().ToString(), Xunit.TestContext.Current.CancellationToken);
-
-		// Assert
-		result.Should().BeTrue();
-	}
-
-	[Fact]
-	public async Task DeleteAsync_ReturnsFalse_OnNotFound()
-	{
-		// Arrange
-		var response = new HttpResponseMessage(HttpStatusCode.NotFound);
-		var client = new StatusApiClient(CreateMockClient(response));
-
-		// Act
-		var result = await client.DeleteAsync(ObjectId.GenerateNewId().ToString(), Xunit.TestContext.Current.CancellationToken);
-
-		// Assert
-		result.Should().BeFalse();
-	}
 }

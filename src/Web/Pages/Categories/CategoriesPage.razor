@@ -26,34 +26,19 @@
 				<td class="px-6 py-4 font-medium text-[var(--text-main)]">@context.CategoryName</td>
 				<td class="px-6 py-4 text-[var(--text-muted)]">@(string.IsNullOrWhiteSpace(context.CategoryDescription) ? "—" : context.CategoryDescription)</td>
 				<td class="px-6 py-4 text-right">
-					<div class="inline-flex items-center gap-3">
-						<a href="/categories/@context.Id.ToString()/edit" class="text-[var(--color-primary)] hover:underline text-sm">
-							Edit
-						</a>
-						<button @onclick="() => ShowDeleteConfirm(context)" class="text-red-600 hover:underline text-sm">
-							Delete
-						</button>
-					</div>
+					<a href="/categories/@context.Id.ToString()/edit" class="text-[var(--color-primary)] hover:underline text-sm">
+			Edit
+		</a>
 				</td>
 			</tr>
 		</RowContent>
 	</DataTable>
 
-	<ConfirmDialog
-		IsVisible="_showDeleteDialog"
-		Title="Delete Category"
-		Message="@($"Are you sure you want to delete the category \"{_categoryToDelete?.CategoryName}\"? This action cannot be undone.")"
-		ConfirmText="Delete"
-		CancelText="Cancel"
-		OnConfirm="ConfirmDelete"
-		OnCancel="CancelDelete" />
 </div>
 
 @code {
 	private IEnumerable<CategoryDto> _categories = [];
 	private bool _isLoading = true;
-	private bool _showDeleteDialog = false;
-	private CategoryDto? _categoryToDelete;
 
 	/// <summary>
 	/// Loads all categories on initialization.
@@ -69,37 +54,5 @@
 		{
 			_isLoading = false;
 		}
-	}
-
-	/// <summary>
-	/// Shows the delete confirmation dialog for a category.
-	/// </summary>
-	private void ShowDeleteConfirm(CategoryDto category)
-	{
-		_categoryToDelete = category;
-		_showDeleteDialog = true;
-	}
-
-	/// <summary>
-	/// Confirms the deletion of the category and reloads the list.
-	/// </summary>
-	private async Task ConfirmDelete()
-	{
-		if (_categoryToDelete != null)
-		{
-			await CategoryClient.DeleteAsync(_categoryToDelete.Id.ToString());
-			_categories = await CategoryClient.GetAllAsync();
-		}
-		_showDeleteDialog = false;
-		_categoryToDelete = null;
-	}
-
-	/// <summary>
-	/// Cancels the deletion and closes the confirmation dialog.
-	/// </summary>
-	private void CancelDelete()
-	{
-		_showDeleteDialog = false;
-		_categoryToDelete = null;
 	}
 }

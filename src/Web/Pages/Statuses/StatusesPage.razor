@@ -28,34 +28,19 @@
 				</td>
 				<td class="px-6 py-4 text-[var(--text-muted)]">@(string.IsNullOrWhiteSpace(context.StatusDescription) ? "—" : context.StatusDescription)</td>
 				<td class="px-6 py-4 text-right">
-					<div class="inline-flex items-center gap-3">
-						<a href="/statuses/@context.Id.ToString()/edit" class="text-[var(--color-primary)] hover:underline text-sm">
-							Edit
-						</a>
-						<button @onclick="() => ShowDeleteConfirm(context)" class="text-red-600 hover:underline text-sm">
-							Delete
-						</button>
-					</div>
+					<a href="/statuses/@context.Id.ToString()/edit" class="text-[var(--color-primary)] hover:underline text-sm">
+						Edit
+					</a>
 				</td>
 			</tr>
 		</RowContent>
 	</DataTable>
 
-	<ConfirmDialog
-		IsVisible="_showDeleteDialog"
-		Title="Delete Status"
-		Message="@($"Are you sure you want to delete the status \"{_statusToDelete?.StatusName}\"? This action cannot be undone.")"
-		ConfirmText="Delete"
-		CancelText="Cancel"
-		OnConfirm="ConfirmDelete"
-		OnCancel="CancelDelete" />
 </div>
 
 @code {
 	private IEnumerable<StatusDto> _statuses = [];
 	private bool _isLoading = true;
-	private bool _showDeleteDialog = false;
-	private StatusDto? _statusToDelete;
 
 	/// <summary>
 	/// Loads all statuses on initialization.
@@ -71,37 +56,5 @@
 		{
 			_isLoading = false;
 		}
-	}
-
-	/// <summary>
-	/// Shows the delete confirmation dialog for a status.
-	/// </summary>
-	private void ShowDeleteConfirm(StatusDto status)
-	{
-		_statusToDelete = status;
-		_showDeleteDialog = true;
-	}
-
-	/// <summary>
-	/// Confirms the deletion of the status and reloads the list.
-	/// </summary>
-	private async Task ConfirmDelete()
-	{
-		if (_statusToDelete != null)
-		{
-			await StatusClient.DeleteAsync(_statusToDelete.Id.ToString());
-			_statuses = await StatusClient.GetAllAsync();
-		}
-		_showDeleteDialog = false;
-		_statusToDelete = null;
-	}
-
-	/// <summary>
-	/// Cancels the deletion and closes the confirmation dialog.
-	/// </summary>
-	private void CancelDelete()
-	{
-		_showDeleteDialog = false;
-		_statusToDelete = null;
 	}
 }
