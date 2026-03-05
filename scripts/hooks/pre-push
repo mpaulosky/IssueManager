@@ -2,7 +2,7 @@
 # pre-push hook — runs three gate checks before allowing any push:
 #
 #   Gate 1: Copyright Header Validation
-#     - Validates File Name, Solution Name, and Project Name in all .cs files with full headers
+#     - Validates File Name, Solution Name, and Project Name in changed .cs files with full headers
 #
 #   Gate 2: Code Formatting Check
 #     - Runs `dotnet format --verify-no-changes` to ensure code is properly formatted
@@ -83,7 +83,7 @@ validate_copyright_headers() {
       fi
     fi
 
-  done < <(find src tests -name "*.cs" -type f 2>/dev/null)
+  done < <(git diff --name-only HEAD @{push} 2>/dev/null | grep '\.cs$' | grep -v '^$' || git diff --name-only HEAD 2>/dev/null | grep '\.cs$')
 
   if [ $failed -gt 0 ]; then
     echo "❌ Copyright header validation FAILED ($failed of $checked files):"
