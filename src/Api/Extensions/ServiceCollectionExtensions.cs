@@ -36,6 +36,8 @@ public static class ServiceCollectionExtensions
 		services.AddSingleton<ICommentRepository>(_ =>
 			new CommentRepository(connectionString, databaseName));
 
+		services.AddTransient<DatabaseSeeder>();
+
 		return services;
 	}
 
@@ -49,10 +51,8 @@ public static class ServiceCollectionExtensions
 		services.AddSingleton<UpdateIssueStatusValidator>();
 		services.AddSingleton<CreateStatusValidator>();
 		services.AddSingleton<UpdateStatusValidator>();
-		services.AddSingleton<DeleteStatusValidator>();
 		services.AddSingleton<CreateCategoryValidator>();
 		services.AddSingleton<UpdateCategoryValidator>();
-		services.AddSingleton<DeleteCategoryValidator>();
 		services.AddSingleton<CreateCommentValidator>();
 		services.AddSingleton<UpdateCommentValidator>();
 		services.AddSingleton<DeleteCommentValidator>();
@@ -73,12 +73,10 @@ public static class ServiceCollectionExtensions
 		services.AddSingleton<GetStatusHandler>();
 		services.AddSingleton<ListStatusesHandler>();
 		services.AddSingleton<UpdateStatusHandler>();
-		services.AddSingleton<DeleteStatusHandler>();
 		services.AddSingleton<CreateCategoryHandler>();
 		services.AddSingleton<GetCategoryHandler>();
 		services.AddSingleton<ListCategoriesHandler>();
 		services.AddSingleton<UpdateCategoryHandler>();
-		services.AddSingleton<DeleteCategoryHandler>();
 		services.AddSingleton<CreateCommentHandler>();
 		services.AddSingleton<GetCommentHandler>();
 		services.AddSingleton<ListCommentsHandler>();

@@ -42,9 +42,24 @@ public class NavMenuTests : ComponentTestBase
 		// Act
 		var cut = TestContext.Render<NavMenu>();
 
-		// Assert
+		// Assert — Home and Issues are always visible
 		cut.Markup.Should().Contain("href=\"/\"");
 		cut.Markup.Should().Contain("href=\"/issues\"");
+	}
+
+	[Fact]
+	public void NavMenu_ShowsAdminLinks_WhenAdminRole()
+	{
+		// Arrange
+		var authContext = TestContext.AddAuthorization();
+		authContext.SetAuthorized("AdminUser");
+		authContext.SetRoles("Admin");
+		TestContext.JSInterop.Mode = JSRuntimeMode.Loose;
+
+		// Act
+		var cut = TestContext.Render<NavMenu>();
+
+		// Assert — admin-only links visible when user is Admin
 		cut.Markup.Should().Contain("href=\"/categories\"");
 		cut.Markup.Should().Contain("href=\"/statuses\"");
 	}

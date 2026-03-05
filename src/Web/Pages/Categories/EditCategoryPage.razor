@@ -1,7 +1,7 @@
 @* Copyright (c) 2026. All rights reserved. *@
 @namespace Web.Pages.Categories
 @page "/categories/{Id}/edit"
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin")]
 @using System.ComponentModel.DataAnnotations
 @inject ICategoryApiClient CategoryClient
 @inject NavigationManager Nav

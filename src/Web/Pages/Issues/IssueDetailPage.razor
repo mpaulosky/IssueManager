@@ -1,9 +1,12 @@
 @* Copyright (c) 2026. All rights reserved. *@
 @namespace Web.Pages.Issues
 @page "/issues/{Id}"
+@rendermode InteractiveServer
 @inject IIssueApiClient IssueClient
 @inject ICommentApiClient CommentClient
+@inject IStatusApiClient StatusClient
 @inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthStateProvider
 @using Web.Components.Shared
 
 <PageTitle>@(_issue?.Title ?? "Issue") — IssueManager</PageTitle>
@@ -33,9 +36,21 @@
 						<span>@_issue.DateCreated.ToString("MMMM dd, yyyy")</span>
 					</div>
 				</div>
-				<a href="/issues/@Id/edit" class="px-4 py-2 border border-[var(--border-color)] text-[var(--text-main)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors text-sm font-medium">
-					Edit Issue
-				</a>
+				<AuthorizeView Roles="Admin" Context="authCtx">
+					<Authorized>
+						<a href="/issues/@Id/edit" class="px-4 py-2 border border-[var(--border-color)] text-[var(--text-main)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors text-sm font-medium">
+							Edit Issue
+						</a>
+					</Authorized>
+					<NotAuthorized>
+						@if (_currentUserName != null && _issue != null && _currentUserName == _issue.Author.Name)
+						{
+							<a href="/issues/@Id/edit" class="px-4 py-2 border border-[var(--border-color)] text-[var(--text-main)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors text-sm font-medium">
+								Edit Issue
+							</a>
+						}
+					</NotAuthorized>
+				</AuthorizeView>
 			</div>
 			<div class="flex items-center gap-3">
 				<StatusBadge Status="@_issue.Status" />
@@ -55,6 +70,27 @@
 				<p class="text-[var(--text-main)] whitespace-pre-wrap">@_issue.Description</p>
 			}
 		</div>
+
+		<!-- Admin: Set Status -->
+		<AuthorizeView Roles="Admin">
+			<Authorized>
+				<div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm p-6 mb-8">
+					<h2 class="text-lg font-semibold text-[var(--text-main)] mb-4">Set Status</h2>
+					@if (_availableStatuses.Any())
+					{
+						<div class="flex flex-wrap gap-2">
+							@foreach (var status in _availableStatuses)
+							{
+								<button @onclick="@(() => SetIssueStatus(status))"
+									class="px-4 py-2 border border-[var(--border-color)] text-[var(--text-main)] rounded-lg hover:bg-[var(--color-primary)] hover:text-white hover:border-[var(--color-primary)] transition-colors text-sm font-medium @(status.StatusName == _issue?.Status?.StatusName ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]" : "")">
+									@status.StatusName
+								</button>
+							}
+						</div>
+					}
+				</div>
+			</Authorized>
+		</AuthorizeView>
 
 		<!-- Comments section -->
 		<div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm p-6">
@@ -176,9 +212,11 @@
 
 	private IssueDto? _issue;
 	private IEnumerable<CommentDto> _comments = [];
+	private IEnumerable<StatusDto> _availableStatuses = [];
 	private bool _isLoading = true;
 	private string _newCommentText = "";
 	private bool _isSubmittingComment = false;
+	private string? _currentUserName;
 
 	// Edit comment state
 	private string? _editingCommentId = null;
@@ -194,10 +232,14 @@
 	/// </summary>
 	protected override async Task OnInitializedAsync()
 	{
+		var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+		_currentUserName = authState.User.Identity?.Name;
+		
 		_isLoading = true;
 		try
 		{
 			_issue = await IssueClient.GetByIdAsync(Id);
+			_availableStatuses = await StatusClient.GetAllAsync();
 			if (_issue != null)
 			{
 				var allComments = await CommentClient.GetAllAsync();
@@ -320,5 +362,23 @@
 	{
 		_showDeleteDialog = false;
 		_commentToDeleteId = null;
+	}
+
+	/// <summary>
+	/// Sets the status of the issue.
+	/// </summary>
+	private async Task SetIssueStatus(StatusDto status)
+	{
+		if (_issue == null) return;
+		var command = new UpdateIssueStatusCommand
+		{
+			IssueId = _issue.Id,
+			Status = status
+		};
+		var updated = await IssueClient.UpdateStatusAsync(_issue.Id.ToString(), command);
+		if (updated != null)
+		{
+			_issue = updated;
+		}
 	}
 }

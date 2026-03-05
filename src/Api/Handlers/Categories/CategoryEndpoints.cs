@@ -70,20 +70,6 @@ var commandWithId = command with { Id = objectId };
 		.Produces(StatusCodes.Status404NotFound)
 		.RequireAuthorization();
 
-		group.MapDelete("{id}", async (string id, DeleteCategoryHandler handler) =>
-		{
-if (!ObjectId.TryParse(id, out var objectId))
-return Results.BadRequest("Invalid ID format");
-var command = new DeleteCategoryCommand { Id = objectId };
-			var result = await handler.Handle(command);
-			return result.Success ? Results.NoContent() : Results.NotFound();
-		})
-		.WithName("DeleteCategory")
-		.WithSummary("Delete (archive) a category")
-		.Produces(StatusCodes.Status204NoContent)
-		.Produces(StatusCodes.Status404NotFound)
-		.RequireAuthorization();
-
 		return app;
 	}
 }

@@ -25,6 +25,8 @@ builder.Services.AddTransient<TokenForwardingHandler>();
 builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents();
 
+builder.Services.AddRadzenComponents();
+
 builder.Services.AddHttpClient<IIssueApiClient, IssueApiClient>(client =>
 	client.BaseAddress = new Uri("https+http://api"))
 	.AddServiceDiscovery()

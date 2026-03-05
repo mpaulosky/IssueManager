@@ -181,43 +181,4 @@ public class CategoryEndpointsTests : IDisposable
 		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 	}
 
-	[Fact]
-	public async Task DeleteCategory_WithValidId_ReturnsNoContent()
-	{
-		// Arrange
-		var categoryId = ObjectId.GenerateNewId();
-		var categoryDto = new CategoryDto(
-			categoryId,
-			"Test Category",
-			"Description",
-			DateTime.UtcNow,
-			null,
-			false,
-			UserDto.Empty);
-		_factory.CategoryRepository
-			.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
-			.Returns(Result<CategoryDto>.Ok(categoryDto));
-		_factory.CategoryRepository
-			.ArchiveAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
-			.Returns(Result.Ok());
-
-		// Act
-		var response = await _authenticatedClient.DeleteAsync($"/api/v1/categories/{categoryId}").ConfigureAwait(false);
-
-		// Assert
-		response.StatusCode.Should().Be(HttpStatusCode.NoContent);
-	}
-
-	[Fact]
-	public async Task DeleteCategory_WithoutAuthentication_ReturnsUnauthorized()
-	{
-		// Arrange
-		var categoryId = ObjectId.GenerateNewId();
-
-		// Act
-		var response = await _client.DeleteAsync($"/api/v1/categories/{categoryId}").ConfigureAwait(false);
-
-		// Assert
-		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-	}
 }

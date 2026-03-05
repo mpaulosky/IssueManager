@@ -2,9 +2,11 @@
 @namespace Web.Pages.Issues
 @page "/issues"
 @attribute [StreamRendering]
+@rendermode InteractiveServer
 @inject IIssueApiClient IssueClient
 @inject ICategoryApiClient CategoryClient
 @inject IStatusApiClient StatusClient
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Issues — IssueManager</PageTitle>
 
@@ -88,9 +90,21 @@
 				<td class="px-6 py-4 text-[var(--text-muted)]">@context.Author.Name</td>
 				<td class="px-6 py-4 text-[var(--text-muted)]">@context.DateCreated.ToString("yyyy-MM-dd")</td>
 				<td class="px-6 py-4 text-right">
-					<a href="/issues/@context.Id.ToString()/edit" class="text-[var(--color-primary)] hover:underline text-sm">
-						Edit
-					</a>
+					<AuthorizeView Roles="Admin" Context="authCtx">
+						<Authorized>
+							<a href="/issues/@context.Id.ToString()/edit" class="text-[var(--color-primary)] hover:underline text-sm">
+								Edit
+							</a>
+						</Authorized>
+						<NotAuthorized>
+							@if (_currentUserName != null && _currentUserName == context.Author.Name)
+							{
+								<a href="/issues/@context.Id.ToString()/edit" class="text-[var(--color-primary)] hover:underline text-sm">
+									Edit
+								</a>
+							}
+						</NotAuthorized>
+					</AuthorizeView>
 				</td>
 			</tr>
 		</RowContent>
@@ -113,12 +127,16 @@
 	private string? _searchTerm;
 	private string? _statusFilter;
 	private string? _categoryFilter;
+	private string? _currentUserName;
 
 	/// <summary>
 	/// Initializes the page by loading categories, statuses, and the first page of issues.
 	/// </summary>
 	protected override async Task OnInitializedAsync()
 	{
+		var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+		_currentUserName = authState.User.Identity?.Name;
+		
 		_isLoading = true;
 		try
 		{

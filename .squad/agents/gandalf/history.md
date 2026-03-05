@@ -21,6 +21,24 @@ Key security concerns to address from day one:
 ## Learnings
 <!-- Gandalf appends learnings here after each session -->
 
+### 2026-03-04: Role-Based Access Control Implementation
+**Sprint:** Security Hardening
+**Status:** Complete
+**What:** Implemented comprehensive RBAC across Categories, Statuses, and Issues pages:
+1. Created NotAuthorizedPage.razor — friendly "Access Denied" page with navigation options
+2. Updated Routes.razor to distinguish between unauthenticated users (redirect to login) vs authenticated users with wrong role (show NotAuthorizedPage)
+3. Restricted all Category CRUD pages to Admin role only (CategoriesPage, CreateCategoryPage, EditCategoryPage)
+4. Restricted all Status CRUD pages to Admin role only (StatusesPage, CreateStatusPage, EditStatusPage)
+5. Enforced Admin OR Author access on EditIssuePage — reads auth state and redirects unauthorized users to /not-authorized
+6. Created decision inbox file documenting Auth0 role claim mapping requirement
+**Key Implementation:**
+- NotAuthorizedPage provides user-friendly access denial with navigation to home/issues
+- Routes.razor uses nested AuthorizeView to detect auth state: authenticated users without role see NotAuthorizedPage, unauthenticated users redirect to login
+- All Category/Status pages now require `[Authorize(Roles = "Admin")]` attribute
+- EditIssuePage checks `user.IsInRole("Admin") || user.Identity?.Name == _issue.Author.Name` in OnInitializedAsync
+**Why:** P0 security gap — anonymous and non-admin users could access admin-only CRUD pages. Issue editing was unrestricted.
+**Security Note:** For RBAC to work, Auth0 must be configured to include roles in JWT claims and Web/Extensions/AuthExtensions.cs must map those claims to ClaimTypes.Role. Without this, all Admin checks will fail. Documented in decisions/inbox.
+
 ### 2026-02-27: Auth0 Scaffold Implementation — Passive Configuration Pattern
 **Sprint:** Sprint 3 Hardening
 **Branch:** feat/sprint-3-hardening

@@ -24,6 +24,7 @@ public class CategoriesPageTests : IDisposable
 	public CategoriesPageTests()
 	{
 		_ctx = new BunitContext();
+		_ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 		_mockCategoryClient = Substitute.For<ICategoryApiClient>();
 		_mockCategoryClient.GetAllAsync(Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IEnumerable<CategoryDto>>([]));
@@ -58,18 +59,6 @@ public class CategoriesPageTests : IDisposable
 	}
 
 	[Fact]
-	public void CategoriesPage_HasNewCategoryLink()
-	{
-		// Act
-		var cut = _ctx.Render<CategoriesPage>();
-
-		// Assert
-		var link = cut.Find("a[href='/categories/create']");
-		link.Should().NotBeNull();
-		link.TextContent.Trim().Should().Contain("New Category");
-	}
-
-	[Fact]
 	public void CategoriesPage_ShowsEmptyMessage_WhenApiReturnsNoCategories()
 	{
 		// Arrange — mock already returns empty by default
@@ -77,8 +66,8 @@ public class CategoriesPageTests : IDisposable
 		// Act
 		var cut = _ctx.Render<CategoriesPage>();
 
-		// Assert
-		cut.Markup.Should().Contain("No categories found.");
+		// Assert — Radzen DataGrid shows "No records to display." when empty
+		cut.Markup.Should().Contain("No records to display.");
 	}
 
 	[Fact]
@@ -94,38 +83,6 @@ public class CategoriesPageTests : IDisposable
 
 		// Assert
 		cut.Markup.Should().Contain("Performance");
-	}
-
-	[Fact]
-	public void CategoriesPage_ShowsEditLink_ForEachCategory()
-	{
-		// Arrange
-		var category = MakeCategory("Security");
-		_mockCategoryClient.GetAllAsync(Arg.Any<CancellationToken>())
-			.Returns(Task.FromResult<IEnumerable<CategoryDto>>([ category ]));
-
-		// Act
-		var cut = _ctx.Render<CategoriesPage>();
-
-		// Assert
-		var editLink = cut.Find($"a[href='/categories/{category.Id}/edit']");
-		editLink.Should().NotBeNull();
-	}
-
-	[Fact]
-	public void CategoriesPage_ShowsDeleteButton_ForEachCategory()
-	{
-		// Arrange
-		var category = MakeCategory("UI");
-		_mockCategoryClient.GetAllAsync(Arg.Any<CancellationToken>())
-			.Returns(Task.FromResult<IEnumerable<CategoryDto>>([ category ]));
-
-		// Act
-		var cut = _ctx.Render<CategoriesPage>();
-
-		// Assert
-		var deleteButtons = cut.FindAll("button").Where(b => b.TextContent.Trim() == "Delete");
-		deleteButtons.Should().NotBeEmpty();
 	}
 
 	[Fact]

@@ -11,6 +11,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Auth0.AspNetCore.Authentication" />
+		<PackageReference Include="Radzen.Blazor" />
 	</ItemGroup>
 
 	<ItemGroup>

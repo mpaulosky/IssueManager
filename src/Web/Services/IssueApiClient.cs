@@ -32,6 +32,9 @@ public interface IIssueApiClient
 	/// <summary>Updates an existing issue.</summary>
 	Task<IssueDto?> UpdateAsync(string id, UpdateIssueCommand command, CancellationToken cancellationToken = default);
 
+	/// <summary>Updates the status of an issue.</summary>
+	Task<IssueDto?> UpdateStatusAsync(string id, UpdateIssueStatusCommand command, CancellationToken cancellationToken = default);
+
 	/// <summary>Deletes an issue by its identifier.</summary>
 	Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default);
 }
@@ -94,6 +97,15 @@ public class IssueApiClient : IIssueApiClient
 	public async Task<IssueDto?> UpdateAsync(string id, UpdateIssueCommand command, CancellationToken cancellationToken = default)
 	{
 		var response = await _httpClient.PatchAsJsonAsync($"/api/v1/issues/{id}", command, cancellationToken).ConfigureAwait(false);
+		return response.IsSuccessStatusCode
+			? await response.Content.ReadFromJsonAsync<IssueDto>(cancellationToken).ConfigureAwait(false)
+			: null;
+	}
+
+	/// <inheritdoc/>
+	public async Task<IssueDto?> UpdateStatusAsync(string id, UpdateIssueStatusCommand command, CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient.PatchAsJsonAsync($"/api/v1/issues/{id}/status", command, cancellationToken).ConfigureAwait(false);
 		return response.IsSuccessStatusCode
 			? await response.Content.ReadFromJsonAsync<IssueDto>(cancellationToken).ConfigureAwait(false)
 			: null;

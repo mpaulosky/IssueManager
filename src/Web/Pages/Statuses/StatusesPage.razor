@@ -1,106 +1,63 @@
-@* Copyright (c) 2026. All rights reserved. *@
+@* ============================================
+   Copyright (c) 2026. All rights reserved.
+   File Name :     StatusesPage.razor
+   Company :       mpaulosky
+   Author :        Matthew Paulosky
+   Solution Name : IssueManager
+   Project Name :  Web
+   ============================================= *@
 @namespace Web.Pages.Statuses
 @page "/statuses"
-@attribute [StreamRendering]
-@inject IStatusApiClient StatusClient
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Statuses — IssueManager</PageTitle>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-	<div class="flex items-center justify-between mb-6">
-		<h1 class="text-2xl font-bold text-[var(--text-main)]">Statuses</h1>
-		<a href="/statuses/create" class="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
-			New Status
-		</a>
-	</div>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-[var(--text-main)]">Statuses</h1>
+        <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Text="Add Status"
+            Click="@InsertRow" Disabled="@(_insertingStatus != null || _editingStatus != null)"
+            class="px-4 py-2 text-sm" />
+    </div>
 
-	<DataTable Items="_statuses" IsLoading="_isLoading" EmptyMessage="No statuses found." TItem="StatusDto">
-		<HeaderContent>
-			<th scope="col" class="px-6 py-3">Status Name</th>
-			<th scope="col" class="px-6 py-3">Description</th>
-			<th scope="col" class="px-6 py-3 text-right">Actions</th>
-		</HeaderContent>
-		<RowContent>
-			<tr class="bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] transition-colors">
-				<td class="px-6 py-4">
-					<StatusBadge Status="@context" />
-				</td>
-				<td class="px-6 py-4 text-[var(--text-muted)]">@(string.IsNullOrWhiteSpace(context.StatusDescription) ? "—" : context.StatusDescription)</td>
-				<td class="px-6 py-4 text-right">
-					<div class="inline-flex items-center gap-3">
-						<a href="/statuses/@context.Id.ToString()/edit" class="text-[var(--color-primary)] hover:underline text-sm">
-							Edit
-						</a>
-						<button @onclick="() => ShowDeleteConfirm(context)" class="text-red-600 hover:underline text-sm">
-							Delete
-						</button>
-					</div>
-				</td>
-			</tr>
-		</RowContent>
-	</DataTable>
-
-	<ConfirmDialog
-		IsVisible="_showDeleteDialog"
-		Title="Delete Status"
-		Message="@($"Are you sure you want to delete the status \"{_statusToDelete?.StatusName}\"? This action cannot be undone.")"
-		ConfirmText="Delete"
-		CancelText="Cancel"
-		OnConfirm="ConfirmDelete"
-		OnCancel="CancelDelete" />
+    @if (_isLoading)
+    {
+        <div class="text-center py-12 text-[var(--text-muted)]">Loading...</div>
+    }
+    else
+    {
+        <div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm overflow-hidden">
+            <RadzenDataGrid @ref="_grid" Data="@_statuses" TItem="StatusEditModel"
+                EditMode="DataGridEditMode.Single"
+                RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow"
+                AllowSorting="true" AllowPaging="true" PageSize="10">
+                <Columns>
+                    <RadzenDataGridColumn TItem="StatusEditModel" Property="StatusName" Title="Status Name" Width="200px">
+                        <EditTemplate Context="status">
+                            <RadzenTextBox @bind-Value="status.StatusName" Style="width:100%" Name="StatusName" />
+                            <RadzenRequiredValidator Component="StatusName" Text="Name is required" Popup="true" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="StatusEditModel" Property="StatusDescription" Title="Description">
+                        <EditTemplate Context="status">
+                            <RadzenTextBox @bind-Value="status.StatusDescription" Style="width:100%" Name="StatusDesc" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="StatusEditModel" Context="status" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Width="140px" Title="Actions">
+                        <Template Context="status">
+                            <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
+                                Click="@(() => EditRow(status))" @onclick:stopPropagation="true" />
+                        </Template>
+                        <EditTemplate Context="status">
+                            <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small"
+                                Click="@(() => SaveRow(status))" />
+                            <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
+                                Click="@(() => CancelEdit(status))" Class="ms-1" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </div>
+    }
 </div>
-
-@code {
-	private IEnumerable<StatusDto> _statuses = [];
-	private bool _isLoading = true;
-	private bool _showDeleteDialog = false;
-	private StatusDto? _statusToDelete;
-
-	/// <summary>
-	/// Loads all statuses on initialization.
-	/// </summary>
-	protected override async Task OnInitializedAsync()
-	{
-		_isLoading = true;
-		try
-		{
-			_statuses = await StatusClient.GetAllAsync();
-		}
-		finally
-		{
-			_isLoading = false;
-		}
-	}
-
-	/// <summary>
-	/// Shows the delete confirmation dialog for a status.
-	/// </summary>
-	private void ShowDeleteConfirm(StatusDto status)
-	{
-		_statusToDelete = status;
-		_showDeleteDialog = true;
-	}
-
-	/// <summary>
-	/// Confirms the deletion of the status and reloads the list.
-	/// </summary>
-	private async Task ConfirmDelete()
-	{
-		if (_statusToDelete != null)
-		{
-			await StatusClient.DeleteAsync(_statusToDelete.Id.ToString());
-			_statuses = await StatusClient.GetAllAsync();
-		}
-		_showDeleteDialog = false;
-		_statusToDelete = null;
-	}
-
-	/// <summary>
-	/// Cancels the deletion and closes the confirmation dialog.
-	/// </summary>
-	private void CancelDelete()
-	{
-		_showDeleteDialog = false;
-		_statusToDelete = null;
-	}
-}

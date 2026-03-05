@@ -35,6 +35,14 @@ builder.Services.AddCurrentUser();
 
 var app = builder.Build();
 
+// Seed default data (skip in test environment — repositories are NSubstitute fakes)
+if (!app.Environment.IsEnvironment("Testing"))
+{
+	using var scope = app.Services.CreateScope();
+	var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+	await seeder.SeedAsync();
+}
+
 app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();
@@ -50,3 +58,8 @@ app.MapCommentEndpoints();
 app.MapDefaultEndpoints();
 
 app.Run();
+
+/// <summary>
+/// Partial class to make Program accessible to WebApplicationFactory in tests.
+/// </summary>
+public partial class Program { }

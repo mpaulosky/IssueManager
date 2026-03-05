@@ -24,6 +24,7 @@ public class StatusesPageTests : IDisposable
 	public StatusesPageTests()
 	{
 		_ctx = new BunitContext();
+		_ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 		_mockStatusClient = Substitute.For<IStatusApiClient>();
 		_mockStatusClient.GetAllAsync(Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IEnumerable<StatusDto>>([]));
@@ -58,18 +59,6 @@ public class StatusesPageTests : IDisposable
 	}
 
 	[Fact]
-	public void StatusesPage_HasNewStatusLink()
-	{
-		// Act
-		var cut = _ctx.Render<StatusesPage>();
-
-		// Assert
-		var link = cut.Find("a[href='/statuses/create']");
-		link.Should().NotBeNull();
-		link.TextContent.Trim().Should().Contain("New Status");
-	}
-
-	[Fact]
 	public void StatusesPage_ShowsEmptyMessage_WhenApiReturnsNoStatuses()
 	{
 		// Arrange — mock already returns empty by default
@@ -77,8 +66,8 @@ public class StatusesPageTests : IDisposable
 		// Act
 		var cut = _ctx.Render<StatusesPage>();
 
-		// Assert
-		cut.Markup.Should().Contain("No statuses found.");
+		// Assert — Radzen DataGrid shows "No records to display." when empty
+		cut.Markup.Should().Contain("No records to display.");
 	}
 
 	[Fact]
@@ -94,38 +83,6 @@ public class StatusesPageTests : IDisposable
 
 		// Assert
 		cut.Markup.Should().Contain("In Progress");
-	}
-
-	[Fact]
-	public void StatusesPage_ShowsEditLink_ForEachStatus()
-	{
-		// Arrange
-		var status = MakeStatus("Resolved");
-		_mockStatusClient.GetAllAsync(Arg.Any<CancellationToken>())
-			.Returns(Task.FromResult<IEnumerable<StatusDto>>([ status ]));
-
-		// Act
-		var cut = _ctx.Render<StatusesPage>();
-
-		// Assert
-		var editLink = cut.Find($"a[href='/statuses/{status.Id}/edit']");
-		editLink.Should().NotBeNull();
-	}
-
-	[Fact]
-	public void StatusesPage_ShowsDeleteButton_ForEachStatus()
-	{
-		// Arrange
-		var status = MakeStatus("Closed");
-		_mockStatusClient.GetAllAsync(Arg.Any<CancellationToken>())
-			.Returns(Task.FromResult<IEnumerable<StatusDto>>([ status ]));
-
-		// Act
-		var cut = _ctx.Render<StatusesPage>();
-
-		// Assert
-		var deleteButtons = cut.FindAll("button").Where(b => b.TextContent.Trim() == "Delete");
-		deleteButtons.Should().NotBeEmpty();
 	}
 
 	[Fact]
