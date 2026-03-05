@@ -45,4 +45,9 @@ public interface IStatusRepository
 	/// </summary>
 	Task<Result<StatusDto>> UpdateAsync(StatusDto status, CancellationToken cancellationToken = default);
 
+	/// <summary>
+	/// Counts the total number of statuses in the database.
+	/// </summary>
+	Task<Result<long>> CountAsync(CancellationToken cancellationToken = default);
+
 }

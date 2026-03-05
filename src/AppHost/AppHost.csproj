@@ -1,5 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-	<Sdk Name="Aspire.AppHost.Sdk" Version="13.1.1" />
+<Project Sdk="Aspire.AppHost.Sdk/13.1.2">
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net10.0</TargetFramework>
@@ -12,7 +11,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="Aspire.Hosting" />
-		<PackageReference Include="Aspire.Hosting.AppHost" />
 		<PackageReference Include="Aspire.Hosting.MongoDB" />
 		<PackageReference Include="Aspire.Hosting.Redis" />
 	</ItemGroup>
@@ -23,7 +21,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" IsAspireProjectResource="false" />
-		<ProjectReference Include="..\Shared\Shared.csproj" IsAspireProjectResource="false"/>
+		<ProjectReference Include="..\Shared\Shared.csproj" IsAspireProjectResource="false" />
 		<ProjectReference Include="..\Api\Api.csproj" />
 		<ProjectReference Include="..\Web\Web.csproj" />
 	</ItemGroup>

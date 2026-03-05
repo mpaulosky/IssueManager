@@ -36,6 +36,8 @@ public static class ServiceCollectionExtensions
 		services.AddSingleton<ICommentRepository>(_ =>
 			new CommentRepository(connectionString, databaseName));
 
+		services.AddTransient<DatabaseSeeder>();
+
 		return services;
 	}
 

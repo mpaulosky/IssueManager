@@ -4,6 +4,7 @@
 @attribute [Authorize]
 @inject IIssueApiClient IssueClient
 @inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Edit Issue — IssueManager</PageTitle>
 
@@ -55,6 +56,9 @@
 		_isLoadingIssue = true;
 		try
 		{
+			var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+			var user = authState.User;
+			
 			_issue = await IssueClient.GetByIdAsync(Id);
 			if (_issue != null)
 			{
@@ -65,6 +69,15 @@
 					CategoryId = _issue.Category.Id.ToString(),
 					StatusId = _issue.Status.Id.ToString()
 				};
+				
+				// Enforce: only Admin or the issue author can edit
+				var isAdmin = user.IsInRole("Admin");
+				var isAuthor = user.Identity?.Name == _issue.Author.Name;
+				if (!isAdmin && !isAuthor)
+				{
+					Nav.NavigateTo("/not-authorized", forceLoad: false);
+					return;
+				}
 			}
 		}
 		finally

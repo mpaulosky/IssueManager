@@ -13,7 +13,18 @@
 	<Found Context="routeData">
 		<AuthorizeRouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)">
 			<NotAuthorized>
-				<RedirectToLoginPage />
+				<AuthorizeView>
+					<Authorized Context="authCtx">
+						@* User is authenticated but lacks the required role → show Not Authorized page *@
+						<LayoutView Layout="typeof(MainLayout)">
+							<NotAuthorizedPage />
+						</LayoutView>
+					</Authorized>
+					<NotAuthorized Context="anonCtx">
+						@* User is not authenticated at all → redirect to login *@
+						<RedirectToLoginPage />
+					</NotAuthorized>
+				</AuthorizeView>
 			</NotAuthorized>
 		</AuthorizeRouteView>
 	</Found>

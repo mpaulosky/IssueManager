@@ -1,9 +1,11 @@
 @* Copyright (c) 2026. All rights reserved. *@
 @namespace Web.Pages.Issues
 @page "/issues/{Id}"
+@rendermode InteractiveServer
 @inject IIssueApiClient IssueClient
 @inject ICommentApiClient CommentClient
 @inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthStateProvider
 @using Web.Components.Shared
 
 <PageTitle>@(_issue?.Title ?? "Issue") — IssueManager</PageTitle>
@@ -33,9 +35,21 @@
 						<span>@_issue.DateCreated.ToString("MMMM dd, yyyy")</span>
 					</div>
 				</div>
-				<a href="/issues/@Id/edit" class="px-4 py-2 border border-[var(--border-color)] text-[var(--text-main)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors text-sm font-medium">
-					Edit Issue
-				</a>
+				<AuthorizeView Roles="Admin" Context="authCtx">
+					<Authorized>
+						<a href="/issues/@Id/edit" class="px-4 py-2 border border-[var(--border-color)] text-[var(--text-main)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors text-sm font-medium">
+							Edit Issue
+						</a>
+					</Authorized>
+					<NotAuthorized>
+						@if (_currentUserName != null && _issue != null && _currentUserName == _issue.Author.Name)
+						{
+							<a href="/issues/@Id/edit" class="px-4 py-2 border border-[var(--border-color)] text-[var(--text-main)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors text-sm font-medium">
+								Edit Issue
+							</a>
+						}
+					</NotAuthorized>
+				</AuthorizeView>
 			</div>
 			<div class="flex items-center gap-3">
 				<StatusBadge Status="@_issue.Status" />
@@ -179,6 +193,7 @@
 	private bool _isLoading = true;
 	private string _newCommentText = "";
 	private bool _isSubmittingComment = false;
+	private string? _currentUserName;
 
 	// Edit comment state
 	private string? _editingCommentId = null;
@@ -194,6 +209,9 @@
 	/// </summary>
 	protected override async Task OnInitializedAsync()
 	{
+		var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+		_currentUserName = authState.User.Identity?.Name;
+		
 		_isLoading = true;
 		try
 		{

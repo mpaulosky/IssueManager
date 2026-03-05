@@ -1,7 +1,7 @@
 @* Copyright (c) 2026. All rights reserved. *@
 @namespace Web.Pages.Statuses
 @page "/statuses/{Id}/edit"
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin")]
 @using System.ComponentModel.DataAnnotations
 @inject IStatusApiClient StatusClient
 @inject NavigationManager Nav

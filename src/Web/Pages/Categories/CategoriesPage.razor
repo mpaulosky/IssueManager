@@ -2,6 +2,7 @@
 @namespace Web.Pages.Categories
 @page "/categories"
 @attribute [StreamRendering]
+@attribute [Authorize(Roles = "Admin")]
 @inject ICategoryApiClient CategoryClient
 
 <PageTitle>Categories — IssueManager</PageTitle>

@@ -2,6 +2,7 @@
 @namespace Web.Pages.Statuses
 @page "/statuses"
 @attribute [StreamRendering]
+@attribute [Authorize(Roles = "Admin")]
 @inject IStatusApiClient StatusClient
 
 <PageTitle>Statuses — IssueManager</PageTitle>
