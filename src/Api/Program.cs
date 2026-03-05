@@ -35,9 +35,10 @@ builder.Services.AddCurrentUser();
 
 var app = builder.Build();
 
-// Seed default data
-using (var scope = app.Services.CreateScope())
+// Seed default data (skip in test environment — repositories are NSubstitute fakes)
+if (!app.Environment.IsEnvironment("Testing"))
 {
+	using var scope = app.Services.CreateScope();
 	var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
 	await seeder.SeedAsync();
 }
