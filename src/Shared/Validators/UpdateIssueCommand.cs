@@ -27,4 +27,14 @@ public record UpdateIssueCommand
 	/// Gets or sets the description of the issue.
 	/// </summary>
 	public string? Description { get; init; }
+
+	/// <summary>
+	/// Gets or sets whether the issue is approved for public display.
+	/// </summary>
+	public bool? ApprovedForRelease { get; init; }
+
+	/// <summary>
+	/// Gets or sets whether the issue has been rejected.
+	/// </summary>
+	public bool? Rejected { get; init; }
 }

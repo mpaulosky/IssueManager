@@ -1,58 +1,63 @@
-@* Copyright (c) 2026. All rights reserved. *@
+@* ============================================
+   Copyright (c) 2026. All rights reserved.
+   File Name :     CategoriesPage.razor
+   Company :       mpaulosky
+   Author :        Matthew Paulosky
+   Solution Name : IssueManager
+   Project Name :  Web
+   ============================================= *@
 @namespace Web.Pages.Categories
 @page "/categories"
-@attribute [StreamRendering]
+@rendermode InteractiveServer
 @attribute [Authorize(Roles = "Admin")]
-@inject ICategoryApiClient CategoryClient
 
 <PageTitle>Categories — IssueManager</PageTitle>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-	<div class="flex items-center justify-between mb-6">
-		<h1 class="text-2xl font-bold text-[var(--text-main)]">Categories</h1>
-		<a href="/categories/create" class="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
-			New Category
-		</a>
-	</div>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-[var(--text-main)]">Categories</h1>
+        <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Text="Add Category"
+            Click="@InsertRow" Disabled="@(_insertingCategory != null || _editingCategory != null)"
+            class="px-4 py-2 text-sm" />
+    </div>
 
-	<DataTable Items="_categories" IsLoading="_isLoading" EmptyMessage="No categories found." TItem="CategoryDto">
-		<HeaderContent>
-			<th scope="col" class="px-6 py-3">Name</th>
-			<th scope="col" class="px-6 py-3">Description</th>
-			<th scope="col" class="px-6 py-3 text-right">Actions</th>
-		</HeaderContent>
-		<RowContent>
-			<tr class="bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] transition-colors">
-				<td class="px-6 py-4 font-medium text-[var(--text-main)]">@context.CategoryName</td>
-				<td class="px-6 py-4 text-[var(--text-muted)]">@(string.IsNullOrWhiteSpace(context.CategoryDescription) ? "—" : context.CategoryDescription)</td>
-				<td class="px-6 py-4 text-right">
-					<a href="/categories/@context.Id.ToString()/edit" class="text-[var(--color-primary)] hover:underline text-sm">
-			Edit
-		</a>
-				</td>
-			</tr>
-		</RowContent>
-	</DataTable>
-
+    @if (_isLoading)
+    {
+        <div class="text-center py-12 text-[var(--text-muted)]">Loading...</div>
+    }
+    else
+    {
+        <div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm overflow-hidden">
+            <RadzenDataGrid @ref="_grid" Data="@_categories" TItem="CategoryEditModel"
+                EditMode="DataGridEditMode.Single"
+                RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow"
+                AllowSorting="true" AllowPaging="true" PageSize="10">
+                <Columns>
+                    <RadzenDataGridColumn TItem="CategoryEditModel" Property="CategoryName" Title="Category Name" Width="200px">
+                        <EditTemplate Context="cat">
+                            <RadzenTextBox @bind-Value="cat.CategoryName" Style="width:100%" Name="CatName" />
+                            <RadzenRequiredValidator Component="CatName" Text="Name is required" Popup="true" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="CategoryEditModel" Property="CategoryDescription" Title="Description">
+                        <EditTemplate Context="cat">
+                            <RadzenTextBox @bind-Value="cat.CategoryDescription" Style="width:100%" Name="CatDesc" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="CategoryEditModel" Context="cat" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Width="140px" Title="Actions">
+                        <Template Context="cat">
+                            <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
+                                Click="@(() => EditRow(cat))" @onclick:stopPropagation="true" />
+                        </Template>
+                        <EditTemplate Context="cat">
+                            <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small"
+                                Click="@(() => SaveRow(cat))" />
+                            <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
+                                Click="@(() => CancelEdit(cat))" Class="ms-1" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </div>
+    }
 </div>
-
-@code {
-	private IEnumerable<CategoryDto> _categories = [];
-	private bool _isLoading = true;
-
-	/// <summary>
-	/// Loads all categories on initialization.
-	/// </summary>
-	protected override async Task OnInitializedAsync()
-	{
-		_isLoading = true;
-		try
-		{
-			_categories = await CategoryClient.GetAllAsync();
-		}
-		finally
-		{
-			_isLoading = false;
-		}
-	}
-}

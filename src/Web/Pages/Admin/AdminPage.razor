@@ -1,0 +1,104 @@
+@* ============================================
+   Copyright (c) 2026. All rights reserved.
+   File Name :     AdminPage.razor
+   Company :       mpaulosky
+   Author :        Matthew Paulosky
+   Solution Name : IssueManager
+   Project Name :  Web
+   ============================================= *@
+@namespace Web.Pages.Admin
+@page "/admin"
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Admin")]
+@inject NavigationManager Nav
+
+<PageTitle>Admin — Pending Issues — IssueManager</PageTitle>
+
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-[var(--text-main)]">Pending Issues</h1>
+        <button @onclick="@(() => Nav.NavigateTo("/"))" class="text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors text-sm">
+            ← Back
+        </button>
+    </div>
+
+    @if (_isLoading)
+    {
+        <div class="text-center py-12 text-[var(--text-muted)]">Loading...</div>
+    }
+    else if (!_issues.Any())
+    {
+        <div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] p-8 text-center text-[var(--text-muted)]">
+            No pending issues to review.
+        </div>
+    }
+    else
+    {
+        <div class="space-y-4">
+            @foreach (var issue in _issues)
+            {
+                <div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm p-6">
+                    <div class="flex items-start gap-4">
+                        <div class="flex flex-col gap-2 shrink-0">
+                            <button id="approve-@issue.Id" @onclick="@(() => ApproveIssue(issue))"
+                                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
+                                Approve
+                            </button>
+                            <button id="reject-@issue.Id" @onclick="@(() => RejectIssue(issue))"
+                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+                                Reject
+                            </button>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            @if (_editingTitleId == issue.Id.ToString())
+                            {
+                                <div class="flex items-center gap-2 mb-2">
+                                    <input type="text" @bind="_editedTitle"
+                                        class="form-input flex-1" />
+                                    <button @onclick="@(() => SaveTitle(issue))"
+                                        class="px-3 py-1 bg-[var(--color-primary)] text-white rounded text-sm hover:opacity-90">✓</button>
+                                    <button @onclick="@(() => _editingTitleId = null)"
+                                        class="px-3 py-1 border border-[var(--border-color)] text-[var(--text-main)] rounded text-sm hover:bg-[var(--bg-hover)]">✕</button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h2 class="text-lg font-semibold text-[var(--text-main)]">@issue.Title</h2>
+                                    <button @onclick="@(() => EditTitle(issue))"
+                                        class="text-[var(--text-muted)] hover:text-[var(--color-primary)] transition-colors text-xs">✎</button>
+                                </div>
+                            }
+
+                            @if (_editingDescId == issue.Id.ToString())
+                            {
+                                <div class="flex items-start gap-2 mb-2">
+                                    <input type="text" @bind="_editedDesc"
+                                        class="form-input flex-1" />
+                                    <button @onclick="@(() => SaveDescription(issue))"
+                                        class="px-3 py-1 bg-[var(--color-primary)] text-white rounded text-sm hover:opacity-90 mt-1">✓</button>
+                                    <button @onclick="@(() => _editingDescId = null)"
+                                        class="px-3 py-1 border border-[var(--border-color)] text-[var(--text-main)] rounded text-sm hover:bg-[var(--bg-hover)] mt-1">✕</button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="flex items-center gap-2 mb-3">
+                                    <p class="text-[var(--text-muted)] text-sm">@(string.IsNullOrWhiteSpace(issue.Description) ? "(no description)" : issue.Description)</p>
+                                    <button @onclick="@(() => EditDescription(issue))"
+                                        class="text-[var(--text-muted)] hover:text-[var(--color-primary)] transition-colors text-xs shrink-0">✎</button>
+                                </div>
+                            }
+
+                            <div class="flex items-center gap-4 text-xs text-[var(--text-muted)]">
+                                <span>Author: <strong>@issue.Author.Name</strong></span>
+                                <span>Category: <strong>@issue.Category.CategoryName</strong></span>
+                                <span>@issue.DateCreated.ToString("MMM dd, yyyy")</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

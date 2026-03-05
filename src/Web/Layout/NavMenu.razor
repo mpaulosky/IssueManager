@@ -38,6 +38,9 @@ Issues
 <a href="/issues/create" class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
 New Issue
 </a>
+<a href="/profile" class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+Profile
+</a>
 </Authorized>
 </AuthorizeView>
 <AuthorizeView Roles="Admin">
@@ -47,6 +50,12 @@ Categories
 </a>
 <a href="/statuses" class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
 Statuses
+</a>
+<a href="/admin" class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+Admin
+</a>
+<a href="/sample-data" class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+Sample Data
 </a>
 </Authorized>
 </AuthorizeView>
@@ -116,6 +125,9 @@ Issues
 <a href="/issues/create" @onclick="CloseMobileMenu" class="block px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
 New Issue
 </a>
+<a href="/profile" @onclick="CloseMobileMenu" class="block px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+Profile
+</a>
 </Authorized>
 </AuthorizeView>
 <AuthorizeView Roles="Admin">
@@ -125,6 +137,12 @@ Categories
 </a>
 <a href="/statuses" @onclick="CloseMobileMenu" class="block px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
 Statuses
+</a>
+<a href="/admin" @onclick="CloseMobileMenu" class="block px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+Admin
+</a>
+<a href="/sample-data" @onclick="CloseMobileMenu" class="block px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-colors">
+Sample Data
 </a>
 </Authorized>
 </AuthorizeView>

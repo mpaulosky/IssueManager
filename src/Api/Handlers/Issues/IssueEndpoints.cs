@@ -84,6 +84,25 @@ var commandWithId = command with { Id = objectId };
 		.Produces(StatusCodes.Status404NotFound)
 		.RequireAuthorization();
 
+		// Update Issue Status (Admin only)
+		group.MapPatch("{id}/status", async (string id, UpdateIssueStatusCommand command, UpdateIssueStatusHandler handler) =>
+		{
+			if (!ObjectId.TryParse(id, out var objectId))
+				return Results.BadRequest("Invalid ID format");
+			var commandWithId = command with { IssueId = objectId };
+			var result = await handler.Handle(commandWithId);
+			if (!result.Success)
+				return result.ErrorCode == ResultErrorCode.NotFound ? Results.NotFound()
+					: Results.BadRequest(result.Error);
+			return Results.Ok(result.Value);
+		})
+		.WithName("UpdateIssueStatus")
+		.WithSummary("Update the status of an issue")
+		.Produces(StatusCodes.Status200OK)
+		.Produces(StatusCodes.Status400BadRequest)
+		.Produces(StatusCodes.Status404NotFound)
+		.RequireAuthorization("Admin");
+
 		// Delete Issue (soft-delete)
 		group.MapDelete("{id}", async (string id, DeleteIssueHandler handler) =>
 		{

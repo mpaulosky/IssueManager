@@ -353,3 +353,39 @@ For `.razor` files: `@* ... *@` comment syntax
 - Pushed to main: 2 commits (cb6f9bf tests, 91eee02 src+automation)
 
 **Key Learning:** Lightweight automation (Copilot instructions + charter rules) provides immediate value without build system complexity. No StyleCop or .editorconfig changes needed — instructions file is sufficient for consistent headers on new files.
+
+---
+
+## 2026-03-05 — IssueTrackerApp UI Modernization Feasibility Review
+
+**Task:** Reviewed `E:\github\IssueTrackerApp\src\Web\Components` vs `E:\github\IssueManager\src\Web` to assess feasibility of modernizing IssueTrackerApp's UI.
+
+### What I Found in IssueTrackerApp
+- **Tech stack:** Blazor Interactive Server, .NET 10 — same rendering model as IssueManager ✅
+- **CSS:** Bootstrap 5 + scoped `.razor.css` per component. No utility-first framework, no CSS variables, no dark mode.
+- **Component library:** Radzen.Blazor — heavy use of `RadzenDataGrid` (inline edit mode), `RadzenButton`, `RadzenTextBox`, validators. This is the largest single replacement cost.
+- **Auth:** Microsoft Identity Web (Azure AD / Entra ID). Claims use `objectidentifier`, `givenname`, `surname`.
+- **Data access:** Direct service injection (`ICategoryService`, `IIssueService`, etc.) — no HTTP clients, no Aspire service discovery.
+- **Navigation:** Left sidebar (dark background, checkbox-toggle collapse). No mobile hamburger, no theme controls.
+- **Theme system:** Absent — hardcoded colors, no dark/light toggle.
+- **Pages beyond IssueManager:** Admin (approve/reject issues), Profile, Comment detail.
+- **Session state:** Blazored.SessionStorage used for filter state persistence on Index page.
+
+### Feasibility Verdict: ✅ FEASIBLE — Pure UI Modernization
+Because both projects share the same Blazor rendering model, a UI-only modernization pass is achievable without touching the service layer or auth provider:
+- Remove Bootstrap → add Tailwind CSS + CSS custom properties
+- Replace all Radzen components → IssueManager's custom DataTable, ConfirmDialog, etc.
+- Port layouts and pages to Tailwind markup (code-behind logic preserved)
+- Add dark/light toggle + 4 color themes (ThemeToggle, ThemeColorSelector, theme.js)
+- Port navigation to top horizontal responsive nav
+
+### Scope Boundaries
+- **In scope:** CSS framework swap, component replacement, layout port, theme system
+- **Out of scope:** Auth provider migration (MS Identity → Auth0), service-to-API-client migration — both are separate architectural sprints
+
+### Key Risks
+1. RadzenDataGrid inline edit mode → must decide: keep inline or switch to separate edit pages
+2. Auth claims shape differs between MS Identity and Auth0 — if auth stays as-is, NavMenu must read the right claim types
+3. Remove Radzen package from csproj after replacement
+
+**Decision doc:** `.squad/decisions/inbox/aragorn-issuetracker-ui-review.md`

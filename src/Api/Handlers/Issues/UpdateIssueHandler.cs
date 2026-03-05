@@ -45,7 +45,9 @@ public class UpdateIssueHandler
 		var updatedIssue = getResult.Value with
 		{
 			Title = command.Title,
-			Description = command.Description ?? string.Empty
+			Description = command.Description ?? string.Empty,
+			ApprovedForRelease = command.ApprovedForRelease ?? getResult.Value.ApprovedForRelease,
+			Rejected = command.Rejected ?? getResult.Value.Rejected
 		};
 
 		return await _repository.UpdateAsync(updatedIssue, cancellationToken);
