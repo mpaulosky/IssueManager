@@ -25,6 +25,7 @@ public abstract class ComponentTestBase : IDisposable
 	protected ComponentTestBase()
 	{
 		TestContext = new BunitContext();
+		TestContext.AddAuthorization();
 
 		var categoryClient = Substitute.For<ICategoryApiClient>();
 		categoryClient.GetAllAsync(Arg.Any<CancellationToken>())
