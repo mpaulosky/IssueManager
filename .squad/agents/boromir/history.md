@@ -226,3 +226,24 @@ DevOps on IssueManager (.NET 10, GitHub Actions, Aspire, NuGet centralized packa
 - No additional infrastructure work needed
 - Commented on GitHub issue #89 with validation summary
 - Infrastructure scope is complete; application code scope (ObjectId refactoring) handled separately by Sam
+
+### 2026-03-09: Test Workflow Rewrite — Split Unit Tests by Project
+
+**Context:** squad-test.yml had test-unit bundling Api.Tests.Unit + Shared.Tests.Unit in one bash script, and stale test-aspire job referencing deleted tests/Aspire/ project.
+
+**Changes:**
+- **Split test-unit → 3 jobs:** Created separate jobs for test-api-unit (Api.Tests.Unit), test-shared-unit (Shared.Tests.Unit), test-web-unit (Web.Tests.Unit)
+- **Replace test-aspire → test-apphost-unit:** New job for AppHost.Tests.Unit using dotnet test (not xUnit executable workaround). Gracefully skips if directory missing with ::notice::.
+- **Job naming standardization:** All test job names now match test project names (e.g., "Api.Tests.Unit" not "Unit Tests")
+- **Updated dependencies:** coverage and report jobs now depend on all 7 test jobs (test-api-unit, test-shared-unit, test-web-unit, test-architecture, test-bunit, test-integration, test-apphost-unit)
+- **Artifact naming:** Each job uploads separate artifacts (api-unit-test-results, shared-unit-test-results, web-unit-test-results, apphost-unit-test-results)
+- **Header comment fix:** Updated to reflect current project names (Api.Tests.Unit, Shared.Tests.Unit, Web.Tests.Unit, not old "Unit.Tests" or "Blazor.Tests")
+- **squad-ci.yml integration:** Removed TODO placeholder, now calls squad-test.yml via workflow_call for DRY CI pipeline
+
+**Key Decisions:**
+- Web.Tests.Unit currently has 0 tests — job runs and succeeds (placeholder project)
+- AppHost.Tests.Unit uses standard dotnet test (not xUnit executable workaround) — AppHost tests don't have the TestProcessLauncherAdapter issue
+- Each unit test project gets individual job for parallelization and clearer failure reporting in CI
+
+**Commit:** cffe0b1 on main
+**Files Modified:** .github/workflows/squad-test.yml, .github/workflows/squad-ci.yml
