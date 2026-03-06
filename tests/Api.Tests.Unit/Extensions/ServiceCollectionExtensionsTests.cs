@@ -162,13 +162,13 @@ public class ServiceCollectionExtensionsTests
 	}
 
 	[Fact]
-	public void AddHandlers_RegistersAsSingleton()
+	public void AddHandlers_RegistersAsScoped()
 	{
 		var services = CreateServices();
 		services.AddHandlers();
 
 		services.Where(sd => sd.ServiceType == typeof(CreateIssueHandler))
-			.Should().AllSatisfy(sd => sd.Lifetime.Should().Be(ServiceLifetime.Singleton));
+			.Should().AllSatisfy(sd => sd.Lifetime.Should().Be(ServiceLifetime.Scoped));
 	}
 
 	[Fact]

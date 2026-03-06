@@ -22,7 +22,7 @@ public partial class StatusesPage : ComponentBase
 	[Inject] private IStatusApiClient StatusClient { get; set; } = null!;
 
 	private List<StatusEditModel> _statuses = [];
-	private readonly RadzenDataGrid<StatusEditModel>? _grid;
+	private RadzenDataGrid<StatusEditModel>? _grid;
 	private StatusEditModel? _insertingStatus;
 	private StatusEditModel? _editingStatus;
 	private bool _isLoading = true;

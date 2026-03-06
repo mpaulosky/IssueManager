@@ -28,7 +28,7 @@ public partial class CategoriesPage : ComponentBase
 
 	private List<CategoryEditModel> _categories = [];
 
-	private readonly RadzenDataGrid<CategoryEditModel>? _grid;
+	private RadzenDataGrid<CategoryEditModel>? _grid;
 
 	private CategoryEditModel? _insertingCategory;
 
