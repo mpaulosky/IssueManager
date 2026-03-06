@@ -1,19 +1,19 @@
 // ============================================
 // Copyright (c) 2026. All rights reserved.
-// File Name :     StatusApiClientTests.cs
+// File Name :     CategoryApiClientTests.cs
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
-// Project Name :  Web.Tests.Bunit
+// Project Name :  Web.Tests.Unit
 // =============================================
 
-namespace Web.Components.Features.Statuses;
+namespace Web.Components.Features.Categories;
 
 /// <summary>
-/// Unit tests for the <see cref="StatusApiClient"/> HTTP client.
+/// Unit tests for the <see cref="CategoryApiClient"/> HTTP client.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class StatusApiClientTests
+public class CategoryApiClientTests
 {
 	private static HttpClient CreateMockClient(HttpResponseMessage response, string baseUrl = "https://api.test")
 	{
@@ -29,30 +29,30 @@ public class StatusApiClientTests
 			=> Task.FromResult(_response);
 	}
 
-	private static StatusDto MakeStatus(string name = "Open") => new(
+	private static CategoryDto MakeCategory(string name = "Test Category") => new(
 		ObjectId.GenerateNewId(),
 		name,
-		$"{name} status",
+		"Test Description",
 		DateTime.UtcNow,
 		null,
 		false,
 		UserDto.Empty);
 
 	[Fact]
-	public async Task GetAllAsync_ReturnsStatuses_OnSuccess()
+	public async Task GetAllAsync_ReturnsCategories_OnSuccess()
 	{
 		// Arrange
-		var statuses = new List<StatusDto> { MakeStatus(), MakeStatus("Closed") };
-		var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(statuses) };
-		var client = new StatusApiClient(CreateMockClient(response));
+		var categories = new List<CategoryDto> { MakeCategory("Bug"), MakeCategory("Feature") };
+		var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(categories) };
+		var client = new CategoryApiClient(CreateMockClient(response));
 
 		// Act
 		var result = await client.GetAllAsync(Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
-		IEnumerable<StatusDto> statusDtos = result as StatusDto[] ?? result.ToArray();
-		statusDtos.Should().NotBeNull();
-		statusDtos.Should().HaveCount(2);
+		IEnumerable<CategoryDto> categoryDtos = result as CategoryDto[] ?? result.ToArray();
+		categoryDtos.Should().NotBeNull();
+		categoryDtos.Should().HaveCount(2);
 	}
 
 	[Fact]
@@ -60,32 +60,32 @@ public class StatusApiClientTests
 	{
 		// Arrange
 		var response = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
-		var client = new StatusApiClient(CreateMockClient(response));
+		var client = new CategoryApiClient(CreateMockClient(response));
 
 		// Act
 		var result = await client.GetAllAsync(Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
-		IEnumerable<StatusDto> statusDtos = result as StatusDto[] ?? result.ToArray();
-		statusDtos.Should().NotBeNull();
-		statusDtos.Should().BeEmpty();
+		IEnumerable<CategoryDto> categoryDtos = result as CategoryDto[] ?? result.ToArray();
+		categoryDtos.Should().NotBeNull();
+		categoryDtos.Should().BeEmpty();
 	}
 
 	[Fact]
-	public async Task CreateAsync_ReturnsStatusDto_OnCreated()
+	public async Task CreateAsync_ReturnsCategoryDto_OnCreated()
 	{
 		// Arrange
-		var expected = MakeStatus("In Progress");
+		var expected = MakeCategory("New Category");
 		var response = new HttpResponseMessage(HttpStatusCode.Created) { Content = JsonContent.Create(expected) };
-		var client = new StatusApiClient(CreateMockClient(response));
-		var command = new CreateStatusCommand { StatusName = "In Progress" };
+		var client = new CategoryApiClient(CreateMockClient(response));
+		var command = new CreateCategoryCommand { CategoryName = "New Category" };
 
 		// Act
 		var result = await client.CreateAsync(command, Xunit.TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Should().NotBeNull();
-		result.StatusName.Should().Be("In Progress");
+		result.CategoryName.Should().Be("New Category");
 	}
 
 	[Fact]
@@ -93,8 +93,8 @@ public class StatusApiClientTests
 	{
 		// Arrange
 		var response = new HttpResponseMessage(HttpStatusCode.BadRequest);
-		var client = new StatusApiClient(CreateMockClient(response));
-		var command = new CreateStatusCommand { StatusName = "x" };
+		var client = new CategoryApiClient(CreateMockClient(response));
+		var command = new CreateCategoryCommand { CategoryName = "x" };
 
 		// Act
 		var result = await client.CreateAsync(command, Xunit.TestContext.Current.CancellationToken);

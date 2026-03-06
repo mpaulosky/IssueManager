@@ -4,7 +4,7 @@
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
-// Project Name :  Web.Tests.Bunit
+// Project Name :  Web.Tests.Unit
 // =============================================
 
 namespace Web.Components.Features.Comments;
