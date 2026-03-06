@@ -41,6 +41,7 @@ validate_copyright_headers() {
       *"tests/Web.Tests.Unit/"*)     echo "Web.Tests.Unit" ;;
       *"tests/Api.Tests.Integration/"*)  echo "Api.Tests.Integration" ;;
       *"tests/Web.Tests.Bunit/"*)    echo "Web.Tests.Bunit" ;;
+      *"tests/AppHost.Tests.Unit/"*) echo "AppHost.Tests.Unit" ;;
       *"tests/Architecture.Tests/"*) echo "Architecture.Tests" ;;
       *)                          echo "Unknown" ;;
     esac

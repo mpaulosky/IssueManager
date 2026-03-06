@@ -4,7 +4,7 @@
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
-// Project Name :  Aspire.Tests
+// Project Name :  AppHost.Tests.Unit
 // =======================================================
 
 namespace AppHost;

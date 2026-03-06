@@ -7,15 +7,6 @@
 // Project Name :  AppHost.Tests.Unit
 // =======================================================
 
-// =======================================================
-// Copyright (c) 2026. All rights reserved.
-// File Name :     DatabaseServiceTests.cs
-// Company :       mpaulosky
-// Author :        Matthew Paulosky
-// Solution Name : IssueManager
-// Project Name :  AppHost.Tests.Unit
-// =======================================================
-
 namespace AppHost;
 
 /// <summary>
