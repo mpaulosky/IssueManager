@@ -8,7 +8,7 @@
 #     - Runs `dotnet format --verify-no-changes` to ensure code is properly formatted
 #
 #   Gate 3: Test Suite Execution
-#     - Runs Unit.Tests, Blazor.Tests, and Architecture.Tests
+#     - Runs Api.Tests.Unit, Shared.Tests.Unit, Web.Tests.Bunit, and Architecture.Tests
 #     - Integration.Tests excluded (require Docker/TestContainers)
 #
 # Blocks the push if ANY gate fails so broken/non-compliant code never reaches GitHub.
@@ -31,15 +31,17 @@ validate_copyright_headers() {
   get_expected_project() {
     local filepath="$1"
     case "$filepath" in
-      *"/src/Api/"*)              echo "Api" ;;
-      *"/src/Web/"*)              echo "Web" ;;
-      *"/src/Shared/"*)           echo "Shared" ;;
-      *"/src/AppHost/"*)          echo "AppHost" ;;
-      *"/src/ServiceDefaults/"*)  echo "ServiceDefaults" ;;
-      *"/tests/Unit.Tests/"*)     echo "Unit Tests" ;;
-      *"/tests/Integration.Tests/"*) echo "Integration.Tests" ;;
-      *"/tests/Blazor.Tests/"*)   echo "Blazor.Tests" ;;
-      *"/tests/Architecture.Tests/"*) echo "Architecture.Tests" ;;
+      *"src/Api/"*)              echo "Api" ;;
+      *"src/Web/"*)              echo "Web" ;;
+      *"src/Shared/"*)           echo "Shared" ;;
+      *"src/AppHost/"*)          echo "AppHost" ;;
+      *"src/ServiceDefaults/"*)  echo "ServiceDefaults" ;;
+      *"tests/Api.Tests.Unit/"*)     echo "Api.Tests.Unit" ;;
+      *"tests/Shared.Tests.Unit/"*)  echo "Shared.Tests.Unit" ;;
+      *"tests/Web.Tests.Unit/"*)     echo "Web.Tests.Unit" ;;
+      *"tests/Integration.Tests/"*)  echo "Integration.Tests" ;;
+      *"tests/Web.Tests.Bunit/"*)    echo "Web.Tests.Bunit" ;;
+      *"tests/Architecture.Tests/"*) echo "Architecture.Tests" ;;
       *)                          echo "Unknown" ;;
     esac
   }
@@ -73,14 +75,9 @@ validate_copyright_headers() {
     fi
 
     if [ "$header_project" != "$expected_project" ]; then
-      # Accept "Unit.Tests" as a valid alternative to "Unit Tests" for tests/Unit.Tests/ files
-      if [ "$expected_project" = "Unit Tests" ] && [ "$header_project" = "Unit.Tests" ]; then
-        :  # both values are acceptable during transition
-      else
         failures+=("$filepath: Project Name mismatch (expected: '$expected_project', found: '$header_project')")
         failed=$((failed + 1))
         continue
-      fi
     fi
 
   done < <(find src tests -name "*.cs" -type f 2>/dev/null)
@@ -126,8 +123,9 @@ run_tests() {
 
 validate_copyright_headers
 validate_formatting
-run_tests "tests/Unit.Tests"
-run_tests "tests/Blazor.Tests"
+run_tests "tests/Api.Tests.Unit"
+run_tests "tests/Shared.Tests.Unit"
+run_tests "tests/Web.Tests.Bunit"
 run_tests "tests/Architecture.Tests"
 
 if [ "$FAILED" -ne 0 ]; then

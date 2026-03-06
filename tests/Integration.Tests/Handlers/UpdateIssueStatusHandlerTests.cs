@@ -58,8 +58,8 @@ public class UpdateIssueStatusHandlerTests : IAsyncLifetime
 		{
 			var command = new UpdateIssueStatusCommand
 			{
-					IssueId = created.Value.Id,
-					Status = newStatus
+				IssueId = created.Value.Id,
+				Status = newStatus
 			};
 
 			// Act

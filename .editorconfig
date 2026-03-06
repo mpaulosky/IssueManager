@@ -399,3 +399,21 @@ dotnet_naming_style.s_camelcase.required_prefix = s_
 dotnet_naming_style.s_camelcase.required_suffix =
 dotnet_naming_style.s_camelcase.word_separator =
 dotnet_naming_style.s_camelcase.capitalization = camel_case
+
+#############################
+# Test project overrides
+#############################
+[tests/**/*.cs]
+# xUnit v3 analyzer rules — suppressed for test files:
+# xUnit1030: ConfigureAwait(false) is not recommended in test methods
+# xUnit1051: Use TestContext.Current.CancellationToken — informational/style choice
+dotnet_diagnostic.xUnit1030.severity = none
+dotnet_diagnostic.xUnit1051.severity = none
+
+#############################
+# Blazor code-behind overrides
+#############################
+[src/**/*.razor.cs]
+# IDE0044: Blazor @ref fields are assigned at render time, outside the constructor.
+# Roslyn cannot see this assignment, so 'make field readonly' is a false positive.
+dotnet_diagnostic.IDE0044.severity = none

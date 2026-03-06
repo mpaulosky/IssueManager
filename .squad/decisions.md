@@ -1767,3 +1767,16 @@ When starting a new project: run the installation script → team files are copi
 **Why:** CI test failures were found on team commits. This wastes CI minutes and blocks the main branch. Local validation is mandatory.
 
 ---
+
+---
+### 2026-03-06T19:48:59Z: Web project restructured for Vertical Slice Architecture
+**By:** Matthew Paulosky (via Copilot)
+**What:** Folder locations in the `src/Web` project were manually reorganized to implement Vertical Slice Architecture (VSA). Each feature now lives in its own slice folder rather than the previous layer-based structure.
+**Why:** User request — captured for team memory. All agents working on the Web project must follow VSA conventions: features are self-contained slices, not split across horizontal layers.
+
+---
+### 2026-03-06T19:48:59Z: Test project renamed from Blazor.Tests to Web.Tests.Bunit
+**By:** Matthew Paulosky (via Copilot)
+**What:** The Blazor component test project was renamed from `Blazor.Tests` to `Web.Tests.Bunit` to better reflect that it tests the Web project specifically using bUnit.
+**Why:** User request — captured for team memory. All agents should reference the test project as `Web.Tests.Bunit` (path: `tests/Web.Tests.Bunit/`). The old name `Blazor.Tests` is retired.
+

@@ -466,3 +466,10 @@ Get-ChildItem -Path tests -Recurse -Include "*.cs","*.razor" |
 **Build verification:** Clean build passed with 74 warnings (existing xUnit1030/xUnit1051 warnings, not related to header changes).
 
 **Pre-push hook:** Unit tests passed successfully before push.
+
+
+### Web Project Architecture & Testing (2026-03-06)
+- Web project now uses Vertical Slice Architecture — features are self-contained slices with their own routes, pages, components, and services
+- Old horizontal-layer structure (Handlers/, Pages/, Services/) replaced with feature-based folder organization
+- Test project renamed: Blazor.Tests → Web.Tests.Bunit (path: 	ests/Web.Tests.Bunit/)
+- All test references should use the new project name

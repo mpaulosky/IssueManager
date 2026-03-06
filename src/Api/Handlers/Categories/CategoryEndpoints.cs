@@ -31,9 +31,9 @@ public static class CategoryEndpoints
 
 		group.MapGet("{id}", async (string id, GetCategoryHandler handler) =>
 		{
-if (!ObjectId.TryParse(id, out var objectId))
-return Results.BadRequest("Invalid ID format");
-var query = new GetCategoryQuery(objectId);
+			if (!ObjectId.TryParse(id, out var objectId))
+				return Results.BadRequest("Invalid ID format");
+			var query = new GetCategoryQuery(objectId);
 			var result = await handler.Handle(query);
 			return result.Success ? Results.Ok(result.Value) : Results.NotFound();
 		})
@@ -55,9 +55,9 @@ var query = new GetCategoryQuery(objectId);
 
 		group.MapPatch("{id}", async (string id, UpdateCategoryCommand command, UpdateCategoryHandler handler) =>
 		{
-if (!ObjectId.TryParse(id, out var objectId))
-return Results.BadRequest("Invalid ID format");
-var commandWithId = command with { Id = objectId };
+			if (!ObjectId.TryParse(id, out var objectId))
+				return Results.BadRequest("Invalid ID format");
+			var commandWithId = command with { Id = objectId };
 			var result = await handler.Handle(commandWithId);
 			if (!result.Success)
 				return result.ErrorCode == ResultErrorCode.NotFound ? Results.NotFound() : Results.BadRequest(result.Error);

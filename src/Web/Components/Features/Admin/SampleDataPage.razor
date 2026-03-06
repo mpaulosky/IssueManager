@@ -1,0 +1,63 @@
+@page "/sample-data"
+
+@attribute [Authorize(Roles = "Admin")]
+@inject NavigationManager Nav
+
+<PageTitle>Sample Data — IssueManager</PageTitle>
+
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+	<div class="flex items-center justify-between mb-6">
+		<h1 class="text-2xl font-bold text-[var(--text-main)]">Sample Data</h1>
+		<button @onclick="@(() => Nav.NavigateTo("/"))"
+		        class="text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors text-sm">
+			← Back
+		</button>
+	</div>
+
+	<div class="space-y-4">
+		<!-- Categories -->
+		<div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm p-6">
+			<h2 class="text-lg font-semibold text-[var(--text-main)] mb-2">Categories</h2>
+			@if (_categoriesCreated)
+			{
+				<p class="text-green-600 dark:text-green-400 font-medium">✓ Categories have been created</p>
+			}
+			else
+			{
+				<p class="text-sm text-[var(--text-muted)] mb-3">Seeds Design, Documentation, Implementation, Clarification, and
+					Miscellaneous categories.</p>
+				<button
+					class="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium disabled:opacity-60"
+					@onclick="CreateCategories" disabled="@_isWorking">
+					Create Categories
+				</button>
+			}
+		</div>
+
+		<!-- Statuses -->
+		<div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm p-6">
+			<h2 class="text-lg font-semibold text-[var(--text-main)] mb-2">Statuses</h2>
+			@if (_statusesCreated)
+			{
+				<p class="text-green-600 dark:text-green-400 font-medium">✓ Statuses have been created</p>
+			}
+			else
+			{
+				<p class="text-sm text-[var(--text-muted)] mb-3">Seeds Answered, Watching, Upcoming, and Dismissed statuses.</p>
+				<button
+					class="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium disabled:opacity-60"
+					@onclick="CreateStatuses" disabled="@_isWorking">
+					Create Statuses
+				</button>
+			}
+		</div>
+
+		@if (!string.IsNullOrEmpty(_errorMessage))
+		{
+			<div
+				class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-xl p-4 text-red-700 dark:text-red-300 text-sm">
+				@_errorMessage
+			</div>
+		}
+	</div>
+</div>

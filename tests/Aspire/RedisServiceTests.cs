@@ -9,6 +9,7 @@
 
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
+
 using FluentAssertions;
 
 namespace Aspire.Tests;
@@ -24,37 +25,37 @@ namespace Aspire.Tests;
 /// </remarks>
 public class RedisServiceTests
 {
-/// <summary>
-/// Verifies that AddRedisServices can be invoked and returns a resource builder.
-/// </summary>
-[Fact]
-public void AddRedisServices_CanBeInvoked()
-{
-// Arrange
-var builder = DistributedApplication.CreateBuilder();
+	/// <summary>
+	/// Verifies that AddRedisServices can be invoked and returns a resource builder.
+	/// </summary>
+	[Fact]
+	public void AddRedisServices_CanBeInvoked()
+	{
+		// Arrange
+		var builder = DistributedApplication.CreateBuilder();
 
-// Act
-var result = AppHost.RedisServices.AddRedisServices(builder);
+		// Act
+		var result = AppHost.RedisServices.AddRedisServices(builder);
 
-// Assert
-result.Should().NotBeNull("method should return a resource builder");
-result.Should().BeAssignableTo<IResourceBuilder<RedisResource>>(
-"should return Redis resource builder");
-}
+		// Assert
+		result.Should().NotBeNull("method should return a resource builder");
+		result.Should().BeAssignableTo<IResourceBuilder<RedisResource>>(
+		"should return Redis resource builder");
+	}
 
-/// <summary>
-/// Verifies that AddRedisServices registers a Redis resource with the expected name.
-/// </summary>
-[Fact]
-public void AddRedisServices_RegistersResourceWithCorrectName()
-{
-// Arrange
-var builder = DistributedApplication.CreateBuilder();
+	/// <summary>
+	/// Verifies that AddRedisServices registers a Redis resource with the expected name.
+	/// </summary>
+	[Fact]
+	public void AddRedisServices_RegistersResourceWithCorrectName()
+	{
+		// Arrange
+		var builder = DistributedApplication.CreateBuilder();
 
-// Act
-var result = AppHost.RedisServices.AddRedisServices(builder);
+		// Act
+		var result = AppHost.RedisServices.AddRedisServices(builder);
 
-// Assert
-result.Resource.Name.Should().Be("RedisCache", "should register Redis with the correct name from constants");
-}
+		// Assert
+		result.Resource.Name.Should().Be("RedisCache", "should register Redis with the correct name from constants");
+	}
 }

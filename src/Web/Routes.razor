@@ -1,38 +1,31 @@
-@namespace Web
+@* Add global render mode *@
+@rendermode InteractiveServer
 
-@* ============================================
-   Copyright (c) 2026. All rights reserved.
-   File Name :     Routes.razor
-   Company :       mpaulosky
-   Author :        Matthew Paulosky
-   Solution Name : IssueManager
-   Project Name :  Web
-   ============================================= *@
-
-<Router AppAssembly="typeof(App).Assembly">
-	<Found Context="routeData">
-		<AuthorizeRouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)">
-			<NotAuthorized>
-				<AuthorizeView>
-					<Authorized Context="authCtx">
-						@* User is authenticated but lacks the required role → show Not Authorized page *@
-						<LayoutView Layout="typeof(MainLayout)">
-							<NotAuthorizedPage />
-						</LayoutView>
-					</Authorized>
-					<NotAuthorized Context="anonCtx">
-						@* User is not authenticated at all → redirect to login *@
-						<RedirectToLoginPage />
-					</NotAuthorized>
-				</AuthorizeView>
-			</NotAuthorized>
-		</AuthorizeRouteView>
-	</Found>
-	<NotFound>
-		<PageTitle>Not found</PageTitle>
-		<LayoutView Layout="typeof(MainLayout)">
-			<p role="alert">Sorry, there's nothing at this address.</p>
-		</LayoutView>
-	</NotFound>
-</Router>
-
+<CascadingAuthenticationState>
+	<Router AppAssembly="typeof(App).Assembly">
+		<Found Context="routeData">
+			<AuthorizeRouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)">
+				<NotAuthorized>
+					<AuthorizeView>
+						<Authorized Context="authCtx">
+							@* User is authenticated but lacks the required role → show Not Authorized page *@
+							<LayoutView Layout="typeof(MainLayout)">
+								<NotAuthorizedPage/>
+							</LayoutView>
+						</Authorized>
+						<NotAuthorized Context="anonCtx">
+							@* User is not authenticated at all → redirect to login *@
+							<RedirectToLoginPage/>
+						</NotAuthorized>
+					</AuthorizeView>
+				</NotAuthorized>
+			</AuthorizeRouteView>
+		</Found>
+		<NotFound>
+			<PageTitle>Not found</PageTitle>
+			<LayoutView Layout="typeof(MainLayout)">
+				<p role="alert">Sorry, there's nothing at this address.</p>
+			</LayoutView>
+		</NotFound>
+	</Router>
+</CascadingAuthenticationState>

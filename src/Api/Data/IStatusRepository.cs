@@ -1,4 +1,4 @@
-﻿// ============================================
+// ============================================
 // Copyright (c) 2023. All rights reserved.
 // File Name :     IStatusRepository.cs
 // Company :       mpaulosky

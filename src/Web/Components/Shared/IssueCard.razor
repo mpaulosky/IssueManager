@@ -1,33 +1,27 @@
-@* ============================================
-   Copyright (c) 2026. All rights reserved.
-   File Name :     IssueCard.razor
-   Company :       mpaulosky
-   Author :        Matthew Paulosky
-   Solution Name : IssueManager
-   Project Name :  Web
-   ============================================= *@
-@namespace Web.Components.Shared
 @inject NavigationManager Nav
 
-<div class="bg-[var(--bg-surface)] rounded-xl border border-[var(--border-color)] p-4 hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
-     @onclick="@(() => Nav.NavigateTo($"/issues/{Item.Id}"))">
-    <div class="flex items-start justify-between gap-4">
-        <div class="flex-1 min-w-0">
-            <h3 class="font-semibold text-[var(--text-main)] truncate">@Item.Title</h3>
-            @if (!string.IsNullOrWhiteSpace(Item.Description))
-            {
-                <p class="text-sm text-[var(--text-muted)] mt-1 line-clamp-2">@Item.Description</p>
-            }
-            <div class="flex items-center gap-3 mt-2 text-xs text-[var(--text-muted)]">
-                <span>@Item.Category.CategoryName</span>
-                <span>•</span>
-                <span>@Item.DateCreated.ToString("MMM dd, yyyy")</span>
-            </div>
-        </div>
-        <StatusBadge Status="@Item.Status" />
-    </div>
+<div
+	class="bg-[var(--bg-surface)] rounded-xl border border-[var(--border-color)] p-4 hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
+	@onclick="@(() => Nav.NavigateTo($"/issues/{Item.Id}"))">
+	<div class="flex items-start justify-between gap-4">
+		<div class="flex-1 min-w-0">
+			<h3 class="font-semibold text-[var(--text-main)] truncate">@Item.Title</h3>
+			@if (!string.IsNullOrWhiteSpace(Item.Description))
+			{
+				<p class="text-sm text-[var(--text-muted)] mt-1 line-clamp-2">@Item.Description</p>
+			}
+			<div class="flex items-center gap-3 mt-2 text-xs text-[var(--text-muted)]">
+				<span>@Item.Category.CategoryName</span>
+				<span>•</span>
+				<span>@Item.DateCreated.ToString("MMM dd, yyyy")</span>
+			</div>
+		</div>
+		<StatusBadge Status="@Item.Status"/>
+	</div>
 </div>
 
 @code {
-    [Parameter] public IssueDto Item { get; set; } = default!;
+
+	[Parameter] public IssueDto Item { get; set; } = IssueDto.Empty;
+
 }

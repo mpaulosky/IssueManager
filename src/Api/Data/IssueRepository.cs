@@ -43,7 +43,7 @@ public class IssueRepository : IIssueRepository
 	}
 
 	/// <inheritdoc />
-	public async Task<Result<IssueDto>> GetByIdAsync( ObjectId issueId, CancellationToken cancellationToken = default)
+	public async Task<Result<IssueDto>> GetByIdAsync(ObjectId issueId, CancellationToken cancellationToken = default)
 	{
 		if (!ObjectId.TryParse(issueId.ToString(), out var id))
 			return Result.Fail<IssueDto>("Invalid issue ID format.");

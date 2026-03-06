@@ -1,13 +1,3 @@
-@* ============================================
-   Copyright (c) 2026. All rights reserved.
-   File Name :     DataTable.razor
-   Company :       mpaulosky
-   Author :        Matthew Paulosky
-   Solution Name : IssueManager
-   Project Name :  Web
-   ============================================= *@
-
-@namespace Web.Components.Shared
 @typeparam TItem
 
 @if (IsLoading)
@@ -65,7 +55,7 @@ else
 	public bool IsLoading { get; set; }
 
 	/// <summary>
-	/// Custom message to display when <see cref="Items"/> is empty. Defaults to "No items found.".
+	/// Custom message to display when <see cref="Items"/> is empty. Defaults to "No items found."
 	/// </summary>
 	[Parameter]
 	public string? EmptyMessage { get; set; }

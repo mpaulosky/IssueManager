@@ -1,0 +1,117 @@
+@page "/issues/{Id}/edit"
+
+@attribute [Authorize]
+@inject IIssueApiClient IssueClient
+@inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Edit Issue — IssueManager</PageTitle>
+
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+	@if (_isLoadingIssue)
+	{
+		<LoadingSpinner />
+	}
+	else if (_issue == null)
+	{
+		<div class="text-center py-12 text-[var(--text-muted)]">
+			<p class="text-lg mb-4">Issue not found.</p>
+			<a href="/issues" class="text-[var(--color-primary)] hover:underline">Back to Issues</a>
+		</div>
+	}
+	else
+	{
+		<div class="mb-6">
+			<h1 class="text-2xl font-bold text-[var(--text-main)] mb-2">Edit Issue</h1>
+			<p class="text-[var(--text-muted)] text-sm">Update the issue details below.</p>
+		</div>
+
+		<IssueForm
+			OnSubmit="HandleSubmit"
+			OnCancel="HandleCancel"
+			InitialValues="_initialValues"
+			IsEditMode="true"
+			IsSubmitting="_isSubmitting" />
+	}
+</div>
+
+@code {
+	/// <summary>
+	/// The ID of the issue to edit.
+	/// </summary>
+	[Parameter]
+	public string Id { get; set; } = "";
+
+	private IssueDto? _issue;
+	private CreateIssueRequest? _initialValues;
+	private bool _isLoadingIssue = true;
+	private bool _isSubmitting = false;
+
+	/// <summary>
+	/// Loads the existing issue and populates the form.
+	/// </summary>
+	protected override async Task OnInitializedAsync()
+	{
+		_isLoadingIssue = true;
+		try
+		{
+			var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+			var user = authState.User;
+
+			_issue = await IssueClient.GetByIdAsync(Id);
+			if (_issue != null)
+			{
+				_initialValues = new CreateIssueRequest
+				{
+					Title = _issue.Title,
+					Description = _issue.Description,
+					CategoryId = _issue.Category.Id.ToString(),
+					StatusId = _issue.Status.Id.ToString()
+				};
+
+				// Enforce: only Admin or the issue author can edit
+				var isAdmin = user.IsInRole("Admin");
+				var isAuthor = user.Identity?.Name == _issue.Author.Name;
+				if (!isAdmin && !isAuthor)
+				{
+					Nav.NavigateTo("/not-authorized", forceLoad: false);
+					return;
+				}
+			}
+		}
+		finally
+		{
+			_isLoadingIssue = false;
+		}
+	}
+
+	/// <summary>
+	/// Handles the form submission by updating the issue and navigating to the issue detail page.
+	/// </summary>
+	private async Task HandleSubmit(CreateIssueRequest request)
+	{
+		_isSubmitting = true;
+		try
+		{
+			var command = new UpdateIssueCommand
+			{
+				Id = ObjectId.Parse(Id),
+				Description = request.Description
+			};
+			await IssueClient.UpdateAsync(Id, command);
+			Nav.NavigateTo($"/issues/{Id}");
+		}
+		finally
+		{
+			_isSubmitting = false;
+		}
+	}
+
+	/// <summary>
+	/// Handles the cancel action by navigating to the issue detail page.
+	/// </summary>
+	private void HandleCancel()
+	{
+		Nav.NavigateTo($"/issues/{Id}");
+	}
+}

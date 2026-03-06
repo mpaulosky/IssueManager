@@ -1,4 +1,4 @@
-﻿// ============================================
+// ============================================
 // Copyright (c) 2023. All rights reserved.
 // File Name :     ICommentRepository.cs
 // Company :       mpaulosky
@@ -67,7 +67,7 @@ public interface ICommentRepository
 	/// <summary>
 	/// Updates an existing comment in the database.
 	/// </summary>
-	Task<Result<CommentDto>> UpdateAsync(  CommentDto comment, CancellationToken cancellationToken = default);
+	Task<Result<CommentDto>> UpdateAsync(CommentDto comment, CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Registers an upvote for a comment by a specific user.

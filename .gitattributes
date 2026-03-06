@@ -3,3 +3,19 @@
 .squad/agents/*/history.md merge=union
 .squad/log/** merge=union
 .squad/orchestration-log/** merge=union
+
+# Normalize line endings: store as LF in git; editors/tools see LF on all platforms
+# (matches .editorconfig end_of_line = lf)
+* text=auto
+*.cs text eol=lf
+*.razor text eol=lf
+*.razor.cs text eol=lf
+*.razor.css text eol=lf
+*.csproj text eol=lf
+*.props text eol=lf
+*.targets text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.sh text eol=lf

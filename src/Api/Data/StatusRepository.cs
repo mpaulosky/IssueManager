@@ -49,7 +49,7 @@ public class StatusRepository : IStatusRepository
 	}
 
 	/// <inheritdoc />
-	public async Task<Result<StatusDto>> GetByIdAsync( ObjectId statusId, CancellationToken cancellationToken = default)
+	public async Task<Result<StatusDto>> GetByIdAsync(ObjectId statusId, CancellationToken cancellationToken = default)
 	{
 		if (!ObjectId.TryParse(statusId.ToString(), out var id))
 			return Result.Fail<StatusDto>("Invalid status ID format.");

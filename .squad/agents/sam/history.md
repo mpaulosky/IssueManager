@@ -103,3 +103,10 @@ Backend Developer on IssueManager (.NET 10, MongoDB, EF Core, CQRS, MediatR, Min
 - **Program.cs startup:** After `var app = builder.Build()`, create scope, resolve `DatabaseSeeder`, call `SeedAsync()`. Runs BEFORE middleware pipeline setup
 - **Result<T> API:** Properties are `Success` (not IsSuccess), `Failure`, `Error` (not ErrorMessage), `Value`. Check `result.Success` before accessing `result.Value`. Log `result.Error` on failure
 - **Program.cs partial class:** Added `public partial class Program { }` at end of file for WebApplicationFactory test access (standard backend pattern)
+
+
+### Web Project Architecture & Testing (2026-03-06)
+- Web project now uses Vertical Slice Architecture — features are self-contained slices with their own routes, pages, components, and services
+- Old horizontal-layer structure (Handlers/, Pages/, Services/) replaced with feature-based folder organization
+- Test project renamed: Blazor.Tests → Web.Tests.Bunit (path: 	ests/Web.Tests.Bunit/)
+- All test references should use the new project name
