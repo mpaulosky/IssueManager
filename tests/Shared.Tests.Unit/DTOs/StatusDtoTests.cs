@@ -6,11 +6,6 @@
 // Solution Name : IssueManager
 // Project Name :  Shared.Tests.Unit
 // =============================================
-// File Name :     StatusDtoTests.cs
-// Company :       mpaulosky
-// Author :        Matthew Paulosky
-// Solution Name : IssueManager
-// Project Name :  Shared.Tests.Unit
 
 namespace Shared.DTOs;
 
