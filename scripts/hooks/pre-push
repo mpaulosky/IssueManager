@@ -8,8 +8,8 @@
 #     - Runs `dotnet format --verify-no-changes` to ensure code is properly formatted
 #
 #   Gate 3: Test Suite Execution
-#     - Runs Api.Tests.Unit, Shared.Tests.Unit, Web.Tests.Bunit, and Architecture.Tests
-#     - Integration.Tests excluded (require Docker/TestContainers)
+#     - Runs Api.Tests.Unit, Shared.Tests.Unit, Web.Tests.Unit, Web.Tests.Bunit, and Architecture.Tests
+#     - Integration tests excluded (require Docker/TestContainers)
 #
 # Blocks the push if ANY gate fails so broken/non-compliant code never reaches GitHub.
 #
@@ -80,7 +80,7 @@ validate_copyright_headers() {
         continue
     fi
 
-  done < <(find src tests -name "*.cs" -type f 2>/dev/null)
+  done < <(git diff --name-only HEAD @{push} 2>/dev/null | grep '\.cs$' | grep -v '^$' || git diff --name-only HEAD 2>/dev/null | grep '\.cs$')
 
   if [ $failed -gt 0 ]; then
     echo "❌ Copyright header validation FAILED ($failed of $checked files):"
