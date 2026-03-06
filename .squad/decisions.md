@@ -1869,3 +1869,10 @@ esac
 **What:** When `tests/Unit.Tests` was split into `Api.Tests.Unit`, `Shared.Tests.Unit`, and `Web.Tests.Unit`, all three new `.csproj` files were given `<RootNamespace>Unit</RootNamespace>`. This preserves the existing `Tests.Unit.*` file-level namespace declarations without renaming any test files.
 **Why:** Renaming the namespace in 60+ test files would create a noisy diff with no functional benefit. Keeping `RootNamespace = Unit` is the standard IssueManager approach for split test assemblies that share a logical namespace.
 
+---
+
+### 2026-03-07: PR #96 merged — Integration.Tests renamed to Api.Tests.Integration
+**By:** Gimli (Tester)
+**What:** Resolved merge conflicts (IssueManager.sln, squad-test.yml, pre-push hook) then squash-merged PR #96.
+**Decision:** When a PR branch diverges from main after a squash-merge, use `git merge origin/main` (not rebase) to preserve `.gitattributes merge=union` behavior for `.squad/` files.
+
