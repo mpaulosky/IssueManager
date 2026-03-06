@@ -1096,7 +1096,7 @@ Enhanced the pre-push hook with a **three-gate strategy**, ordered from fastest 
     - `src/Api/` → "Api"
     - `src/Web/` → "Web"
     - `tests/Unit.Tests/` → "Unit Tests"
-    - `tests/Integration.Tests/` → "Integration.Tests"
+    - `tests/Integration.Tests/` → "Api.Tests.Integration"
   - Skips files without full header (simple one-liner copyright format)
   - Reports: number of files checked + any failures with file path and specific field that failed
 - **Rationale:**
@@ -1476,7 +1476,7 @@ For `.razor` files, use @* comment syntax:
 Test folder path → Project Name:
 - 	ests/Blazor.Tests/ → Blazor.Tests
 - 	ests/Unit.Tests/ → Unit.Tests
-- 	ests/Integration.Tests/ → Integration.Tests
+- 	ests/Integration.Tests/ → Api.Tests.Integration
 - 	ests/Aspire/ → Aspire.Tests
 - 	ests/Architecture.Tests/ → Architecture.Tests
 
@@ -1607,7 +1607,7 @@ Matthew Paulosky requested standardization of copyright headers across the Issue
 - src/AppHost/ → AppHost
 - src/ServiceDefaults/ → ServiceDefaults
 - 	ests/Unit.Tests/ → Unit.Tests
-- 	ests/Integration.Tests/ → Integration.Tests
+- 	ests/Integration.Tests/ → Api.Tests.Integration
 - 	ests/Blazor.Tests/ → Blazor.Tests
 - 	ests/Aspire/ → Aspire
 

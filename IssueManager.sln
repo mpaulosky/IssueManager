@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Architecture.Tests", "tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Tests.Bunit", "tests\Web.Tests.Bunit\Web.Tests.Bunit.csproj", "{7B8D5A2C-1C1B-4E5F-8F5A-1B1B1B1B1B1B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Integration.Tests", "tests\Integration.Tests\Integration.Tests.csproj", "{7B8D5A2D-1C1B-4E5F-8F5A-1B1B1B1B1B1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api.Tests.Integration", "tests\Api.Tests.Integration\Api.Tests.Integration.csproj", "{7B8D5A2D-1C1B-4E5F-8F5A-1B1B1B1B1B1B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
