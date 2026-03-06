@@ -1829,3 +1829,43 @@ When starting a new project: run the installation script → team files are copi
 
 **All 4 pre-push gates pass:** Copyright headers ✅ · dotnet format ✅ · Api.Tests.Unit + Shared.Tests.Unit ✅ · Web.Tests.Bunit + Architecture.Tests ✅
 
+### 2026-03-06: Merged-PR Branch Guard — Process Rule
+**By:** Matthew (via Copilot)
+**What:** Before any git commit to a squad/* branch, check if that branch's PR is already merged (`gh pr list --head {branch} --state merged`). If merged, switch to `main` and sync (`git checkout main && git pull origin main`) before committing.
+**Why:** Prevents stranded Scribe commits on re-created/orphaned branches after a PR is merged. User directive — captured for team memory.
+**Applies to:** Scribe (Step 6 of responsibilities), and any agent that does its own git commit at end of issue work.
+
+### 2026-03-07: Blazor @ref Fields Must Not Be readonly — IDE0044 Suppressed
+**By:** Gimli (Tester) via Copilot
+**What:** Roslyn analyzer `IDE0044` ("Make field readonly") was suppressed in `.editorconfig` for `src/**/*.razor.cs` files. Blazor `@ref` fields (e.g., `private DataGrid _grid;`) cannot be `readonly` because Razor sets them at render time. The `readonly` keyword causes a compile error.
+**Rule added to .editorconfig:**
+```
+[src/**/*.razor.cs]
+dotnet_diagnostic.IDE0044.severity = none
+```
+**Why:** IDE0044 correctly flags these fields as "could be readonly" based on C# static analysis, but Blazor's component model requires them to remain mutable. Suppressing at the glob pattern level avoids per-field `[SuppressMessage]` attributes across every code-behind file.
+
+### 2026-03-07: pre-push Hook Path Patterns Must NOT Include a Leading Slash
+**By:** Boromir (DevOps) via Copilot
+**What:** In `scripts/hooks/pre-push`, the `case` statement path patterns for project detection must NOT begin with `/`. The `find src tests` command returns relative paths (e.g., `src/Web/Components/Foo.cs`), not absolute paths. Patterns like `*"/src/Web/"*` will never match because there is no leading `/`.
+**Correct pattern:**
+```bash
+case "$file" in
+  *"src/Web/"*)  expected_project="Web" ;;
+  *"src/Api/"*)  expected_project="Api" ;;
+  ...
+esac
+```
+**Wrong pattern (breaks silently):**
+```bash
+case "$file" in
+  *"/src/Web/"*)  expected_project="Web" ;;   # never matches
+esac
+```
+**Why:** This bug was introduced twice during the Unit.Tests split session. Each time the pre-push hook was edited, leading slashes were accidentally added and then had to be corrected before gates would pass.
+
+### 2026-03-07: Test Projects Use RootNamespace = Unit to Preserve Namespace Structure
+**By:** Gimli (Tester) via Copilot
+**What:** When `tests/Unit.Tests` was split into `Api.Tests.Unit`, `Shared.Tests.Unit`, and `Web.Tests.Unit`, all three new `.csproj` files were given `<RootNamespace>Unit</RootNamespace>`. This preserves the existing `Tests.Unit.*` file-level namespace declarations without renaming any test files.
+**Why:** Renaming the namespace in 60+ test files would create a noisy diff with no functional benefit. Keeping `RootNamespace = Unit` is the standard IssueManager approach for split test assemblies that share a logical namespace.
+

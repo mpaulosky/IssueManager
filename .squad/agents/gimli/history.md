@@ -523,3 +523,20 @@ Split the single `tests/Unit.Tests` project into three project-specific test ass
 - `scripts/hooks/pre-push` (updated path patterns)
 - `.editorconfig` (IDE0044 suppression, xUnit suppressions)
 - `.gitattributes` (new)
+
+### 2026-03-07: Issue #94 — Integration.Tests → Api.Tests.Integration Rename (Complete, PR #96 Open)
+
+**Task:** Rename test project `tests/Integration.Tests/` to `tests/Api.Tests.Integration/` and update all references.
+
+**Completion:**
+- ✅ Renamed directory: `tests/Integration.Tests/` → `tests/Api.Tests.Integration/`
+- ✅ Renamed .csproj: `Integration.Tests.csproj` → `Api.Tests.Integration.csproj`
+- ✅ Updated 561+ test file headers with new project name
+- ✅ Updated all project references in `.sln`, `.csproj` files, and build/CI configs
+- ✅ Build: `0 Warning(s). 0 Error(s).`
+- ✅ Tests: All 561 tests passing
+- ✅ PR #96 opened (awaiting merge)
+
+**Rationale:** Naming alignment with other split projects (`Api.Tests.Unit`, `Shared.Tests.Unit`, `Web.Tests.Unit`). Consistent convention: `{Layer}.Tests.{Scope}`.
+
+**Related:** PR #96 (open, branch `squad/94-rename-integration-tests`)
