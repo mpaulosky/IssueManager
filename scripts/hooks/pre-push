@@ -31,17 +31,17 @@ validate_copyright_headers() {
   get_expected_project() {
     local filepath="$1"
     case "$filepath" in
-      *"/src/Api/"*)              echo "Api" ;;
-      *"/src/Web/"*)              echo "Web" ;;
-      *"/src/Shared/"*)           echo "Shared" ;;
-      *"/src/AppHost/"*)          echo "AppHost" ;;
-      *"/src/ServiceDefaults/"*)  echo "ServiceDefaults" ;;
-      *"/tests/Api.Tests.Unit/"*)     echo "Api.Tests.Unit" ;;
-      *"/tests/Shared.Tests.Unit/"*)  echo "Shared.Tests.Unit" ;;
-      *"/tests/Web.Tests.Unit/"*)     echo "Web.Tests.Unit" ;;
-      *"/tests/Integration.Tests/"*)  echo "Integration.Tests" ;;
-      *"/tests/Web.Tests.Bunit/"*)    echo "Web.Tests.Bunit" ;;
-      *"/tests/Architecture.Tests/"*) echo "Architecture.Tests" ;;
+      *"src/Api/"*)              echo "Api" ;;
+      *"src/Web/"*)              echo "Web" ;;
+      *"src/Shared/"*)           echo "Shared" ;;
+      *"src/AppHost/"*)          echo "AppHost" ;;
+      *"src/ServiceDefaults/"*)  echo "ServiceDefaults" ;;
+      *"tests/Api.Tests.Unit/"*)     echo "Api.Tests.Unit" ;;
+      *"tests/Shared.Tests.Unit/"*)  echo "Shared.Tests.Unit" ;;
+      *"tests/Web.Tests.Unit/"*)     echo "Web.Tests.Unit" ;;
+      *"tests/Integration.Tests/"*)  echo "Integration.Tests" ;;
+      *"tests/Web.Tests.Bunit/"*)    echo "Web.Tests.Bunit" ;;
+      *"tests/Architecture.Tests/"*) echo "Architecture.Tests" ;;
       *)                          echo "Unknown" ;;
     esac
   }
