@@ -1780,3 +1780,52 @@ When starting a new project: run the installation script → team files are copi
 **What:** The Blazor component test project was renamed from `Blazor.Tests` to `Web.Tests.Bunit` to better reflect that it tests the Web project specifically using bUnit.
 **Why:** User request — captured for team memory. All agents should reference the test project as `Web.Tests.Bunit` (path: `tests/Web.Tests.Bunit/`). The old name `Blazor.Tests` is retired.
 
+---
+
+### 2026-03-05T12:08Z: IssueTrackerApp UI modernization — revised scope
+**By:** Matthew Paulosky (via Copilot)
+**What:**
+- Keep Tailwind CSS (add to IssueTrackerApp, matching IssueManager's design system)
+- Keep Radzen DataGrid — do NOT replace with custom DataTable; style it to match IssueManager's CSS variables
+- Style-only modernization: update markup/CSS to match IssueManager's design system (CSS custom properties, dark/light theme, 4-color system, top-nav layout)
+- Maintain all existing local functionality (Blazored.SessionStorage filter persistence, existing business logic)
+- Auth provider decision: PENDING user clarification (IssueTrackerApp uses Azure AD; user referenced "Auth0")
+**Why:** User revised Aragorn's original sprint plan to narrow scope — Radzen stays, functionality stays, only styling changes.
+
+---
+
+### 2026-03-05T12:17Z: IssueTrackerApp → IssueManager import — revised scope
+**By:** Matthew Paulosky (via Copilot)
+**What:**
+- DO NOT modify IssueTrackerApp at all — it stays untouched
+- IMPORT the Components, Pages, and Shared folders from IssueTrackerApp INTO IssueManager's Web project
+- Update the IMPORTED files to match IssueManager styling (Tailwind CSS, CSS custom properties, dark/light theme) and functionality (Auth0, Aspire HTTP clients, IssueManager patterns)
+- Auth: replace Azure AD / Microsoft Identity with Auth0 (matching IssueManager's AuthExtensions + /auth/login /auth/logout pattern)
+- Data access: replace direct service injection (ICategoryService, IIssueService, etc.) with IssueManager's HTTP API clients
+- Keep Radzen DataGrid for admin pages (Categories, Statuses) — style it to match IssueManager CSS vars
+- Keep Blazored.SessionStorage filter persistence from IssueTrackerApp Index page
+**Why:** User clarified that IssueTrackerApp is the source of content; IssueManager is the target destination and design system.
+
+---
+
+### 2026-03-07: Unit.Tests Monolith Split into Project-Specific Assemblies (PR #95)
+**By:** Gimli (Tester) + Boromir (DevOps)
+**Branch:** squad/unit-tests-split
+**Status:** ✅ Complete
+
+**What:** `tests/Unit.Tests` deleted and replaced with three project-specific test assemblies:
+- `tests/Api.Tests.Unit` — Api project tests (endpoints, handlers, repositories, services, extensions)
+- `tests/Shared.Tests.Unit` — Shared project tests (DTOs, validators, mappers, exceptions, helpers)
+- `tests/Web.Tests.Unit` — empty placeholder for future Web unit tests
+
+**Key decisions recorded:**
+- `RootNamespace = Unit` kept in all new projects to preserve existing `Tests.Unit.*` namespace — avoids renaming 60+ test files
+- Builders duplicated in Api.Tests.Unit and Shared.Tests.Unit (both need them; test executables can't cross-reference)
+- pre-push hook path patterns must NOT have a leading `/` (find returns relative paths like `src/Web/`, not `/src/Web/`)
+- Blazor `@ref` fields must not be `readonly` — IDE0044 suppressed in `.editorconfig` for `src/**/*.razor.cs`
+- `xUnit1030` and `xUnit1051` suppressed in `.editorconfig` for all test files
+
+**CI / DevOps (Boromir):** Updated `.github/workflows/squad-test.yml` and Gimli's charter to reference new project names.
+
+**All 4 pre-push gates pass:** Copyright headers ✅ · dotnet format ✅ · Api.Tests.Unit + Shared.Tests.Unit ✅ · Web.Tests.Bunit + Architecture.Tests ✅
+

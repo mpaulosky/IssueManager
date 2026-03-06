@@ -177,3 +177,52 @@ DevOps on IssueManager (.NET 10, GitHub Actions, Aspire, NuGet centralized packa
 - src/Web/_Imports.razor (copyright header moved to end)
 - .squad/agents/aragorn/charter.md (added mandatory full test run rule)
 - .squad/agents/gimli/charter.md (added mandatory full test run rule)
+### 2026-03-07: Unit.Tests Split — CI Workflow and Charter Updates (PR #95)
+
+**Context:** Gimli split `tests/Unit.Tests` into three project-specific assemblies: `Api.Tests.Unit`, `Shared.Tests.Unit`, and `Web.Tests.Unit`.
+
+**CI Workflow Updated (`scripts/hooks/pre-push` — Gate 3 references updated):**
+- Removed references to the deleted `Unit.Tests` project
+- Added `Api.Tests.Unit` and `Shared.Tests.Unit` to the test runner
+- `Web.Tests.Unit` is empty placeholder — not added to gate yet
+
+**Gimli's Charter Updated (`.squad/agents/gimli/charter.md`):**
+- Replaced `Unit.Tests` references with the three new project names
+- Updated Project Name Mapping table to include `Api.Tests.Unit`, `Shared.Tests.Unit`, `Web.Tests.Unit`
+- Updated pre-push gate documentation to match new project structure
+
+**Key files:**
+- `.github/workflows/squad-test.yml` — updated test job matrix to run new assemblies
+- `.squad/agents/gimli/charter.md` — updated project references
+
+---
+
+### 2026-03-06: Issue #89 — Aspire Startup Fixes VALIDATED (Sam's PR #91)
+
+**Status:** ✅ RESOLVED — All infrastructure components validated and passing
+
+**Current Branch:** squad/80-foundation-objectid-standardization
+
+**Build Results:**
+- AppHost: ✅ Clean (0 errors, 0 warnings)
+- Api: ✅ Clean (0 errors, 0 warnings)
+- Web: ✅ Clean (0 errors, 0 warnings)
+
+**Test Results:**
+- Aspire.Tests: ✅ 18/18 passing (all infrastructure orchestration tests)
+- AppHost configuration validated
+- ServiceDefaults configuration validated
+- Auth service initialization validated
+- ServiceDiscovery initialization validated
+
+**Infrastructure Validation Complete:**
+- AppHost → ServiceDefaults resource naming: ✅ Consistent
+- Service registration: ✅ Correct
+- Orchestration startup order: ✅ Correct
+- All Aspire integration points: ✅ Passing
+
+**Resolution:**
+- Matthew's infrastructure changes (issue #89) fully integrated into Sam's PR #91 (squad/80-foundation-objectid-standardization)
+- No additional infrastructure work needed
+- Commented on GitHub issue #89 with validation summary
+- Infrastructure scope is complete; application code scope (ObjectId refactoring) handled separately by Sam

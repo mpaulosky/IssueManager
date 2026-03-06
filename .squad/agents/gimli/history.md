@@ -473,3 +473,53 @@ Get-ChildItem -Path tests -Recurse -Include "*.cs","*.razor" |
 - Old horizontal-layer structure (Handlers/, Pages/, Services/) replaced with feature-based folder organization
 - Test project renamed: Blazor.Tests → Web.Tests.Bunit (path: 	ests/Web.Tests.Bunit/)
 - All test references should use the new project name
+
+---
+
+## Session: Unit.Tests Monolith Split (Issue #95)
+**Branch:** squad/unit-tests-split
+**PR:** #95
+
+### What Was Done
+
+Split the single `tests/Unit.Tests` project into three project-specific test assemblies:
+
+#### New Projects Created
+- **tests/Api.Tests.Unit** — Api project tests: endpoints, handlers, repositories, services, extensions
+- **tests/Shared.Tests.Unit** — Shared project tests: DTOs, validators, mappers, exceptions, helpers
+- **tests/Web.Tests.Unit** — empty placeholder for future Web unit tests
+
+#### Old Project Deleted
+- `tests/Unit.Tests` removed from solution and file system
+
+#### Key Design Decision
+- `<RootNamespace>Unit</RootNamespace>` set in all new projects to preserve existing `Tests.Unit.*` namespace structure — avoids renaming 60+ test files
+- Builders duplicated in both Api.Tests.Unit and Shared.Tests.Unit (needed by both, no cross-reference between test executables)
+- AppHost/ServiceDefaults had no unit tests — no new projects created for them
+
+#### Pre-Push Hook Fixed (twice)
+- Removed stale `Unit.Tests` and old `Blazor.Tests` paths; added new project paths: `Api.Tests.Unit`, `Shared.Tests.Unit`, `Web.Tests.Unit`
+- Fixed path pattern bug: removed leading `/` from `case` patterns — `find src tests` returns relative paths, so `*"src/Web/"*` must NOT be `*"/src/Web/"*`
+
+#### Editorconfig / Build Improvements
+- Added `.gitattributes` with `eol=lf` for CRLF normalization
+- Suppressed `xUnit1030` and `xUnit1051` for all test files in `.editorconfig`
+- Suppressed `IDE0044` for `src/**/*.razor.cs` — Blazor `@ref` fields cannot be `readonly`
+
+#### Bugs Fixed
+- `ServiceCollectionExtensionsTests`: corrected test name and assertion (Singleton → Scoped)
+- `CategoriesPage.razor.cs` and `StatusesPage.razor.cs`: removed `readonly` from `_grid` fields (blocked by IDE0044 / Blazor @ref requirement)
+
+#### All 4 Pre-Push Gates Pass
+- Copyright headers ✅
+- dotnet format ✅
+- Api.Tests.Unit + Shared.Tests.Unit ✅
+- Web.Tests.Bunit + Architecture.Tests ✅
+
+### Key Files
+- `tests/Api.Tests.Unit/Api.Tests.Unit.csproj`
+- `tests/Shared.Tests.Unit/Shared.Tests.Unit.csproj`
+- `tests/Web.Tests.Unit/Web.Tests.Unit.csproj`
+- `scripts/hooks/pre-push` (updated path patterns)
+- `.editorconfig` (IDE0044 suppression, xUnit suppressions)
+- `.gitattributes` (new)
