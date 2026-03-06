@@ -20,6 +20,8 @@ Lead Developer on IssueManager (.NET 10, Blazor, MongoDB, CQRS, VSA). User: Matt
 
 ## Learnings
 
+- **Copyright headers now apply only to `.cs` files** (not `.razor` or other file types). The `csharp.instructions.md` `applyTo` was narrowed from `**/*.cs,**/*.razor,**/*.razor.cs` to `**/*.cs` only. The `.razor` header format section and the `tests/Aspire/` mapping were also removed. (2026-03-06, Matthew Paulosky directive)
+
 
 ---
 
