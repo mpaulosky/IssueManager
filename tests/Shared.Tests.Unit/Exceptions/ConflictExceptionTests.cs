@@ -12,7 +12,7 @@
 // Solution Name : IssueManager
 // Project Name :  Shared.Tests.Unit
 
-namespace Unit.Exceptions;
+namespace Shared.Exceptions;
 
 /// <summary>
 /// Unit tests for <see cref="ConflictException"/>.

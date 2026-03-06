@@ -12,7 +12,7 @@
 // Solution Name : IssueManager
 // Project Name :  Shared.Tests.Unit
 
-namespace Unit.DTOs;
+namespace Shared.DTOs;
 
 /// <summary>
 /// Unit tests for <see cref="CategoryDto"/>.

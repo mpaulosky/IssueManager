@@ -7,7 +7,7 @@
 // Project Name :  Shared.Tests.Unit
 // =======================================================
 
-namespace Unit.Mappers;
+namespace Shared.Mappers;
 
 /// <summary>
 /// Unit tests for UserMapper extension methods.

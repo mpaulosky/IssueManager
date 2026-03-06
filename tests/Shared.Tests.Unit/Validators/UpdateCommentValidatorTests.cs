@@ -6,7 +6,7 @@
 // Solution Name : IssueManager
 // Project Name :  Shared.Tests.Unit
 // =======================================================
-namespace Unit.Validators;
+namespace Shared.Validators;
 
 /// <summary>
 /// Unit tests for <see cref="UpdateCommentValidator"/>.

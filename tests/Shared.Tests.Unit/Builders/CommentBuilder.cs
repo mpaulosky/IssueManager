@@ -7,7 +7,7 @@
 // Project Name :  Shared.Tests.Unit
 // =======================================================
 
-namespace Unit.Builders;
+namespace Shared.Builders;
 
 /// <summary>
 /// Builder for creating CommentDto test data with fluent API.

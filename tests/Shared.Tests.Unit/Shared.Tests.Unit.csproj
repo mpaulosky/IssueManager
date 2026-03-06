@@ -7,7 +7,7 @@
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
 		<OutputType>Exe</OutputType>
-		<RootNamespace>Unit</RootNamespace>
+		<RootNamespace>Shared</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -21,6 +21,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="xunit.runner.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\..\src\Shared\Shared.csproj" />
 	</ItemGroup>
+
 </Project>

@@ -12,7 +12,7 @@
 // Solution Name : IssueManager
 // Project Name :  Shared.Tests.Unit
 
-namespace Unit.Helpers;
+namespace Shared.Helpers;
 
 /// <summary>
 /// Unit tests for <see cref="Helpers"/>.

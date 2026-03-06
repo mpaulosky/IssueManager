@@ -7,7 +7,7 @@
 // Project Name :  Shared.Tests.Unit
 // =======================================================
 
-namespace Unit.Abstractions;
+namespace Shared.Abstractions;
 
 /// <summary>
 /// Unit tests for <see cref="Result"/> and <see cref="Result{T}"/> classes.

@@ -7,7 +7,7 @@
 // Project Name :  Shared.Tests.Unit
 // =======================================================
 
-namespace Unit.Builders;
+namespace Shared.Builders;
 
 /// <summary>
 /// Builder for creating IssueDto test data with fluent API.
