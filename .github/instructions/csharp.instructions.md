@@ -36,7 +36,7 @@ Every new C# or Razor file MUST begin with this exact copyright block:
 - `src/AppHost/` → `AppHost`
 - `src/ServiceDefaults/` → `ServiceDefaults`
 - `tests/Unit.Tests/` → `Unit.Tests`
-- `tests/Integration.Tests/` → `Integration.Tests`
+- `tests/Api.Tests.Integration/` → `Api.Tests.Integration`
 - `tests/Blazor.Tests/` → `Blazor.Tests`
 - `tests/Aspire/` → `Aspire`
 

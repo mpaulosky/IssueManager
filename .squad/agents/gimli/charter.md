@@ -38,7 +38,7 @@ You are Gimli, the Tester on the IssueManager project. You own unit tests, integ
    // Project Name :  {ProjectName}
    // =============================================
    ```
-   Project Name: `Api.Tests.Unit`, `Shared.Tests.Unit`, `Web.Tests.Unit`, `Integration.Tests`, `Web.Tests.Bunit`, or `Aspire` based on test project directory.
+   Project Name: `Api.Tests.Unit`, `Shared.Tests.Unit`, `Web.Tests.Unit`, `Api.Tests.Integration`, `Web.Tests.Bunit`, or `Aspire` based on test project directory.
 7. AAA pattern (Arrange / Act / Assert) with comments
 8. File-scoped namespaces, tab indentation
 

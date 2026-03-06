@@ -1096,7 +1096,7 @@ Enhanced the pre-push hook with a **three-gate strategy**, ordered from fastest 
     - `src/Api/` → "Api"
     - `src/Web/` → "Web"
     - `tests/Unit.Tests/` → "Unit Tests"
-    - `tests/Integration.Tests/` → "Integration.Tests"
+    - `tests/Integration.Tests/` → "Api.Tests.Integration"
   - Skips files without full header (simple one-liner copyright format)
   - Reports: number of files checked + any failures with file path and specific field that failed
 - **Rationale:**
@@ -1476,7 +1476,7 @@ For `.razor` files, use @* comment syntax:
 Test folder path → Project Name:
 - 	ests/Blazor.Tests/ → Blazor.Tests
 - 	ests/Unit.Tests/ → Unit.Tests
-- 	ests/Integration.Tests/ → Integration.Tests
+- 	ests/Integration.Tests/ → Api.Tests.Integration
 - 	ests/Aspire/ → Aspire.Tests
 - 	ests/Architecture.Tests/ → Architecture.Tests
 
@@ -1607,7 +1607,7 @@ Matthew Paulosky requested standardization of copyright headers across the Issue
 - src/AppHost/ → AppHost
 - src/ServiceDefaults/ → ServiceDefaults
 - 	ests/Unit.Tests/ → Unit.Tests
-- 	ests/Integration.Tests/ → Integration.Tests
+- 	ests/Integration.Tests/ → Api.Tests.Integration
 - 	ests/Blazor.Tests/ → Blazor.Tests
 - 	ests/Aspire/ → Aspire
 
@@ -1779,4 +1779,93 @@ When starting a new project: run the installation script → team files are copi
 **By:** Matthew Paulosky (via Copilot)
 **What:** The Blazor component test project was renamed from `Blazor.Tests` to `Web.Tests.Bunit` to better reflect that it tests the Web project specifically using bUnit.
 **Why:** User request — captured for team memory. All agents should reference the test project as `Web.Tests.Bunit` (path: `tests/Web.Tests.Bunit/`). The old name `Blazor.Tests` is retired.
+
+---
+
+### 2026-03-05T12:08Z: IssueTrackerApp UI modernization — revised scope
+**By:** Matthew Paulosky (via Copilot)
+**What:**
+- Keep Tailwind CSS (add to IssueTrackerApp, matching IssueManager's design system)
+- Keep Radzen DataGrid — do NOT replace with custom DataTable; style it to match IssueManager's CSS variables
+- Style-only modernization: update markup/CSS to match IssueManager's design system (CSS custom properties, dark/light theme, 4-color system, top-nav layout)
+- Maintain all existing local functionality (Blazored.SessionStorage filter persistence, existing business logic)
+- Auth provider decision: PENDING user clarification (IssueTrackerApp uses Azure AD; user referenced "Auth0")
+**Why:** User revised Aragorn's original sprint plan to narrow scope — Radzen stays, functionality stays, only styling changes.
+
+---
+
+### 2026-03-05T12:17Z: IssueTrackerApp → IssueManager import — revised scope
+**By:** Matthew Paulosky (via Copilot)
+**What:**
+- DO NOT modify IssueTrackerApp at all — it stays untouched
+- IMPORT the Components, Pages, and Shared folders from IssueTrackerApp INTO IssueManager's Web project
+- Update the IMPORTED files to match IssueManager styling (Tailwind CSS, CSS custom properties, dark/light theme) and functionality (Auth0, Aspire HTTP clients, IssueManager patterns)
+- Auth: replace Azure AD / Microsoft Identity with Auth0 (matching IssueManager's AuthExtensions + /auth/login /auth/logout pattern)
+- Data access: replace direct service injection (ICategoryService, IIssueService, etc.) with IssueManager's HTTP API clients
+- Keep Radzen DataGrid for admin pages (Categories, Statuses) — style it to match IssueManager CSS vars
+- Keep Blazored.SessionStorage filter persistence from IssueTrackerApp Index page
+**Why:** User clarified that IssueTrackerApp is the source of content; IssueManager is the target destination and design system.
+
+---
+
+### 2026-03-07: Unit.Tests Monolith Split into Project-Specific Assemblies (PR #95)
+**By:** Gimli (Tester) + Boromir (DevOps)
+**Branch:** squad/unit-tests-split
+**Status:** ✅ Complete
+
+**What:** `tests/Unit.Tests` deleted and replaced with three project-specific test assemblies:
+- `tests/Api.Tests.Unit` — Api project tests (endpoints, handlers, repositories, services, extensions)
+- `tests/Shared.Tests.Unit` — Shared project tests (DTOs, validators, mappers, exceptions, helpers)
+- `tests/Web.Tests.Unit` — empty placeholder for future Web unit tests
+
+**Key decisions recorded:**
+- `RootNamespace = Unit` kept in all new projects to preserve existing `Tests.Unit.*` namespace — avoids renaming 60+ test files
+- Builders duplicated in Api.Tests.Unit and Shared.Tests.Unit (both need them; test executables can't cross-reference)
+- pre-push hook path patterns must NOT have a leading `/` (find returns relative paths like `src/Web/`, not `/src/Web/`)
+- Blazor `@ref` fields must not be `readonly` — IDE0044 suppressed in `.editorconfig` for `src/**/*.razor.cs`
+- `xUnit1030` and `xUnit1051` suppressed in `.editorconfig` for all test files
+
+**CI / DevOps (Boromir):** Updated `.github/workflows/squad-test.yml` and Gimli's charter to reference new project names.
+
+**All 4 pre-push gates pass:** Copyright headers ✅ · dotnet format ✅ · Api.Tests.Unit + Shared.Tests.Unit ✅ · Web.Tests.Bunit + Architecture.Tests ✅
+
+### 2026-03-06: Merged-PR Branch Guard — Process Rule
+**By:** Matthew (via Copilot)
+**What:** Before any git commit to a squad/* branch, check if that branch's PR is already merged (`gh pr list --head {branch} --state merged`). If merged, switch to `main` and sync (`git checkout main && git pull origin main`) before committing.
+**Why:** Prevents stranded Scribe commits on re-created/orphaned branches after a PR is merged. User directive — captured for team memory.
+**Applies to:** Scribe (Step 6 of responsibilities), and any agent that does its own git commit at end of issue work.
+
+### 2026-03-07: Blazor @ref Fields Must Not Be readonly — IDE0044 Suppressed
+**By:** Gimli (Tester) via Copilot
+**What:** Roslyn analyzer `IDE0044` ("Make field readonly") was suppressed in `.editorconfig` for `src/**/*.razor.cs` files. Blazor `@ref` fields (e.g., `private DataGrid _grid;`) cannot be `readonly` because Razor sets them at render time. The `readonly` keyword causes a compile error.
+**Rule added to .editorconfig:**
+```
+[src/**/*.razor.cs]
+dotnet_diagnostic.IDE0044.severity = none
+```
+**Why:** IDE0044 correctly flags these fields as "could be readonly" based on C# static analysis, but Blazor's component model requires them to remain mutable. Suppressing at the glob pattern level avoids per-field `[SuppressMessage]` attributes across every code-behind file.
+
+### 2026-03-07: pre-push Hook Path Patterns Must NOT Include a Leading Slash
+**By:** Boromir (DevOps) via Copilot
+**What:** In `scripts/hooks/pre-push`, the `case` statement path patterns for project detection must NOT begin with `/`. The `find src tests` command returns relative paths (e.g., `src/Web/Components/Foo.cs`), not absolute paths. Patterns like `*"/src/Web/"*` will never match because there is no leading `/`.
+**Correct pattern:**
+```bash
+case "$file" in
+  *"src/Web/"*)  expected_project="Web" ;;
+  *"src/Api/"*)  expected_project="Api" ;;
+  ...
+esac
+```
+**Wrong pattern (breaks silently):**
+```bash
+case "$file" in
+  *"/src/Web/"*)  expected_project="Web" ;;   # never matches
+esac
+```
+**Why:** This bug was introduced twice during the Unit.Tests split session. Each time the pre-push hook was edited, leading slashes were accidentally added and then had to be corrected before gates would pass.
+
+### 2026-03-07: Test Projects Use RootNamespace = Unit to Preserve Namespace Structure
+**By:** Gimli (Tester) via Copilot
+**What:** When `tests/Unit.Tests` was split into `Api.Tests.Unit`, `Shared.Tests.Unit`, and `Web.Tests.Unit`, all three new `.csproj` files were given `<RootNamespace>Unit</RootNamespace>`. This preserves the existing `Tests.Unit.*` file-level namespace declarations without renaming any test files.
+**Why:** Renaming the namespace in 60+ test files would create a noisy diff with no functional benefit. Keeping `RootNamespace = Unit` is the standard IssueManager approach for split test assemblies that share a logical namespace.
 

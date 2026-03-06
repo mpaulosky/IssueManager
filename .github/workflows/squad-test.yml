@@ -297,20 +297,20 @@ jobs:
         run: dotnet restore
 
       - name: Build Integration Tests
-        run: dotnet build tests/Integration.Tests --configuration Release --no-restore
+        run: dotnet build tests/Api.Tests.Integration --configuration Release --no-restore
 
       - name: Run Integration Tests
         id: integration-tests
         run: |
           mkdir -p test-results
-          if [ ! -d "tests/Integration.Tests" ]; then
-            echo "::error::Integration test project not found at tests/Integration.Tests"
+          if [ ! -d "tests/Api.Tests.Integration" ]; then
+            echo "::error::Integration test project not found at tests/Api.Tests.Integration"
             exit 1
           fi
 
           # Run test executable directly (xUnit v3 workaround for test process launcher compatibility)
-          cd tests/Integration.Tests/bin/Release/net10.0
-          ./Integration.Tests -xml "$GITHUB_WORKSPACE/test-results/integration.xml" -nunit "$GITHUB_WORKSPACE/test-results/integration-nunit.xml"
+          cd tests/Api.Tests.Integration/bin/Release/net10.0
+          ./Api.Tests.Integration -xml "$GITHUB_WORKSPACE/test-results/integration.xml" -nunit "$GITHUB_WORKSPACE/test-results/integration-nunit.xml"
           exit_code=$?
 
           if [ $exit_code -ne 0 ]; then
