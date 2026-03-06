@@ -7,12 +7,12 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
-namespace Unit.Repositories;
+namespace Api.Repositories;
 
 /// <summary>
 /// Unit tests for repository validation logic that can be tested without a database.
 /// These tests validate input validation and ObjectId parsing logic.
-/// Note: Full CRUD operations are covered by integration tests.
+/// Note: Integration tests cover full CRUD operations.
 /// </summary>
 public sealed class RepositoryValidationTests
 {
@@ -26,10 +26,10 @@ public sealed class RepositoryValidationTests
 	// 	// Arrange
 	// 	var repo = new IssueRepository("mongodb://localhost:27017", "TestDb");
 	// 	const string invalidId = "invalid-id";
-	// 
+	//
 	// 	// Act
 	// 	var result = await repo.GetByIdAsync(invalidId);
-	// 
+	//
 	// 	// Assert
 	// 	result.Should().BeNull("invalid ObjectId should return null without DB call");
 	// }
@@ -39,11 +39,11 @@ public sealed class RepositoryValidationTests
 	// {
 	// 	// Arrange
 	// 	var repo = new IssueRepository("mongodb://localhost:27017", "TestDb");
-	// 	const string invalidId = "not-a-valid-objectid";
-	// 
+	// 	const string invalidId = "not-a-valid-objected";
+	//
 	// 	// Act
 	// 	var result = await repo.DeleteAsync(invalidId);
-	// 
+	//
 	// 	// Assert
 	// 	result.Should().BeFalse("invalid ObjectId should return false without DB call");
 	// }
@@ -54,10 +54,10 @@ public sealed class RepositoryValidationTests
 	// 	// Arrange
 	// 	var repo = new IssueRepository("mongodb://localhost:27017", "TestDb");
 	// 	const string invalidId = "12345";
-	// 
+	//
 	// 	// Act
 	// 	var result = await repo.ArchiveAsync(invalidId);
-	// 
+	//
 	// 	// Assert
 	// 	result.Should().BeFalse("invalid ObjectId should return false without DB call");
 	// }
@@ -178,10 +178,10 @@ public sealed class RepositoryValidationTests
 	// {
 	// 	// Arrange
 	// 	var repo = new CategoryRepository("mongodb://localhost:27017", "TestDb");
-	// 
+	//
 	// 	// Act
 	// 	var result = await repo.ArchiveAsync(null!);
-	// 
+	//
 	// 	// Assert
 	// 	result.Success.Should().BeFalse();
 	// 	result.Error.Should().Be("Category cannot be null.");
@@ -193,10 +193,10 @@ public sealed class RepositoryValidationTests
 	// 	// Arrange
 	// 	var repo = new CategoryRepository("mongodb://localhost:27017", "TestDb");
 	// 	var categoryId = ObjectId.GenerateNewId();
-	// 
+	//
 	// 	// Act
 	// 	var result = await repo.UpdateAsync(categoryId, null!);
-	// 
+	//
 	// 	// Assert
 	// 	result.Success.Should().BeFalse();
 	// 	result.Error.Should().Be("Category cannot be null.");
@@ -225,10 +225,10 @@ public sealed class RepositoryValidationTests
 	// {
 	// 	// Arrange
 	// 	var repo = new StatusRepository("mongodb://localhost:27017", "TestDb");
-	// 
+	//
 	// 	// Act
 	// 	var result = await repo.ArchiveAsync(null!);
-	// 
+	//
 	// 	// Assert
 	// 	result.Success.Should().BeFalse();
 	// 	result.Error.Should().Be("Status cannot be null.");
@@ -240,10 +240,10 @@ public sealed class RepositoryValidationTests
 	// 	// Arrange
 	// 	var repo = new StatusRepository("mongodb://localhost:27017", "TestDb");
 	// 	var statusId = ObjectId.GenerateNewId();
-	// 
+	//
 	// 	// Act
 	// 	var result = await repo.UpdateAsync(statusId, null!);
-	// 
+	//
 	// 	// Assert
 	// 	result.Success.Should().BeFalse();
 	// 	result.Error.Should().Be("Status cannot be null.");
@@ -272,10 +272,10 @@ public sealed class RepositoryValidationTests
 	// {
 	// 	// Arrange
 	// 	var repo = new CommentRepository("mongodb://localhost:27017", "TestDb");
-	// 
+	//
 	// 	// Act
 	// 	var result = await repo.ArchiveAsync(null!);
-	// 
+	//
 	// 	// Assert
 	// 	result.Success.Should().BeFalse();
 	// 	result.Error.Should().Be("Comment cannot be null.");
@@ -287,10 +287,10 @@ public sealed class RepositoryValidationTests
 	// 	// Arrange
 	// 	var repo = new CommentRepository("mongodb://localhost:27017", "TestDb");
 	// 	var commentId = ObjectId.GenerateNewId();
-	// 
+	//
 	// 	// Act
 	// 	var result = await repo.UpdateAsync(commentId, null!);
-	// 
+	//
 	// 	// Assert
 	// 	result.Success.Should().BeFalse();
 	// 	result.Error.Should().Be("Comment cannot be null.");

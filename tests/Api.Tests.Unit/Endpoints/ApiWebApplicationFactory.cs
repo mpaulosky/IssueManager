@@ -7,7 +7,10 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
-namespace Unit.Endpoints;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+
+namespace Api.Endpoints;
 
 /// <summary>
 /// WebApplicationFactory for endpoint tests. Replaces repository singletons with NSubstitute fakes

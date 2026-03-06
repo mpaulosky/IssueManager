@@ -7,7 +7,7 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
-namespace Unit.Handlers.Comments;
+namespace Api.Handlers.Comments;
 
 /// <summary>
 /// Unit tests for GetCommentHandler.

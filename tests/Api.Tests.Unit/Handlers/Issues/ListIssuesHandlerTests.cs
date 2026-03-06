@@ -6,7 +6,7 @@
 // Solution Name : IssueManager
 // Project Name :  Api.Tests.Unit
 // =======================================================
-namespace Unit.Handlers.Issues;
+namespace Api.Handlers.Issues;
 
 /// <summary>
 /// Unit tests for ListIssuesHandler with pagination.

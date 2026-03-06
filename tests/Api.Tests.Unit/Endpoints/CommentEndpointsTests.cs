@@ -7,7 +7,7 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
-namespace Unit.Endpoints;
+namespace Api.Endpoints;
 
 /// <summary>
 /// Endpoint tests for Comment API routes.

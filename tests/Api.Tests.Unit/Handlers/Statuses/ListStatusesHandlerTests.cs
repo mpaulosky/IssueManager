@@ -7,7 +7,7 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
-namespace Unit.Handlers.Statuses;
+namespace Api.Handlers.Statuses;
 
 /// <summary>
 /// Unit tests for ListStatusesHandler.

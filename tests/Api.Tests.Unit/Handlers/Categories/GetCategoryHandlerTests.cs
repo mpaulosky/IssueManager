@@ -7,7 +7,7 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
-namespace Unit.Handlers.Categories;
+namespace Api.Handlers.Categories;
 
 /// <summary>
 /// Unit tests for GetCategoryHandler.

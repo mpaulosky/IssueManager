@@ -7,7 +7,7 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
-namespace Unit.Services;
+namespace Api.Services;
 
 /// <summary>
 /// Unit tests for CurrentUserService.

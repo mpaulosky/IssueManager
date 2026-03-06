@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
@@ -8,28 +8,29 @@
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
 		<OutputType>Exe</OutputType>
-		<RootNamespace>Web</RootNamespace>
+		<RootNamespace>AppHost</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="xunit.v3" />
 		<PackageReference Include="xunit.runner.visualstudio" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" />
-		<PackageReference Include="bunit" />
 		<PackageReference Include="FluentAssertions" />
 		<PackageReference Include="NSubstitute" />
 		<PackageReference Include="Coverlet.Collector" />
+		<PackageReference Include="Aspire.Hosting.Testing" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\ServiceDefaults\ServiceDefaults.csproj" />
+		<ProjectReference Include="..\..\src\AppHost\AppHost.csproj" />
+		<ProjectReference Include="..\..\src\Shared\Shared.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<None Update="xunit.runner.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\..\src\Web\Web.csproj" />
-		<ProjectReference Include="..\..\src\Shared\Shared.csproj" />
 	</ItemGroup>
 
 </Project>

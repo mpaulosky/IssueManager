@@ -10,13 +10,10 @@ global using System;
 global using System.Diagnostics.CodeAnalysis;
 global using System.Net;
 global using System.Net.Http.Json;
-global using System.Reflection;
 global using System.Security.Claims;
 global using System.Text.Encodings.Web;
 
 global using Api.Data;
-global using Api.Extensions;
-global using Api.Handlers;
 global using Api.Handlers.Categories;
 global using Api.Handlers.Comments;
 global using Api.Handlers.Issues;
@@ -30,8 +27,6 @@ global using FluentValidation;
 global using Microsoft.AspNetCore.Authentication;
 global using Microsoft.AspNetCore.Hosting;
 global using Microsoft.AspNetCore.Http;
-global using Microsoft.AspNetCore.Mvc.Testing;
-global using Microsoft.AspNetCore.TestHost;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
@@ -44,10 +39,6 @@ global using NSubstitute;
 
 global using Shared.Abstractions;
 global using Shared.DTOs;
-global using Shared.Exceptions;
-global using Shared.Helpers;
-global using Shared.Mappers;
-global using Shared.Models;
 global using Shared.Validators;
 
 global using Xunit;

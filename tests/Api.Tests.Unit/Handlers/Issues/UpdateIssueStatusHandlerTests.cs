@@ -7,9 +7,9 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
-using Unit.Builders;
+using Api.Builders;
 
-namespace Unit.Handlers.Issues;
+namespace Api.Handlers.Issues;
 
 /// <summary>
 /// Unit tests for UpdateIssueStatusHandler.

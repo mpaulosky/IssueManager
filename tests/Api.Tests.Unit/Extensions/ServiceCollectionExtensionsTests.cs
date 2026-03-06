@@ -7,7 +7,7 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
-namespace Unit.Extensions;
+namespace Api.Extensions;
 
 /// <summary>Unit tests for <see cref="ServiceCollectionExtensions"/>.</summary>
 [ExcludeFromCodeCoverage]

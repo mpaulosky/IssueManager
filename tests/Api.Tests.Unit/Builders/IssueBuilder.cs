@@ -7,7 +7,7 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
-namespace Unit.Builders;
+namespace Api.Builders;
 
 /// <summary>
 /// Builder for creating IssueDto test data with fluent API.
