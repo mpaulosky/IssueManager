@@ -125,6 +125,7 @@ validate_copyright_headers
 validate_formatting
 run_tests "tests/Api.Tests.Unit"
 run_tests "tests/Shared.Tests.Unit"
+run_tests "tests/Web.Tests.Unit"
 run_tests "tests/Web.Tests.Bunit"
 run_tests "tests/Architecture.Tests"
 
