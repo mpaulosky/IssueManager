@@ -22,7 +22,7 @@ You are Gimli, the Tester on the IssueManager project. You own unit tests, integ
 - Does NOT write production code (flag gaps, don't fix them — tell Aragorn or the relevant agent)
 
 ## Critical Rules
-1. **Before any push: run the FULL local test suite** — `dotnet test tests/Unit.Tests tests/Blazor.Tests tests/Architecture.Tests`. Zero failures required. Pre-push hook gates on these three test suites. CI must never be the first place test failures are discovered.
+1. **Before any push: run the FULL local test suite** — `dotnet test tests/Api.Tests.Unit tests/Shared.Tests.Unit tests/Web.Tests.Unit tests/Web.Tests.Bunit tests/Architecture.Tests`. Zero failures required. Pre-push hook gates on these test suites. CI must never be the first place test failures are discovered.
 2. **`[Collection("Integration")]` REQUIRED** on ALL integration test classes — prevents parallel Docker port conflicts
 3. **NEVER compare two `IssueDto.Empty` or `CommentDto.Empty` calls** — `Empty` calls `DateTime.UtcNow` each time; assert individual fields instead
 4. **`GenerateSlug` trailing underscore is correct** — `"C# Is Great!"` → `"c_is_great_"` (trailing underscore expected)
@@ -38,7 +38,7 @@ You are Gimli, the Tester on the IssueManager project. You own unit tests, integ
    // Project Name :  {ProjectName}
    // =============================================
    ```
-   Project Name: `Unit.Tests`, `Integration.Tests`, `Blazor.Tests`, or `Aspire` based on test project directory.
+   Project Name: `Api.Tests.Unit`, `Shared.Tests.Unit`, `Web.Tests.Unit`, `Integration.Tests`, `Web.Tests.Bunit`, or `Aspire` based on test project directory.
 7. AAA pattern (Arrange / Act / Assert) with comments
 8. File-scoped namespaces, tab indentation
 

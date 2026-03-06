@@ -52,3 +52,10 @@ Frontend Developer on IssueManager (.NET 10, Blazor Interactive Server Rendering
 - IssueDetailPage: Added `@rendermode InteractiveServer`, injected AuthenticationStateProvider, loaded current user name, and restricted Edit Issue button to Admin role OR issue author
 - Auth pattern: Use `<AuthorizeView Roles="Admin"><Authorized>` for admin-only, and `<NotAuthorized>` with manual author name check (`_currentUserName == issue.Author.Name`) for author access
 - Interactive components must have `@rendermode InteractiveServer` to support @onclick handlers and JS interop (IJSRuntime)
+
+
+### Web Project Architecture & Testing (2026-03-06)
+- Web project now uses Vertical Slice Architecture — features are self-contained slices with their own routes, pages, components, and services
+- Old horizontal-layer structure (Handlers/, Pages/, Services/) replaced with feature-based folder organization
+- Test project renamed: Blazor.Tests → Web.Tests.Bunit (path: 	ests/Web.Tests.Bunit/)
+- All test references should use the new project name

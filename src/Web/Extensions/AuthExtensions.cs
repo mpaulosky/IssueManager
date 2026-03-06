@@ -23,10 +23,10 @@ public static class AuthExtensions
 	/// <remarks>
 	/// Required configuration (set via user secrets or environment variables):
 	/// <list type="bullet">
-	///   <item><description>Auth0:Domain — your Auth0 tenant domain (e.g. your-tenant.auth0.com)</description></item>
-	///   <item><description>Auth0:ClientId — your Auth0 application's Client ID</description></item>
-	///   <item><description>Auth0:ClientSecret — your Auth0 application's Client Secret</description></item>
-	///   <item><description>Auth0:Audience — optional, the API identifier for token audience</description></item>
+	///   <item><description>Auth0: Domain — your Auth0 tenant domain (e.g., your-tenant.auth0.com)</description></item>
+	///   <item><description>Auth0: ClientId — your Auth0 application's Client ID</description></item>
+	///   <item><description>Auth0: ClientSecret — your Auth0 application's Client Secret</description></item>
+	///   <item><description>Auth0: Audience — optional, the API identifier for token audience</description></item>
 	/// </list>
 	/// </remarks>
 	public static WebApplicationBuilder AddAuth0(this WebApplicationBuilder builder)
@@ -37,7 +37,7 @@ public static class AuthExtensions
 		if (string.IsNullOrEmpty(domain) || string.IsNullOrEmpty(clientId))
 		{
 			// Auth0 is not yet configured — skip authentication setup.
-			// Set Auth0:Domain and Auth0:ClientId in user secrets or environment to enable.
+			// Set Auth0: Domain and Auth0: ClientId in user secrets or environment to enable.
 			return builder;
 		}
 

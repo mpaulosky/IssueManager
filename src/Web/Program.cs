@@ -11,6 +11,10 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using ServiceDefaults;
 using Web;
+using Web.Components.Features.Categories;
+using Web.Components.Features.Comments;
+using Web.Components.Features.Issues;
+using Web.Components.Features.Statuses;
 using Web.Extensions;
 using Web.Services;
 

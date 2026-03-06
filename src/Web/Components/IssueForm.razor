@@ -1,18 +1,10 @@
-@* ============================================
-   Copyright (c) 2026. All rights reserved.
-   File Name :     IssueForm.razor
-   Company :       mpaulosky
-   Author :        Matthew Paulosky
-   Solution Name : IssueManager
-   Project Name :  Web
-   ============================================= *@
-
-@namespace Web.Components
+@using Web.Components.Features.Categories
+@using Web.Components.Features.Statuses
 @inject ICategoryApiClient CategoryClient
 @inject IStatusApiClient StatusClient
 
 <div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm p-6">
-	<EditForm Model="@FormModel" OnValidSubmit="@OnFormSubmit">
+	<EditForm Model="@_formModel" OnValidSubmit="@OnFormSubmit">
 		<DataAnnotationsValidator />
 		<ValidationSummary class="mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 p-3 text-sm text-red-700 dark:text-red-400" />
 
@@ -24,11 +16,11 @@
 				</label>
 				<InputText
 					id="title"
-					@bind-Value="FormModel.Title"
+					@bind-Value="_formModel.Title"
 					class="form-input"
 					placeholder="Enter issue title"
 					aria-required="true" />
-				<ValidationMessage For="@(() => FormModel.Title)" class="validation-message" />
+				<ValidationMessage For="@(() => _formModel.Title)" class="validation-message" />
 			</div>
 
 			<!-- Description -->
@@ -38,11 +30,11 @@
 				</label>
 				<InputTextArea
 					id="description"
-					@bind-Value="FormModel.Description"
+					@bind-Value="_formModel.Description"
 					class="form-input resize-y"
 					rows="5"
 					placeholder="Enter issue description (optional)" />
-				<ValidationMessage For="@(() => FormModel.Description)" class="validation-message" />
+				<ValidationMessage For="@(() => _formModel.Description)" class="validation-message" />
 			</div>
 
 			<!-- Category -->
@@ -56,7 +48,7 @@
 				}
 				else
 				{
-					<InputSelect id="category" @bind-Value="FormModel.CategoryId" class="form-input">
+					<InputSelect id="category" @bind-Value="_formModel.CategoryId" class="form-input">
 						<option value="">— Select a category —</option>
 						@foreach (var cat in _categories)
 						{
@@ -64,7 +56,7 @@
 						}
 					</InputSelect>
 				}
-				<ValidationMessage For="@(() => FormModel.CategoryId)" class="validation-message" />
+				<ValidationMessage For="@(() => _formModel.CategoryId)" class="validation-message" />
 			</div>
 
 			<!-- Status -->
@@ -78,7 +70,7 @@
 				}
 				else
 				{
-					<InputSelect id="status" @bind-Value="FormModel.StatusId" class="form-input">
+					<InputSelect id="status" @bind-Value="_formModel.StatusId" class="form-input">
 						<option value="">— Select a status —</option>
 						@foreach (var s in _statuses)
 						{
@@ -86,7 +78,7 @@
 						}
 					</InputSelect>
 				}
-				<ValidationMessage For="@(() => FormModel.StatusId)" class="validation-message" />
+				<ValidationMessage For="@(() => _formModel.StatusId)" class="validation-message" />
 			</div>
 		</div>
 
@@ -138,7 +130,7 @@
 	/// Indicates whether the form is in edit mode (updating an existing issue).
 	/// </summary>
 	[Parameter]
-	public bool IsEditMode { get; set; } = false;
+	public bool IsEditMode { get; set; }
 
 	/// <summary>
 	/// Initial values for the form when in edit mode.
@@ -150,9 +142,9 @@
 	/// Indicates whether the form is currently submitting.
 	/// </summary>
 	[Parameter]
-	public bool IsSubmitting { get; set; } = false;
+	public bool IsSubmitting { get; set; }
 
-	private CreateIssueRequest FormModel = new();
+	private CreateIssueRequest _formModel = new();
 
 	private IEnumerable<CategoryDto> _categories = [];
 	private IEnumerable<StatusDto> _statuses = [];
@@ -178,7 +170,7 @@
 
 		if (InitialValues != null)
 		{
-			FormModel = InitialValues with { };
+			_formModel = InitialValues with { };
 		}
 	}
 
@@ -187,15 +179,15 @@
 	/// </summary>
 	protected override void OnParametersSet()
 	{
-		if (InitialValues != null && FormModel != InitialValues)
+		if (InitialValues != null && _formModel != InitialValues)
 		{
-			FormModel = InitialValues with { };
+			_formModel = InitialValues with { };
 		}
 	}
 
 	private async Task OnFormSubmit()
 	{
-		await OnSubmit.InvokeAsync(FormModel);
+		await OnSubmit.InvokeAsync(_formModel);
 	}
 
 	private async Task HandleCancel()

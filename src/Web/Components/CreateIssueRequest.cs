@@ -5,7 +5,8 @@
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
 // Project Name :  Web
-// =======================================================
+// ======================================================
+
 using System.ComponentModel.DataAnnotations;
 
 namespace Web.Components;

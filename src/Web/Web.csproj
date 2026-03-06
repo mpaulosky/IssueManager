@@ -72,4 +72,63 @@
 		<ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
 		<ProjectReference Include="..\Shared\Shared.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <_ContentIncludedByDefault Remove="Layout\FooterComponent.razor" />
+	  <_ContentIncludedByDefault Remove="Layout\MainLayout.razor" />
+	  <_ContentIncludedByDefault Remove="Layout\NavMenu.razor" />
+	  <_ContentIncludedByDefault Remove="Layout\ThemeColorSelector.razor" />
+	  <_ContentIncludedByDefault Remove="Layout\ThemeToggle.razor" />
+	  <_ContentIncludedByDefault Remove="Pages\Admin\AdminPage.razor" />
+	  <_ContentIncludedByDefault Remove="Pages\Admin\SampleDataPage.razor" />
+	  <_ContentIncludedByDefault Remove="Pages\Categories\CategoriesPage.razor" />
+	  <_ContentIncludedByDefault Remove="Pages\Categories\CreateCategoryPage.razor" />
+	  <_ContentIncludedByDefault Remove="Pages\Categories\EditCategoryPage.razor" />
+	  <_ContentIncludedByDefault Remove="Pages\Home.razor" />
+	  <_ContentIncludedByDefault Remove="Pages\Issues\CreateIssuePage.razor" />
+	  <_ContentIncludedByDefault Remove="Pages\Issues\EditIssuePage.razor" />
+	  <_ContentIncludedByDefault Remove="Pages\Issues\IssueDetailPage.razor" />
+	  <_ContentIncludedByDefault Remove="Pages\Issues\IssuesPage.razor" />
+	  <_ContentIncludedByDefault Remove="Pages\NotAuthorizedPage.razor" />
+	  <_ContentIncludedByDefault Remove="Pages\Profile\ProfilePage.razor" />
+	  <_ContentIncludedByDefault Remove="Pages\RedirectToLoginPage.razor" />
+	  <_ContentIncludedByDefault Remove="Pages\Statuses\CreateStatusPage.razor" />
+	  <_ContentIncludedByDefault Remove="Pages\Statuses\EditStatusPage.razor" />
+	  <_ContentIncludedByDefault Remove="Pages\Statuses\StatusesPage.razor" />
+	  <_ContentIncludedByDefault Remove="Components\Pages\Categories\CategoriesPage.razor" />
+	  <_ContentIncludedByDefault Remove="Components\Pages\Categories\CreateCategoryPage.razor" />
+	  <_ContentIncludedByDefault Remove="Components\Pages\Categories\EditCategoryPage.razor" />
+	  <_ContentIncludedByDefault Remove="Components\Pages\Issues\CreateIssuePage.razor" />
+	  <_ContentIncludedByDefault Remove="Components\Pages\Issues\EditIssuePage.razor" />
+	  <_ContentIncludedByDefault Remove="Components\Pages\Issues\IssueDetailPage.razor" />
+	  <_ContentIncludedByDefault Remove="Components\Pages\Issues\IssuesPage.razor" />
+	  <_ContentIncludedByDefault Remove="Components\Pages\Profile\ProfilePage.razor" />
+	  <_ContentIncludedByDefault Remove="Components\Pages\Statuses\CreateStatusPage.razor" />
+	  <_ContentIncludedByDefault Remove="Components\Pages\Statuses\EditStatusPage.razor" />
+	  <_ContentIncludedByDefault Remove="Components\Pages\Statuses\StatusesPage.razor" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <AdditionalFiles Include="Components\Features\Admin\AdminPage.razor" />
+	  <AdditionalFiles Include="Components\Features\Admin\SampleDataPage.razor" />
+	  <AdditionalFiles Include="Components\Features\Categories\CategoriesPage.razor" />
+	  <AdditionalFiles Include="Components\Features\Categories\CreateCategoryPage.razor" />
+	  <AdditionalFiles Include="Components\Features\Categories\EditCategoryPage.razor" />
+	  <AdditionalFiles Include="Components\Features\Issues\CreateIssuePage.razor" />
+	  <AdditionalFiles Include="Components\Features\Issues\EditIssuePage.razor" />
+	  <AdditionalFiles Include="Components\Features\Issues\IssueDetailPage.razor" />
+	  <AdditionalFiles Include="Components\Features\Issues\IssuesPage.razor" />
+	  <AdditionalFiles Include="Components\Features\Profile\ProfilePage.razor" />
+	  <AdditionalFiles Include="Components\Features\Statuses\CreateStatusPage.razor" />
+	  <AdditionalFiles Include="Components\Features\Statuses\EditStatusPage.razor" />
+	  <AdditionalFiles Include="Components\Features\Statuses\StatusesPage.razor" />
+	  <AdditionalFiles Include="Components\Layout\FooterComponent.razor" />
+	  <AdditionalFiles Include="Components\Layout\MainLayout.razor" />
+	  <AdditionalFiles Include="Components\Layout\NavMenu.razor" />
+	  <AdditionalFiles Include="Components\Layout\ThemeColorSelector.razor" />
+	  <AdditionalFiles Include="Components\Layout\ThemeToggle.razor" />
+	  <AdditionalFiles Include="Components\Pages\Home.razor" />
+	  <AdditionalFiles Include="Components\Pages\NotAuthorizedPage.razor" />
+	  <AdditionalFiles Include="Components\Pages\RedirectToLoginPage.razor" />
+	</ItemGroup>
 </Project>

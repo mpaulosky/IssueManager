@@ -1,0 +1,383 @@
+@page "/issues/{Id}"
+@using Web.Components.Features.Comments
+@using Web.Components.Features.Statuses
+
+@inject IIssueApiClient IssueClient
+@inject ICommentApiClient CommentClient
+@inject IStatusApiClient StatusClient
+@inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>@(_issue?.Title ?? "Issue") — IssueManager</PageTitle>
+
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+	@if (_isLoading)
+	{
+		<LoadingSpinner />
+	}
+	else if (_issue == null)
+	{
+		<div class="text-center py-12 text-[var(--text-muted)]">
+			<p class="text-lg mb-4">Issue not found.</p>
+			<a href="/issues" class="text-[var(--color-primary)] hover:underline">Back to Issues</a>
+		</div>
+	}
+	else
+	{
+		<!-- Header -->
+		<div class="mb-6">
+			<div class="flex items-start justify-between mb-4">
+				<div class="flex-1">
+					<h1 class="text-3xl font-bold text-[var(--text-main)] mb-2">@_issue.Title</h1>
+					<div class="flex items-center gap-3 text-sm text-[var(--text-muted)]">
+						<span>Created by <strong>@_issue.Author.Name</strong></span>
+						<span>•</span>
+						<span>@_issue.DateCreated.ToString("MMMM dd, yyyy")</span>
+					</div>
+				</div>
+				<AuthorizeView Roles="Admin" Context="authCtx">
+					<Authorized>
+						<a href="/issues/@Id/edit" class="px-4 py-2 border border-[var(--border-color)] text-[var(--text-main)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors text-sm font-medium">
+							Edit Issue
+						</a>
+					</Authorized>
+					<NotAuthorized>
+						@if (_currentUserName != null && _issue != null && _currentUserName == _issue.Author.Name)
+						{
+							<a href="/issues/@Id/edit" class="px-4 py-2 border border-[var(--border-color)] text-[var(--text-main)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors text-sm font-medium">
+								Edit Issue
+							</a>
+						}
+					</NotAuthorized>
+				</AuthorizeView>
+			</div>
+			<div class="flex items-center gap-3">
+				<StatusBadge Status="@_issue.Status" />
+				<span class="text-sm text-[var(--text-muted)]">Category: <strong>@_issue.Category.CategoryName</strong></span>
+			</div>
+		</div>
+
+		<!-- Description -->
+		<div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm p-6 mb-8">
+			<h2 class="text-lg font-semibold text-[var(--text-main)] mb-3">Description</h2>
+			@if (string.IsNullOrWhiteSpace(_issue.Description))
+			{
+				<p class="text-[var(--text-muted)] italic">No description provided.</p>
+			}
+			else
+			{
+				<p class="text-[var(--text-main)] whitespace-pre-wrap">@_issue.Description</p>
+			}
+		</div>
+
+		<!-- Admin: Set Status -->
+		<AuthorizeView Roles="Admin">
+			<Authorized>
+				<div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm p-6 mb-8">
+					<h2 class="text-lg font-semibold text-[var(--text-main)] mb-4">Set Status</h2>
+					@if (_availableStatuses.Any())
+					{
+						<div class="flex flex-wrap gap-2">
+							@foreach (var status in _availableStatuses)
+							{
+								<button @onclick="@(() => SetIssueStatus(status))"
+									class="px-4 py-2 border border-[var(--border-color)] text-[var(--text-main)] rounded-lg hover:bg-[var(--color-primary)] hover:text-white hover:border-[var(--color-primary)] transition-colors text-sm font-medium @(status.StatusName == _issue?.Status?.StatusName ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]" : "")">
+									@status.StatusName
+								</button>
+							}
+						</div>
+					}
+				</div>
+			</Authorized>
+		</AuthorizeView>
+
+		<!-- Comments section -->
+		<div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm p-6">
+			<h2 class="text-lg font-semibold text-[var(--text-main)] mb-4">Comments (@_comments.Count())</h2>
+
+			@if (!_comments.Any())
+			{
+				<p class="text-[var(--text-muted)] italic mb-6">No comments yet. Be the first to comment!</p>
+			}
+			else
+			{
+				<div class="space-y-4 mb-6">
+					@foreach (var comment in _comments)
+					{
+						<div class="border-l-2 border-[var(--border-color)] pl-4 py-2">
+							<div class="flex items-center justify-between gap-2 mb-1">
+								<div class="flex items-center gap-2 text-sm text-[var(--text-muted)]">
+									<strong>@comment.Author.Name</strong>
+									<span>•</span>
+									<span>@comment.DateCreated.ToString("MMM dd, yyyy HH:mm")</span>
+								</div>
+								@if (_editingCommentId != comment.Id.ToString())
+								{
+									<!-- TODO: Restrict to comment owner when auth is implemented -->
+									<div class="flex items-center gap-2">
+										<button
+											type="button"
+											@onclick="() => StartEditComment(comment)"
+											class="text-xs text-[var(--color-primary)] hover:underline">
+											Edit
+										</button>
+										<button
+											type="button"
+											@onclick="() => ShowDeleteConfirmDialog(comment.Id.ToString())"
+											class="text-xs text-red-600 hover:underline">
+											Delete
+										</button>
+									</div>
+								}
+							</div>
+
+							@if (_editingCommentId == comment.Id.ToString())
+							{
+								<!-- Edit mode -->
+								<textarea
+									@bind="_editCommentText"
+									class="form-input resize-y w-full mb-2"
+									rows="4"
+									disabled="@_isSavingComment"></textarea>
+								<div class="flex items-center gap-2">
+									<button
+										type="button"
+										@onclick="SaveEditComment"
+										disabled="@(string.IsNullOrWhiteSpace(_editCommentText) || _isSavingComment)"
+										class="px-3 py-1 bg-[var(--color-primary)] text-white rounded text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed">
+										@(_isSavingComment ? "Saving..." : "Save")
+									</button>
+									<button
+										type="button"
+										@onclick="CancelEditComment"
+										disabled="@_isSavingComment"
+										class="px-3 py-1 border border-[var(--border-color)] text-[var(--text-main)] rounded text-xs font-medium hover:bg-[var(--bg-hover)] transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+										Cancel
+									</button>
+								</div>
+							}
+							else
+							{
+								<!-- View mode -->
+								<p class="text-[var(--text-main)] whitespace-pre-wrap">@comment.Description</p>
+							}
+						</div>
+					}
+				</div>
+			}
+
+			<!-- Add comment form -->
+			<div>
+				<label for="comment-text" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">Add a comment</label>
+				<textarea
+					id="comment-text"
+					@bind="_newCommentText"
+					class="form-input resize-y"
+					rows="4"
+					placeholder="Write your comment here..."
+					disabled="@_isSubmittingComment"></textarea>
+				<button
+					@onclick="AddComment"
+					disabled="@(string.IsNullOrWhiteSpace(_newCommentText) || _isSubmittingComment)"
+					class="mt-3 px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed">
+					@(_isSubmittingComment ? "Posting..." : "Post Comment")
+				</button>
+			</div>
+		</div>
+
+		<!-- Back link -->
+		<div class="mt-6">
+			<a href="/issues" class="text-[var(--color-primary)] hover:underline text-sm">← Back to Issues</a>
+		</div>
+	}
+</div>
+
+<!-- Delete Confirmation Dialog -->
+<ConfirmDialog
+	IsVisible="@_showDeleteDialog"
+	Title="Delete Comment"
+	Message="Are you sure you want to delete this comment? This action cannot be undone."
+	ConfirmText="Delete"
+	CancelText="Cancel"
+	OnConfirm="HandleDeleteConfirm"
+	OnCancel="HandleDeleteCancel" />
+
+@code {
+	/// <summary>
+	/// The ID of the issue to display.
+	/// </summary>
+	[Parameter]
+	public string Id { get; set; } = "";
+
+	private IssueDto? _issue;
+	private IEnumerable<CommentDto> _comments = [];
+	private IEnumerable<StatusDto> _availableStatuses = [];
+	private bool _isLoading = true;
+	private string _newCommentText = "";
+	private bool _isSubmittingComment = false;
+	private string? _currentUserName;
+
+	// Edit comment state
+	private string? _editingCommentId = null;
+	private string _editCommentText = "";
+	private bool _isSavingComment = false;
+
+	// Delete comment state
+	private bool _showDeleteDialog = false;
+	private string? _commentToDeleteId = null;
+
+	/// <summary>
+	/// Loads the issue and its comments on initialization.
+	/// </summary>
+	protected override async Task OnInitializedAsync()
+	{
+		var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+		_currentUserName = authState.User.Identity?.Name;
+
+		_isLoading = true;
+		try
+		{
+			_issue = await IssueClient.GetByIdAsync(Id);
+			_availableStatuses = await StatusClient.GetAllAsync();
+			if (_issue != null)
+			{
+				var allComments = await CommentClient.GetAllAsync();
+				_comments = allComments.Where(c => c.Issue.Id.ToString() == Id);
+			}
+		}
+		finally
+		{
+			_isLoading = false;
+		}
+	}
+
+	/// <summary>
+	/// Adds a new comment to the issue.
+	/// </summary>
+	private async Task AddComment()
+	{
+		if (string.IsNullOrWhiteSpace(_newCommentText) || _issue == null) return;
+
+		_isSubmittingComment = true;
+		try
+		{
+			var command = new CreateCommentCommand
+			{
+				Title = "Comment",
+				CommentText = _newCommentText,
+				IssueId = Id
+			};
+			var newComment = await CommentClient.CreateAsync(command);
+			if (newComment != null)
+			{
+				_comments = _comments.Append(newComment);
+				_newCommentText = "";
+			}
+		}
+		finally
+		{
+			_isSubmittingComment = false;
+		}
+	}
+
+	/// <summary>
+	/// Starts editing a comment by entering edit mode.
+	/// </summary>
+	private void StartEditComment(CommentDto comment)
+	{
+		_editingCommentId = comment.Id.ToString();
+		_editCommentText = comment.Description;
+	}
+
+	/// <summary>
+	/// Saves the edited comment.
+	/// </summary>
+	private async Task SaveEditComment()
+	{
+		if (string.IsNullOrWhiteSpace(_editCommentText) || string.IsNullOrEmpty(_editingCommentId)) return;
+
+		_isSavingComment = true;
+		try
+		{
+			var command = new UpdateCommentCommand
+			{
+				Id = ObjectId.Parse(_editingCommentId),
+				Title = "Comment",
+				CommentText = _editCommentText
+			};
+			var updatedComment = await CommentClient.UpdateAsync(_editingCommentId, command);
+			if (updatedComment != null)
+			{
+				_comments = _comments.Select(c => c.Id.ToString() == _editingCommentId ? updatedComment : c);
+				_editingCommentId = null;
+				_editCommentText = "";
+			}
+		}
+		finally
+		{
+			_isSavingComment = false;
+		}
+	}
+
+	/// <summary>
+	/// Cancels editing and reverts to view mode.
+	/// </summary>
+	private void CancelEditComment()
+	{
+		_editingCommentId = null;
+		_editCommentText = "";
+	}
+
+	/// <summary>
+	/// Shows the delete confirmation dialog.
+	/// </summary>
+	private void ShowDeleteConfirmDialog(string commentId)
+	{
+		_commentToDeleteId = commentId;
+		_showDeleteDialog = true;
+	}
+
+	/// <summary>
+	/// Handles the delete confirmation.
+	/// </summary>
+	private async Task HandleDeleteConfirm()
+	{
+		_showDeleteDialog = false;
+		if (string.IsNullOrEmpty(_commentToDeleteId)) return;
+
+		var success = await CommentClient.DeleteAsync(_commentToDeleteId);
+		if (success)
+		{
+			_comments = _comments.Where(c => c.Id.ToString() != _commentToDeleteId);
+			await InvokeAsync(StateHasChanged);
+		}
+		_commentToDeleteId = null;
+	}
+
+	/// <summary>
+	/// Handles the delete cancellation.
+	/// </summary>
+	private void HandleDeleteCancel()
+	{
+		_showDeleteDialog = false;
+		_commentToDeleteId = null;
+	}
+
+	/// <summary>
+	/// Sets the status of the issue.
+	/// </summary>
+	private async Task SetIssueStatus(StatusDto status)
+	{
+		if (_issue == null) return;
+		var command = new UpdateIssueStatusCommand
+		{
+			IssueId = _issue.Id,
+			Status = status
+		};
+		var updated = await IssueClient.UpdateStatusAsync(_issue.Id.ToString(), command);
+		if (updated != null)
+		{
+			_issue = updated;
+		}
+	}
+}

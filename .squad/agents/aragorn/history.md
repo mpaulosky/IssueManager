@@ -389,3 +389,10 @@ Because both projects share the same Blazor rendering model, a UI-only moderniza
 3. Remove Radzen package from csproj after replacement
 
 **Decision doc:** `.squad/decisions/inbox/aragorn-issuetracker-ui-review.md`
+
+
+### Web Project Architecture & Testing (2026-03-06)
+- Web project now uses Vertical Slice Architecture — features are self-contained slices with their own routes, pages, components, and services
+- Old horizontal-layer structure (Handlers/, Pages/, Services/) replaced with feature-based folder organization
+- Test project renamed: Blazor.Tests → Web.Tests.Bunit (path: 	ests/Web.Tests.Bunit/)
+- All test references should use the new project name

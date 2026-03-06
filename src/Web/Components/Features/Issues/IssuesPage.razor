@@ -1,0 +1,185 @@
+@page "/issues"
+@using Web.Components.Features.Categories
+@using Web.Components.Features.Statuses
+
+@attribute [StreamRendering]
+@inject IIssueApiClient IssueClient
+@inject ICategoryApiClient CategoryClient
+@inject IStatusApiClient StatusClient
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Issues — IssueManager</PageTitle>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+	<div class="flex items-center justify-between mb-6">
+		<h1 class="text-2xl font-bold text-[var(--text-main)]">Issues</h1>
+		<a href="/issues/create" class="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
+			New Issue
+		</a>
+	</div>
+
+	<!-- Filter bar -->
+	<div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm p-4 mb-6">
+		<div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+			<div>
+				<label for="search" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">Search</label>
+				<input
+					id="search"
+					type="text"
+					@bind="_searchTerm"
+					@bind:event="oninput"
+					class="form-input"
+					placeholder="Search title/description..." />
+			</div>
+			<div>
+				<label for="status-filter" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">Status</label>
+				<select id="status-filter" @bind="_statusFilter" class="form-input">
+					<option value="">All statuses</option>
+					@foreach (var status in _statuses)
+					{
+						<option value="@status.StatusName">@status.StatusName</option>
+					}
+				</select>
+			</div>
+			<div>
+				<label for="category-filter" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">Category</label>
+				<select id="category-filter" @bind="_categoryFilter" class="form-input">
+					<option value="">All categories</option>
+					@foreach (var category in _categories)
+					{
+						<option value="@category.CategoryName">@category.CategoryName</option>
+					}
+				</select>
+			</div>
+			<div class="flex gap-2">
+				<button
+					@onclick="() => LoadIssues(1)"
+					class="flex-1 px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
+					Search
+				</button>
+				<button
+					@onclick="ClearFilters"
+					class="flex-1 px-4 py-2 border border-[var(--border-color)] text-[var(--text-main)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors text-sm font-medium">
+					Clear
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Data table -->
+	<DataTable Items="_issues" IsLoading="_isLoading" EmptyMessage="No issues found." TItem="IssueDto">
+		<HeaderContent>
+			<th scope="col" class="px-6 py-3">Title</th>
+			<th scope="col" class="px-6 py-3">Status</th>
+			<th scope="col" class="px-6 py-3">Category</th>
+			<th scope="col" class="px-6 py-3">Author</th>
+			<th scope="col" class="px-6 py-3">Created</th>
+			<th scope="col" class="px-6 py-3 text-right">Actions</th>
+		</HeaderContent>
+		<RowContent>
+			<tr class="bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] transition-colors">
+				<td class="px-6 py-4">
+					<a href="/issues/@context.Id.ToString()" class="text-[var(--color-primary)] hover:underline font-medium">
+						@context.Title
+					</a>
+				</td>
+				<td class="px-6 py-4">
+					<StatusBadge Status="@context.Status" />
+				</td>
+				<td class="px-6 py-4 text-[var(--text-muted)]">@context.Category.CategoryName</td>
+				<td class="px-6 py-4 text-[var(--text-muted)]">@context.Author.Name</td>
+				<td class="px-6 py-4 text-[var(--text-muted)]">@context.DateCreated.ToString("yyyy-MM-dd")</td>
+				<td class="px-6 py-4 text-right">
+					<AuthorizeView Roles="Admin" Context="authCtx">
+						<Authorized>
+							<a href="/issues/@context.Id.ToString()/edit" class="text-[var(--color-primary)] hover:underline text-sm">
+								Edit
+							</a>
+						</Authorized>
+						<NotAuthorized>
+							@if (_currentUserName != null && _currentUserName == context.Author.Name)
+							{
+								<a href="/issues/@context.Id.ToString()/edit" class="text-[var(--color-primary)] hover:underline text-sm">
+									Edit
+								</a>
+							}
+						</NotAuthorized>
+					</AuthorizeView>
+				</td>
+			</tr>
+		</RowContent>
+	</DataTable>
+
+	<!-- Pagination -->
+	@if (_totalPages > 0)
+	{
+		<Pagination CurrentPage="_currentPage" TotalPages="_totalPages" OnPageChanged="LoadIssues" />
+	}
+</div>
+
+@code {
+	private IEnumerable<IssueDto> _issues = [];
+	private IEnumerable<CategoryDto> _categories = [];
+	private IEnumerable<StatusDto> _statuses = [];
+	private bool _isLoading = true;
+	private int _currentPage = 1;
+	private int _totalPages = 0;
+	private string? _searchTerm;
+	private string? _statusFilter;
+	private string? _categoryFilter;
+	private string? _currentUserName;
+
+	/// <summary>
+	/// Initializes the page by loading categories, statuses, and the first page of issues.
+	/// </summary>
+	protected override async Task OnInitializedAsync()
+	{
+		var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+		_currentUserName = authState.User.Identity?.Name;
+
+		_isLoading = true;
+		try
+		{
+			var catTask = CategoryClient.GetAllAsync();
+			var statusTask = StatusClient.GetAllAsync();
+			await Task.WhenAll(catTask, statusTask);
+			_categories = catTask.Result;
+			_statuses = statusTask.Result;
+			await LoadIssues(1);
+		}
+		finally
+		{
+			_isLoading = false;
+		}
+	}
+
+	/// <summary>
+	/// Loads issues for the specified page with current filters.
+	/// </summary>
+	private async Task LoadIssues(int page)
+	{
+		_isLoading = true;
+		_currentPage = page;
+		try
+		{
+			var response = await IssueClient.GetAllAsync(page, 20);
+			_issues = response.Items;
+			_totalPages = response.TotalPages;
+		}
+		finally
+		{
+			_isLoading = false;
+		}
+	}
+
+	/// <summary>
+	/// Clears all filters and reloads the issues.
+	/// </summary>
+	private async Task ClearFilters()
+	{
+		_searchTerm = null;
+		_statusFilter = null;
+		_categoryFilter = null;
+		await LoadIssues(1);
+	}
+}

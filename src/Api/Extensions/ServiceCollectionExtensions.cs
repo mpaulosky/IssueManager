@@ -60,28 +60,28 @@ public static class ServiceCollectionExtensions
 		return services;
 	}
 
-	/// <summary>Registers all CQRS handler classes as singletons.</summary>
+	/// <summary>Registers all CQRS handler classes as scoped.</summary>
 	public static IServiceCollection AddHandlers(this IServiceCollection services)
 	{
-		services.AddSingleton<CreateIssueHandler>();
-		services.AddSingleton<UpdateIssueHandler>();
-		services.AddSingleton<DeleteIssueHandler>();
-		services.AddSingleton<ListIssuesHandler>();
-		services.AddSingleton<GetIssueHandler>();
-		services.AddSingleton<UpdateIssueStatusHandler>();
-		services.AddSingleton<CreateStatusHandler>();
-		services.AddSingleton<GetStatusHandler>();
-		services.AddSingleton<ListStatusesHandler>();
-		services.AddSingleton<UpdateStatusHandler>();
-		services.AddSingleton<CreateCategoryHandler>();
-		services.AddSingleton<GetCategoryHandler>();
-		services.AddSingleton<ListCategoriesHandler>();
-		services.AddSingleton<UpdateCategoryHandler>();
-		services.AddSingleton<CreateCommentHandler>();
-		services.AddSingleton<GetCommentHandler>();
-		services.AddSingleton<ListCommentsHandler>();
-		services.AddSingleton<UpdateCommentHandler>();
-		services.AddSingleton<DeleteCommentHandler>();
+		services.AddScoped<CreateIssueHandler>();
+		services.AddScoped<UpdateIssueHandler>();
+		services.AddScoped<DeleteIssueHandler>();
+		services.AddScoped<ListIssuesHandler>();
+		services.AddScoped<GetIssueHandler>();
+		services.AddScoped<UpdateIssueStatusHandler>();
+		services.AddScoped<CreateStatusHandler>();
+		services.AddScoped<GetStatusHandler>();
+		services.AddScoped<ListStatusesHandler>();
+		services.AddScoped<UpdateStatusHandler>();
+		services.AddScoped<CreateCategoryHandler>();
+		services.AddScoped<GetCategoryHandler>();
+		services.AddScoped<ListCategoriesHandler>();
+		services.AddScoped<UpdateCategoryHandler>();
+		services.AddScoped<CreateCommentHandler>();
+		services.AddScoped<GetCommentHandler>();
+		services.AddScoped<ListCommentsHandler>();
+		services.AddScoped<UpdateCommentHandler>();
+		services.AddScoped<DeleteCommentHandler>();
 
 		return services;
 	}
