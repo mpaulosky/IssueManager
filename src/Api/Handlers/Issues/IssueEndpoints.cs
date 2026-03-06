@@ -23,9 +23,9 @@ public static class IssueEndpoints
 		// List Issues (paginated)
 		group.MapGet("", async (int? page, int? pageSize, string? searchTerm, string? authorName, ListIssuesHandler handler) =>
 		{
-			var query = new ListIssuesQuery 
-			{ 
-				Page = page ?? 1, 
+			var query = new ListIssuesQuery
+			{
+				Page = page ?? 1,
 				PageSize = pageSize ?? 20,
 				SearchTerm = searchTerm,
 				AuthorName = authorName
@@ -41,9 +41,9 @@ public static class IssueEndpoints
 		// Get Issue by ID
 		group.MapGet("{id}", async (string id, GetIssueHandler handler) =>
 		{
-if (!ObjectId.TryParse(id, out var objectId))
-return Results.BadRequest("Invalid ID format");
-var query = new GetIssueQuery(objectId);
+			if (!ObjectId.TryParse(id, out var objectId))
+				return Results.BadRequest("Invalid ID format");
+			var query = new GetIssueQuery(objectId);
 			var result = await handler.Handle(query);
 			return result.Success ? Results.Ok(result.Value) : Results.NotFound();
 		})
@@ -67,12 +67,12 @@ var query = new GetIssueQuery(objectId);
 		// Update Issue
 		group.MapPatch("{id}", async (string id, UpdateIssueCommand command, UpdateIssueHandler handler) =>
 		{
-if (!ObjectId.TryParse(id, out var objectId))
-return Results.BadRequest("Invalid ID format");
-var commandWithId = command with { Id = objectId };
+			if (!ObjectId.TryParse(id, out var objectId))
+				return Results.BadRequest("Invalid ID format");
+			var commandWithId = command with { Id = objectId };
 			var result = await handler.Handle(commandWithId);
 			if (!result.Success)
-				return result.ErrorCode == ResultErrorCode.NotFound ? Results.NotFound() 
+				return result.ErrorCode == ResultErrorCode.NotFound ? Results.NotFound()
 					: result.ErrorCode == ResultErrorCode.Conflict ? Results.Conflict(result.Error)
 					: Results.BadRequest(result.Error);
 			return Results.Ok(result.Value);
@@ -106,9 +106,9 @@ var commandWithId = command with { Id = objectId };
 		// Delete Issue (soft-delete)
 		group.MapDelete("{id}", async (string id, DeleteIssueHandler handler) =>
 		{
-if (!ObjectId.TryParse(id, out var objectId))
-return Results.BadRequest("Invalid ID format");
-var command = new DeleteIssueCommand { Id = objectId };
+			if (!ObjectId.TryParse(id, out var objectId))
+				return Results.BadRequest("Invalid ID format");
+			var command = new DeleteIssueCommand { Id = objectId };
 			var result = await handler.Handle(command);
 			return result.Success ? Results.NoContent() : Results.NotFound();
 		})

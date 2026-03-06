@@ -100,7 +100,7 @@ public class DeleteCommentHandlerIntegrationTests : IAsyncLifetime
 		result.Success.Should().BeTrue();
 		result.Value.Should().BeTrue();
 
-		var dbCommentResult= await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
+		var dbCommentResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
 		dbCommentResult.Should().NotBeNull();
 		dbCommentResult.Value?.Archived.Should().BeTrue();
 	}

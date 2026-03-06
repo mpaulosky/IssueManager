@@ -7,5 +7,7 @@
 // Project Name :  Web.Tests.Unit
 // =============================================
 global using FluentAssertions;
+
 global using NSubstitute;
+
 global using Xunit;

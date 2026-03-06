@@ -76,7 +76,7 @@ public class CategoriesPageTests : IDisposable
 		// Arrange
 		var category = MakeCategory("Performance");
 		_mockCategoryClient.GetAllAsync(Arg.Any<CancellationToken>())
-			.Returns(Task.FromResult<IEnumerable<CategoryDto>>([ category ]));
+			.Returns(Task.FromResult<IEnumerable<CategoryDto>>([category]));
 
 		// Act
 		var cut = _ctx.Render<CategoriesPage>();

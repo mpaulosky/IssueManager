@@ -28,7 +28,7 @@ public partial class CategoriesPage : ComponentBase
 
 	private List<CategoryEditModel> _categories = [];
 
-	private RadzenDataGrid<CategoryEditModel>? _grid;
+	private readonly RadzenDataGrid<CategoryEditModel>? _grid;
 
 	private CategoryEditModel? _insertingCategory;
 
@@ -51,7 +51,9 @@ public partial class CategoriesPage : ComponentBase
 
 			_categories = dtos.Select(d => new CategoryEditModel
 			{
-					Id = d.Id.ToString(), CategoryName = d.CategoryName, CategoryDescription = d.CategoryDescription
+				Id = d.Id.ToString(),
+				CategoryName = d.CategoryName,
+				CategoryDescription = d.CategoryDescription
 			}).ToList();
 		}
 		finally
@@ -90,7 +92,8 @@ public partial class CategoriesPage : ComponentBase
 
 		var command = new CreateCategoryCommand
 		{
-				CategoryName = cat.CategoryName, CategoryDescription = cat.CategoryDescription
+			CategoryName = cat.CategoryName,
+			CategoryDescription = cat.CategoryDescription
 		};
 
 		var created = await CategoryClient.CreateAsync(command);
@@ -111,7 +114,8 @@ public partial class CategoriesPage : ComponentBase
 
 		var command = new UpdateCategoryCommand
 		{
-				CategoryName = cat.CategoryName, CategoryDescription = cat.CategoryDescription
+			CategoryName = cat.CategoryName,
+			CategoryDescription = cat.CategoryDescription
 		};
 
 		await CategoryClient.UpdateAsync(cat.Id, command);

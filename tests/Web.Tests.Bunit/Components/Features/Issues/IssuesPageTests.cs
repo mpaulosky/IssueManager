@@ -106,7 +106,7 @@ public class IssuesPageTests : ComponentTestBase
 		// Arrange
 		var issue = MakeIssue("My Integration Bug");
 		var response = new PaginatedResponse<IssueDto>(
-				[ issue ],
+				[issue],
 			1,
 			1,
 			20);

@@ -76,7 +76,7 @@ public class StatusesPageTests : IDisposable
 		// Arrange
 		var status = MakeStatus("In Progress");
 		_mockStatusClient.GetAllAsync(Arg.Any<CancellationToken>())
-			.Returns(Task.FromResult<IEnumerable<StatusDto>>([ status ]));
+			.Returns(Task.FromResult<IEnumerable<StatusDto>>([status]));
 
 		// Act
 		var cut = _ctx.Render<StatusesPage>();

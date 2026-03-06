@@ -45,7 +45,7 @@ public static class RedisServices
 			commandOptions: new CommandOptions
 			{
 
-					UpdateState = OnUpdateResourceState,
+				UpdateState = OnUpdateResourceState,
 				ConfirmationMessage = "Are you sure you want to clear the cache?",
 				Description = "This command will clear all cached data in the Redis cache.",
 

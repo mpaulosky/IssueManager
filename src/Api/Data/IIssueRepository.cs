@@ -48,7 +48,7 @@ public interface IIssueRepository
 	/// <summary>
 	/// Updates an existing issue in the database.
 	/// </summary>
-	Task<Result<IssueDto>> UpdateAsync(  IssueDto issue, CancellationToken cancellationToken = default);
+	Task<Result<IssueDto>> UpdateAsync(IssueDto issue, CancellationToken cancellationToken = default);
 
 	/// <summary>
 	/// Counts the total number of issues in the database.

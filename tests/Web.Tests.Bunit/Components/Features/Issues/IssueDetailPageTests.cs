@@ -152,7 +152,7 @@ public class IssueDetailPageTests : ComponentTestBase
 		_mockIssueClient.GetByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IssueDto?>(issue));
 		_mockCommentClient.GetAllAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
-			.Returns(Task.FromResult<IEnumerable<CommentDto>>([ comment ]));
+			.Returns(Task.FromResult<IEnumerable<CommentDto>>([comment]));
 
 		// Act
 		var cut = TestContext.Render<IssueDetailPage>(p =>

@@ -50,11 +50,11 @@ public partial class AdminPage : ComponentBase
 	{
 		var command = new UpdateIssueCommand
 		{
-				Id = issue.Id,
-				Title = issue.Title,
-				Description = issue.Description,
-				ApprovedForRelease = true,
-				Rejected = false
+			Id = issue.Id,
+			Title = issue.Title,
+			Description = issue.Description,
+			ApprovedForRelease = true,
+			Rejected = false
 		};
 
 		var updated = await IssueClient.UpdateAsync(issue.Id.ToString(), command);
@@ -69,7 +69,10 @@ public partial class AdminPage : ComponentBase
 	{
 		var command = new UpdateIssueCommand
 		{
-				Id = issue.Id, Title = issue.Title, Description = issue.Description, Rejected = true
+			Id = issue.Id,
+			Title = issue.Title,
+			Description = issue.Description,
+			Rejected = true
 		};
 
 		var updated = await IssueClient.UpdateAsync(issue.Id.ToString(), command);
