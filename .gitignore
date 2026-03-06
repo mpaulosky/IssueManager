@@ -70,6 +70,7 @@ OpenCover/
 # Rider
 .idea/
 *.sln.iml
+*.sln.DotSettings.user
 
 # Version Control Merge Files
 *.orig
