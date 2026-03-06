@@ -540,3 +540,20 @@ Split the single `tests/Unit.Tests` project into three project-specific test ass
 **Rationale:** Naming alignment with other split projects (`Api.Tests.Unit`, `Shared.Tests.Unit`, `Web.Tests.Unit`). Consistent convention: `{Layer}.Tests.{Scope}`.
 
 **Related:** PR #96 (open, branch `squad/94-rename-integration-tests`)
+
+### 2026-03-07: PR #96 Merged — Conflict Resolution
+
+**Task:** Resolve merge conflicts in PR #96 (`squad/94-rename-integration-tests` → `main`) and squash-merge.
+
+**Conflicts resolved:**
+- `scripts/hooks/pre-push` — kept `Api.Tests.Integration` case entry; added `Web.Tests.Unit` to test suite; switched to `git diff --name-only HEAD @{push}` for faster copyright validation
+- `.squad/agents/gimli/charter.md` — kept `Api.Tests.Integration` (HEAD version)
+- `tests/Integration.Tests/*.cs` (modify/delete) — kept deletions (files already moved to `Api.Tests.Integration/`)
+- `IssueManager.sln`, `.github/workflows/squad-test.yml` — auto-merged cleanly
+
+**Outcome:**
+- ✅ Merge commit: `chore: merge main into squad/94 to resolve conflicts`
+- ✅ All pre-push gates passed (copyright, format, 5 test suites)
+- ✅ All 12 CI checks green
+- ✅ PR #96 squash-merged: `refactor(tests): rename Integration.Tests to Api.Tests.Integration (#96)`
+- ✅ Branch deleted; main synced
