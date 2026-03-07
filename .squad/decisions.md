@@ -2101,3 +2101,21 @@ All unit test jobs follow same structure:
 - \CreateIssueRequestTests.cs\ (15 validation tests)
 
 **Commit:** \da72ae\ — test: migrate 32 pure tests to Web.Tests.Unit and add 15 new unit tests
+
+---
+
+### 2026-03-07: AppHost integration tests skip gracefully without Docker
+
+**By:** Gimli (Tester)  
+**What:** AppHost.Tests.Unit uses DistributedApplicationFixture.IsAvailable + SkipException.ForSkip() to skip when Aspire/Docker initialization fails. This converts environment failures to explicit skips rather than inconclusive test results.  
+**Why:** AppHostTests depends on DistributedApplicationTestingBuilder.CreateAsync<Projects.AppHost>() which may fail without Docker. Explicit skips are better than inconclusive failures in CI. Note: SkipException.ForSkip(string) is the correct factory method in xUnit v3.2.2 — SkipException constructor is private; Skip.If() static helper does not exist.  
+**Impact:** AppHost.Tests.Unit now passes in Docker-less environments; test failures are explicit skips rather than inconclusive results.
+
+---
+
+### 2026-03-07: AppHost.Tests.Unit uses direct executable mode in CI
+
+**By:** Gimli (Tester)  
+**What:** AppHost.Tests.Unit (OutputType=Exe) runs as direct executable in CI, consistent with Architecture.Tests and Web.Tests.Bunit. Not via dotnet test.  
+**Why:** xUnit v3 TestProcessLauncherAdapter compatibility issue causes inconclusive tests when dotnet test is used with OutputType=Exe projects. Direct executable invocation bypasses the adapter.  
+**Impact:** AppHost.Tests.Unit now runs reliably in CI workflows without inconclusive failures.
