@@ -247,3 +247,36 @@ DevOps on IssueManager (.NET 10, GitHub Actions, Aspire, NuGet centralized packa
 
 **Commit:** cffe0b1 on main
 **Files Modified:** .github/workflows/squad-test.yml, .github/workflows/squad-ci.yml
+
+### 2026-03-10: PR #97 Review — AppHost.Tests.Unit CI Exe Mode Fix
+
+**Context:** Gimli fixed AppHost.Tests.Unit inconclusive tests + CI test-apphost-unit job failing due to incorrect dotnet test invocation (should use exe directly).
+
+**PR Review Results:**
+- ✅ **Workflow changes validated:** test-apphost-unit job now uses direct exe mode (matches Architecture.Tests and Web.Tests.Bunit reference patterns)
+  - Build step: `dotnet build tests/AppHost.Tests.Unit --configuration Release --no-restore`
+  - Run step: `cd tests/AppHost.Tests.Unit/bin/Release/net10.0 && ./AppHost.Tests.Unit -xml ... -nunit ...`
+  - Pattern consistent with other xUnit v3 workaround jobs (Architecture.Tests line 258, Web.Tests.Bunit line 314)
+- ✅ **Pre-push hook validated:** Added `run_apphost_tests()` function with Docker availability check
+  - Docker detection: `docker info &>/dev/null 2>&1`
+  - Non-blocking: Docker not required to push — tests skip gracefully if Docker unavailable via fixture's `IsAvailable` flag
+  - Hook executes AppHost.Tests.Unit exe directly (lines 124-152)
+- ✅ **Test infrastructure validated:**
+  - `DistributedApplicationFixture.cs`: proper IAsyncLifetime with IsAvailable/UnavailableReason properties
+  - `AppHostTests.cs`: uses `[Collection("AppHostIntegration")]` + `SkipException.ForSkip()` guard pattern
+  - `IntegrationTestCollection.cs`: proper xUnit collection definition with `ICollectionFixture<DistributedApplicationFixture>`
+  - `xunit.runner.json`: `parallelizeTestCollections: true` enabled
+- ✅ **File headers validated:** All new .cs files have correct copyright headers with Project Name = "AppHost.Tests.Unit"
+- ✅ **CI status:** All 25 checks passing (Test Suite, Squad CI, CodeQL, codecov)
+
+**Key Technical Notes:**
+- xUnit v3.2.2: `SkipException.ForSkip(string)` factory method required (constructor is private)
+- AppHost.Tests.Unit requires direct exe execution due to xUnit v3 TestProcessLauncherAdapter compatibility issues (same as Architecture.Tests, Web.Tests.Bunit, Api.Tests.Integration)
+- Shared fixture pattern reduces `DistributedApplicationTestingBuilder.CreateAsync()` calls from 5 to 1 per test run
+
+**Merge Action:**
+- PR #97 auto-merged via squash (all requirements met, branch protection satisfied)
+- Branch `squad/apphost-tests-fix` will be auto-deleted on merge completion
+
+**Commit:** (pending auto-merge completion)
+**Files Modified:** .github/workflows/squad-test.yml, .git/hooks/pre-push, tests/AppHost.Tests.Unit/ (fixtures + tests)

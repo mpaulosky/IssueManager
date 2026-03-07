@@ -33,6 +33,57 @@ Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, Te
 
 ---
 
+## 2026-03-07 — AppHost.Tests.Unit Fix: Shared Fixture, Docker Skip Guard, Parallel Collections
+
+**Task:** Fix AppHost.Tests.Unit so tests don't show as inconclusive in VS Test Explorer; reduce
+5 separate `CreateAsync<Projects.AppHost>()` calls to 1 per run; add to pre-push hook; fix CI job.
+
+**Root Cause Analysis:**
+- `AppHost.Tests.Unit` has `OutputType=Exe` like Architecture.Tests and Web.Tests.Bunit, but CI was
+  using `dotnet test` → xUnit v3 compatibility issue → inconclusive/not-run tests
+- Each of the 5 AppHostTests called `DistributedApplicationTestingBuilder.CreateAsync<Projects.AppHost>()`
+  separately → 5x expensive Aspire host initialization
+- `parallelizeTestCollections: false` → no parallel collection execution
+- AppHost.Tests.Unit missing from pre-push hook
+
+**Solution Applied:**
+
+1. **DistributedApplicationFixture** — `IAsyncLifetime` fixture (in `AppHost.Fixtures` namespace)
+   that calls `CreateAsync` + `BuildAsync` once, catches exceptions, sets `IsAvailable` flag.
+   Uses `IDistributedApplicationTestingBuilder` (not `DistributedApplicationTestingBuilder` which
+   is static — CreateAsync returns the interface).
+
+2. **IntegrationTestCollection** — `[CollectionDefinition("AppHostIntegration")]` with
+   `ICollectionFixture<DistributedApplicationFixture>` so AppHostTests gets a shared fixture.
+
+3. **AppHostTests.cs** — Rewritten with `[Collection("AppHostIntegration")]` + primary constructor
+   injection. Tests use `throw SkipException.ForSkip(reason)` when `!fixture.IsAvailable`.
+   Tests are now synchronous (async work is done in the fixture).
+
+4. **xunit.runner.json** — Changed `parallelizeTestCollections: false` → `true`. AppHostTests
+   in `AppHostIntegration` collection, other 4 classes in their own default collections → parallel.
+
+5. **CI fix** — `test-apphost-unit` job now builds then runs exe directly (consistent with
+   Architecture.Tests, Web.Tests.Bunit pattern).
+
+6. **Pre-push hook** — Added `run_apphost_tests()` function with Docker availability check;
+   called after Architecture.Tests gate. Non-blocking when Docker unavailable (warns + continues).
+
+**Key xUnit v3 API Discovery:**
+- `Skip.If()` static method does NOT exist in xUnit v3.2.2
+- `SkipException` constructor is PRIVATE — must use `SkipException.ForSkip(string)` factory method
+- `SkipException` is in `Xunit.Sdk` namespace
+- `DynamicSkipToken.Value = "$XunitDynamicSkip$"` (alternative: throw Exception with this prefix)
+- `IDistributedApplicationTestingBuilder` is the interface returned by `DistributedApplicationTestingBuilder.CreateAsync<T>()`
+
+**Files Created:** 2 (DistributedApplicationFixture.cs, IntegrationTestCollection.cs in Fixtures/)
+**Files Modified:** 5 (AppHostTests.cs, GlobalUsings.cs, xunit.runner.json, squad-test.yml, .git/hooks/pre-push)
+**Decision files:** 2 (gimli-apphost-test-exe-mode.md, gimli-apphost-docker-skip.md)
+
+**Build:** ✅ 0 errors. **Tests:** Api 182, Shared 215, Web.Unit 46, AppHost 18 (all passed) — Total 461.
+
+---
+
 ## 2026-03-07 — Integration Test Parallel Collection Optimization
 
 **Task:** Optimize `Api.Tests.Integration` runtime by replacing 23 per-class `MongoDbContainer` instances with a shared `ICollectionFixture<MongoDbFixture>` and enabling parallel collection execution.
