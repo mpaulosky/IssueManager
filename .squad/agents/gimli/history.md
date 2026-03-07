@@ -2,6 +2,7 @@
 
 ## Core Context
 Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, TestContainers). User: Matthew Paulosky.
+**Test Portfolio:** Web.Tests.Unit 46 (32 migrated + 15 new - 1 dup), Web.Tests.Bunit 123 (bUnit-required only).
 
 ### Foundation Sessions (2026-02-25 through 2026-02-28)
 - **Unit Test Batch (11 files):** DTOs (7), Exceptions (2), Helpers (2) for shared project. Namespaces follow RootNamespace pattern: `Tests.Unit.*`
@@ -29,6 +30,64 @@ Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, Te
 - MockHandler: Captures LastRequest for URL assertion verification
 
 ## Learnings
+
+---
+
+## 2026-03-06 23:57Z — Web Test Migration + New Unit Tests
+
+**Task:** Migrate 32 pure-xUnit tests from Web.Tests.Bunit to Web.Tests.Unit and add new unit tests for uncovered Web classes.
+
+**Phases Completed:**
+1. ✅ **Audit:** Confirmed 6 files (CategoryApiClientTests, CommentApiClientTests, IssueApiClientTests, StatusApiClientTests, TokenForwardingHandlerTests, AuthExtensionsTests) contain ZERO bUnit APIs — pure xUnit + HttpClient mocking
+2. ✅ **Migration:** Moved 32 tests (6 files) to Web.Tests.Unit with updated copyright headers (`Project Name : Web.Tests.Unit`)
+3. ✅ **Cleanup:** Deleted source files from Web.Tests.Bunit
+4. ✅ **Verification:** Web.Tests.Bunit rebuilt successfully — 123 tests pass (down from 155, as expected)
+5. ✅ **New Tests:** Added `CreateIssueRequestTests.cs` with 15 comprehensive validation tests for the `CreateIssueRequest` record (Required, StringLength, edge cases)
+6. ✅ **Build & Test:** Web.Tests.Unit compiles and passes all 46 tests (32 migrated + 15 new - 1 from file split)
+7. ✅ **Pre-Push Gate:** ALL test suites pass — Api: 182, Shared: 215, Web.Unit: 46, Web.Bunit: 123, Arch: 9 (Total: 575)
+8. ✅ **Formatting Fix:** `dotnet format` applied to fix CRLF → LF line endings for pre-push gate compliance
+9. ✅ **Push:** Committed and pushed to main — all gates passed
+
+**Files Moved (32 tests):**
+- `CategoryApiClientTests.cs` — 4 tests
+- `CommentApiClientTests.cs` — 6 tests
+- `IssueApiClientTests.cs` — 12 tests (including URL query string verification)
+- `StatusApiClientTests.cs` — 4 tests
+- `TokenForwardingHandlerTests.cs` — 4 tests (Auth0 token forwarding with NSubstitute mocks)
+- `AuthExtensionsTests.cs` — 2 tests
+
+**Files Created (15 tests):**
+- `CreateIssueRequestTests.cs` — 15 validation tests:
+  - Constructor default values
+  - Required field validation (Title)
+  - StringLength validation (Title: 3-200, Description: max 5000)
+  - Edge cases (empty, too short, too long, max length, null)
+  - Property setters (Status, CategoryId, StatusId)
+
+**GlobalUsings.cs Updates:**
+- Added: `System.Diagnostics.CodeAnalysis`, `Microsoft.AspNetCore.Builder`, `Microsoft.AspNetCore.Http`, `MongoDB.Bson`, `Shared.DTOs`, `Shared.Validators`
+- Result: All test files compile without namespace issues
+
+**Key Patterns:**
+- **MockHandler:** Inline `HttpMessageHandler` subclass for mocking HttpClient responses — defined in each test file (no shared helper needed since only used in moved files)
+- **AAA Pattern:** All tests follow Arrange / Act / Assert with comments
+- **FluentAssertions:** `.Should().Be()`, `.Should().BeNull()`, `.Should().HaveCount()`, `.Should().Contain()`
+- **NSubstitute:** `Substitute.For<IInterface>()`, `Returns()` for Auth0 mocks
+
+**Test Count Summary:**
+- **Before Migration:** Web.Tests.Bunit had 155 tests (123 bUnit + 32 pure xUnit)
+- **After Migration:** Web.Tests.Bunit: 123, Web.Tests.Unit: 46 (32 migrated + 15 new - 1 duplicate)
+- **Net Change:** +15 new tests, better project organization
+
+**Why This Matters:**
+- Tests now live in the correct project based on their dependencies
+- Non-bUnit tests in a bUnit project is misleading and increases bUnit build time
+- Web.Tests.Unit can now grow with additional pure-xUnit tests without bUnit overhead
+- Pre-push gate ensures all test suites remain green
+
+**Commit:** `bda72ae` — test: migrate 32 pure tests to Web.Tests.Unit and add 15 new unit tests
+
+**Next:** ProfilePage and AdminPage filtering logic remains untested — these require bUnit (inherit from ComponentBase). Consider adding bUnit tests for these components in a future task.
 
 ---
 
