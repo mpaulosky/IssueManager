@@ -33,6 +33,52 @@ Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, Te
 
 ---
 
+## 2026-03-07 — Integration Test Parallel Collection Optimization
+
+**Task:** Optimize `Api.Tests.Integration` runtime by replacing 23 per-class `MongoDbContainer` instances with a shared `ICollectionFixture<MongoDbFixture>` and enabling parallel collection execution.
+
+**Root Cause Analysis:**
+- 23 test classes each started their own `MongoDbContainer` in `InitializeAsync()` → ~2s × 23 = ~46s wasted startup time
+- Single `[CollectionDefinition("Integration", DisableParallelization = true)]` forced sequential execution
+- `parallelizeTestCollections: false` in `xunit.runner.json` — no parallelism at all
+- `ListIssuesHandlerIntegrationTests` was creating 1,000 issues (now 100)
+
+**Solution Applied:**
+
+1. **4 Parallel Domain Collections** — `IntegrationTestCollection.cs` now defines:
+   - `CategoryIntegration` (5 classes: 4 handlers + CategoryRepository)
+   - `IssueIntegration` (9 classes: 7 handlers + IssueRepositorySearch + IssueRepository)
+   - `CommentIntegration` (5 classes: 5 handlers)
+   - `StatusIntegration` (4 classes: 4 handlers)
+   Each collection has `ICollectionFixture<MongoDbFixture>` — 4 containers total instead of 23.
+
+2. **MongoDbFixture** — pre-existing fixture; provides `ConnectionString` property. Container starts once per collection, shared across all test classes in that domain.
+
+3. **Per-test-method DB isolation** — Each test class constructor uses `$"T{Guid.NewGuid():N}"` as the database name. Since xUnit v3 creates a new class instance per test method, each test method gets a fresh MongoDB database within the shared container. This maintains full isolation without per-method container startup.
+
+4. **xunit.runner.json** — changed `parallelizeTestCollections: false` → `true`. `parallelizeAssembly` stays `false` (we want collection-level parallelism, not method-level).
+
+5. **Large dataset test** — Reduced from 1,000 to 100 issues; added `[Trait("Category", "slow")]`.
+
+**Key Pattern — Guid-based DB name:**
+```csharp
+// In test class constructor — gives unique DB per test method (xUnit creates new instance per test)
+_repository = new CategoryRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
+```
+MongoDB database name `T` + 32 hex chars = 33 chars — well under the 64-char MongoDB limit.
+
+**Files Changed:** 26 (23 test classes + IntegrationTestCollection.cs + GlobalUsings.cs + xunit.runner.json)
+
+**Build:** ✅ 0 errors, 14 pre-existing nullable warnings. Unit tests: Api 182, Shared 215, Web.Unit 46, Web.Bunit 123, Arch 9 — all passed.
+
+**Formatting fix:** Added `global using Integration.Fixtures;` — needed to appear alphabetically between `FluentValidation` and `MongoDB.Bson` in GlobalUsings. Pre-push hook caught the ordering issue; fixed with `dotnet format`.
+
+**Commit:** `69c0bb5` — perf(tests): optimize Api.Tests.Integration — shared fixture, parallel collections
+
+**Critical Rule 2 Updated:** No longer "use `[Collection('Integration')]` on all classes". Now: use domain-specific collections (`CategoryIntegration`, `IssueIntegration`, `CommentIntegration`, `StatusIntegration`), each backed by `ICollectionFixture<MongoDbFixture>`.
+
+---
+
 ## 2026-03-06 23:57Z — Web Test Migration + New Unit Tests
 
 **Task:** Migrate 32 pure-xUnit tests from Web.Tests.Bunit to Web.Tests.Unit and add new unit tests for uncovered Web classes.

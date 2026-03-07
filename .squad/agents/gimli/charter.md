@@ -23,7 +23,7 @@ You are Gimli, the Tester on the IssueManager project. You own unit tests, integ
 
 ## Critical Rules
 1. **Before any push: run the FULL local test suite** — `dotnet test tests/Api.Tests.Unit tests/Shared.Tests.Unit tests/Web.Tests.Unit tests/Web.Tests.Bunit tests/Architecture.Tests`. Zero failures required. Pre-push hook gates on these test suites. CI must never be the first place test failures are discovered.
-2. **`[Collection("Integration")]` REQUIRED** on ALL integration test classes — prevents parallel Docker port conflicts
+2. **Domain-specific collections REQUIRED** — Use `[Collection("CategoryIntegration")]`, `[Collection("IssueIntegration")]`, `[Collection("CommentIntegration")]`, or `[Collection("StatusIntegration")]` on all integration test classes. Each collection is backed by `ICollectionFixture<MongoDbFixture>`. Do NOT use the old single `[Collection("Integration")]`. Use `$"T{Guid.NewGuid():N}"` as the DB name in the constructor for per-test-method isolation.
 3. **NEVER compare two `IssueDto.Empty` or `CommentDto.Empty` calls** — `Empty` calls `DateTime.UtcNow` each time; assert individual fields instead
 4. **`GenerateSlug` trailing underscore is correct** — `"C# Is Great!"` → `"c_is_great_"` (trailing underscore expected)
 5. Test namespace pattern: `Tests.Unit.{Folder}` for unit tests, `Tests.Integration.{Area}` for integration
