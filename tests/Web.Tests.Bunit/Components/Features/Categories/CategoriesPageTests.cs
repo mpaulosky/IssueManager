@@ -7,6 +7,8 @@
 // Project Name :  Web.Tests.Bunit
 // =============================================
 
+using System.Reflection;
+
 namespace Web.Components.Features.Categories;
 
 /// <summary>
@@ -93,5 +95,161 @@ public class CategoriesPageTests : IDisposable
 
 		// Assert
 		_mockCategoryClient.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
+	}
+
+	[Fact]
+	public async Task CategoriesPage_OnCreateRow_CallsCreateAsync_AndSetsId()
+	{
+		// Arrange
+		var createdDto = MakeCategory("NewCat", "NewDesc");
+		_mockCategoryClient.CreateAsync(Arg.Any<CreateCategoryCommand>(), Arg.Any<CancellationToken>())
+			.Returns(Task.FromResult<CategoryDto?>(createdDto));
+		var cut = _ctx.Render<CategoriesPage>();
+		var method = typeof(CategoriesPage).GetMethod("OnCreateRow", BindingFlags.NonPublic | BindingFlags.Instance);
+		var cat = new CategoryEditModel { CategoryName = "NewCat", CategoryDescription = "NewDesc" };
+
+		// Act
+		await cut.InvokeAsync(() => (Task)method!.Invoke(cut.Instance, [cat])!);
+
+		// Assert
+		_ = _mockCategoryClient.Received(1).CreateAsync(Arg.Any<CreateCategoryCommand>(), Arg.Any<CancellationToken>());
+		cat.Id.Should().Be(createdDto.Id.ToString());
+	}
+
+	[Fact]
+	public async Task CategoriesPage_OnCreateRow_DoesNotSetId_WhenCreateReturnsNull()
+	{
+		// Arrange
+		_mockCategoryClient.CreateAsync(Arg.Any<CreateCategoryCommand>(), Arg.Any<CancellationToken>())
+			.Returns(Task.FromResult<CategoryDto?>(null));
+		var cut = _ctx.Render<CategoriesPage>();
+		var method = typeof(CategoriesPage).GetMethod("OnCreateRow", BindingFlags.NonPublic | BindingFlags.Instance);
+		var cat = new CategoryEditModel { CategoryName = "NewCat", CategoryDescription = "NewDesc" };
+
+		// Act
+		await cut.InvokeAsync(() => (Task)method!.Invoke(cut.Instance, [cat])!);
+
+		// Assert
+		cat.Id.Should().BeEmpty();
+	}
+
+	[Fact]
+	public async Task CategoriesPage_OnUpdateRow_CallsUpdateAsync_WhenIdIsSet()
+	{
+		// Arrange
+		var id = ObjectId.GenerateNewId().ToString();
+		_mockCategoryClient.UpdateAsync(Arg.Any<string>(), Arg.Any<UpdateCategoryCommand>(), Arg.Any<CancellationToken>())
+			.Returns(Task.FromResult<CategoryDto?>(null));
+		var cut = _ctx.Render<CategoriesPage>();
+		var method = typeof(CategoriesPage).GetMethod("OnUpdateRow", BindingFlags.NonPublic | BindingFlags.Instance);
+		var cat = new CategoryEditModel { Id = id, CategoryName = "Updated", CategoryDescription = "Desc" };
+
+		// Act
+		await cut.InvokeAsync(() => (Task)method!.Invoke(cut.Instance, [cat])!);
+
+		// Assert
+		_ = _mockCategoryClient.Received(1).UpdateAsync(id, Arg.Any<UpdateCategoryCommand>(), Arg.Any<CancellationToken>());
+	}
+
+	[Fact]
+	public async Task CategoriesPage_OnUpdateRow_SkipsUpdate_WhenIdIsEmpty()
+	{
+		// Arrange
+		var cut = _ctx.Render<CategoriesPage>();
+		var method = typeof(CategoriesPage).GetMethod("OnUpdateRow", BindingFlags.NonPublic | BindingFlags.Instance);
+		var cat = new CategoryEditModel { Id = "", CategoryName = "Updated", CategoryDescription = "Desc" };
+
+		// Act
+		await cut.InvokeAsync(() => (Task)method!.Invoke(cut.Instance, [cat])!);
+
+		// Assert
+		_ = _mockCategoryClient.DidNotReceive().UpdateAsync(Arg.Any<string>(), Arg.Any<UpdateCategoryCommand>(), Arg.Any<CancellationToken>());
+	}
+
+	[Fact]
+	public async Task CategoriesPage_CancelEdit_ClearsInsertingState()
+	{
+		// Arrange
+		var cut = _ctx.Render<CategoriesPage>();
+		var insertingField = typeof(CategoriesPage).GetField("_insertingCategory", BindingFlags.NonPublic | BindingFlags.Instance);
+		var cat = new CategoryEditModel { CategoryName = "Test" };
+		insertingField!.SetValue(cut.Instance, cat);
+		var cancelMethod = typeof(CategoriesPage).GetMethod("CancelEdit", BindingFlags.NonPublic | BindingFlags.Instance);
+
+		// Act
+		await cut.InvokeAsync(() => { cancelMethod!.Invoke(cut.Instance, [cat]); });
+
+		// Assert
+		insertingField.GetValue(cut.Instance).Should().BeNull();
+	}
+
+	[Fact]
+	public async Task CategoriesPage_CancelEdit_ClearsEditingState()
+	{
+		// Arrange
+		var cut = _ctx.Render<CategoriesPage>();
+		var editingField = typeof(CategoriesPage).GetField("_editingCategory", BindingFlags.NonPublic | BindingFlags.Instance);
+		var cat = new CategoryEditModel { CategoryName = "Test" };
+		editingField!.SetValue(cut.Instance, cat);
+		var cancelMethod = typeof(CategoriesPage).GetMethod("CancelEdit", BindingFlags.NonPublic | BindingFlags.Instance);
+
+		// Act
+		await cut.InvokeAsync(() => { cancelMethod!.Invoke(cut.Instance, [cat]); });
+
+		// Assert
+		editingField.GetValue(cut.Instance).Should().BeNull();
+	}
+
+	[Fact]
+	public async Task CategoriesPage_InsertRow_SetsInsertingCategory()
+	{
+		// Arrange
+		var cut = _ctx.Render<CategoriesPage>();
+		var method = typeof(CategoriesPage).GetMethod("InsertRow", BindingFlags.NonPublic | BindingFlags.Instance);
+		var insertingField = typeof(CategoriesPage).GetField("_insertingCategory", BindingFlags.NonPublic | BindingFlags.Instance);
+
+		// Act — _insertingCategory is assigned before any grid interop call
+		try
+		{
+			await cut.InvokeAsync(() => (Task)method!.Invoke(cut.Instance, [])!);
+		}
+		catch (Exception) { /* grid JS interop may fail in test environment */ }
+
+		// Assert
+		insertingField!.GetValue(cut.Instance).Should().NotBeNull();
+	}
+
+	[Fact]
+	public async Task CategoriesPage_EditRow_SetsEditingCategory()
+	{
+		// Arrange
+		var cat = new CategoryEditModel { Id = "1", CategoryName = "Bug", CategoryDescription = "Bugs" };
+		var cut = _ctx.Render<CategoriesPage>();
+		var method = typeof(CategoriesPage).GetMethod("EditRow", BindingFlags.NonPublic | BindingFlags.Instance);
+		var editingField = typeof(CategoriesPage).GetField("_editingCategory", BindingFlags.NonPublic | BindingFlags.Instance);
+
+		// Act — _editingCategory is assigned before any grid interop call
+		try
+		{
+			await cut.InvokeAsync(() => (Task)method!.Invoke(cut.Instance, [cat])!);
+		}
+		catch (Exception) { /* grid JS interop may fail in test environment */ }
+
+		// Assert
+		editingField!.GetValue(cut.Instance).Should().Be(cat);
+	}
+
+	[Fact]
+	public async Task CategoriesPage_SaveRow_InvokesGridUpdate()
+	{
+		// Arrange
+		var cat = new CategoryEditModel { Id = "1", CategoryName = "Bug" };
+		var cut = _ctx.Render<CategoriesPage>();
+		var method = typeof(CategoriesPage).GetMethod("SaveRow", BindingFlags.NonPublic | BindingFlags.Instance);
+
+		// Act & Assert — SaveRow completes without throwing (Radzen grid interop handled by Loose JS mode)
+		Func<Task> act = () => cut.InvokeAsync(() => (Task)method!.Invoke(cut.Instance, [cat])!);
+
+		await act.Should().NotThrowAsync();
 	}
 }

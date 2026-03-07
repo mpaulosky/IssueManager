@@ -31,6 +31,48 @@ Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, Te
 
 ## Learnings
 
+### StatusEditModel / CategoryEditModel POCO Tests (2026-03-06)
+- Edit models in Web project are simple POCOs (no validation, no logic) — 5 tests each covers defaults + 3 setters + nullable description.
+- Namespace for these tests matches production namespace (Web.Components.Features.Statuses / Web.Components.Features.Categories) because GlobalUsings already imports them and xUnit discovery works fine.
+- StatusDescription and CategoryDescription are string? (nullable) — test both set and null-roundtrip explicitly.
+- No mocking (NSubstitute) or async needed for pure POCO tests; AAA comment blocks with inline Arrange/Act is fine when trivial.
+
+### AdminPage bUnit Patterns (2026-07-14)
+- `AdminPage` uses `@attribute [Authorize(Roles = "Admin")]` — tests require `_ctx.AddAuthorization().SetAuthorized().SetRoles("Admin")` without inheriting `ComponentTestBase` (to control auth state precisely).
+- `GetAllAsync` is called with `pageSize: 100` only — assert `Received(1).GetAllAsync(Arg.Any<int>(), 100, ...)`.
+- `_issues` is filtered on the client side: only issues with `ApprovedForRelease == false && Rejected == false` appear. Approved/rejected issues passed by the API are silently excluded in UI — test with `Markup.Should().Contain("No pending issues to review.")`.
+- `IssueDto with { ApprovedForRelease = true }` and `with { Rejected = true }` work cleanly for creating modified record copies in tests.
+- Inline cancel lambdas (`@onclick="@(() => _editingTitleId = null)"`) are fully testable by clicking the ✕ button — no separate C# method required.
+- Button ordering in AdminPage per issue: Approve (id="approve-{id}"), Reject (id="reject-{id}"), ✎ (title), ✎ (desc). Use `.First(b => b.TextContent.Contains("✎"))` for title and `.Last(...)` for description when both are visible.
+- Edit title/desc are synchronous (`.Click()`); approve/reject/save are async (await `.ClickAsync(new MouseEventArgs())`).
+- Null-return from `UpdateAsync` leaves the issue in the list — testable distinct from success path.
+- 24 tests total: 5 initialization/filter, 6 approve/reject, 7 title edit/save/cancel, 6 description edit/save/cancel.
+
+### ProfilePage bUnit Patterns (2026-07-14)
+- `ProfilePage` uses `@attribute [Authorize]` (no roles) and `AuthenticationStateProvider` to read the username — use standalone `BunitContext` (not `ComponentTestBase`) with `AddAuthorization().SetAuthorized("testuser")`.
+- `GetAllAsync` is called with named args `pageSize: 200, authorName: _userName` — assert with `Received(1).GetAllAsync(Arg.Any<int>(), 200, Arg.Any<string?>(), "testuser", ...)`.
+- Filtering is pure client-side: `_approved` = {ApprovedForRelease=true, Rejected=false, Archived=false}; `_pending` = {ApprovedForRelease=false, Rejected=false, Archived=false}; `_rejected` = {Rejected=true}. Archived issues with Rejected=false fall into none of the three lists.
+- Username fallback test: call `ctx.AddAuthorization()` WITHOUT `SetAuthorized` → anonymous user → `Identity.Name = null` → production code uses "User".
+- Use `.Find("h1").TextContent.Should().Contain(...)` to avoid apostrophe HTML-encoding ambiguity on the heading.
+- `IssueCard` (rendered per issue) needs `NavigationManager` (auto-provided by bUnit) and `StatusBadge` (pure component, no DI needed).
+- 8 tests: render/heading, GetAllAsync call args, approved section, pending section, rejected section, archived exclusion, loading spinner gone, username fallback.
+
+### SampleDataPage bUnit Patterns (2026-03-07)
+- `SampleDataPage` uses `@attribute [Authorize(Roles = "Admin")]` — tests require `_ctx.AddAuthorization()` + `SetAuthorized()` + `SetRoles("Admin")`.
+- Both `ICategoryApiClient` and `IStatusApiClient` must be registered; `GetAllAsync` is called during both `OnInitializedAsync` AND the button-click handler — use NSubstitute multi-return (`.Returns(first, second)`) to simulate different responses per call.
+- Idempotency: after creation button disappears from DOM (if/else in razor) — second click can't happen; assert absence of button instead of calling a second click.
+- `_isWorking = false` after completion: assert the *other* still-visible button is not disabled (categories button → check statuses button and vice versa), since the just-used button disappears when `_XxxCreated = true`.
+- NSubstitute `Task.FromException<T>()` is the correct approach to simulate faulted async returns for exception-handling tests on async `GetAllAsync`.
+
+### Web Coverage P0 Batch (2026-03-07)
+- **Agents:** agent-20 and agent-21 (parallel Gimli runners, background mode)
+- **Deliverables:** AdminPageTests.cs (24 tests) + SampleDataPageTests.cs (19 tests) = 43 total
+- **Batch Status:** ✅ All 43 tests passing
+- **Impact:** +7-9% estimated coverage gain (from 65-70% baseline → 72-79% current)
+- **Orchestration Logs:** `.squad/orchestration-log/2026-03-07T02-38-01Z-gimli-admin-page-tests.md` and `.../gimli-sample-data-page-tests.md`
+- **Session Log:** `.squad/log/2026-03-07T02-38-01Z-web-coverage-p0-batch.md`
+- **Next P0 Items:** ProfilePage tests (~8-10), IssueCard tests (~4-6), App shell/error pages (~8-10) to reach 90% target
+
 ---
 
 ## 2026-03-07 — AppHost.Tests.Unit Fix: Shared Fixture, Docker Skip Guard, Parallel Collections
@@ -436,7 +478,8 @@ Found and converted 13 test files with old single-line copyright headers to the 
 
 ### Learnings
 
-**Copyright Header Standard:** All test files now use the multi-line block format:
+### StatusEditModel / CategoryEditModel POCO Tests (2026-03-06)
+See earlier "StatusEditModel / CategoryEditModel POCO Tests (2026-03-06)" notes above; details are not repeated here to keep this history concise.
 \\\csharp
 // ============================================
 // Copyright (c) 2026. All rights reserved.
@@ -581,3 +624,4 @@ Split the single `tests/Unit.Tests` project into three project-specific test ass
 
 ### Notes
 History file currently at 37KB. If exceeded 12KB limit in future, will require summarization of entries older than 30 days into "## Core Context" section.
+

@@ -258,4 +258,67 @@ public class IssueApiClientTests
 		query.Should().NotContain("searchTerm");
 		query.Should().NotContain("authorName");
 	}
+
+	[Fact]
+	public async Task UpdateAsync_ReturnsIssueDto_OnSuccess()
+	{
+		// Arrange
+		var expected = MakeIssue("Updated Title");
+		var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(expected) };
+		var client = new IssueApiClient(CreateMockClient(response));
+		var command = new UpdateIssueCommand { Title = "Updated Title", Description = "Desc" };
+
+		// Act
+		var result = await client.UpdateAsync(expected.Id.ToString(), command, Xunit.TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Should().NotBeNull();
+		result!.Title.Should().Be("Updated Title");
+	}
+
+	[Fact]
+	public async Task UpdateAsync_ReturnsNull_OnBadRequest()
+	{
+		// Arrange
+		var response = new HttpResponseMessage(HttpStatusCode.BadRequest);
+		var client = new IssueApiClient(CreateMockClient(response));
+		var command = new UpdateIssueCommand { Title = "x" };
+
+		// Act
+		var result = await client.UpdateAsync(ObjectId.GenerateNewId().ToString(), command, Xunit.TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Should().BeNull();
+	}
+
+	[Fact]
+	public async Task UpdateStatusAsync_ReturnsIssueDto_OnSuccess()
+	{
+		// Arrange
+		var expected = MakeIssue("Status Updated Issue");
+		var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(expected) };
+		var client = new IssueApiClient(CreateMockClient(response));
+		var command = new UpdateIssueStatusCommand { IssueId = expected.Id, Status = StatusDto.Empty };
+
+		// Act
+		var result = await client.UpdateStatusAsync(expected.Id.ToString(), command, Xunit.TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Should().NotBeNull();
+	}
+
+	[Fact]
+	public async Task UpdateStatusAsync_ReturnsNull_OnBadRequest()
+	{
+		// Arrange
+		var response = new HttpResponseMessage(HttpStatusCode.BadRequest);
+		var client = new IssueApiClient(CreateMockClient(response));
+		var command = new UpdateIssueStatusCommand { IssueId = ObjectId.GenerateNewId(), Status = StatusDto.Empty };
+
+		// Act
+		var result = await client.UpdateStatusAsync(ObjectId.GenerateNewId().ToString(), command, Xunit.TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Should().BeNull();
+	}
 }

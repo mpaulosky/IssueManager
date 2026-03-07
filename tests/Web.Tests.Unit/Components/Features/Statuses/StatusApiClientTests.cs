@@ -103,4 +103,52 @@ public class StatusApiClientTests
 		result.Should().BeNull();
 	}
 
+	[Fact]
+	public async Task GetByIdAsync_ReturnsStatusDto_OnSuccess()
+	{
+		// Arrange
+		var expected = MakeStatus("In Review");
+		var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(expected) };
+		var client = new StatusApiClient(CreateMockClient(response));
+
+		// Act
+		var result = await client.GetByIdAsync(expected.Id.ToString(), Xunit.TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Should().NotBeNull();
+		result!.StatusName.Should().Be("In Review");
+	}
+
+	[Fact]
+	public async Task UpdateAsync_ReturnsStatusDto_OnSuccess()
+	{
+		// Arrange
+		var expected = MakeStatus("Updated Status");
+		var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(expected) };
+		var client = new StatusApiClient(CreateMockClient(response));
+		var command = new UpdateStatusCommand { StatusName = "Updated Status", StatusDescription = "Updated desc" };
+
+		// Act
+		var result = await client.UpdateAsync(expected.Id.ToString(), command, Xunit.TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Should().NotBeNull();
+		result!.StatusName.Should().Be("Updated Status");
+	}
+
+	[Fact]
+	public async Task UpdateAsync_ReturnsNull_OnBadRequest()
+	{
+		// Arrange
+		var response = new HttpResponseMessage(HttpStatusCode.BadRequest);
+		var client = new StatusApiClient(CreateMockClient(response));
+		var command = new UpdateStatusCommand { StatusName = "x" };
+
+		// Act
+		var result = await client.UpdateAsync(ObjectId.GenerateNewId().ToString(), command, Xunit.TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Should().BeNull();
+	}
+
 }
