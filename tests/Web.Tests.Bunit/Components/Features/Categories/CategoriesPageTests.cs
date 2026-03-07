@@ -247,14 +247,9 @@ public class CategoriesPageTests : IDisposable
 		var cut = _ctx.Render<CategoriesPage>();
 		var method = typeof(CategoriesPage).GetMethod("SaveRow", BindingFlags.NonPublic | BindingFlags.Instance);
 
-		// Act — exercise the SaveRow code path (Radzen grid interop handled by Loose JS mode)
-		try
-		{
-			await cut.InvokeAsync(() => (Task)method!.Invoke(cut.Instance, [cat])!);
-		}
-		catch (Exception) { /* grid may not be fully initialized in bUnit */ }
+		// Act & Assert — SaveRow completes without throwing (Radzen grid interop handled by Loose JS mode)
+		Func<Task> act = () => cut.InvokeAsync(() => (Task)method!.Invoke(cut.Instance, [cat])!);
 
-		// Assert — code path was reachable
-		cut.Should().NotBeNull();
+		await act.Should().NotThrowAsync();
 	}
 }

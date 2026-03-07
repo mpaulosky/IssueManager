@@ -479,12 +479,7 @@ Found and converted 13 test files with old single-line copyright headers to the 
 ### Learnings
 
 ### StatusEditModel / CategoryEditModel POCO Tests (2026-03-06)
-- Edit models in Web project are simple POCOs (no validation, no logic) — 5 tests each covers defaults + 3 setters + nullable description.
-- Namespace for these tests matches production namespace (Web.Components.Features.Statuses / Web.Components.Features.Categories) because GlobalUsings already imports them and xUnit discovery works fine.
-- StatusDescription and CategoryDescription are string? (nullable) — test both set and null-roundtrip explicitly.
-- No mocking (NSubstitute) or async needed for pure POCO tests; AAA comment blocks with inline Arrange/Act is fine when trivial.
-
-**Copyright Header Standard:** All test files now use the multi-line block format:
+See earlier "StatusEditModel / CategoryEditModel POCO Tests (2026-03-06)" notes above; details are not repeated here to keep this history concise.
 \\\csharp
 // ============================================
 // Copyright (c) 2026. All rights reserved.
