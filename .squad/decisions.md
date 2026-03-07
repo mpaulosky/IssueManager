@@ -1111,6 +1111,72 @@ None required. Coverage exclusion is now enforced at the class level across all 
 
 ---
 
+### 2026-03-06: Web Project Test Coverage Assessment — 90% Target
+**Date:** 2026-03-06  
+**Assessment by:** Aragorn (Lead Developer)  
+**Requested by:** Matthew Paulosky  
+**Goal:** Identify test coverage baseline and produce work plan to reach 90% for Web project
+**Status:** Completed  
+**What:** Comprehensive coverage audit identified 45 source files, current ~65-70% estimated coverage. Baseline: 169 passing tests (46 unit + 123 bUnit). Vertical Slice Architecture (VSA) structure; uneven coverage distribution across features.
+**Coverage Map:**
+- **Well-Covered (95-100%):** Shared UI components, Layout components, API clients, Feature pages (Issues/Categories/Statuses)
+- **Partially Covered (0-83%):** App entry points, IssueCard component
+- **Not Covered (0%):** Admin pages (AdminPage, ProfilePage), SampleDataPage, Home page, error pages
+**Work Plan (Phases 1-3):**
+- **P0/P1 (Critical):** AdminPage tests (12-15), SampleDataPage tests (4-6), ProfilePage tests (8-10) — expected +13-18% coverage
+- **P2 (High):** IssueCard, App shell, error pages — expected +5-6% coverage
+- **P3 (Medium):** Program.cs composition, edge cases — expected +2-4% coverage
+**Target:** 90% coverage requires ~200 tests total (current 169 + ~31 new tests)
+**Key Decisions:** Use bUnit for component tests, NSubstitute for mocking, ComponentTestBase inheritance for shared setup, explicit auth setup for Admin role pages.
+**Why:** Web project is high-visibility; dashboard and admin features lack test protection. Uneven coverage creates maintenance risk. Phased approach prioritizes highest-impact, lowest-effort items first.
+
+---
+
+### 2026-03-07: AdminPage and SampleDataPage bUnit Tests — P0 Batch Complete
+**Date:** 2026-03-07  
+**Agent:** Gimli (Tester)  
+**Branch:** `squad/web-coverage-90pct`  
+**Status:** Completed  
+**What:** Delivered two test suites for Admin feature:
+1. **AdminPageTests.cs** — 24 bUnit tests covering initialization, data display, filtering, approve/reject flows, title/description editing
+2. **SampleDataPageTests.cs** — 19 bUnit tests covering render, button visibility, category/status seeding, idempotency, error handling
+**Total Tests:** 43 (24 + 19), all passing ✅
+**Batch Impact:** +7-9% estimated coverage gain (per Aragorn's assessment). Current estimated coverage now 72-79% (up from 65-70% baseline).
+**Key Patterns:** Admin role authorization (standalone IDisposable, not ComponentTestBase), client-side filtering, NSubstitute multi-return setup, _isWorking state management, async/sync click distinction, null-return edge cases, idempotent seeding.
+**Next Steps:** ProfilePage tests (~8-10), IssueCard component tests (~4-6), App shell & error pages (~8-10) to reach 90% target.
+**Why:** P0 batch prioritizes highest-impact test coverage. AdminPage and SampleDataPage have complex business logic and high user visibility. Completing this batch demonstrates feasibility and establishes test patterns for remaining coverage work.
+
+---
+
+### 2026-03-07: Admin Feature Test Patterns — Authorization & Seeding
+**Date:** 2026-03-07  
+**Author:** Gimli (Tester)  
+**Branch:** `squad/web-coverage-90pct`  
+**Status:** Established  
+**What:** Two decision sets for Admin feature tests:
+
+**AdminPage Test Pattern (24 tests):**
+- **Authorization:** Admin role pages use explicit `IDisposable` pattern, NOT `ComponentTestBase` inheritance. Setup: `ctx.AddAuthorization().SetAuthorized("AdminUser").SetRoles("Admin")`
+- **Client-Side Filtering:** Component receives all issues from API, filters approved/rejected in `OnInitializedAsync`. Tests verify filtering by passing marked issues and asserting they don't appear.
+- **Button Selector Strategy:** Stable IDs for approve/reject (`#approve-{id}`, `#reject-{id}`). Edit buttons (✎) found by text content; first ✎ is title, last ✎ is description.
+- **Async vs Sync Clicks:** Edit methods synchronous (`.Click()`). Approve, Reject, Save methods async (`await .ClickAsync(new MouseEventArgs())`).
+- **Null-Return Guard:** `UpdateAsync` returning null leaves issue in list — separate test case validates this edge case.
+- **Record Syntax:** `IssueDto with { }` creates clean approved/rejected variants from pending base.
+- **Decision:** No production code changes. Test-only. Pattern matches StatusesPageTests, CategoriesPageTests for consistency.
+
+**SampleDataPage Test Pattern (19 tests):**
+- **Authorization:** Same admin role setup as AdminPage (explicit `IDisposable`, not `ComponentTestBase`)
+- **NSubstitute Multi-Return:** Critical pattern — `.Returns(firstCall, secondCall)` because `GetAllAsync` called in both `OnInitializedAsync` and button handler. Must simulate both check + seed operations.
+- **Idempotency Testing:** Component automatically hides "Create Categories" button after categories seeded; hides "Create Statuses" button after statuses seeded. Tests verify buttons disappear (can't click twice).
+- **Exception Handling:** `Task.FromException<T>()` to test error paths. Component displays error message, disables button with `_isWorking = false`.
+- **Button Lookup:** Use `TextContent.Contains(...)` to distinguish from "← Back" button.
+- **Data Seeding:** Creates 5 categories (Design, Docs, Impl, Clarification, Misc) and 4 statuses (Answered, Watching, Upcoming, Dismissed).
+- **Decision:** No production code changes. Test-only. Pattern established for admin utility pages.
+
+**Why:** Admin features require explicit role setup (not inherited in base). Client-side filtering is architectural choice; tests verify behavior maintained. Idempotent seeding prevents accidental duplication. Multi-return setup essential for stateful operations. Pattern clarity ensures future maintainers understand complexity.
+
+---
+
 # Decision: Pre-Push Hook Three-Gate Strategy
 
 **Date:** 2026-02-28  
