@@ -12,36 +12,17 @@ namespace Integration.Handlers;
 /// <summary>
 /// Integration tests for DeleteIssueHandler (soft-delete via Archived) with a real MongoDB database.
 /// </summary>
-[Collection("Integration")]
+[Collection("IssueIntegration")]
 [ExcludeFromCodeCoverage]
-public class DeleteIssueHandlerIntegrationTests : IAsyncLifetime
+public class DeleteIssueHandlerIntegrationTests
 {
-	private const string MongodbImage = "mongo:latest";
-	private const string TestDatabase = "IssueManagerTestDb";
-	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage)
-			.Build();
+	private readonly IIssueRepository _repository;
+	private readonly DeleteIssueHandler _handler;
 
-	private IIssueRepository _repository = null!;
-	private DeleteIssueHandler _handler = null!;
-
-	/// <summary>
-	/// Initializes the test container and repository.
-	/// </summary>
-	public async ValueTask InitializeAsync()
+	public DeleteIssueHandlerIntegrationTests(MongoDbFixture fixture)
 	{
-		await _mongoContainer.StartAsync();
-		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new IssueRepository(connectionString, TestDatabase);
+		_repository = new IssueRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		_handler = new DeleteIssueHandler(_repository, new DeleteIssueValidator());
-	}
-
-	/// <summary>
-	/// Disposes the test container.
-	/// </summary>
-	public async ValueTask DisposeAsync()
-	{
-		await _mongoContainer.StopAsync();
-		await _mongoContainer.DisposeAsync();
 	}
 
 	private static IssueDto CreateTestIssueDto(string title, string description, bool archived = false) =>

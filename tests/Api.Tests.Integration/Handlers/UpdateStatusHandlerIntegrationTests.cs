@@ -12,36 +12,17 @@ namespace Integration.Handlers;
 /// <summary>
 /// Integration tests for UpdateStatusHandler with a real MongoDB database.
 /// </summary>
-[Collection("Integration")]
+[Collection("StatusIntegration")]
 [ExcludeFromCodeCoverage]
-public class UpdateStatusHandlerIntegrationTests : IAsyncLifetime
+public class UpdateStatusHandlerIntegrationTests
 {
-	private const string MongodbImage = "mongo:latest";
-	private const string TestDatabase = "IssueManagerTestDb";
-	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage)
-		.Build();
+	private readonly IStatusRepository _repository;
+	private readonly UpdateStatusHandler _handler;
 
-	private IStatusRepository _repository = null!;
-	private UpdateStatusHandler _handler = null!;
-
-	/// <summary>
-	/// Initializes the test container and repository.
-	/// </summary>
-	public async ValueTask InitializeAsync()
+	public UpdateStatusHandlerIntegrationTests(MongoDbFixture fixture)
 	{
-		await _mongoContainer.StartAsync();
-		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new StatusRepository(connectionString, TestDatabase);
+		_repository = new StatusRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		_handler = new UpdateStatusHandler(_repository, new UpdateStatusValidator());
-	}
-
-	/// <summary>
-	/// Disposes the test container.
-	/// </summary>
-	public async ValueTask DisposeAsync()
-	{
-		await _mongoContainer.StopAsync();
-		await _mongoContainer.DisposeAsync();
 	}
 
 	private static StatusDto CreateTestStatusDto(string name, string description = "Test description") =>

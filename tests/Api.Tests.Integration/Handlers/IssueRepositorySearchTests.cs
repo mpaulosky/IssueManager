@@ -12,36 +12,17 @@ namespace Integration.Handlers;
 /// <summary>
 /// Integration tests for IssueRepository search and filter functionality with a real MongoDB database.
 /// </summary>
-[Collection("Integration")]
+[Collection("IssueIntegration")]
 [ExcludeFromCodeCoverage]
-public class IssueRepositorySearchTests : IAsyncLifetime
+public class IssueRepositorySearchTests
 {
-	private const string MongodbImage = "mongo:latest";
-	private const string TestDatabase = "IssueManagerTestDb";
-	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage)
-		.Build();
+	private readonly IIssueRepository _repository;
+	private readonly ListIssuesHandler _handler;
 
-	private IIssueRepository _repository = null!;
-	private ListIssuesHandler _handler = null!;
-
-	/// <summary>
-	/// Initializes the test container and repository.
-	/// </summary>
-	public async ValueTask InitializeAsync()
+	public IssueRepositorySearchTests(MongoDbFixture fixture)
 	{
-		await _mongoContainer.StartAsync();
-		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new IssueRepository(connectionString, TestDatabase);
+		_repository = new IssueRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		_handler = new ListIssuesHandler(_repository, new ListIssuesQueryValidator());
-	}
-
-	/// <summary>
-	/// Disposes the test container.
-	/// </summary>
-	public async ValueTask DisposeAsync()
-	{
-		await _mongoContainer.StopAsync();
-		await _mongoContainer.DisposeAsync();
 	}
 
 	private static IssueDto CreateTestIssueDto(string title, string description, string authorName = "Test User") =>

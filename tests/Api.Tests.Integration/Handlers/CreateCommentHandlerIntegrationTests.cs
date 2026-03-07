@@ -12,40 +12,21 @@ namespace Integration.Handlers;
 /// <summary>
 /// Integration tests for CreateCommentHandler with a real MongoDB database.
 /// </summary>
-[Collection("Integration")]
+[Collection("CommentIntegration")]
 [ExcludeFromCodeCoverage]
-public class CreateCommentHandlerIntegrationTests : IAsyncLifetime
+public class CreateCommentHandlerIntegrationTests
 {
-	private const string MongodbImage = "mongo:latest";
-	private const string TestDatabase = "IssueManagerTestDb";
-	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage)
-		.Build();
+	private readonly ICommentRepository _repository;
+	private readonly CreateCommentHandler _handler;
 
-	private ICommentRepository _repository = null!;
-	private CreateCommentHandler _handler = null!;
-
-	/// <summary>
-	/// Initializes the test container and repository.
-	/// </summary>
-	public async ValueTask InitializeAsync()
+	public CreateCommentHandlerIntegrationTests(MongoDbFixture fixture)
 	{
-		await _mongoContainer.StartAsync();
-		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new CommentRepository(connectionString, TestDatabase);
+		_repository = new CommentRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 
 		var currentUserService = Substitute.For<ICurrentUserService>();
 		currentUserService.IsAuthenticated.Returns(false);
 
 		_handler = new CreateCommentHandler(_repository, new CreateCommentValidator(), currentUserService);
-	}
-
-	/// <summary>
-	/// Disposes the test container.
-	/// </summary>
-	public async ValueTask DisposeAsync()
-	{
-		await _mongoContainer.StopAsync();
-		await _mongoContainer.DisposeAsync();
 	}
 
 	[Fact]

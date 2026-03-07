@@ -12,41 +12,22 @@ namespace Integration.Handlers;
 /// <summary>
 /// Integration tests for CreateIssueHandler with a real MongoDB database.
 /// </summary>
-[Collection("Integration")]
+[Collection("IssueIntegration")]
 [ExcludeFromCodeCoverage]
-public class CreateIssueHandlerTests : IAsyncLifetime
+public class CreateIssueHandlerTests
 {
-	private const string MongodbImage = "mongo:latest";
-	private const string TestDatabase = "IssueManagerTestDb";
-	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage)
-			.Build();
+	private readonly IIssueRepository _repository;
+	private readonly CreateIssueHandler _handler;
 
-	private IIssueRepository _repository = null!;
-	private CreateIssueHandler _handler = null!;
-
-	/// <summary>
-	/// Initializes the test container and repository.
-	/// </summary>
-	public async ValueTask InitializeAsync()
+	public CreateIssueHandlerTests(MongoDbFixture fixture)
 	{
-		await _mongoContainer.StartAsync();
-		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new IssueRepository(connectionString, TestDatabase);
+		_repository = new IssueRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		var currentUserService = Substitute.For<ICurrentUserService>();
 		currentUserService.UserId.Returns("test-user-id");
 		currentUserService.Name.Returns("Test User");
 		currentUserService.Email.Returns("test@example.com");
 		currentUserService.IsAuthenticated.Returns(true);
 		_handler = new CreateIssueHandler(_repository, new CreateIssueValidator(), currentUserService);
-	}
-
-	/// <summary>
-	/// Disposes the test container.
-	/// </summary>
-	public async ValueTask DisposeAsync()
-	{
-		await _mongoContainer.StopAsync();
-		await _mongoContainer.DisposeAsync();
 	}
 
 	[Fact]

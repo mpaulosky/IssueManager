@@ -8,12 +8,18 @@
 // =======================================================
 namespace Integration.Fixtures;
 
-/// <summary>
-/// Defines an xUnit collection that serializes all integration tests to prevent
-/// Docker resource contention when multiple MongoDbContainers start simultaneously.
-/// </summary>
-[CollectionDefinition("Integration", DisableParallelization = true)]
+[CollectionDefinition("CategoryIntegration")]
 [ExcludeFromCodeCoverage]
-public class IntegrationTestCollection
-{
-}
+public class CategoryIntegrationCollection : ICollectionFixture<MongoDbFixture> { }
+
+[CollectionDefinition("IssueIntegration")]
+[ExcludeFromCodeCoverage]
+public class IssueIntegrationCollection : ICollectionFixture<MongoDbFixture> { }
+
+[CollectionDefinition("CommentIntegration")]
+[ExcludeFromCodeCoverage]
+public class CommentIntegrationCollection : ICollectionFixture<MongoDbFixture> { }
+
+[CollectionDefinition("StatusIntegration")]
+[ExcludeFromCodeCoverage]
+public class StatusIntegrationCollection : ICollectionFixture<MongoDbFixture> { }

@@ -12,36 +12,17 @@ namespace Integration.Handlers;
 /// <summary>
 /// Integration tests for GetCommentHandler with a real MongoDB database.
 /// </summary>
-[Collection("Integration")]
+[Collection("CommentIntegration")]
 [ExcludeFromCodeCoverage]
-public class GetCommentHandlerIntegrationTests : IAsyncLifetime
+public class GetCommentHandlerIntegrationTests
 {
-	private const string MongodbImage = "mongo:latest";
-	private const string TestDatabase = "IssueManagerTestDb";
-	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage)
-		.Build();
+	private readonly ICommentRepository _repository;
+	private readonly GetCommentHandler _handler;
 
-	private ICommentRepository _repository = null!;
-	private GetCommentHandler _handler = null!;
-
-	/// <summary>
-	/// Initializes the test container and repository.
-	/// </summary>
-	public async ValueTask InitializeAsync()
+	public GetCommentHandlerIntegrationTests(MongoDbFixture fixture)
 	{
-		await _mongoContainer.StartAsync();
-		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new CommentRepository(connectionString, TestDatabase);
+		_repository = new CommentRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		_handler = new GetCommentHandler(_repository);
-	}
-
-	/// <summary>
-	/// Disposes the test container.
-	/// </summary>
-	public async ValueTask DisposeAsync()
-	{
-		await _mongoContainer.StopAsync();
-		await _mongoContainer.DisposeAsync();
 	}
 
 	private static CommentDto CreateTestCommentDto(string title, string description = "Test description") =>

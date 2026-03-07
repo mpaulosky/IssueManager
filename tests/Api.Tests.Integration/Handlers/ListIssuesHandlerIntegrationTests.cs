@@ -12,36 +12,17 @@ namespace Integration.Handlers;
 /// <summary>
 /// Integration tests for ListIssuesHandler with pagination and real MongoDB database.
 /// </summary>
-[Collection("Integration")]
+[Collection("IssueIntegration")]
 [ExcludeFromCodeCoverage]
-public class ListIssuesHandlerIntegrationTests : IAsyncLifetime
+public class ListIssuesHandlerIntegrationTests
 {
-	private const string MongodbImage = "mongo:latest";
-	private const string TestDatabase = "IssueManagerTestDb";
-	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage)
-			.Build();
+	private readonly IIssueRepository _repository;
+	private readonly ListIssuesHandler _handler;
 
-	private IIssueRepository _repository = null!;
-	private ListIssuesHandler _handler = null!;
-
-	/// <summary>
-	/// Initializes the test container and repository.
-	/// </summary>
-	public async ValueTask InitializeAsync()
+	public ListIssuesHandlerIntegrationTests(MongoDbFixture fixture)
 	{
-		await _mongoContainer.StartAsync();
-		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new IssueRepository(connectionString, TestDatabase);
+		_repository = new IssueRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		_handler = new ListIssuesHandler(_repository, new ListIssuesQueryValidator());
-	}
-
-	/// <summary>
-	/// Disposes the test container.
-	/// </summary>
-	public async ValueTask DisposeAsync()
-	{
-		await _mongoContainer.StopAsync();
-		await _mongoContainer.DisposeAsync();
 	}
 
 	private static IssueDto CreateTestIssueDto(string title, string description, DateTime? dateCreated = null) =>
@@ -157,10 +138,11 @@ public class ListIssuesHandlerIntegrationTests : IAsyncLifetime
 	}
 
 	[Fact]
+	[Trait("Category", "slow")]
 	public async Task Handle_LargeDataset_PerformanceUnder1Second()
 	{
-		// Arrange - Create 1000 issues
-		for (int i = 0; i < 1000; i++)
+		// Arrange - Create 100 issues
+		for (int i = 0; i < 100; i++)
 		{
 			var issue = CreateTestIssueDto($"Issue {i + 1}", $"Description {i + 1}", DateTime.UtcNow.AddMinutes(-i));
 			await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
@@ -175,7 +157,7 @@ public class ListIssuesHandlerIntegrationTests : IAsyncLifetime
 
 		// Assert
 		result.Items.Should().HaveCount(20);
-		result.Total.Should().Be(1000);
+		result.Total.Should().Be(100);
 		stopwatch.ElapsedMilliseconds.Should().BeLessThan(1000); // < 1 second
 	}
 

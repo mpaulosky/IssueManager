@@ -12,33 +12,15 @@ namespace Integration.Data;
 /// <summary>
 /// Integration tests for CategoryRepository using a real MongoDB container.
 /// </summary>
+[Collection("CategoryIntegration")]
 [ExcludeFromCodeCoverage]
-public class CategoryRepositoryTests : IAsyncLifetime
+public class CategoryRepositoryTests
 {
-	private const string MongodbImage = "mongo:latest";
-	private const string TestDatabase = "IssueManagerTestDb";
-	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage)
-			.Build();
+	private readonly ICategoryRepository _repository;
 
-	private ICategoryRepository _repository = null!;
-
-	/// <summary>
-	/// Initializes the test container and repository.
-	/// </summary>
-	public async ValueTask InitializeAsync()
+	public CategoryRepositoryTests(MongoDbFixture fixture)
 	{
-		await _mongoContainer.StartAsync();
-		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new CategoryRepository(connectionString, TestDatabase);
-	}
-
-	/// <summary>
-	/// Disposes the test container.
-	/// </summary>
-	public async ValueTask DisposeAsync()
-	{
-		await _mongoContainer.StopAsync();
-		await _mongoContainer.DisposeAsync();
+		_repository = new CategoryRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 	}
 
 	private static CategoryDto CreateTestCategory(string name = "Test Category", string description = "Test Description") =>

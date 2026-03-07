@@ -21,6 +21,8 @@ global using FluentAssertions;
 
 global using FluentValidation;
 
+global using Integration.Fixtures;
+
 global using MongoDB.Bson;
 
 global using NSubstitute;

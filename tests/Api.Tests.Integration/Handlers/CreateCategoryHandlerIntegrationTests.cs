@@ -12,36 +12,17 @@ namespace Integration.Handlers;
 /// <summary>
 /// Integration tests for CreateCategoryHandler with a real MongoDB database.
 /// </summary>
-[Collection("Integration")]
+[Collection("CategoryIntegration")]
 [ExcludeFromCodeCoverage]
-public class CreateCategoryHandlerIntegrationTests : IAsyncLifetime
+public class CreateCategoryHandlerIntegrationTests
 {
-	private const string MongodbImage = "mongo:latest";
-	private const string TestDatabase = "IssueManagerTestDb";
-	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage)
-		.Build();
+	private readonly ICategoryRepository _repository;
+	private readonly CreateCategoryHandler _handler;
 
-	private ICategoryRepository _repository = null!;
-	private CreateCategoryHandler _handler = null!;
-
-	/// <summary>
-	/// Initializes the test container and repository.
-	/// </summary>
-	public async ValueTask InitializeAsync()
+	public CreateCategoryHandlerIntegrationTests(MongoDbFixture fixture)
 	{
-		await _mongoContainer.StartAsync();
-		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new CategoryRepository(connectionString, TestDatabase);
+		_repository = new CategoryRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		_handler = new CreateCategoryHandler(_repository, new CreateCategoryValidator());
-	}
-
-	/// <summary>
-	/// Disposes the test container.
-	/// </summary>
-	public async ValueTask DisposeAsync()
-	{
-		await _mongoContainer.StopAsync();
-		await _mongoContainer.DisposeAsync();
 	}
 
 	[Fact]

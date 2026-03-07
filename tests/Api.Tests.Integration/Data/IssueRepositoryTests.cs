@@ -11,33 +11,15 @@ namespace Integration.Data;
 /// <summary>
 /// Integration tests for IssueRepository with pagination, filtering, and soft-delete.
 /// </summary>
+[Collection("IssueIntegration")]
 [ExcludeFromCodeCoverage]
-public class IssueRepositoryTests : IAsyncLifetime
+public class IssueRepositoryTests
 {
-	private const string MongodbImage = "mongo:latest";
-	private const string TestDatabase = "IssueManagerTestDb";
-	private readonly MongoDbContainer _mongoContainer = new MongoDbBuilder(MongodbImage)
-			.Build();
+	private readonly IIssueRepository _repository;
 
-	private IIssueRepository _repository = null!;
-
-	/// <summary>
-	/// Initializes the test container and repository.
-	/// </summary>
-	public async ValueTask InitializeAsync()
+	public IssueRepositoryTests(MongoDbFixture fixture)
 	{
-		await _mongoContainer.StartAsync();
-		var connectionString = _mongoContainer.GetConnectionString();
-		_repository = new IssueRepository(connectionString, TestDatabase);
-	}
-
-	/// <summary>
-	/// Disposes the test container.
-	/// </summary>
-	public async ValueTask DisposeAsync()
-	{
-		await _mongoContainer.StopAsync();
-		await _mongoContainer.DisposeAsync();
+		_repository = new IssueRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 	}
 
 	private static IssueDto CreateTestIssueDto(string title, string description, DateTime? dateCreated = null) =>
