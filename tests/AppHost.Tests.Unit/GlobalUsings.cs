@@ -7,6 +7,8 @@
 // Project Name :  AppHost.Tests.Unit
 // =======================================================
 
+global using AppHost.Fixtures;
+
 global using Aspire.Hosting;
 global using Aspire.Hosting.ApplicationModel;
 global using Aspire.Hosting.Testing;
@@ -24,5 +26,6 @@ global using OpenTelemetry.Trace;
 global using ServiceDefaults;
 
 global using Xunit;
+global using Xunit.Sdk;
 
 global using static Shared.Constants.Constants;
