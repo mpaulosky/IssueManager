@@ -103,4 +103,52 @@ public class CategoryApiClientTests
 		result.Should().BeNull();
 	}
 
+	[Fact]
+	public async Task GetByIdAsync_ReturnsCategoryDto_OnSuccess()
+	{
+		// Arrange
+		var expected = MakeCategory("Specific Category");
+		var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(expected) };
+		var client = new CategoryApiClient(CreateMockClient(response));
+
+		// Act
+		var result = await client.GetByIdAsync(expected.Id.ToString(), Xunit.TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Should().NotBeNull();
+		result!.CategoryName.Should().Be("Specific Category");
+	}
+
+	[Fact]
+	public async Task UpdateAsync_ReturnsCategoryDto_OnSuccess()
+	{
+		// Arrange
+		var expected = MakeCategory("Updated Category");
+		var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(expected) };
+		var client = new CategoryApiClient(CreateMockClient(response));
+		var command = new UpdateCategoryCommand { CategoryName = "Updated Category", CategoryDescription = "New Desc" };
+
+		// Act
+		var result = await client.UpdateAsync(expected.Id.ToString(), command, Xunit.TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Should().NotBeNull();
+		result!.CategoryName.Should().Be("Updated Category");
+	}
+
+	[Fact]
+	public async Task UpdateAsync_ReturnsNull_OnNotFound()
+	{
+		// Arrange
+		var response = new HttpResponseMessage(HttpStatusCode.NotFound);
+		var client = new CategoryApiClient(CreateMockClient(response));
+		var command = new UpdateCategoryCommand { CategoryName = "x" };
+
+		// Act
+		var result = await client.UpdateAsync(ObjectId.GenerateNewId().ToString(), command, Xunit.TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Should().BeNull();
+	}
+
 }

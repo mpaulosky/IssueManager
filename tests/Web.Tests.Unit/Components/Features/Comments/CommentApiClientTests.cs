@@ -140,4 +140,52 @@ public class CommentApiClientTests
 		// Assert
 		result.Should().BeFalse();
 	}
+
+	[Fact]
+	public async Task GetByIdAsync_ReturnsCommentDto_OnSuccess()
+	{
+		// Arrange
+		var expected = MakeComment("Specific Comment");
+		var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(expected) };
+		var client = new CommentApiClient(CreateMockClient(response));
+
+		// Act
+		var result = await client.GetByIdAsync(expected.Id.ToString(), Xunit.TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Should().NotBeNull();
+		result!.Title.Should().Be("Specific Comment");
+	}
+
+	[Fact]
+	public async Task UpdateAsync_ReturnsCommentDto_OnSuccess()
+	{
+		// Arrange
+		var expected = MakeComment("Updated Comment");
+		var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(expected) };
+		var client = new CommentApiClient(CreateMockClient(response));
+		var command = new UpdateCommentCommand { Id = expected.Id, Title = "Updated Comment", CommentText = "Updated text" };
+
+		// Act
+		var result = await client.UpdateAsync(expected.Id.ToString(), command, Xunit.TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Should().NotBeNull();
+		result!.Title.Should().Be("Updated Comment");
+	}
+
+	[Fact]
+	public async Task UpdateAsync_ReturnsNull_OnBadRequest()
+	{
+		// Arrange
+		var response = new HttpResponseMessage(HttpStatusCode.BadRequest);
+		var client = new CommentApiClient(CreateMockClient(response));
+		var command = new UpdateCommentCommand { Id = ObjectId.GenerateNewId(), Title = "x", CommentText = "" };
+
+		// Act
+		var result = await client.UpdateAsync(ObjectId.GenerateNewId().ToString(), command, Xunit.TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Should().BeNull();
+	}
 }

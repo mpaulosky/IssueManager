@@ -131,4 +131,18 @@ public class IssuesPageTests : ComponentTestBase
 		_mockIssueClient.Received(1)
 			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
 	}
+
+	[Fact]
+	public async Task IssuesPage_ClearFilters_CallsGetAllAsync_WithPage1()
+	{
+		// Arrange
+		var cut = TestContext.Render<IssuesPage>();
+
+		// Act
+		await cut.FindAll("button").First(b => b.TextContent.Trim() == "Clear").ClickAsync(new MouseEventArgs());
+
+		// Assert — once on init, once on clear
+		_ = _mockIssueClient.Received(2)
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+	}
 }

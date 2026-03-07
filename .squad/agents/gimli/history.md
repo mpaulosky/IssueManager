@@ -48,6 +48,15 @@ Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, Te
 - Null-return from `UpdateAsync` leaves the issue in the list — testable distinct from success path.
 - 24 tests total: 5 initialization/filter, 6 approve/reject, 7 title edit/save/cancel, 6 description edit/save/cancel.
 
+### ProfilePage bUnit Patterns (2026-07-14)
+- `ProfilePage` uses `@attribute [Authorize]` (no roles) and `AuthenticationStateProvider` to read the username — use standalone `BunitContext` (not `ComponentTestBase`) with `AddAuthorization().SetAuthorized("testuser")`.
+- `GetAllAsync` is called with named args `pageSize: 200, authorName: _userName` — assert with `Received(1).GetAllAsync(Arg.Any<int>(), 200, Arg.Any<string?>(), "testuser", ...)`.
+- Filtering is pure client-side: `_approved` = {ApprovedForRelease=true, Rejected=false, Archived=false}; `_pending` = {ApprovedForRelease=false, Rejected=false, Archived=false}; `_rejected` = {Rejected=true}. Archived issues with Rejected=false fall into none of the three lists.
+- Username fallback test: call `ctx.AddAuthorization()` WITHOUT `SetAuthorized` → anonymous user → `Identity.Name = null` → production code uses "User".
+- Use `.Find("h1").TextContent.Should().Contain(...)` to avoid apostrophe HTML-encoding ambiguity on the heading.
+- `IssueCard` (rendered per issue) needs `NavigationManager` (auto-provided by bUnit) and `StatusBadge` (pure component, no DI needed).
+- 8 tests: render/heading, GetAllAsync call args, approved section, pending section, rejected section, archived exclusion, loading spinner gone, username fallback.
+
 ### SampleDataPage bUnit Patterns (2026-03-07)
 - `SampleDataPage` uses `@attribute [Authorize(Roles = "Admin")]` — tests require `_ctx.AddAuthorization()` + `SetAuthorized()` + `SetRoles("Admin")`.
 - Both `ICategoryApiClient` and `IStatusApiClient` must be registered; `GetAllAsync` is called during both `OnInitializedAsync` AND the button-click handler — use NSubstitute multi-return (`.Returns(first, second)`) to simulate different responses per call.
