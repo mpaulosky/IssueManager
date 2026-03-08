@@ -55,7 +55,7 @@ public class IssueRepositorySearchTests
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20, SearchTerm = "bug" };
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Items.Should().HaveCount(2);
@@ -78,7 +78,7 @@ public class IssueRepositorySearchTests
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20, AuthorName = "Alice" };
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Items.Should().HaveCount(2);
@@ -104,7 +104,7 @@ public class IssueRepositorySearchTests
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Items.Should().HaveCount(2);
@@ -135,7 +135,7 @@ public class IssueRepositorySearchTests
 		};
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Items.Should().HaveCount(2);
@@ -159,7 +159,7 @@ public class IssueRepositorySearchTests
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20, SearchTerm = "BuG" };
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Items.Should().HaveCount(3);
@@ -181,7 +181,7 @@ public class IssueRepositorySearchTests
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20, SearchTerm = "bug" };
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Items.Should().HaveCount(2);
@@ -201,7 +201,7 @@ public class IssueRepositorySearchTests
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20, SearchTerm = "bug" };
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Items.Should().BeEmpty();
@@ -221,7 +221,7 @@ public class IssueRepositorySearchTests
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20, AuthorName = "Charlie" };
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Items.Should().BeEmpty();
@@ -254,7 +254,7 @@ public class IssueRepositorySearchTests
 		};
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Items.Should().HaveCount(10);
