@@ -38,7 +38,7 @@ public class DeleteIssueHandlerIntegrationTests
 		var command = new DeleteIssueCommand { Id = created.Value.Id };
 
 		// Act
-		await _handler.Handle(command, CancellationToken.None);
+		await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert - Verify Archived is set in a database
 		var getResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
@@ -57,7 +57,7 @@ public class DeleteIssueHandlerIntegrationTests
 		var command = new DeleteIssueCommand { Id = created.Value.Id };
 
 		// Act - Archive the issue
-		await _handler.Handle(command, CancellationToken.None);
+		await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert - GetAll (paginated) should exclude archived issues
 		var result = await _repository.GetAllAsync(1, 100, cancellationToken: TestContext.Current.CancellationToken);
@@ -73,7 +73,7 @@ public class DeleteIssueHandlerIntegrationTests
 		var command = new DeleteIssueCommand { Id = nonExistentId };
 
 		// Act
-		var result = await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -90,7 +90,7 @@ public class DeleteIssueHandlerIntegrationTests
 		var command = new DeleteIssueCommand { Id = created.Value.Id };
 
 		// Act - Soft delete
-		await _handler.Handle(command, CancellationToken.None);
+		await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert - Record should still exist (soft delete)
 		var dbIssue = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
@@ -111,7 +111,7 @@ public class DeleteIssueHandlerIntegrationTests
 		var command = new DeleteIssueCommand { Id = created.Value.Id };
 
 		// Act - Delete already archived issue (should be idempotent)
-		await _handler.Handle(command, CancellationToken.None);
+		await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert - Should still be archived
 		var dbIssueResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
@@ -133,7 +133,7 @@ public class DeleteIssueHandlerIntegrationTests
 		var command = new DeleteIssueCommand { Id = created1.Value.Id };
 
 		// Act
-		await _handler.Handle(command, CancellationToken.None);
+		await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		var getResult1 = await _repository.GetByIdAsync(created1.Value.Id, TestContext.Current.CancellationToken);

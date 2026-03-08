@@ -41,7 +41,7 @@ public class ListIssuesHandlerIntegrationTests
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Items.Should().HaveCount(20);
@@ -64,7 +64,7 @@ public class ListIssuesHandlerIntegrationTests
 		var query = new ListIssuesQuery { Page = 2, PageSize = 20 };
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Items.Should().HaveCount(20);
@@ -93,7 +93,7 @@ public class ListIssuesHandlerIntegrationTests
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Total.Should().Be(7); // 10 - 3 archived = 7
@@ -107,7 +107,7 @@ public class ListIssuesHandlerIntegrationTests
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Items.Should().BeEmpty();
@@ -128,7 +128,7 @@ public class ListIssuesHandlerIntegrationTests
 		var query = new ListIssuesQuery { Page = 3, PageSize = 20 };
 
 		// Act
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Items.Should().HaveCount(2); // 42 - 40 = 2 on the last page
@@ -152,7 +152,7 @@ public class ListIssuesHandlerIntegrationTests
 
 		// Act
 		var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-		var result = await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 		stopwatch.Stop();
 
 		// Assert
@@ -174,7 +174,7 @@ public class ListIssuesHandlerIntegrationTests
 		var query = new ListIssuesQuery { Page = 1, PageSize = 20 };
 
 		// Act - List while creating a new issue
-		var listTask = _handler.Handle(query, CancellationToken.None);
+		var listTask = _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		var newIssue = CreateTestIssueDto("Concurrent Issue", "Created during list");
 		var createTask = _repository.CreateAsync(newIssue, TestContext.Current.CancellationToken);

@@ -42,7 +42,7 @@ public class UpdateIssueHandlerIntegrationTests
 		};
 
 		// Act
-		var result = await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
@@ -73,7 +73,7 @@ public class UpdateIssueHandlerIntegrationTests
 		};
 
 		// Act
-		await _handler.Handle(command, CancellationToken.None);
+		await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert - Both fields should be updated atomically
 		var dbIssueResult = await _repository.GetByIdAsync(created.Value!.Id, TestContext.Current.CancellationToken);
@@ -96,7 +96,7 @@ public class UpdateIssueHandlerIntegrationTests
 		};
 
 		// Act
-		var result = await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -151,7 +151,7 @@ public class UpdateIssueHandlerIntegrationTests
 		};
 
 		// Act
-		var result = await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
