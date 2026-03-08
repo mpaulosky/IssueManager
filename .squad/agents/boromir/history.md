@@ -280,3 +280,33 @@ DevOps on IssueManager (.NET 10, GitHub Actions, Aspire, NuGet centralized packa
 
 **Commit:** (pending auto-merge completion)
 **Files Modified:** .github/workflows/squad-test.yml, .git/hooks/pre-push, tests/AppHost.Tests.Unit/ (fixtures + tests)
+
+### 2026-03-07: PR #100 Review — GitHub Actions Dependency Bumps
+
+**Context:** Matthew Paulosky requested review and merge of Dependabot PR #100 (all CI checks passing).
+
+**PR Summary:**
+- Bumps `actions/checkout`: v4 → v6 (stable, Jan 2026)
+  - Improved credential security (separate file in $RUNNER_TEMP, not .git/config)
+  - Node.js 24 support
+  - Runner v2.329.0+ required (satisfied by hosted runners)
+- Bumps `actions/github-script`: v7 → v8 (stable)
+  - Node.js runtime: v20 → v24
+  - Runner v2.327.1+ required (satisfied by hosted runners)
+  - All squad workflow scripts compatible (basic GitHub API calls)
+- Scope: 10 workflow files updated consistently
+- CI Status: All 25 checks passing (test suites, CodeQL, coverage, Architecture)
+
+**Review Assessment:**
+- ✅ Only GitHub Actions version bumps (no application code)
+- ✅ Stable releases (not pre-releases or beta)
+- ✅ Runner version requirements satisfied by GitHub's hosted runners
+- ✅ No breaking changes to workflow logic
+- ✅ All scripts compatible with Node.js 24
+
+**Merge Action:** 
+- Approved and merged via squash
+- Commit: "chore(deps): Bump actions/checkout to v6 and actions/github-script to v8"
+- Branch: `dependabot/github_actions/all-actions-2`
+
+**Decision Note:** `.squad/decisions/inbox/boromir-pr100-merge.md`
