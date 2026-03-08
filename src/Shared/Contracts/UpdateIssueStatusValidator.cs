@@ -1,15 +1,15 @@
-// ============================================
-// Copyright (c) 2023. All rights reserved.
+// =======================================================
+// Copyright (c) 2026. All rights reserved.
 // File Name :     UpdateIssueStatusValidator.cs
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
 // Project Name :  Shared
-// =============================================
+// =======================================================
 
 using FluentValidation;
 
-namespace Shared.Validators;
+namespace Shared.Contracts;
 
 /// <summary>
 /// Command for updating the status of an issue.

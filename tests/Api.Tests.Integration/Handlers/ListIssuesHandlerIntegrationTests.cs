@@ -21,6 +21,7 @@ public class ListIssuesHandlerIntegrationTests
 
 	public ListIssuesHandlerIntegrationTests(MongoDbFixture fixture)
 	{
+		fixture.ThrowIfUnavailable();
 		_repository = new IssueRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		_handler = new ListIssuesHandler(_repository, new ListIssuesQueryValidator());
 	}

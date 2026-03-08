@@ -14,6 +14,6 @@ global using Radzen;
 global using Radzen.Blazor;
 
 global using Shared.DTOs;
-global using Shared.Validators;
+global using Shared.Contracts;
 
 global using Web.Services;

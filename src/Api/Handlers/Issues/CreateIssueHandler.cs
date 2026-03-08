@@ -33,11 +33,11 @@ public class CreateIssueHandler
 	/// <summary>
 	/// Handles the creation of a new issue.
 	/// </summary>
-	public async Task<IssueDto> Handle(CreateIssueCommand command, CancellationToken cancellationToken = default)
+	public async Task<Result<IssueDto>> Handle(CreateIssueCommand command, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
 		if (!validationResult.IsValid)
-			throw new ValidationException(validationResult.Errors);
+			return Result.Fail<IssueDto>("Validation failed: " + string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)), ResultErrorCode.Validation);
 
 		var author = _currentUserService.IsAuthenticated
 			? new UserDto(_currentUserService.UserId ?? string.Empty, _currentUserService.Name ?? string.Empty, _currentUserService.Email ?? string.Empty)
@@ -54,6 +54,9 @@ public class CreateIssueHandler
 		};
 
 		var result = await _repository.CreateAsync(model.ToDto(), cancellationToken);
-		return result.Success ? result.Value! : throw new InvalidOperationException("Failed to create issue.");
+		if (!result.Success)
+			return Result.Fail<IssueDto>(result.Error ?? "Failed to create issue.");
+
+		return Result.Ok(result.Value!);
 	}
 }

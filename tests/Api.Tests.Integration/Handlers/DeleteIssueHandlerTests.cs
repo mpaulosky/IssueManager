@@ -21,6 +21,7 @@ public class DeleteIssueHandlerTests
 
 	public DeleteIssueHandlerTests(MongoDbFixture fixture)
 	{
+		fixture.ThrowIfUnavailable();
 		_repository = new IssueRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 	}
 

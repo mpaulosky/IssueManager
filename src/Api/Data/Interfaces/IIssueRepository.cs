@@ -7,7 +7,7 @@
 // Project Name :  Api
 // ================================================
 
-namespace Api.Data;
+namespace Api.Data.Interfaces;
 
 /// <summary>
 /// Repository interface for issue persistence operations.

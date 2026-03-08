@@ -20,7 +20,7 @@ public class ArchitectureTests
 	private const string WebNamespace = "Web";
 	private const string ServiceDefaultsNamespace = "ServiceDefaults";
 	private const string ModelsNamespace = "Shared.Models";
-	private const string ValidatorsNamespace = "Shared.Validators";
+	private const string ContractsNamespace = "Shared.Contracts";
 
 	/// <summary>
 	/// Ensures that the Shared layer has no dependencies on higher layers (Api, Web).
@@ -81,7 +81,7 @@ public class ArchitectureTests
 		// Act
 		var result = Types.InAssembly(sharedAssembly)
 			.That()
-			.ResideInNamespace(ValidatorsNamespace)
+			.ResideInNamespace(ContractsNamespace)
 			.And()
 			.HaveNameEndingWith("Validator")
 			.Should()
@@ -105,7 +105,7 @@ public class ArchitectureTests
 		// Act
 		var result = Types.InAssembly(sharedAssembly)
 			.That()
-			.ResideInNamespace(ValidatorsNamespace)
+			.ResideInNamespace(ContractsNamespace)
 			.ShouldNot()
 			.HaveDependencyOnAny(ApiNamespace, WebNamespace)
 			.GetResult();
@@ -116,10 +116,10 @@ public class ArchitectureTests
 	}
 
 	/// <summary>
-	/// Ensures that all validator classes follow the naming convention of ending with "Validator", "Command", or "Query".
+	/// Ensures that all contract classes follow the naming convention of ending with "Validator", "Command", or "Query".
 	/// </summary>
 	[Fact]
-	public void Validators_ShouldFollowNamingConvention()
+	public void Contracts_ShouldFollowNamingConvention()
 	{
 		// Arrange
 		var sharedAssembly = typeof(CreateIssueValidator).Assembly;
@@ -127,7 +127,7 @@ public class ArchitectureTests
 		// Act
 		var result = Types.InAssembly(sharedAssembly)
 			.That()
-			.ResideInNamespace(ValidatorsNamespace)
+			.ResideInNamespace(ContractsNamespace)
 			.And()
 			.AreClasses()
 			.Should()
@@ -140,7 +140,66 @@ public class ArchitectureTests
 
 		// Assert
 		result.IsSuccessful.Should().BeTrue(
-			"All validator classes should end with 'Validator', 'Command', or 'Query'");
+			"All contract classes should end with 'Validator', 'Command', or 'Query'");
+	}
+
+	/// <summary>
+	/// Ensures all handlers in the Api layer are in the Api.Handlers.* namespace.
+	/// </summary>
+	[Fact]
+	public void ApiHandlers_ShouldResideInHandlersNamespace()
+	{
+		// Arrange
+		var apiAssembly = AppDomain.CurrentDomain.GetAssemblies()
+			.FirstOrDefault(a => a.GetName().Name == "Api");
+
+		if (apiAssembly is null)
+			return;
+
+		// Act
+		var result = Types.InAssembly(apiAssembly)
+			.That()
+			.HaveNameEndingWith("Handler")
+			.And()
+			.AreClasses()
+			.Should()
+			.ResideInNamespaceStartingWith("Api.Handlers")
+			.GetResult();
+
+		// Assert
+		result.IsSuccessful.Should().BeTrue(
+			"All handler classes must reside in the Api.Handlers.* namespace to enforce vertical slice organisation");
+	}
+
+	/// <summary>
+	/// Ensures command and query types reside in Shared.Contracts, not in higher layers.
+	/// </summary>
+	[Fact]
+	public void CommandsAndQueries_ShouldResideInSharedContracts()
+	{
+		// Arrange
+		var sharedAssembly = typeof(CreateIssueValidator).Assembly;
+
+		// Act — commands
+		var commandResult = Types.InAssembly(sharedAssembly)
+			.That()
+			.HaveNameEndingWith("Command")
+			.Should()
+			.ResideInNamespace(ContractsNamespace)
+			.GetResult();
+
+		var queryResult = Types.InAssembly(sharedAssembly)
+			.That()
+			.HaveNameEndingWith("Query")
+			.Should()
+			.ResideInNamespace(ContractsNamespace)
+			.GetResult();
+
+		// Assert
+		commandResult.IsSuccessful.Should().BeTrue(
+			"All Command types must be in Shared.Contracts to serve as the shared contract layer");
+		queryResult.IsSuccessful.Should().BeTrue(
+			"All Query types must be in Shared.Contracts to serve as the shared contract layer");
 	}
 
 	/// <summary>

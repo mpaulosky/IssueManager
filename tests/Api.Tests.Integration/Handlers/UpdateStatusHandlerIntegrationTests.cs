@@ -21,6 +21,7 @@ public class UpdateStatusHandlerIntegrationTests
 
 	public UpdateStatusHandlerIntegrationTests(MongoDbFixture fixture)
 	{
+		fixture.ThrowIfUnavailable();
 		_repository = new StatusRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		_handler = new UpdateStatusHandler(_repository, new UpdateStatusValidator());
 	}

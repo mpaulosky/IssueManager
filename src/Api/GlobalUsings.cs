@@ -8,6 +8,7 @@
 // =======================================================
 
 global using Api.Data;
+global using Api.Data.Interfaces;
 global using Api.Extensions;
 global using Api.Handlers.Categories;
 global using Api.Handlers.Comments;
@@ -28,6 +29,6 @@ global using Shared.DTOs;
 global using Shared.Exceptions;
 global using Shared.Mappers;
 global using Shared.Models;
-global using Shared.Validators;
+global using Shared.Contracts;
 
 global using static Shared.Constants.Constants;

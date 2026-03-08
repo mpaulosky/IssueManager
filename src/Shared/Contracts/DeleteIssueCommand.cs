@@ -6,7 +6,7 @@
 // Solution Name : IssueManager
 // Project Name :  Shared
 // =======================================================
-namespace Shared.Validators;
+namespace Shared.Contracts;
 
 /// <summary>
 /// Command for soft-deleting (archiving) an issue.

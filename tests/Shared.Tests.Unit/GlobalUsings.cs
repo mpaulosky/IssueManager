@@ -24,6 +24,6 @@ global using Shared.Exceptions;
 global using Shared.Helpers;
 global using Shared.Mappers;
 global using Shared.Models;
-global using Shared.Validators;
+global using Shared.Contracts;
 
 global using Xunit;

@@ -39,6 +39,6 @@ global using NSubstitute;
 
 global using Shared.Abstractions;
 global using Shared.DTOs;
-global using Shared.Validators;
+global using Shared.Contracts;
 
 global using Xunit;

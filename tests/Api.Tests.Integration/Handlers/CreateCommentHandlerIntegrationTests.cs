@@ -21,6 +21,7 @@ public class CreateCommentHandlerIntegrationTests
 
 	public CreateCommentHandlerIntegrationTests(MongoDbFixture fixture)
 	{
+		fixture.ThrowIfUnavailable();
 		_repository = new CommentRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 
 		var currentUserService = Substitute.For<ICurrentUserService>();

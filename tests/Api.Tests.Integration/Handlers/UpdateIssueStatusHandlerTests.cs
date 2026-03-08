@@ -6,6 +6,7 @@
 // Solution Name : IssueManager
 // Project Name :  Api.Tests.Integration
 // =======================================================
+
 namespace Integration.Handlers;
 
 /// <summary>
@@ -20,6 +21,7 @@ public class UpdateIssueStatusHandlerTests
 
 	public UpdateIssueStatusHandlerTests(MongoDbFixture fixture)
 	{
+		fixture.ThrowIfUnavailable();
 		_repository = new IssueRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		_handler = new UpdateIssueStatusHandler(_repository, new UpdateIssueStatusValidator());
 	}

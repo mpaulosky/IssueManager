@@ -21,6 +21,7 @@ public class GetCategoryHandlerIntegrationTests
 
 	public GetCategoryHandlerIntegrationTests(MongoDbFixture fixture)
 	{
+		fixture.ThrowIfUnavailable();
 		_repository = new CategoryRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		_handler = new GetCategoryHandler(_repository);
 	}

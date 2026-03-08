@@ -21,6 +21,7 @@ public class GetIssueHandlerTests
 
 	public GetIssueHandlerTests(MongoDbFixture fixture)
 	{
+		fixture.ThrowIfUnavailable();
 		_repository = new IssueRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		_handler = new GetIssueHandler(_repository);
 	}

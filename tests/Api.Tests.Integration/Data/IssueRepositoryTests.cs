@@ -6,6 +6,7 @@
 // Solution Name : IssueManager
 // Project Name :  Api.Tests.Integration
 // =======================================================
+
 namespace Integration.Data;
 
 /// <summary>
@@ -19,6 +20,7 @@ public class IssueRepositoryTests
 
 	public IssueRepositoryTests(MongoDbFixture fixture)
 	{
+		fixture.ThrowIfUnavailable();
 		_repository = new IssueRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 	}
 

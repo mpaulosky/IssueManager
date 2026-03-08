@@ -7,6 +7,8 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
+using Api.Data.Interfaces;
+
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 

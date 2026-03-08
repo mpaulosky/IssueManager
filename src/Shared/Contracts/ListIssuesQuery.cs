@@ -6,7 +6,7 @@
 // Solution Name : IssueManager
 // Project Name :  Shared
 // =======================================================
-namespace Shared.Validators;
+namespace Shared.Contracts;
 
 /// <summary>
 /// Query for retrieving a paginated list of issues.

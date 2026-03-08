@@ -14,6 +14,6 @@ global using FluentAssertions;
 global using NetArchTest.Rules;
 
 global using Shared.Models;
-global using Shared.Validators;
+global using Shared.Contracts;
 
 global using Xunit;

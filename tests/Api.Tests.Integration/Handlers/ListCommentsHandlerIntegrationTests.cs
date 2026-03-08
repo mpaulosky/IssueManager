@@ -21,6 +21,7 @@ public class ListCommentsHandlerIntegrationTests
 
 	public ListCommentsHandlerIntegrationTests(MongoDbFixture fixture)
 	{
+		fixture.ThrowIfUnavailable();
 		_repository = new CommentRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		_handler = new ListCommentsHandler(_repository);
 	}

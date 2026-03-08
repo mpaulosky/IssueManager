@@ -11,6 +11,7 @@ global using System;
 global using System.Diagnostics.CodeAnalysis;
 
 global using Api.Data;
+global using Api.Data.Interfaces;
 global using Api.Handlers.Categories;
 global using Api.Handlers.Comments;
 global using Api.Handlers.Issues;
@@ -30,8 +31,9 @@ global using NSubstitute;
 global using Shared.Abstractions;
 global using Shared.DTOs;
 global using Shared.Exceptions;
-global using Shared.Validators;
+global using Shared.Contracts;
 
 global using Testcontainers.MongoDb;
 
 global using Xunit;
+global using Xunit.Sdk;

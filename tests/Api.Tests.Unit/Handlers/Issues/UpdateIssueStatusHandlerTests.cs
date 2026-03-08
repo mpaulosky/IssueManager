@@ -8,6 +8,7 @@
 // =======================================================
 
 using Api.Builders;
+using Api.Data.Interfaces;
 
 namespace Api.Handlers.Issues;
 

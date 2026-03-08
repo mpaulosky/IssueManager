@@ -21,6 +21,7 @@ public class DeleteCommentHandlerIntegrationTests
 
 	public DeleteCommentHandlerIntegrationTests(MongoDbFixture fixture)
 	{
+		fixture.ThrowIfUnavailable();
 		_repository = new CommentRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		_handler = new DeleteCommentHandler(_repository, new DeleteCommentValidator());
 	}

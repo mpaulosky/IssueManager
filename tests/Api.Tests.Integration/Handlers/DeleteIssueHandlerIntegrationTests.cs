@@ -21,6 +21,7 @@ public class DeleteIssueHandlerIntegrationTests
 
 	public DeleteIssueHandlerIntegrationTests(MongoDbFixture fixture)
 	{
+		fixture.ThrowIfUnavailable();
 		_repository = new IssueRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		_handler = new DeleteIssueHandler(_repository, new DeleteIssueValidator());
 	}
