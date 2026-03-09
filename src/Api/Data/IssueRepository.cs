@@ -29,6 +29,9 @@ public class IssueRepository : IIssueRepository
 	/// <inheritdoc />
 	public async Task<Result> ArchiveAsync(ObjectId issueId, CancellationToken cancellationToken = default)
 	{
+		if (issueId == ObjectId.Empty)
+			return Result.Fail("Issue cannot be null.");
+
 		var update = Builders<Issue>.Update.Set(x => x.Archived, true);
 		var result = await _collection.UpdateOneAsync(x => x.Id == issueId, update, cancellationToken: cancellationToken);
 		return result.ModifiedCount > 0 ? Result.Ok() : Result.Fail("Issue not found or already archived.");
@@ -37,6 +40,9 @@ public class IssueRepository : IIssueRepository
 	/// <inheritdoc />
 	public async Task<Result<IssueDto>> CreateAsync(IssueDto issue, CancellationToken cancellationToken = default)
 	{
+		if (issue is null)
+			return Result.Fail<IssueDto>("Issue cannot be null.");
+
 		var model = issue.ToModel();
 		await _collection.InsertOneAsync(model, cancellationToken: cancellationToken);
 		return Result.Ok(model.ToDto());
@@ -103,6 +109,9 @@ public class IssueRepository : IIssueRepository
 	/// <inheritdoc />
 	public async Task<Result<IssueDto>> UpdateAsync(IssueDto dto, CancellationToken cancellationToken = default)
 	{
+		if (dto is null)
+			return Result.Fail<IssueDto>("Issue cannot be null.");
+
 		var model = dto.ToModel();
 
 		var result = await _collection.ReplaceOneAsync(

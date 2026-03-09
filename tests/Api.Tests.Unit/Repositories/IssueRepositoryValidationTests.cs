@@ -11,54 +11,52 @@ namespace Api.Repositories;
 
 /// <summary>
 /// Unit tests for IssueRepository validation logic that can be tested without a database.
-/// These tests validate input validation and ObjectId parsing logic.
+/// These tests validate input validation before any database operations occur.
 /// Note: Integration tests cover full CRUD operations.
 /// </summary>
 public sealed class IssueRepositoryValidationTests
 {
-	// ========== IssueRepository ObjectId Validation Tests ==========
-	// NOTE: These tests are commented out because the repository no longer accepts string IDs.
-	// Validation is now handled at the handler level before calling repository methods.
+	// ========== IssueRepository Validation Tests ==========
 
-	// [Fact]
-	// public async Task IssueRepository_GetByIdAsync_WithInvalidObjectId_ReturnsNull()
-	// {
-	// 	// Arrange
-	// 	var repo = new IssueRepository("mongodb://localhost:27017", "TestDb");
-	// 	const string invalidId = "invalid-id";
-	//
-	// 	// Act
-	// 	var result = await repo.GetByIdAsync(invalidId);
-	//
-	// 	// Assert
-	// 	result.Should().BeNull("invalid ObjectId should return null without DB call");
-	// }
+	[Fact]
+	public async Task IssueRepository_ArchiveAsync_WithEmptyObjectId_ReturnsFailureResult()
+	{
+		// Arrange
+		var repo = new IssueRepository("mongodb://localhost:27017", "TestDb");
 
-	// [Fact]
-	// public async Task IssueRepository_DeleteAsync_WithInvalidObjectId_ReturnsFalse()
-	// {
-	// 	// Arrange
-	// 	var repo = new IssueRepository("mongodb://localhost:27017", "TestDb");
-	// 	const string invalidId = "not-a-valid-objected";
-	//
-	// 	// Act
-	// 	var result = await repo.DeleteAsync(invalidId);
-	//
-	// 	// Assert
-	// 	result.Should().BeFalse("invalid ObjectId should return false without DB call");
-	// }
+		// Act
+		var result = await repo.ArchiveAsync(ObjectId.Empty, TestContext.Current.CancellationToken);
 
-	// [Fact]
-	// public async Task IssueRepository_ArchiveAsync_WithInvalidObjectId_ReturnsFalse()
-	// {
-	// 	// Arrange
-	// 	var repo = new IssueRepository("mongodb://localhost:27017", "TestDb");
-	// 	const string invalidId = "12345";
-	//
-	// 	// Act
-	// 	var result = await repo.ArchiveAsync(invalidId);
-	//
-	// 	// Assert
-	// 	result.Should().BeFalse("invalid ObjectId should return false without DB call");
-	// }
+		// Assert
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Issue cannot be null.");
+	}
+
+	[Fact]
+	public async Task IssueRepository_CreateAsync_WithNullIssue_ReturnsFailureResult()
+	{
+		// Arrange
+		var repo = new IssueRepository("mongodb://localhost:27017", "TestDb");
+
+		// Act
+		var result = await repo.CreateAsync(null!, TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Issue cannot be null.");
+	}
+
+	[Fact]
+	public async Task IssueRepository_UpdateAsync_WithNullIssue_ReturnsFailureResult()
+	{
+		// Arrange
+		var repo = new IssueRepository("mongodb://localhost:27017", "TestDb");
+
+		// Act
+		var result = await repo.UpdateAsync(null!, TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Issue cannot be null.");
+	}
 }
