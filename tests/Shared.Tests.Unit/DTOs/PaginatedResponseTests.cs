@@ -12,6 +12,7 @@ namespace Shared.DTOs;
 /// <summary>
 /// Unit tests for <see cref="PaginatedResponse{T}"/>.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public sealed class PaginatedResponseTests
 {
 	[Fact]

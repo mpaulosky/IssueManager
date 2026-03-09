@@ -12,6 +12,7 @@ namespace Shared.Helpers;
 /// <summary>
 /// Unit tests for <see cref="MyCategories"/>.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public sealed class MyCategoriesTests
 {
 	[Fact]

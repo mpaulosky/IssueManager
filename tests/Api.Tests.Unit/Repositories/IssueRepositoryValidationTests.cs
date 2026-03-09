@@ -14,6 +14,7 @@ namespace Api.Repositories;
 /// These tests validate input validation before any database operations occur.
 /// Note: Integration tests cover full CRUD operations.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public sealed class IssueRepositoryValidationTests
 {
 	// ========== IssueRepository Validation Tests ==========

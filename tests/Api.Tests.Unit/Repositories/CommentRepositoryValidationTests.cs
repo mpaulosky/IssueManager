@@ -14,6 +14,7 @@ namespace Api.Repositories;
 /// These tests validate input validation and ObjectId parsing logic.
 /// Note: Integration tests cover full CRUD operations.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public sealed class CommentRepositoryValidationTests
 {
 	// ========== CommentRepository Validation Tests ==========

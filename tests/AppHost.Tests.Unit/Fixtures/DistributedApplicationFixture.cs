@@ -13,6 +13,7 @@ namespace AppHost.Fixtures;
 /// Shared fixture for AppHost integration tests that require DistributedApplicationTestingBuilder.
 /// Creates the builder and app once per collection run, shared across all tests in the collection.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public sealed class DistributedApplicationFixture : IAsyncLifetime
 {
 	private IDistributedApplicationTestingBuilder? _builder;

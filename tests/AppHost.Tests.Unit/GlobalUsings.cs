@@ -7,6 +7,8 @@
 // Project Name :  AppHost.Tests.Unit
 // =======================================================
 
+global using System.Diagnostics.CodeAnalysis;
+
 global using AppHost.Fixtures;
 
 global using Aspire.Hosting;

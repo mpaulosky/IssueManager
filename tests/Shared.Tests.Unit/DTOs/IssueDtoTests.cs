@@ -12,6 +12,7 @@ namespace Shared.DTOs;
 /// <summary>
 /// Unit tests for <see cref="IssueDto"/>.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public sealed class IssueDtoTests
 {
 	[Fact]

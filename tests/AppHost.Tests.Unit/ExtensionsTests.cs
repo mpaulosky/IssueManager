@@ -12,6 +12,7 @@ namespace AppHost;
 /// <summary>
 /// Tests for ServiceDefaults Extensions.cs
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class ExtensionsTests
 {
 	[Fact]

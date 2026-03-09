@@ -12,6 +12,7 @@ namespace Shared.Exceptions;
 /// <summary>
 /// Unit tests for <see cref="ConflictException"/>.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public sealed class ConflictExceptionTests
 {
 	[Fact]

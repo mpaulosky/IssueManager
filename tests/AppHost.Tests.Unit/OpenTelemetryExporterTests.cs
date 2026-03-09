@@ -12,6 +12,7 @@ namespace AppHost;
 /// <summary>
 /// Tests for OpenTelemetry exporter configuration
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class OpenTelemetryExporterTests
 {
 	[Fact]

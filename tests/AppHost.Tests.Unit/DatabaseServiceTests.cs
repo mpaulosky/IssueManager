@@ -17,6 +17,7 @@ namespace AppHost;
 /// <c>builder.AddConnectionString(DatabaseName)</c> rather than as a managed container.
 /// Full integration testing is done in AppHostTests.cs.
 /// </remarks>
+[ExcludeFromCodeCoverage]
 public class DatabaseServiceTests
 {
 	/// <summary>

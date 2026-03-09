@@ -12,6 +12,7 @@ namespace Shared.Exceptions;
 /// <summary>
 /// Unit tests for <see cref="NotFoundException"/>.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public sealed class NotFoundExceptionTests
 {
 	[Fact]

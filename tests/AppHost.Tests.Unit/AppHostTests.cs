@@ -18,6 +18,7 @@ namespace AppHost;
 /// Private methods (OnRunClearCacheCommandAsync, OnUpdateResourceState, WithClearCommand) cannot
 /// be tested directly as they are invoked internally by Aspire's command infrastructure.
 /// </remarks>
+[ExcludeFromCodeCoverage]
 [Collection("AppHostIntegration")]
 public class AppHostTests(DistributedApplicationFixture fixture)
 {

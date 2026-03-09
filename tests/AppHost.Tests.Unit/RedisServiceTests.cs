@@ -18,6 +18,7 @@ namespace AppHost;
 /// cannot be tested directly as they are invoked internally by Aspire's command infrastructure.
 /// Full integration testing is done in AppHostTests.cs.
 /// </remarks>
+[ExcludeFromCodeCoverage]
 public class RedisServiceTests
 {
 	/// <summary>
