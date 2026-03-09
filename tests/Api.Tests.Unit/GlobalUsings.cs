@@ -38,7 +38,7 @@ global using MongoDB.Bson;
 global using NSubstitute;
 
 global using Shared.Abstractions;
-global using Shared.DTOs;
 global using Shared.Contracts;
+global using Shared.DTOs;
 
 global using Xunit;

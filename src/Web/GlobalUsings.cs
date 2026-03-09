@@ -13,7 +13,7 @@ global using Microsoft.AspNetCore.Components.Authorization;
 global using Radzen;
 global using Radzen.Blazor;
 
-global using Shared.DTOs;
 global using Shared.Contracts;
+global using Shared.DTOs;
 
 global using Web.Services;

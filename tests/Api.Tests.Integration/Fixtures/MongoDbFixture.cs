@@ -19,7 +19,7 @@ namespace Integration.Fixtures;
 public class MongoDbFixture : IAsyncLifetime
 {
 	private const string MongodbImage = "mongo:latest";
-  private MongoDbContainer? _mongoContainer;
+	private MongoDbContainer? _mongoContainer;
 
 	/// <summary>
 	/// Runs once before the first instance is created.
@@ -32,7 +32,7 @@ public class MongoDbFixture : IAsyncLifetime
 	}
 
 	/// <summary>
- /// True when the MongoDB container started successfully; false when Docker is unavailable.
+	/// True when the MongoDB container started successfully; false when Docker is unavailable.
 	/// </summary>
 	public bool IsAvailable { get; private set; }
 
@@ -44,7 +44,7 @@ public class MongoDbFixture : IAsyncLifetime
 	/// <summary>
 	/// Gets the MongoDB connection string.
 	/// </summary>
-  public string ConnectionString =>
+	public string ConnectionString =>
 		_mongoContainer?.GetConnectionString()
 		?? throw new InvalidOperationException("MongoDB container is not running. Call ThrowIfUnavailable() first.");
 
@@ -65,7 +65,7 @@ public class MongoDbFixture : IAsyncLifetime
 	/// </summary>
 	public async ValueTask InitializeAsync()
 	{
-   try
+		try
 		{
 			_mongoContainer = new MongoDbBuilder(MongodbImage).Build();
 			await _mongoContainer.StartAsync();
@@ -85,7 +85,7 @@ public class MongoDbFixture : IAsyncLifetime
 	/// </summary>
 	public async ValueTask DisposeAsync()
 	{
-    if (_mongoContainer is not null)
+		if (_mongoContainer is not null)
 		{
 			await _mongoContainer.StopAsync();
 			await _mongoContainer.DisposeAsync();
@@ -128,16 +128,16 @@ public class MongoDbFixture : IAsyncLifetime
 			if (!dockerEp.TryGetProperty("Host", out var hostProp)) return;
 
 			var host = hostProp.GetString();
-				if (!string.IsNullOrEmpty(host))
-				{
-					// Docker context stores npipe:////./pipe/<name> (4-slash format used by the Docker CLI)
-					// but Docker.DotNet / Testcontainers requires npipe://./pipe/<name> (2-slash URI format).
-					// Normalise before setting DOCKER_HOST to avoid an ArgumentException on URI parsing.
-					if (host.StartsWith("npipe:////", StringComparison.OrdinalIgnoreCase))
-						host = "npipe://" + host["npipe:////".Length..];
+			if (!string.IsNullOrEmpty(host))
+			{
+				// Docker context stores npipe:////./pipe/<name> (4-slash format used by the Docker CLI)
+				// but Docker.DotNet / Testcontainers requires npipe://./pipe/<name> (2-slash URI format).
+				// Normalise before setting DOCKER_HOST to avoid an ArgumentException on URI parsing.
+				if (host.StartsWith("npipe:////", StringComparison.OrdinalIgnoreCase))
+					host = "npipe://" + host["npipe:////".Length..];
 
-					Environment.SetEnvironmentVariable("DOCKER_HOST", host);
-				}
+				Environment.SetEnvironmentVariable("DOCKER_HOST", host);
+			}
 		}
 		catch
 		{

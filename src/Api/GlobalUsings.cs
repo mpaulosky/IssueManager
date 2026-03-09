@@ -25,10 +25,10 @@ global using Scalar.AspNetCore;
 global using ServiceDefaults;
 
 global using Shared.Abstractions;
+global using Shared.Contracts;
 global using Shared.DTOs;
 global using Shared.Exceptions;
 global using Shared.Mappers;
 global using Shared.Models;
-global using Shared.Contracts;
 
 global using static Shared.Constants.Constants;
