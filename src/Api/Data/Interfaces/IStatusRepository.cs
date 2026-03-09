@@ -7,7 +7,7 @@
 // Project Name :  Shared
 // =============================================
 
-namespace Api.Data;
+namespace Api.Data.Interfaces;
 
 /// <summary>
 /// Provides data access operations for status entities in the data store.

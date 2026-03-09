@@ -77,15 +77,15 @@ public class IssueRepository : IIssueRepository
 		if (!string.IsNullOrWhiteSpace(searchTerm))
 		{
 			var searchFilter = filterBuilder.Or(
-				filterBuilder.Regex(x => x.Title, new MongoDB.Bson.BsonRegularExpression(searchTerm, "i")),
-				filterBuilder.Regex(x => x.Description, new MongoDB.Bson.BsonRegularExpression(searchTerm, "i"))
+				filterBuilder.Regex(x => x.Title, new BsonRegularExpression(searchTerm, "i")),
+				filterBuilder.Regex(x => x.Description, new BsonRegularExpression(searchTerm, "i"))
 			);
 			filters.Add(searchFilter);
 		}
 
 		if (!string.IsNullOrWhiteSpace(authorName))
 		{
-			filters.Add(filterBuilder.Regex(x => x.Author.Name, new MongoDB.Bson.BsonRegularExpression(authorName, "i")));
+			filters.Add(filterBuilder.Regex(x => x.Author.Name, new BsonRegularExpression(authorName, "i")));
 		}
 
 		var filter = filterBuilder.And(filters);

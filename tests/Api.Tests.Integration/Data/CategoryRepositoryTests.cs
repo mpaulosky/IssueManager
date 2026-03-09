@@ -20,6 +20,7 @@ public class CategoryRepositoryTests
 
 	public CategoryRepositoryTests(MongoDbFixture fixture)
 	{
+		fixture.ThrowIfUnavailable();
 		_repository = new CategoryRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 	}
 

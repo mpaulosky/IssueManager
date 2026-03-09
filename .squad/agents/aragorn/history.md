@@ -254,3 +254,66 @@ Because both projects share the same Blazor rendering model, a UI-only moderniza
 - Old horizontal-layer structure (Handlers/, Pages/, Services/) replaced with feature-based folder organization
 - Test project renamed: Blazor.Tests → Web.Tests.Bunit (path: 	ests/Web.Tests.Bunit/)
 - All test references should use the new project name
+
+---
+
+## 2026-03-08 — VSA Refactoring Architecture Review & Execution Oversight
+
+**Session:** Aragorn (Lead), Sam (Backend), Gimli (Tester), Boromir (DevOps), Coordinator
+
+**Role:** Architecture Lead — Identified 3 critical gaps, recommended refactoring, coordinated execution
+
+### 3 Critical VSA Gaps Identified
+
+1. **Namespace Inconsistency: Shared.Validators**
+   - Role mismatch: Validators namespace contains commands, queries, AND validators (tri-purpose)
+   - Recommended rename: `Shared.Validators` → `Shared.Contracts` (reflects command/query/validator union)
+   - Fixes VSA clarity: contracts are separate from implementation concerns
+
+2. **Repository Interface Location: src/Api/Data/**
+   - Interfaces live in same folder as implementations — no clear boundary
+   - Recommended relocation: Move all 4 interfaces to new `src/Api/Data/Interfaces/` directory
+   - Improves VSA structure: explicit abstraction layer
+
+3. **Handler Return Type Uniformity: CreateIssueHandler**
+   - Current: `CreateIssueHandler.Handle()` returns `Task<IssueDto>` (exception-throwing)
+   - Issue: All other 6 handlers return `Task<Result<T>>` (Result-based error handling)
+   - Recommended fix: Change to `Task<Result<IssueDto>>` for consistency
+   - Outcome: Eliminates sole exception-throwing handler; unified error handling model
+
+### Architecture Test Enforcement Recommendations
+- Add test: `ApiHandlers_ShouldResideInHandlersNamespace` — enforce all handlers in `Api.Handlers.*`
+- Add test: `CommandsAndQueries_ShouldResideInSharedContracts` — enforce CQRS in `Shared.Contracts.*`
+- Outcome: Automated VSA violations detection in CI
+
+### Execution Oversight & Verification
+
+**Sam (Backend):** Executed all 3 refactorings + global usings updates + test migration ✅
+- 15 files updated (namespace, interface location, handler return type)
+- All GlobalUsings.cs and _Imports.razor updated
+- CreateIssueHandler tests migrated to Result<IssueDto> assertions
+
+**Gimli (Tester):** Added 2 new VSA enforcement tests ✅
+- `ApiHandlers_ShouldResideInHandlersNamespace`: 11 handlers verified
+- `CommandsAndQueries_ShouldResideInSharedContracts`: 8 commands/queries verified
+- All 11 architecture tests passing
+
+**Coordinator:** Full solution verification ✅
+- All 8 projects: clean builds
+- All test suites: passing (11/11 arch, 215/215 shared, full suite)
+- Committed as `54aadb2` to main
+
+**Boromir (DevOps):** PR #100 (Dependabot) still pending merge — blocked on auth workflow
+
+### Key Outcomes
+
+| Item | Result |
+|------|--------|
+| Namespace consistency | `Shared.Validators` → `Shared.Contracts` |
+| Interface organization | Moved to `src/Api/Data/Interfaces/` |
+| Error handling uniformity | CreateIssueHandler now returns `Task<Result<IssueDto>>` |
+| VSA test coverage | 2 new tests added; 11/11 passing |
+| Build status | All 8 projects clean ✅ |
+| Commit hash | `54aadb2` (main) |
+
+**Session Status:** ✅ COMPLETE — All gaps closed, VSA architecture strengthened, full CI verification passed.

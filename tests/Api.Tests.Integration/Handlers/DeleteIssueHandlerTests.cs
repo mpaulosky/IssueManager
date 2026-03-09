@@ -21,6 +21,7 @@ public class DeleteIssueHandlerTests
 
 	public DeleteIssueHandlerTests(MongoDbFixture fixture)
 	{
+		fixture.ThrowIfUnavailable();
 		_repository = new IssueRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 	}
 
@@ -33,16 +34,19 @@ public class DeleteIssueHandlerTests
 		// Arrange
 		var issue = CreateTestIssueDto("Test Issue", "Test Description");
 		var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
+		created.Value.Should().NotBeNull();
+		var createdIssue = created.Value!;
 
 		// Act
-		var result = await _repository.ArchiveAsync(created.Value.Id, TestContext.Current.CancellationToken);
+		var result = await _repository.ArchiveAsync(createdIssue.Id, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
 
-		var retrievedResult = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
+		var retrievedResult = await _repository.GetByIdAsync(createdIssue.Id, TestContext.Current.CancellationToken);
 		retrievedResult.Should().NotBeNull();
-		var retrieved = retrievedResult.Value;
+		retrievedResult.Value.Should().NotBeNull();
+		var retrieved = retrievedResult.Value!;
 		retrieved.Archived.Should().BeTrue();
 	}
 
@@ -52,10 +56,12 @@ public class DeleteIssueHandlerTests
 		// Arrange
 		var issue = CreateTestIssueDto("Already Archived Issue", "Description");
 		var created = await _repository.CreateAsync(issue, TestContext.Current.CancellationToken);
-		await _repository.ArchiveAsync(created.Value.Id, TestContext.Current.CancellationToken);
+		created.Value.Should().NotBeNull();
+		var createdIssue = created.Value!;
+		await _repository.ArchiveAsync(createdIssue.Id, TestContext.Current.CancellationToken);
 
 		// Act - archive again (already archived, ModifiedCount = 0)
-		var result = await _repository.ArchiveAsync(created.Value.Id, TestContext.Current.CancellationToken);
+		var result = await _repository.ArchiveAsync(createdIssue.Id, TestContext.Current.CancellationToken);
 
 		// Assert - should return false since no modification was made
 		result.Success.Should().BeFalse();

@@ -21,6 +21,7 @@ public class ListCategoriesHandlerIntegrationTests
 
 	public ListCategoriesHandlerIntegrationTests(MongoDbFixture fixture)
 	{
+		fixture.ThrowIfUnavailable();
 		_repository = new CategoryRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		_handler = new ListCategoriesHandler(_repository);
 	}

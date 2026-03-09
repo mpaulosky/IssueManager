@@ -1,6 +1,6 @@
 // =======================================================
 // Copyright (c) 2026. All rights reserved.
-// File Name :     UpdateStatusCommand.cs
+// File Name :     CreateStatusCommand.cs
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
@@ -9,18 +9,13 @@
 
 using FluentValidation;
 
-namespace Shared.Validators;
+namespace Shared.Contracts;
 
 /// <summary>
-/// Command for updating an existing status.
+/// Command for creating a new status.
 /// </summary>
-public record UpdateStatusCommand
+public record CreateStatusCommand
 {
-	/// <summary>
-	/// Gets or sets the status ID.
-	/// </summary>
-	public ObjectId Id { get; init; }
-
 	/// <summary>
 	/// Gets or sets the name of the status.
 	/// </summary>
@@ -33,19 +28,15 @@ public record UpdateStatusCommand
 }
 
 /// <summary>
-/// Validates the <see cref="UpdateStatusCommand"/>.
+/// Validates the <see cref="CreateStatusCommand"/>.
 /// </summary>
-public class UpdateStatusValidator : AbstractValidator<UpdateStatusCommand>
+public class CreateStatusValidator : AbstractValidator<CreateStatusCommand>
 {
 	/// <summary>
-	/// Initializes a new instance of the <see cref="UpdateStatusValidator"/> class.
+	/// Initializes a new instance of the <see cref="CreateStatusValidator"/> class.
 	/// </summary>
-	public UpdateStatusValidator()
+	public CreateStatusValidator()
 	{
-		RuleFor(x => x.Id)
-			.NotEmpty()
-			.WithMessage("Status ID is required.");
-
 		RuleFor(x => x.StatusName)
 			.NotEmpty()
 			.WithMessage("Status name is required.")

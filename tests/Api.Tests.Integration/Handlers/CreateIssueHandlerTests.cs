@@ -21,6 +21,7 @@ public class CreateIssueHandlerTests
 
 	public CreateIssueHandlerTests(MongoDbFixture fixture)
 	{
+		fixture.ThrowIfUnavailable();
 		_repository = new IssueRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
 		var currentUserService = Substitute.For<ICurrentUserService>();
 		currentUserService.UserId.Returns("test-user-id");
@@ -45,19 +46,20 @@ public class CreateIssueHandlerTests
 
 		// Assert
 		result.Should().NotBeNull();
-		result.Id.Should().NotBe(ObjectId.Empty);
-		result.Title.Should().Be("Test Issue");
-		result.Description.Should().Be("This is a test issue description.");
+		result.Success.Should().BeTrue();
+		result.Value!.Id.Should().NotBe(ObjectId.Empty);
+		result.Value!.Title.Should().Be("Test Issue");
+		result.Value!.Description.Should().Be("This is a test issue description.");
 
 		// Verify persistence
-		var retrievedResult = await _repository.GetByIdAsync(result.Id, TestContext.Current.CancellationToken);
+		var retrievedResult = await _repository.GetByIdAsync(result.Value!.Id, TestContext.Current.CancellationToken);
 		retrievedResult.Should().NotBeNull();
 		var retrieved = retrievedResult.Value;
 		retrieved?.Title.Should().Be("Test Issue");
 	}
 
 	[Fact]
-	public async Task Handle_EmptyTitle_ThrowsValidationException()
+	public async Task Handle_EmptyTitle_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateIssueCommand
@@ -66,12 +68,16 @@ public class CreateIssueHandlerTests
 			Description = "Description without title"
 		};
 
-		// Act & Assert
-		await Assert.ThrowsAsync<ValidationException>(() => _handler.Handle(command, TestContext.Current.CancellationToken));
+		// Act
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
-	public async Task Handle_TitleTooShort_ThrowsValidationException()
+	public async Task Handle_TitleTooShort_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateIssueCommand
@@ -80,12 +86,16 @@ public class CreateIssueHandlerTests
 			Description = "Title is too short"
 		};
 
-		// Act & Assert
-		await Assert.ThrowsAsync<ValidationException>(() => _handler.Handle(command, TestContext.Current.CancellationToken));
+		// Act
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
-	public async Task Handle_TitleTooLong_ThrowsValidationException()
+	public async Task Handle_TitleTooLong_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateIssueCommand
@@ -94,8 +104,12 @@ public class CreateIssueHandlerTests
 			Description = "Title exceeds maximum length"
 		};
 
-		// Act & Assert
-		await Assert.ThrowsAsync<ValidationException>(() => _handler.Handle(command, TestContext.Current.CancellationToken));
+		// Act
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
@@ -135,10 +149,11 @@ public class CreateIssueHandlerTests
 
 		// Assert
 		result.Should().NotBeNull();
-		result.Description.Should().BeEmpty();
+		result.Success.Should().BeTrue();
+		result.Value!.Description.Should().BeEmpty();
 
 		// Verify persistence
-		var retrievedResult = await _repository.GetByIdAsync(result.Id, TestContext.Current.CancellationToken);
+		var retrievedResult = await _repository.GetByIdAsync(result.Value!.Id, TestContext.Current.CancellationToken);
 		retrievedResult.Should().NotBeNull();
 		var retrieved = retrievedResult.Value;
 		retrieved?.Description.Should().BeEmpty();
@@ -159,7 +174,8 @@ public class CreateIssueHandlerTests
 		var afterCreation = DateTime.UtcNow.AddSeconds(1);
 
 		// Assert
-		result.DateCreated.Should().BeAfter(beforeCreation);
-		result.DateCreated.Should().BeBefore(afterCreation);
+		result.Success.Should().BeTrue();
+		result.Value!.DateCreated.Should().BeAfter(beforeCreation);
+		result.Value!.DateCreated.Should().BeBefore(afterCreation);
 	}
 }

@@ -55,8 +55,12 @@ public static class IssueEndpoints
 		// Create Issue
 		group.MapPost("", async (CreateIssueCommand command, CreateIssueHandler handler) =>
 		{
-			var issue = await handler.Handle(command);
-			return Results.Created($"/api/v1/issues/{issue.Id}", issue);
+			var result = await handler.Handle(command);
+			if (!result.Success)
+				return result.ErrorCode == ResultErrorCode.Validation
+					? Results.BadRequest(result.Error)
+					: Results.BadRequest(result.Error);
+			return Results.Created($"/api/v1/issues/{result.Value!.Id}", result.Value);
 		})
 		.WithName("CreateIssue")
 		.WithSummary("Create a new issue")

@@ -9,7 +9,7 @@
 
 using FluentValidation;
 
-namespace Shared.Validators;
+namespace Shared.Contracts;
 
 /// <summary>
 /// Command for soft-deleting (archiving) a comment.

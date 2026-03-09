@@ -7,6 +7,8 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
+using Api.Data.Interfaces;
+
 namespace Api.Handlers.Issues;
 
 /// <summary>
@@ -64,13 +66,14 @@ public class CreateIssueHandlerTests
 
 		// Assert
 		result.Should().NotBeNull();
-		result.Title.Should().Be(command.Title);
-		result.Description.Should().Be(command.Description);
+		result.Success.Should().BeTrue();
+		result.Value!.Title.Should().Be(command.Title);
+		result.Value!.Description.Should().Be(command.Description);
 		await _repository.Received(1).CreateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_EmptyTitle_ThrowsValidationException()
+	public async Task Handle_EmptyTitle_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateIssueCommand
@@ -80,15 +83,15 @@ public class CreateIssueHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Title*required*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
-	public async Task Handle_TitleTooLong_ThrowsValidationException()
+	public async Task Handle_TitleTooLong_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateIssueCommand
@@ -98,15 +101,15 @@ public class CreateIssueHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Title*200 characters*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
-	public async Task Handle_DescriptionTooLong_ThrowsValidationException()
+	public async Task Handle_DescriptionTooLong_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateIssueCommand
@@ -116,11 +119,11 @@ public class CreateIssueHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Description*5000 characters*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
@@ -154,7 +157,8 @@ public class CreateIssueHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Description.Should().BeEmpty();
+		result.Success.Should().BeTrue();
+		result.Value!.Description.Should().BeEmpty();
 	}
 
 	[Fact]

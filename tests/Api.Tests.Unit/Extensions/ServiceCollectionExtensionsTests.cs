@@ -7,6 +7,8 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
+using Api.Data.Interfaces;
+
 namespace Api.Extensions;
 
 /// <summary>Unit tests for <see cref="ServiceCollectionExtensions"/>.</summary>

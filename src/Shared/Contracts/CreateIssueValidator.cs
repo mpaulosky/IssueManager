@@ -8,7 +8,7 @@
 // =======================================================
 using FluentValidation;
 
-namespace Shared.Validators;
+namespace Shared.Contracts;
 
 /// <summary>
 /// Command for creating a new issue.

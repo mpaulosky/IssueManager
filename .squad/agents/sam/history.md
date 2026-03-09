@@ -110,3 +110,34 @@ Backend Developer on IssueManager (.NET 10, MongoDB, EF Core, CQRS, MediatR, Min
 - Old horizontal-layer structure (Handlers/, Pages/, Services/) replaced with feature-based folder organization
 - Test project renamed: Blazor.Tests → Web.Tests.Bunit (path: 	ests/Web.Tests.Bunit/)
 - All test references should use the new project name
+
+### 2026-03-08 — VSA Refactoring Backend Implementation
+
+**Session:** Aragorn (Lead), Sam (Backend), Gimli (Tester), Boromir (DevOps), Coordinator
+
+**Execution:** Implemented all three refactoring gaps identified by Aragorn
+
+1. **Namespace Rename: Shared.Validators → Shared.Contracts**
+   - Renamed `src/Shared/Validators/` directory to `src/Shared/Contracts/`
+   - Updated namespace declaration in all 13 contract files to `namespace Shared.Contracts`
+   - Reorganized CQRS commands/queries to co-locate with their validators under unified contract layer
+
+2. **Repository Interface Relocation**
+   - Created new directory `src/Api/Data/Interfaces/`
+   - Moved all 4 repository interfaces: `IIssueRepository`, `IUserRepository`, `ICategoryRepository`, `IStatusRepository`
+   - Updated namespace references in all dependent files (repository implementations, handlers, etc.)
+
+3. **CreateIssueHandler Return Type Fix**
+   - Changed `CreateIssueHandler.Handle()` return type from `Task<IssueDto>` to `Task<Result<IssueDto>>`
+   - Eliminates the last exception-throwing handler; all 7 handlers now consistently return `Task<Result<T>>`
+   - Updated `IssueEndpoints.cs` Create endpoint to unwrap the `Result<IssueDto>` response
+
+4. **Global Namespace Updates**
+   - Updated `GlobalUsings.cs` in 6 projects: `using Shared.Validators;` → `using Shared.Contracts;`
+   - Updated `src/Web/_Imports.razor`: `@using Shared.Validators` → `@using Shared.Contracts`
+
+5. **Test Migrations**
+   - Updated `CreateIssueHandler` unit tests: replaced throw assertions with Result<IssueDto> assertions
+   - Updated `CreateIssueHandler` integration tests: validated Result pattern with both success and failure paths
+
+**Build Results:** All 8 projects build cleanly. Committed as `54aadb2` to main.

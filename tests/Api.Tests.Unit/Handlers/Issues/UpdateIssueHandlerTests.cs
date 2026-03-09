@@ -6,6 +6,9 @@
 // Solution Name : IssueManager
 // Project Name :  Api.Tests.Unit
 // =======================================================
+
+using Api.Data.Interfaces;
+
 namespace Api.Handlers.Issues;
 
 /// <summary>

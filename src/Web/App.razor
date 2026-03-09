@@ -5,30 +5,30 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<base href="/" />
-	<Title>IssueManager</Title>
+	<title>IssueManager</title>
 	<script>
-		// Apply saved theme preferences BEFORE page render to prevent FOUC
-		(function () {
-			const theme = localStorage.getItem('colorTheme') || 'blue';
-			const darkMode = localStorage.getItem('darkMode') === 'true';
-			document.documentElement.setAttribute('data-theme', theme);
-			if (darkMode) {
-				document.documentElement.classList.add('dark');
-			}
-		})();
+			// Apply saved theme preferences BEFORE page render to prevent FOUC
+			(function () {
+				const theme = localStorage.getItem('colorTheme') || 'blue';
+				const darkMode = localStorage.getItem('darkMode') === 'true';
+				document.documentElement.setAttribute('data-theme', theme);
+				if (darkMode) {
+					document.documentElement.classList.add('dark');
+				}
+			})();
 	</script>
 	<script src="https://cdn.tailwindcss.com"></script>
 	<script>
 		tailwind.config = {
-			darkMode: 'class',
-			theme: {
-				extend: {
-					colors: {
-						primary: 'var(--color-primary)',
-						'primary-hover': 'var(--color-primary-hover)',
-					}
-				}
-			}
+		darkMode: 'class',
+		theme: {
+		extend: {
+		colors: {
+		primary: 'var(--color-primary)',
+		'primary-hover': 'var(--color-primary-hover)',
+		}
+		}
+		}
 		}
 	</script>
 	<link rel="stylesheet" href="app.css" />

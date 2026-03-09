@@ -2185,3 +2185,130 @@ All unit test jobs follow same structure:
 **What:** AppHost.Tests.Unit (OutputType=Exe) runs as direct executable in CI, consistent with Architecture.Tests and Web.Tests.Bunit. Not via dotnet test.  
 **Why:** xUnit v3 TestProcessLauncherAdapter compatibility issue causes inconclusive tests when dotnet test is used with OutputType=Exe projects. Direct executable invocation bypasses the adapter.  
 **Impact:** AppHost.Tests.Unit now runs reliably in CI workflows without inconclusive failures.
+
+---
+
+### 2026-03-07: PR #100 — GitHub Actions Dependency Bumps
+
+**Date:** 2026-03-07  
+**PR:** mpaulosky/IssueManager#100  
+**Title:** "chore(deps): Bump the all-actions group with 2 updates"  
+**Status:** ✅ APPROVED & READY TO MERGE  
+**Reviewer:** Boromir (DevOps)
+
+## Changes Reviewed
+
+**GitHub Actions Version Bumps:**
+1. **actions/checkout**: v4 → v6
+   - Stable release (v6.0.2, released Jan 9, 2026)
+   - Improved credential security, Node.js 24 support
+   - Runner requirement: GitHub Actions Runner v2.329.0+ (met)
+
+2. **actions/github-script**: v7 → v8
+   - Stable release (v8.0.0+)
+   - Node.js runtime v20 → v24
+   - All squad workflows compatible with Node 24
+
+## CI Status
+
+✅ **All 25 checks PASSING:**
+- Test Suite: Unit, Integration, Architecture, App Host
+- CodeQL, Coverage, Squad CI all passing
+
+## Assessment
+
+Routine Dependabot dependency bump for GitHub Actions. No application code changes. Safe to merge.
+
+---
+
+### 2026-03-07: EditModel POCO Test Pattern Decision
+
+**Date:** 2026-03-07  
+**Author:** Gimli (Tester)  
+**Status:** ✅ Implemented
+
+## Context
+
+`StatusEditModel` and `CategoryEditModel` are simple POCO classes with no validation, computed properties, or complex logic.
+
+## Decision
+
+For pure POCO edit-model classes, write **5 focused unit tests per model**:
+
+1. `Constructor_SetsExpectedDefaultValues` — verifies all properties at once
+2. `Id_CanBeSet`
+3. `{Name}_CanBeSet`
+4. `{Description}_CanBeSet`
+5. `{Description}_CanBeSetToNull` — covers nullable `string?` contract
+
+Tests live in the same namespace as the production class. No mocking or async needed for POCO tests.
+
+## Files Created
+
+- `tests/Web.Tests.Unit/Components/Features/Statuses/StatusEditModelTests.cs` (5 tests)
+- `tests/Web.Tests.Unit/Components/Features/Categories/CategoryEditModelTests.cs` (5 tests)
+
+## Results
+
+All 10 tests pass.
+
+---
+
+### 2026-03-07: ProfilePage bUnit Test Patterns
+
+**By:** Gimli (Tester)  
+**Date:** 2026-03-07  
+**Status:** ✅ Documented
+
+## Context
+
+Wrote 8 bUnit tests for `ProfilePage.razor.cs` in `tests/Web.Tests.Bunit/Components/Features/Profile/ProfilePageTests.cs`.
+
+## Key Patterns
+
+### Standalone class (not ComponentTestBase)
+ProfilePage reads authenticated username from `AuthenticationStateProvider`. Use standalone `BunitContext` with `AddAuthorization().SetAuthorized("testuser")` for named user context.
+
+### Username fallback coverage
+Call `ctx.AddAuthorization()` without `SetAuthorized` to get anonymous `ClaimsPrincipal` with `Identity.Name = null`, triggering the `?? "User"` fallback.
+
+### Heading assertions use TextContent not Markup
+Use `cut.Find("h1").TextContent.Should().Contain("testuser")` instead of markup matching to handle HTML-encoding differences.
+
+### No extra service registrations
+Neither `ICategoryApiClient` nor `IStatusApiClient` are needed for ProfilePage tests.
+
+---
+
+### 2026-03-07: Build Fix Investigation — Sam
+
+**Date:** 2026-03-07  
+**Author:** Sam (Backend Developer)  
+**Status:** ✅ Complete
+
+## What Was Reported
+
+Old build log (`build-output-detail.txt`) recorded **8 CS0029 errors** in `src/Shared/Validators/` — string literals assigned to `ObjectId`/`ObjectId?` properties.
+
+## Root Cause (Historical)
+
+Pattern like `public ObjectId? Id { get; init; } = "";` used string `""` as default for `ObjectId` property — type mismatch.
+
+Correct patterns:
+- `public ObjectId Id { get; init; }` (no default; defaults to `ObjectId.Empty`)
+- `public ObjectId Id { get; init; } = ObjectId.Empty;` (explicit)
+
+## Current State
+
+**Build already passes.** Fresh `dotnet build` confirmed:
+```
+Build succeeded.
+    15 Warning(s)
+    0 Error(s)
+```
+
+The fixes were applied prior to investigation (files deleted or corrected). Stale log files (`build-output-detail.txt`, `final-build.log`) reference old project structure and should be archived.
+
+## Remaining Warnings
+
+15 CS8602 warnings in `Api.Tests.Integration` (non-blocking, deferred for Gimli).

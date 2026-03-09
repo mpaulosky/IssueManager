@@ -625,3 +625,32 @@ Split the single `tests/Unit.Tests` project into three project-specific test ass
 ### Notes
 History file currently at 37KB. If exceeded 12KB limit in future, will require summarization of entries older than 30 days into "## Core Context" section.
 
+---
+
+### 2026-03-08 — VSA Refactoring Architecture Test Enforcement
+
+**Session:** Aragorn (Lead), Sam (Backend), Gimli (Tester), Boromir (DevOps), Coordinator
+
+**Execution:** Added 2 new VSA architecture enforcement tests per Aragorn's recommendations
+
+1. **Namespace Test Update**
+   - Updated existing test in `tests/Architecture.Tests/SystemArchitectureTests.cs`
+   - Changed namespace check: `Shared.Validators` → `Shared.Contracts`
+
+2. **New VSA Enforcement Tests (2 added)**
+   - **ApiHandlers_ShouldResideInHandlersNamespace**
+     - Validates all handler classes (implementing `IRequest<T>`) reside under `Api.Handlers.*` namespace
+     - Enforces command/query separation from presentation layer
+   
+   - **CommandsAndQueries_ShouldResideInSharedContracts**
+     - Validates all CQRS objects (Commands, Queries, Responses) reside under `Shared.Contracts.*` namespace
+     - Prevents handlers, endpoints, or other types from polluting the contracts namespace
+
+3. **Architecture Test Results**
+   - All 11 architecture tests passing ✅
+   - Shared.Tests.Unit: 215/215 passing ✅
+   - Api.Tests.Unit: All passing ✅
+   - Full solution verification complete
+
+**Outcome:** ✅ VSA enforcement now automated. Any future violations will fail CI.
+
