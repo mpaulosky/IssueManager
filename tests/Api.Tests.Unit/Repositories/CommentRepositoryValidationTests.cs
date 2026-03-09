@@ -109,9 +109,6 @@ public sealed class CommentRepositoryValidationTests
 		result.Error.Should().Be("User ID cannot be empty.");
 	}
 
-	// NOTE: These tests are commented out because repository signatures have changed.
-	// ArchiveAsync now takes ObjectId only, UpdateAsync takes CommentDto only.
-
 	[Fact]
 	public async Task CommentRepository_CreateAsync_WithNullComment_ReturnsFailureResult()
 	{
@@ -126,32 +123,31 @@ public sealed class CommentRepositoryValidationTests
 		result.Error.Should().Be("Comment cannot be null.");
 	}
 
-	// [Fact]
-	// public async Task CommentRepository_ArchiveAsync_WithNullComment_ReturnsFailureResult()
-	// {
-	// 	// Arrange
-	// 	var repo = new CommentRepository("mongodb://localhost:27017", "TestDb");
-	//
-	// 	// Act
-	// 	var result = await repo.ArchiveAsync(null!);
-	//
-	// 	// Assert
-	// 	result.Success.Should().BeFalse();
-	// 	result.Error.Should().Be("Comment cannot be null.");
-	// }
+	[Fact]
+	public async Task CommentRepository_ArchiveAsync_WithEmptyObjectId_ReturnsFailureResult()
+	{
+		// Arrange
+		var repo = new CommentRepository("mongodb://localhost:27017", "TestDb");
 
-	// [Fact]
-	// public async Task CommentRepository_UpdateAsync_WithNullComment_ReturnsFailureResult()
-	// {
-	// 	// Arrange
-	// 	var repo = new CommentRepository("mongodb://localhost:27017", "TestDb");
-	// 	var commentId = ObjectId.GenerateNewId();
-	//
-	// 	// Act
-	// 	var result = await repo.UpdateAsync(commentId, null!);
-	//
-	// 	// Assert
-	// 	result.Success.Should().BeFalse();
-	// 	result.Error.Should().Be("Comment cannot be null.");
-	// }
+		// Act
+		var result = await repo.ArchiveAsync(ObjectId.Empty, TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Comment cannot be null.");
+	}
+
+	[Fact]
+	public async Task CommentRepository_UpdateAsync_WithNullComment_ReturnsFailureResult()
+	{
+		// Arrange
+		var repo = new CommentRepository("mongodb://localhost:27017", "TestDb");
+
+		// Act
+		var result = await repo.UpdateAsync(null!, TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Comment cannot be null.");
+	}
 }

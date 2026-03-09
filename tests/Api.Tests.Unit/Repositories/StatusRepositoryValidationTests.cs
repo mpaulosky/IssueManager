@@ -16,9 +16,7 @@ namespace Api.Repositories;
 /// </summary>
 public sealed class StatusRepositoryValidationTests
 {
-	// ========== StatusRepository Null Validation Tests ==========
-	// NOTE: These tests are commented out because repository signatures have changed.
-	// ArchiveAsync now takes ObjectId only, UpdateAsync takes StatusDto only.
+	// ========== StatusRepository Validation Tests ==========
 
 	[Fact]
 	public async Task StatusRepository_CreateAsync_WithNullStatus_ReturnsFailureResult()
@@ -34,32 +32,31 @@ public sealed class StatusRepositoryValidationTests
 		result.Error.Should().Be("Status cannot be null.");
 	}
 
-	// [Fact]
-	// public async Task StatusRepository_ArchiveAsync_WithNullStatus_ReturnsFailureResult()
-	// {
-	// 	// Arrange
-	// 	var repo = new StatusRepository("mongodb://localhost:27017", "TestDb");
-	//
-	// 	// Act
-	// 	var result = await repo.ArchiveAsync(null!);
-	//
-	// 	// Assert
-	// 	result.Success.Should().BeFalse();
-	// 	result.Error.Should().Be("Status cannot be null.");
-	// }
+	[Fact]
+	public async Task StatusRepository_ArchiveAsync_WithEmptyObjectId_ReturnsFailureResult()
+	{
+		// Arrange
+		var repo = new StatusRepository("mongodb://localhost:27017", "TestDb");
 
-	// [Fact]
-	// public async Task StatusRepository_UpdateAsync_WithNullStatus_ReturnsFailureResult()
-	// {
-	// 	// Arrange
-	// 	var repo = new StatusRepository("mongodb://localhost:27017", "TestDb");
-	// 	var statusId = ObjectId.GenerateNewId();
-	//
-	// 	// Act
-	// 	var result = await repo.UpdateAsync(statusId, null!);
-	//
-	// 	// Assert
-	// 	result.Success.Should().BeFalse();
-	// 	result.Error.Should().Be("Status cannot be null.");
-	// }
+		// Act
+		var result = await repo.ArchiveAsync(ObjectId.Empty, TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Status cannot be null.");
+	}
+
+	[Fact]
+	public async Task StatusRepository_UpdateAsync_WithNullStatus_ReturnsFailureResult()
+	{
+		// Arrange
+		var repo = new StatusRepository("mongodb://localhost:27017", "TestDb");
+
+		// Act
+		var result = await repo.UpdateAsync(null!, TestContext.Current.CancellationToken);
+
+		// Assert
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Status cannot be null.");
+	}
 }
