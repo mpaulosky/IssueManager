@@ -267,4 +267,82 @@ public sealed class ResultTests
 		successResult.Failure.Should().BeFalse();
 		failureResult.Failure.Should().BeTrue();
 	}
+
+	[Fact]
+	public void ResultGeneric_Fail_WithMessageAndCode_ReturnsFailureWithErrorCode()
+	{
+		// Arrange
+		const string errorMessage = "Not found";
+		const ResultErrorCode errorCode = ResultErrorCode.NotFound;
+
+		// Act
+		var result = Result<int>.Fail(errorMessage, errorCode);
+
+		// Assert
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be(errorMessage);
+		result.ErrorCode.Should().Be(errorCode);
+		result.Details.Should().BeNull();
+		result.Value.Should().Be(0);
+	}
+
+	[Fact]
+	public void ResultGeneric_Fail_WithMessageCodeAndDetails_ReturnsFailureWithAllProperties()
+	{
+		// Arrange
+		const string errorMessage = "Concurrency error";
+		const ResultErrorCode errorCode = ResultErrorCode.Concurrency;
+		var details = new { Version = 5 };
+
+		// Act
+		var result = Result<string>.Fail(errorMessage, errorCode, details);
+
+		// Assert
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be(errorMessage);
+		result.ErrorCode.Should().Be(errorCode);
+		result.Details.Should().Be(details);
+		result.Value.Should().BeNull();
+	}
+
+	[Fact]
+	public void ImplicitOperator_ResultToValue_WithReferenceType_ReturnsValue()
+	{
+		// Arrange
+		var result = Result.Ok("hello");
+
+		// Act
+		string? value = result;
+
+		// Assert
+		value.Should().Be("hello");
+	}
+
+	[Fact]
+	public void ImplicitOperator_ResultToValue_WithNullReferenceTypeResult_ReturnsDefault()
+	{
+		// Arrange
+		Result<string>? result = null;
+
+		// Act
+		string? value = result;
+
+		// Assert
+		value.Should().BeNull();
+	}
+
+	[Fact]
+	public void ImplicitOperator_ValueToResult_WithValueType_ReturnsSuccessResult()
+	{
+		// Arrange
+		const int value = 99;
+
+		// Act
+		Result<int> result = value;
+
+		// Assert
+		result.Success.Should().BeTrue();
+		result.Value.Should().Be(value);
+		result.Error.Should().BeNull();
+	}
 }

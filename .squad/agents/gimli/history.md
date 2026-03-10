@@ -73,6 +73,14 @@ Tester on IssueManager (.NET 10, xUnit, FluentAssertions, NSubstitute, bUnit, Te
 - **Session Log:** `.squad/log/2026-03-07T02-38-01Z-web-coverage-p0-batch.md`
 - **Next P0 Items:** ProfilePage tests (~8-10), IssueCard tests (~4-6), App shell/error pages (~8-10) to reach 90% target
 
+### DatabaseSeeder & AuthExtensions Unit Tests (2026-03-09)
+- **DatabaseSeeder:** 9 tests covering `SeedAsync()` behavior — when counts are > 0 (skips seeding), when counts are 0 (seeds 5 categories/statuses), when `CountAsync` fails (skips), when `CreateAsync` fails (logs warning), expected seeded names.
+- **AuthExtensions:** 5 tests for `NoAuthHandler` and `NoAuthOptions` — authentication result structure, ClaimsPrincipal type, options inheritance from `AuthenticationSchemeOptions`.
+- **NSubstitute ILogger mocking:** Use `_logger.Received().Log(LogLevel.Warning, Arg.Any<EventId>(), Arg.Is<object>(o => o.ToString()!.Contains("...")), ...)` pattern to verify logged messages.
+- **Result<long> returns:** Use `Result.Ok(5L)` (long literal) not `Result<long>.Ok(5)` — the generic `.Ok()` is private; static `Result.Ok<T>(T value)` infers type.
+- Files: `tests/Api.Tests.Unit/Data/DatabaseSeederTests.cs` (9 tests), `tests/Api.Tests.Unit/Extensions/AuthExtensionsTests.cs` (5 tests)
+- **Impact:** DatabaseSeeder 0% → ~85%, AuthExtensions 47% → ~70% coverage
+
 ---
 
 ## 2026-03-07 — AppHost.Tests.Unit Fix: Shared Fixture, Docker Skip Guard, Parallel Collections
@@ -654,3 +662,41 @@ History file currently at 37KB. If exceeded 12KB limit in future, will require s
 
 **Outcome:** ✅ VSA enforcement now automated. Any future violations will fail CI.
 
+
+---
+
+### 2026-03-09 — Shared Project Test Coverage Enhancement
+
+**Session:** Gimli (Tester) solo task
+**Execution:** Enhanced test coverage for Shared project components
+
+1. **ResultTests.cs Enhancements (7 new tests)**
+   - `Result<T>.Fail` with message and ErrorCode
+   - `Result<T>.Fail` with message, ErrorCode, and Details
+   - Implicit operator T? with reference type non-null Result
+   - Implicit operator T? with null reference type Result
+   - Implicit operator Result<T> from value type
+   - Total Result tests: 28
+
+2. **IssueDtoTests.cs Enhancements (4 new tests)**
+   - Constructor from Issue model mapping all properties
+   - Constructor from Issue with Rejected=true
+   - Constructor verifying ApprovedForRelease and Rejected properties
+   - Empty static property verifies ApprovedForRelease and Rejected defaults
+   - Total IssueDto tests: 13
+
+3. **UpdateIssueCommandTests.cs (NEW FILE - 9 tests)**
+   - Created new test file in `tests/Shared.Tests.Unit/Contracts/`
+   - Default values verification
+   - Individual property init tests (Id, Title, Description, ApprovedForRelease, Rejected)
+   - Full property initialization test
+   - Record equality and inequality tests
+   - Total UpdateIssueCommand tests: 9
+
+**Test Summary:**
+- Added 20 new tests total
+- All 40 targeted tests passing ✅
+- FluentAssertions used throughout
+- AAA pattern with comments enforced
+
+**Outcome:** ✅ Coverage gaps addressed for Result<T>, IssueDto, and UpdateIssueCommand
