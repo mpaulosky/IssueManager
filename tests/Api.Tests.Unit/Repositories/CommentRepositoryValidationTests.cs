@@ -11,7 +11,7 @@ namespace Api.Repositories;
 
 /// <summary>
 /// Unit tests for CommentRepository validation logic that can be tested without a database.
-/// These tests validate input validation and ObjectId parsing logic.
+/// These tests validate input validation (ObjectId.Empty checks and string validation) before any database operations occur.
 /// Note: Integration tests cover full CRUD operations.
 /// </summary>
 [ExcludeFromCodeCoverage]
@@ -65,17 +65,18 @@ public sealed class CommentRepositoryValidationTests
 	}
 
 	[Fact]
-	public async Task CommentRepository_GetByIssueAsync_WithNullIssue_ReturnsFailureResult()
+	public async Task CommentRepository_GetByIssueAsync_WithEmptyIssueId_ReturnsFailureResult()
 	{
 		// Arrange
 		var repo = new CommentRepository("mongodb://localhost:27017", "TestDb");
+		var issueWithEmptyId = IssueDto.Empty with { Id = ObjectId.Empty };
 
 		// Act
-		var result = await repo.GetByIssueAsync(null!, TestContext.Current.CancellationToken);
+		var result = await repo.GetByIssueAsync(issueWithEmptyId, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
-		result.Error.Should().Be("Issue cannot be null.");
+		result.Error.Should().Be("Issue ID cannot be empty.");
 	}
 
 	[Fact]
@@ -111,17 +112,18 @@ public sealed class CommentRepositoryValidationTests
 	}
 
 	[Fact]
-	public async Task CommentRepository_CreateAsync_WithNullComment_ReturnsFailureResult()
+	public async Task CommentRepository_CreateAsync_WithEmptyId_ReturnsFailureResult()
 	{
 		// Arrange
 		var repo = new CommentRepository("mongodb://localhost:27017", "TestDb");
+		var commentWithEmptyId = CommentDto.Empty with { Id = ObjectId.Empty };
 
 		// Act
-		var result = await repo.CreateAsync(null!, TestContext.Current.CancellationToken);
+		var result = await repo.CreateAsync(commentWithEmptyId, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
-		result.Error.Should().Be("Comment cannot be null.");
+		result.Error.Should().Be("Comment ID cannot be empty.");
 	}
 
 	[Fact]
@@ -135,20 +137,21 @@ public sealed class CommentRepositoryValidationTests
 
 		// Assert
 		result.Success.Should().BeFalse();
-		result.Error.Should().Be("Comment cannot be null.");
+		result.Error.Should().Be("Comment ID cannot be empty.");
 	}
 
 	[Fact]
-	public async Task CommentRepository_UpdateAsync_WithNullComment_ReturnsFailureResult()
+	public async Task CommentRepository_UpdateAsync_WithEmptyId_ReturnsFailureResult()
 	{
 		// Arrange
 		var repo = new CommentRepository("mongodb://localhost:27017", "TestDb");
+		var commentWithEmptyId = CommentDto.Empty with { Id = ObjectId.Empty };
 
 		// Act
-		var result = await repo.UpdateAsync(null!, TestContext.Current.CancellationToken);
+		var result = await repo.UpdateAsync(commentWithEmptyId, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
-		result.Error.Should().Be("Comment cannot be null.");
+		result.Error.Should().Be("Comment ID cannot be empty.");
 	}
 }

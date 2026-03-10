@@ -7,10 +7,6 @@
 // Project Name :  Api
 // =============================================
 
-using Api.Handlers;
-
-using static Api.Handlers.Categories.GetCategoryHandler;
-
 namespace Api.Handlers.Categories;
 
 /// <summary>Registers Category endpoints on the route builder.</summary>

@@ -11,7 +11,7 @@ namespace Api.Repositories;
 
 /// <summary>
 /// Unit tests for IssueRepository validation logic that can be tested without a database.
-/// These tests validate input validation before any database operations occur.
+/// These tests validate input validation (ObjectId.Empty checks) before any database operations occur.
 /// Note: Integration tests cover full CRUD operations.
 /// </summary>
 [ExcludeFromCodeCoverage]
@@ -30,34 +30,36 @@ public sealed class IssueRepositoryValidationTests
 
 		// Assert
 		result.Success.Should().BeFalse();
-		result.Error.Should().Be("Issue cannot be null.");
+		result.Error.Should().Be("Issue ID cannot be empty.");
 	}
 
 	[Fact]
-	public async Task IssueRepository_CreateAsync_WithNullIssue_ReturnsFailureResult()
+	public async Task IssueRepository_CreateAsync_WithEmptyId_ReturnsFailureResult()
 	{
 		// Arrange
 		var repo = new IssueRepository("mongodb://localhost:27017", "TestDb");
+		var issueWithEmptyId = IssueDto.Empty with { Id = ObjectId.Empty };
 
 		// Act
-		var result = await repo.CreateAsync(null!, TestContext.Current.CancellationToken);
+		var result = await repo.CreateAsync(issueWithEmptyId, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
-		result.Error.Should().Be("Issue cannot be null.");
+		result.Error.Should().Be("Issue ID cannot be empty.");
 	}
 
 	[Fact]
-	public async Task IssueRepository_UpdateAsync_WithNullIssue_ReturnsFailureResult()
+	public async Task IssueRepository_UpdateAsync_WithEmptyId_ReturnsFailureResult()
 	{
 		// Arrange
 		var repo = new IssueRepository("mongodb://localhost:27017", "TestDb");
+		var issueWithEmptyId = IssueDto.Empty with { Id = ObjectId.Empty };
 
 		// Act
-		var result = await repo.UpdateAsync(null!, TestContext.Current.CancellationToken);
+		var result = await repo.UpdateAsync(issueWithEmptyId, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
-		result.Error.Should().Be("Issue cannot be null.");
+		result.Error.Should().Be("Issue ID cannot be empty.");
 	}
 }

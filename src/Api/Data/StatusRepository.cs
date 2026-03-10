@@ -30,7 +30,7 @@ public class StatusRepository : IStatusRepository
 	public async Task<Result> ArchiveAsync(ObjectId statusId, CancellationToken cancellationToken = default)
 	{
 		if (statusId == ObjectId.Empty)
-			return Result.Fail("Status cannot be null.");
+			return Result.Fail("Status ID cannot be empty.");
 
 		var update = Builders<Status>.Update.Set(x => x.Archived, true);
 		var result = await _collection.UpdateOneAsync(x => x.Id == statusId, update, cancellationToken: cancellationToken);
@@ -40,8 +40,8 @@ public class StatusRepository : IStatusRepository
 	/// <inheritdoc />
 	public async Task<Result<StatusDto>> CreateAsync(StatusDto dto, CancellationToken cancellationToken = default)
 	{
-		if (dto is null)
-			return Result.Fail<StatusDto>("Status cannot be null.");
+		if (dto.Id == ObjectId.Empty)
+			return Result.Fail<StatusDto>("Status ID cannot be empty.");
 
 		var model = dto.ToModel();
 		await _collection.InsertOneAsync(model, cancellationToken: cancellationToken);
@@ -80,16 +80,16 @@ public class StatusRepository : IStatusRepository
 			.Limit(pageSize)
 			.ToListAsync(cancellationToken);
 
-		return (Result<(IReadOnlyList<StatusDto> Items, long Total)>)(entities.Count > 0
-				? Result.Ok((entities.Select(x => x.ToDto()).ToList().AsReadOnly(), total))
-				: Result.Fail("Issues not found."));
+		return entities.Count > 0
+				? Result.Ok((Items: (IReadOnlyList<StatusDto>)entities.Select(x => x.ToDto()).ToList(), Total: total))
+				: Result.Fail<(IReadOnlyList<StatusDto> Items, long Total)>("Statuses not found.");
 	}
 
 	/// <inheritdoc />
 	public async Task<Result<StatusDto>> UpdateAsync(StatusDto dto, CancellationToken cancellationToken = default)
 	{
-		if (dto is null)
-			return Result.Fail<StatusDto>("Status cannot be null.");
+		if (dto.Id == ObjectId.Empty)
+			return Result.Fail<StatusDto>("Status ID cannot be empty.");
 
 		var model = dto.ToModel();
 

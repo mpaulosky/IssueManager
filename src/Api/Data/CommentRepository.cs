@@ -30,7 +30,7 @@ public class CommentRepository : ICommentRepository
 	public async Task<Result> ArchiveAsync(ObjectId commentId, CancellationToken cancellationToken = default)
 	{
 		if (commentId == ObjectId.Empty)
-			return Result.Fail("Comment cannot be null.");
+			return Result.Fail("Comment ID cannot be empty.");
 
 		var update = Builders<Comment>.Update.Set(x => x.Archived, true);
 		var result = await _collection.UpdateOneAsync(x => x.Id == commentId, update, cancellationToken: cancellationToken);
@@ -40,8 +40,8 @@ public class CommentRepository : ICommentRepository
 	/// <inheritdoc />
 	public async Task<Result<CommentDto>> CreateAsync(CommentDto comment, CancellationToken cancellationToken = default)
 	{
-		if (comment is null)
-			return Result.Fail<CommentDto>("Comment cannot be null.");
+		if (comment.Id == ObjectId.Empty)
+			return Result.Fail<CommentDto>("Comment ID cannot be empty.");
 
 		var model = comment.ToModel();
 		await _collection.InsertOneAsync(model, cancellationToken: cancellationToken);
@@ -108,10 +108,8 @@ public class CommentRepository : ICommentRepository
 	/// <inheritdoc />
 	public async Task<Result<IEnumerable<CommentDto>>> GetByIssueAsync(IssueDto issue, CancellationToken cancellationToken = default)
 	{
-		if (issue == null)
-		{
-			return Result.Fail<IEnumerable<CommentDto>>("Issue cannot be null.");
-		}
+		if (issue.Id == ObjectId.Empty)
+			return Result.Fail<IEnumerable<CommentDto>>("Issue ID cannot be empty.");
 
 		var entities = await _collection.Find(x => x.Issue.Id == issue.Id).ToListAsync(cancellationToken);
 
@@ -123,8 +121,8 @@ public class CommentRepository : ICommentRepository
 	/// <inheritdoc />
 	public async Task<Result<CommentDto>> UpdateAsync(CommentDto dto, CancellationToken cancellationToken = default)
 	{
-		if (dto is null)
-			return Result.Fail<CommentDto>("Comment cannot be null.");
+		if (dto.Id == ObjectId.Empty)
+			return Result.Fail<CommentDto>("Comment ID cannot be empty.");
 
 		var model = dto.ToModel();
 

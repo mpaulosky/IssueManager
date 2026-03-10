@@ -11,7 +11,7 @@ namespace Api.Repositories;
 
 /// <summary>
 /// Unit tests for StatusRepository validation logic that can be tested without a database.
-/// These tests validate input validation and ObjectId parsing logic.
+/// These tests validate input validation (ObjectId.Empty checks) before any database operations occur.
 /// Note: Integration tests cover full CRUD operations.
 /// </summary>
 [ExcludeFromCodeCoverage]
@@ -20,17 +20,18 @@ public sealed class StatusRepositoryValidationTests
 	// ========== StatusRepository Validation Tests ==========
 
 	[Fact]
-	public async Task StatusRepository_CreateAsync_WithNullStatus_ReturnsFailureResult()
+	public async Task StatusRepository_CreateAsync_WithEmptyId_ReturnsFailureResult()
 	{
 		// Arrange
 		var repo = new StatusRepository("mongodb://localhost:27017", "TestDb");
+		var statusWithEmptyId = StatusDto.Empty with { Id = ObjectId.Empty };
 
 		// Act
-		var result = await repo.CreateAsync(null!, TestContext.Current.CancellationToken);
+		var result = await repo.CreateAsync(statusWithEmptyId, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
-		result.Error.Should().Be("Status cannot be null.");
+		result.Error.Should().Be("Status ID cannot be empty.");
 	}
 
 	[Fact]
@@ -44,20 +45,21 @@ public sealed class StatusRepositoryValidationTests
 
 		// Assert
 		result.Success.Should().BeFalse();
-		result.Error.Should().Be("Status cannot be null.");
+		result.Error.Should().Be("Status ID cannot be empty.");
 	}
 
 	[Fact]
-	public async Task StatusRepository_UpdateAsync_WithNullStatus_ReturnsFailureResult()
+	public async Task StatusRepository_UpdateAsync_WithEmptyId_ReturnsFailureResult()
 	{
 		// Arrange
 		var repo = new StatusRepository("mongodb://localhost:27017", "TestDb");
+		var statusWithEmptyId = StatusDto.Empty with { Id = ObjectId.Empty };
 
 		// Act
-		var result = await repo.UpdateAsync(null!, TestContext.Current.CancellationToken);
+		var result = await repo.UpdateAsync(statusWithEmptyId, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
-		result.Error.Should().Be("Status cannot be null.");
+		result.Error.Should().Be("Status ID cannot be empty.");
 	}
 }

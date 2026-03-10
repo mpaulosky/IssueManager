@@ -700,3 +700,29 @@ History file currently at 37KB. If exceeded 12KB limit in future, will require s
 - AAA pattern with comments enforced
 
 **Outcome:** ✅ Coverage gaps addressed for Result<T>, IssueDto, and UpdateIssueCommand
+
+---
+
+### 2026-03-10 — Repository Validation Tests Update for ObjectId.Empty
+
+**Session:** Gimli (Tester) task for repository test updates
+**Request:** Update tests to support ObjectId.Empty validation changes in repositories
+
+1. **Repository Changes Reviewed**
+   - All 4 repositories (Category, Comment, Issue, Status) now validate with `ObjectId.Empty` instead of null checks
+   - Error messages changed from "X cannot be null." to "X ID cannot be empty."
+   - Validation now checks `dto.Id == ObjectId.Empty` before database operations
+
+2. **Test Files Updated (4 files, 18 tests)**
+   - `CategoryRepositoryValidationTests.cs`: 3 tests updated to pass DTOs with `ObjectId.Empty` IDs
+   - `CommentRepositoryValidationTests.cs`: 9 tests updated (CreateAsync, ArchiveAsync, UpdateAsync, GetByIssueAsync all use ObjectId.Empty)
+   - `IssueRepositoryValidationTests.cs`: 3 tests updated with full IssueDto objects with empty IDs
+   - `StatusRepositoryValidationTests.cs`: 3 tests updated to pass DTOs with `ObjectId.Empty` IDs
+
+3. **Key Pattern Changes**
+   - Tests no longer pass `null!` (which would throw NullReferenceException on .Id access)
+   - Tests now create valid DTO objects with `Id = ObjectId.Empty`
+   - Error message assertions updated: "X cannot be null." → "X ID cannot be empty."
+   - IssueDto and CommentDto require full nested objects (Author, Category, Status, Issue) for validation
+
+**Outcome:** All 18 repository validation tests passing. Full suite: 724 tests green.

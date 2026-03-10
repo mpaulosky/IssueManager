@@ -30,7 +30,7 @@ public class CategoryRepository : ICategoryRepository
 	public async Task<Result> ArchiveAsync(ObjectId categoryId, CancellationToken cancellationToken = default)
 	{
 		if (categoryId == ObjectId.Empty)
-			return Result.Fail("Category cannot be null.");
+			return Result.Fail("Category ID cannot be empty.");
 
 		var update = Builders<Category>.Update.Set(x => x.Archived, true);
 		var result = await _collection.UpdateOneAsync(x => x.Id == categoryId, update, cancellationToken: cancellationToken);
@@ -40,8 +40,8 @@ public class CategoryRepository : ICategoryRepository
 	/// <inheritdoc />
 	public async Task<Result<CategoryDto>> CreateAsync(CategoryDto category, CancellationToken cancellationToken = default)
 	{
-		if (category is null)
-			return Result.Fail<CategoryDto>("Category cannot be null.");
+		if (category.Id == ObjectId.Empty)
+			return Result.Fail<CategoryDto>("Category ID cannot be empty.");
 
 		var model = category.ToModel();
 		await _collection.InsertOneAsync(model, cancellationToken: cancellationToken);
@@ -87,8 +87,8 @@ public class CategoryRepository : ICategoryRepository
 	/// <inheritdoc />
 	public async Task<Result<CategoryDto>> UpdateAsync(CategoryDto dto, CancellationToken cancellationToken = default)
 	{
-		if (dto is null)
-			return Result.Fail<CategoryDto>("Category cannot be null.");
+		if (dto.Id == ObjectId.Empty)
+			return Result.Fail<CategoryDto>("Category ID cannot be empty.");
 
 		var model = dto.ToModel();
 

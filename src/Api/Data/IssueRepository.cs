@@ -30,7 +30,7 @@ public class IssueRepository : IIssueRepository
 	public async Task<Result> ArchiveAsync(ObjectId issueId, CancellationToken cancellationToken = default)
 	{
 		if (issueId == ObjectId.Empty)
-			return Result.Fail("Issue cannot be null.");
+			return Result.Fail("Issue ID cannot be empty.");
 
 		var update = Builders<Issue>.Update.Set(x => x.Archived, true);
 		var result = await _collection.UpdateOneAsync(x => x.Id == issueId, update, cancellationToken: cancellationToken);
@@ -40,8 +40,8 @@ public class IssueRepository : IIssueRepository
 	/// <inheritdoc />
 	public async Task<Result<IssueDto>> CreateAsync(IssueDto issue, CancellationToken cancellationToken = default)
 	{
-		if (issue is null)
-			return Result.Fail<IssueDto>("Issue cannot be null.");
+		if (issue.Id == ObjectId.Empty)
+			return Result.Fail<IssueDto>("Issue ID cannot be empty.");
 
 		var model = issue.ToModel();
 		await _collection.InsertOneAsync(model, cancellationToken: cancellationToken);
@@ -109,8 +109,8 @@ public class IssueRepository : IIssueRepository
 	/// <inheritdoc />
 	public async Task<Result<IssueDto>> UpdateAsync(IssueDto dto, CancellationToken cancellationToken = default)
 	{
-		if (dto is null)
-			return Result.Fail<IssueDto>("Issue cannot be null.");
+		if (dto.Id == ObjectId.Empty)
+			return Result.Fail<IssueDto>("Issue ID cannot be empty.");
 
 		var model = dto.ToModel();
 
