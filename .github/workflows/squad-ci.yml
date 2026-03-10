@@ -2,6 +2,12 @@ name: Squad CI
 # Calls the squad-test.yml workflow for build and test execution
 
 on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual run'
+        required: false
+        default: 'Manual CI verification'
   pull_request:
     branches: [dev, preview, main, insider]
     types: [opened, synchronize, reopened]
