@@ -63,7 +63,7 @@ public class CreateCommentHandler
 			: UserDto.Empty;
 
 		var dto = new CommentDto(
-			ObjectId.Empty,
+			ObjectId.GenerateNewId(),
 			command.Title,
 			command.CommentText,
 			DateTime.UtcNow,

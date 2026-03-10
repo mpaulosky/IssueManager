@@ -45,6 +45,7 @@ public class CreateIssueHandler
 
 		var model = new Issue
 		{
+			Id = ObjectId.GenerateNewId(),
 			Title = command.Title,
 			Description = command.Description ?? string.Empty,
 			DateCreated = DateTime.UtcNow,

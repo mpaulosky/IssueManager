@@ -50,7 +50,7 @@ public class CreateStatusHandler
 			throw new ValidationException(validationResult.Errors);
 
 		var dto = new StatusDto(
-			ObjectId.Empty,
+			ObjectId.GenerateNewId(),
 			command.StatusName,
 			command.StatusDescription ?? string.Empty,
 			DateTime.UtcNow,

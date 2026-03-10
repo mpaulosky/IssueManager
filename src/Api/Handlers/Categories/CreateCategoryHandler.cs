@@ -50,7 +50,7 @@ public class CreateCategoryHandler
 			throw new ValidationException(validationResult.Errors);
 
 		var dto = new CategoryDto(
-			ObjectId.Empty,
+			ObjectId.GenerateNewId(),
 			command.CategoryName,
 			command.CategoryDescription ?? string.Empty,
 			DateTime.UtcNow,
