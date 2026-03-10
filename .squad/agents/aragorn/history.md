@@ -317,3 +317,23 @@ Because both projects share the same Blazor rendering model, a UI-only moderniza
 | Commit hash | `54aadb2` (main) |
 
 **Session Status:** ✅ COMPLETE — All gaps closed, VSA architecture strengthened, full CI verification passed.
+
+---
+
+## 2026-03-10 — PR #104 Review Comment Resolution
+
+**Task:** Address 6 code review comments on PR #104 (squad/workflow-enforcement)
+
+**Fixes Applied:**
+
+1. **ceremonies.md heading levels** — Fixed Phase 3-5 from `##` to `#####` to match Phase 1-2
+2. **Gate count mismatch** — Changed "all 6 pre-push gates" to "all 5 pre-push gates" (actual count: Gate 0 branch protection, Gate 1 headers, Gate 2 format, Gate 3 tests = 4 formal gates, but the list shows 5 bullet items)
+3. **decisions.md path reference** — Changed bare `Ceremonies.md` to `.squad/ceremonies.md`
+4. **Shell read robustness** — Changed `while read` to `while IFS=' ' read -r` in pre-push hook
+5. **Branch name placeholder alignment** — Changed `squad/{issue}-{slug}` to `squad/{issue-number}-{kebab-slug}` to match ceremonies.md
+
+**Comment 6 (informational):** PR description mentions `.git/hooks/pre-push` — not changed because `.git/hooks/pre-push` IS updated at install time (template at `scripts/hooks/pre-push`)
+
+**Commit:** `2b8a721` (amended original commit, force-pushed)
+
+**Learning:** When reviewing PRs, markdown heading hierarchy and placeholder consistency matter for documentation quality. Shell scripts should always use `IFS=' ' read -r` for robust stdin parsing.
