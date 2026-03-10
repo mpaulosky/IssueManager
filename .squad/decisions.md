@@ -2312,3 +2312,11 @@ The fixes were applied prior to investigation (files deleted or corrected). Stal
 ## Remaining Warnings
 
 15 CS8602 warnings in `Api.Tests.Integration` (non-blocking, deferred for Gimli).
+
+---
+
+### 2026-03-10: Main branch push protection enforced
+**By:** Matthew Paulosky (via Copilot)
+**What:** Pre-push hook now blocks direct pushes to `main` or `master`. All work must go through `squad/{issue}-{slug}` feature branches and PRs.
+**Why:** `.squad/ceremonies.md` documents the Standard Task Workflow but it was not enforced. Direct push to main (commit 889d6cb) bypassed the PR process. Gate 0 now reads the remote ref and exits with error if target is main/master.
+
