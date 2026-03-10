@@ -2320,3 +2320,35 @@ The fixes were applied prior to investigation (files deleted or corrected). Stal
 **What:** Pre-push hook now blocks direct pushes to `main` or `master`. All work must go through `squad/{issue}-{slug}` feature branches and PRs.
 **Why:** `.squad/ceremonies.md` documents the Standard Task Workflow but it was not enforced. Direct push to main (commit 889d6cb) bypassed the PR process. Gate 0 now reads the remote ref and exits with error if target is main/master.
 
+
+---
+
+### 2026-03-10: Handlers Generate ObjectIds, Repositories Validate
+
+**By:** Gimli (Tester)  
+**Date:** 2026-03-10  
+**Status:** ✅ Implemented
+
+## Context
+The Create handlers (CreateIssueHandler, CreateCommentHandler, CreateCategoryHandler, CreateStatusHandler) were passing `ObjectId.Empty` to repository CreateAsync methods, expecting the repository or MongoDB to generate the ID. Repositories validate that IDs are not `ObjectId.Empty` before operations, causing all Create handler integration tests to fail with "ID cannot be empty" errors.
+
+## Decision
+**Handlers are responsible for generating new ObjectIds**, not repositories.
+- Create handlers call `ObjectId.GenerateNewId()` when constructing DTOs/models
+- Repositories validate that IDs are not empty before database operations
+- This separation ensures explicit ID ownership at the application layer
+
+## Rationale
+1. **Explicit is better than implicit** — Handler knows it's creating a new entity and should assign the ID
+2. **Repository validation prevents bugs** — Empty ID validation catches accidental omissions
+3. **Testability** — Unit tests can verify the handler generates a valid ID before calling repository
+4. **MongoDB compatibility** — Pre-generation is cleaner than relying on MongoDB auto-generation for BSON-mapped ObjectId
+
+## Affected Files
+- `src/Api/Handlers/Comments/CreateCommentHandler.cs`
+- `src/Api/Handlers/Statuses/CreateStatusHandler.cs`
+- `src/Api/Handlers/Categories/CreateCategoryHandler.cs`
+- `src/Api/Handlers/Issues/CreateIssueHandler.cs`
+
+## For Future Development
+When creating new Create handlers, always use `ObjectId.GenerateNewId()` when constructing the DTO/model. Do NOT rely on the repository or database to generate the ID.
