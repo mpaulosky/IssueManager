@@ -127,4 +127,98 @@ public sealed class IssueDtoTests
 		// Assert
 		dto1.Should().NotBeSameAs(dto2);
 	}
+
+	[Fact]
+	public void Constructor_FromIssue_MapsAllPropertiesCorrectly()
+	{
+		// Arrange
+		var issue = new Issue
+		{
+			Id = ObjectId.GenerateNewId(),
+			Title = "Bug in login",
+			Description = "Users cannot log in",
+			DateCreated = DateTime.UtcNow.AddDays(-5),
+			DateModified = DateTime.UtcNow,
+			Author = new UserDto("auth1", "Author Name", "author@test.com"),
+			Category = new CategoryDto(ObjectId.GenerateNewId(), "Bug", "Bug reports", default, null, false, UserDto.Empty),
+			Status = new StatusDto(ObjectId.GenerateNewId(), "Open", "Open status", default, null, false, UserDto.Empty),
+			Archived = true,
+			ArchivedBy = new UserDto("admin1", "Admin Name", "admin@test.com"),
+			ApprovedForRelease = true,
+			Rejected = false
+		};
+
+		// Act
+		var dto = new IssueDto(issue);
+
+		// Assert
+		dto.Id.Should().Be(issue.Id);
+		dto.Title.Should().Be(issue.Title);
+		dto.Description.Should().Be(issue.Description);
+		dto.DateCreated.Should().Be(issue.DateCreated);
+		dto.DateModified.Should().Be(issue.DateModified);
+		dto.Author.Should().Be(issue.Author);
+		dto.Category.Should().Be(issue.Category);
+		dto.Status.Should().Be(issue.Status);
+		dto.Archived.Should().Be(issue.Archived);
+		dto.ArchivedBy.Should().Be(issue.ArchivedBy);
+		dto.ApprovedForRelease.Should().Be(issue.ApprovedForRelease);
+		dto.Rejected.Should().Be(issue.Rejected);
+	}
+
+	[Fact]
+	public void Constructor_FromIssue_WithRejectedTrue_MapsRejectedCorrectly()
+	{
+		// Arrange
+		var issue = new Issue
+		{
+			Id = ObjectId.GenerateNewId(),
+			Title = "Rejected Issue",
+			Description = "This issue was rejected",
+			DateCreated = DateTime.UtcNow,
+			Author = new UserDto("user1", "Test User", "test@test.com"),
+			Category = CategoryDto.Empty,
+			Status = StatusDto.Empty,
+			Rejected = true,
+			ApprovedForRelease = false
+		};
+
+		// Act
+		var dto = new IssueDto(issue);
+
+		// Assert
+		dto.Rejected.Should().BeTrue();
+		dto.ApprovedForRelease.Should().BeFalse();
+	}
+
+	[Fact]
+	public void Constructor_StoresApprovedForReleaseAndRejected()
+	{
+		// Arrange
+		var id = ObjectId.GenerateNewId();
+		var title = "Test Issue";
+		var description = "Test Description";
+		var dateCreated = DateTime.UtcNow;
+		var author = new UserDto("user1", "John Doe", "john@example.com");
+		var category = new CategoryDto(ObjectId.GenerateNewId(), "Feature", "Feature requests", default, null, false, UserDto.Empty);
+		var status = new StatusDto(ObjectId.Empty, "Closed", "Closed status", default, null, false, UserDto.Empty);
+
+		// Act
+		var dto = new IssueDto(id, title, description, dateCreated, null, author, category, status, false, UserDto.Empty, true, true);
+
+		// Assert
+		dto.ApprovedForRelease.Should().BeTrue();
+		dto.Rejected.Should().BeTrue();
+	}
+
+	[Fact]
+	public void Empty_HasApprovedForReleaseAndRejectedFalse()
+	{
+		// Arrange / Act
+		var dto = IssueDto.Empty;
+
+		// Assert
+		dto.ApprovedForRelease.Should().BeFalse();
+		dto.Rejected.Should().BeFalse();
+	}
 }
