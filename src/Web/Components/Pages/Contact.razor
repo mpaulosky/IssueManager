@@ -1,0 +1,23 @@
+@page "/contact"
+
+<PageHeadingComponent Level="1" HeaderText="@_pageTitle"/>
+
+<div class="container-card">
+	<p>
+		For questions, support, or feedback about <b>ArticlesSite</b>, please use one of the following methods:
+	</p>
+	<ul class="list-disc pl-6 mt-2">
+		<li>Email: <a href="mailto:mpaulosky@gmail.com" class="text-blue-400 underline">mpaulosky@gmail.com</a></li>
+		<li>GitHub Issues: <a href="https://github.com/mpaulosky/ArticlesSite/issues" target="_blank"
+													class="text-blue-400 underline">github.com/mpaulosky/ArticlesSite/issues</a></li>
+	</ul>
+	<p class="mt-4">
+		For more details, see the <a href="/docs/CONTRIBUTING.md" class="text-blue-400 underline">contributing guide</a>.
+	</p>
+</div>
+
+@code {
+
+	private const string _pageTitle = "Contacts - Article Site";
+
+}

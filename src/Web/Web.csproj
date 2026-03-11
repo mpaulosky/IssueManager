@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
+
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
 		<LangVersion>14.0</LangVersion>
@@ -12,6 +13,7 @@
 	<ItemGroup>
 		<PackageReference Include="Auth0.AspNetCore.Authentication" />
 		<PackageReference Include="Radzen.Blazor" />
+		<PackageReference Include="Blazored.LocalStorage" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -40,12 +42,14 @@
 		      StandardOutputImportance="Low">
 			<Output TaskParameter="ConsoleOutput" PropertyName="_RawGitCommit" />
 		</Exec>
+
 		<PropertyGroup>
 			<_GitTag>$(_RawGitTag.Trim())</_GitTag>
 			<_GitCommit>$(_RawGitCommit.Trim())</_GitCommit>
 			<_GitTag Condition="'$(_GitTag)' == ''">v0.0.0</_GitTag>
 			<_GitCommit Condition="'$(_GitCommit)' == ''">unknown</_GitCommit>
 		</PropertyGroup>
+
 		<ItemGroup>
 			<_BuildInfoLine Include="// &lt;auto-generated /&gt;" />
 			<_BuildInfoLine Include="// Copyright (c) 2026. All rights reserved." />
@@ -57,6 +61,7 @@
 			<_BuildInfoLine Include="    internal const string Commit = &quot;$(_GitCommit)&quot;%3B" />
 			<_BuildInfoLine Include="}" />
 		</ItemGroup>
+
 		<WriteLinesToFile
 		    File="$(IntermediateOutputPath)BuildInfo.g.cs"
 		    Lines="@(_BuildInfoLine)"
@@ -131,4 +136,17 @@
 	  <AdditionalFiles Include="Components\Pages\NotAuthorizedPage.razor" />
 	  <AdditionalFiles Include="Components\Pages\RedirectToLoginPage.razor" />
 	</ItemGroup>
+
+	<!-- Optimized CSS build - only runs when source CSS changes -->
+	<Target Name="BuildTailwindCSS" BeforeTargets="PreBuildEvent" Condition="'$(SkipTailwindBuild)' != 'true'">
+		<Exec Command="npm run build:css" />
+		<Message Importance="high" Text="TailwindCSS compiled successfully" />
+	</Target>
+
+	<!-- Ensure npm packages are installed -->
+	<Target Name="EnsureNodeModules" BeforeTargets="BuildTailwindCSS" Condition="'$(SkipTailwindBuild)' != 'true'">
+		<Exec Command="npm install" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="!Exists('node_modules')" />
+		<Message Importance="high" Text="Node modules installed successfully" />
+	</Target>
+
 </Project>

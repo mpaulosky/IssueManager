@@ -371,7 +371,7 @@ public class IssueDetailPageTests : ComponentTestBase
 		cut.Find("button.text-red-600").Click();
 
 		// Act — click the confirm "Delete" button inside the dialog
-		await cut.Find("[role=\"dialog\"] button.bg-\\[var\\(--color-primary\\)\\]").ClickAsync(new MouseEventArgs());
+		await cut.Find("[role=\"dialog\"] button.btn-action").ClickAsync(new MouseEventArgs());
 
 		// Assert
 		await _mockCommentClient.Received(1).DeleteAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());

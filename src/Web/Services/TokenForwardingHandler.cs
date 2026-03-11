@@ -7,8 +7,6 @@
 // Project Name :  Web
 // =============================================
 
-using Microsoft.AspNetCore.Authentication;
-
 namespace Web.Services;
 
 /// <summary>

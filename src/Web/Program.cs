@@ -6,24 +6,11 @@
 // Solution Name : IssueManager
 // Project Name :  Web
 // =======================================================
-using Auth0.AspNetCore.Authentication;
-
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-
-using ServiceDefaults;
-
-using Web;
-using Web.Components.Features.Categories;
-using Web.Components.Features.Comments;
-using Web.Components.Features.Issues;
-using Web.Components.Features.Statuses;
-using Web.Extensions;
-using Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+
 builder.AddAuth0();
 
 builder.Services.AddHttpContextAccessor();
@@ -33,6 +20,7 @@ builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents();
 
 builder.Services.AddRadzenComponents();
+builder.Services.AddBlazoredLocalStorage();
 
 builder.Services.AddHttpClient<IIssueApiClient, IssueApiClient>(client =>
 	client.BaseAddress = new Uri("https+http://api"))
@@ -67,8 +55,9 @@ app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
+app.UseOutputCache();
 
-app.MapGet("/auth/login", async (HttpContext httpContext, string returnUrl = "/") =>
+app.MapGet("/auth/login", async void (HttpContext httpContext, string returnUrl = "/") =>
 {
 	var authProperties = new LoginAuthenticationPropertiesBuilder()
 		.WithRedirectUri(returnUrl)
@@ -76,7 +65,7 @@ app.MapGet("/auth/login", async (HttpContext httpContext, string returnUrl = "/"
 	await httpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authProperties);
 });
 
-app.MapGet("/auth/logout", async (HttpContext httpContext) =>
+app.MapGet("/auth/logout", async httpContext =>
 {
 	var authProperties = new LogoutAuthenticationPropertiesBuilder()
 		.WithRedirectUri("/")

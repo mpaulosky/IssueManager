@@ -1,0 +1,46 @@
+<header class="mb-6 py-4">
+
+	@switch (Level)
+	{
+		case "1":
+
+			<h1 class="@($"text-2xl font-semibold tracking-tight py-4 {TextColorClass}")">@HeaderText</h1>
+
+			break;
+
+		case "2":
+
+			<h2 class="@($"text-xl font-semibold tracking-tight py-4 {TextColorClass}")">@HeaderText</h2>
+
+			break;
+
+		case "3":
+
+			<h3 class="@($"text-lg font-semibold tracking-tight py-4 {TextColorClass}")">@HeaderText</h3>
+
+			break;
+
+		case "4":
+
+			<h4 class="@($"text-md font-semibold tracking-tight py-4 {TextColorClass}")">@HeaderText</h4>
+
+			break;
+
+		case "5":
+
+			<h5 class="@($"text-sm font-semibold tracking-tight py-4 {TextColorClass}")">@HeaderText</h5>
+
+			break;
+	}
+
+</header>
+
+@code {
+
+	[Parameter] public string HeaderText { get; set; } = "My Component";
+
+	[Parameter] public string Level { get; set; } = "3";
+
+	[Parameter] public string TextColorClass { get; set; } = "text-gray-50";
+
+}

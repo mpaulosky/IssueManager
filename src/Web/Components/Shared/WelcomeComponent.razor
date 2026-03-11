@@ -1,0 +1,39 @@
+@using System.Diagnostics.CodeAnalysis
+@inject NavigationManager NavigationManager
+
+<!-- Hero Section Welcome Message -->
+<section class="container-card">
+
+	<h1 class="mb-4 text-center w-full sm:text-2xl md:text-3xl lg:text-4xl">
+		Welcome to the Article Site
+	</h1>
+
+	<p class="text-xl sm:text-2xl mb-8 max-w-3xl mx-auto text-center text-theme-primary-700 dark:text-theme-primary-50">
+		Create and Discover insightful articles, engage with amazing content, and stay up to date with the latest posts
+		from our
+		community.
+	</p>
+
+	<div class="flex flex-wrap justify-center gap-4">
+
+		<div class="button-group">
+			<button @onclick="@(() => NavigateTo("articles"))" class="btn btn-primary">Browse All Articles</button>
+			<button @onclick="@(() => NavigateTo("about"))" class="btn btn-warning">Learn More</button>
+		</div>
+
+	</div>
+
+</section>
+
+@code {
+
+	/// <summary>
+	/// Navigates to the specified path.
+	/// </summary>
+	/// <param name="path">The path to navigate to</param>
+	private void NavigateTo(string path)
+	{
+		NavigationManager.NavigateTo($"/{path}");
+	}
+
+}
