@@ -1,0 +1,31 @@
+@page "/about"
+
+<PageHeadingComponent Level="1" HeaderText="@_pageTitle"/>
+
+<div class="container-card">
+	<p>
+		<strong>Article Site</strong> is a modern, open-source blogging platform built with <b>.NET Aspire</b> and
+		<b>Blazor
+			Server</b>. It enables users to create, manage, and share blog posts with ease, leveraging a MongoDB backend for
+		document storage.
+	</p>
+	<ul class="list-disc pl-6 mt-2">
+		<li>Built with .NET 9, Aspire 9.2, C#, and Blazor Server</li>
+		<li>Styled using TailwindCSS for a clean, responsive UI</li>
+		<li>Supports authentication and authorization (Auth0)</li>
+		<li>Unit and integration tests included (xUnit, bUnit, Playwright)</li>
+		<li>Integration tests use Docker for isolated MongoDB instances</li>
+		<li>Implements Clean Architecture, CQRS, and SOLID principles</li>
+		<li>OpenAPI/Swagger documentation for APIs</li>
+	</ul>
+	<p class="mt-2">
+		<b>Source code:</b> <a href="https://github.com/mpaulosky/ArticlesSite" target="_blank"
+													 class="text-blue-400 underline">github.com/mpaulosky/ArticlesSite</a>
+	</p>
+</div>
+
+@code {
+
+	private const string _pageTitle = "About - Article Site";
+
+}

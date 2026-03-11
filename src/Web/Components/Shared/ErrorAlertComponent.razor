@@ -1,0 +1,35 @@
+@namespace Web.Components.Shared
+
+<div class="bg-red-50 border border-red-200 rounded-md p-4">
+  <div class="flex items-start">
+    <svg class="h-5 w-5 text-red-500 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+      fill="currentColor" aria-hidden="true">
+      <path fill-rule="evenodd"
+        d="M8.257 3.099c.765-1.36 2.722-1.36 3.487 0l5.516 9.82c.75 1.335-.213 2.98-1.744 2.98H4.485c-1.53 0-2.494-1.645-1.744-2.98l5.516-9.82zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-8a1 1 0 00-.993.883L9 6v4a1 1 0 001.993.117L11 10V6a1 1 0 00-1-1z"
+        clip-rule="evenodd" />
+    </svg>
+    <div class="ml-3">
+      <h3 class="text-sm font-medium text-red-800">@Title</h3>
+      <div class="mt-2 text-sm text-red-700">
+        @if (ChildContent is not null)
+        {
+          @ChildContent
+        }
+        else
+        {
+          @Message
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+@code {
+
+  [Parameter] public string Title { get; set; } = "Error";
+
+  [Parameter] public string Message { get; set; } = "An error occurred.";
+
+  [Parameter] public RenderFragment? ChildContent { get; set; }
+
+}

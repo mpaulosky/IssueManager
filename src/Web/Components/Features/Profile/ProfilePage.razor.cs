@@ -7,8 +7,6 @@
 // Project Name :  Web
 // =============================================
 
-using Web.Components.Features.Issues;
-
 namespace Web.Components.Features.Profile;
 
 public partial class ProfilePage : ComponentBase

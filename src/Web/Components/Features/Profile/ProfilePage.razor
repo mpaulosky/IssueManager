@@ -7,22 +7,22 @@
 
 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-[var(--text-main)]">@_userName's Profile</h1>
-        <button @onclick="@(() => Nav.NavigateTo("/"))" class="text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors text-sm">
+        <h1 class="page-title">@_userName's Profile</h1>
+        <button @onclick="@(() => Nav.NavigateTo("/"))" class="link-back">
             ← Back
         </button>
     </div>
 
     @if (_isLoading)
     {
-        <div class="text-center py-12 text-[var(--text-muted)]">Loading...</div>
+        <div class="loading-state">Loading...</div>
     }
     else
     {
         @if (_approved.Any())
         {
             <div class="mb-8">
-                <h2 class="text-lg font-semibold text-[var(--text-main)] mb-3">Approved Issues</h2>
+                <h2 class="section-title mb-3">Approved Issues</h2>
                 <p class="text-sm text-[var(--text-muted)] mb-4">These are your issues currently available for comment.</p>
                 <div class="space-y-3">
                     @foreach (var item in _approved)
@@ -36,7 +36,7 @@
         @if (_pending.Any())
         {
             <div class="mb-8">
-                <h2 class="text-lg font-semibold text-[var(--text-main)] mb-3">Pending Issues</h2>
+                <h2 class="section-title mb-3">Pending Issues</h2>
                 <p class="text-sm text-[var(--text-muted)] mb-4">These are your issues under review.</p>
                 <div class="space-y-3">
                     @foreach (var item in _pending)
@@ -50,7 +50,7 @@
         @if (_rejected.Any())
         {
             <div class="mb-8">
-                <h2 class="text-lg font-semibold text-[var(--text-main)] mb-3">Rejected Issues</h2>
+                <h2 class="section-title mb-3">Rejected Issues</h2>
                 <p class="text-sm text-[var(--text-muted)] mb-4">These issues were not in scope.</p>
                 <div class="space-y-3">
                     @foreach (var item in _rejected)
@@ -63,8 +63,8 @@
 
         @if (!_approved.Any() && !_pending.Any() && !_rejected.Any())
         {
-            <div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] p-8 text-center text-[var(--text-muted)]">
-                You have not submitted any issues yet. <a href="/issues/create" class="text-[var(--color-primary)] hover:underline">Create one now</a>.
+            <div class="card text-center text-[var(--text-muted)]">
+                You have not submitted any issues yet. <a href="/issues/create" class="link-primary">Create one now</a>.
             </div>
         }
     }

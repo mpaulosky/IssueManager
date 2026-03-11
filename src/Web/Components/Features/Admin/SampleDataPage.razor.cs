@@ -7,9 +7,6 @@
 // Project Name :  Web
 // =============================================
 
-using Web.Components.Features.Categories;
-using Web.Components.Features.Statuses;
-
 namespace Web.Components.Features.Admin;
 
 public partial class SampleDataPage : ComponentBase

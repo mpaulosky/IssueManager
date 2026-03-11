@@ -1,0 +1,92 @@
+@inject IJSRuntime JS
+
+<!-- Theme Selector Section -->
+<section class="container-card">
+
+    <div class="mb-2">
+        <h2 class="mb-2">Choose Your Theme</h2>
+        <p class="text-theme-primary-700 dark:text-theme-primary-50">Customize your experience with different color themes</p>
+    </div>
+
+    <div class="theme-controls">
+        <div class="color-selector">
+            <label class="theme-selector-label">Color:</label>
+            <div class="button-group">
+                <button @onclick="@(() => SelectColor("RED"))" class="btn color-btn color-btn-red" id="btn-red">Red</button>
+                <button @onclick="@(() => SelectColor("BLUE"))" class="btn color-btn color-btn-blue active" id="btn-blue">Blue</button>
+                <button @onclick="@(() => SelectColor("GREEN"))" class="btn color-btn color-btn-green" id="btn-green">Green</button>
+                <button @onclick="@(() => SelectColor("YELLOW"))" class="btn color-btn color-btn-yellow" id="btn-yellow">Yellow</button>
+            </div>
+        </div>
+
+        <div class="brightness-selector">
+            <label class="theme-selector-label">Brightness:</label>
+            <div class="button-group">
+                <button @onclick="@(() => SelectBrightness("light"))" class="btn brightness-btn active"
+                        id="btn-light">
+                    Light(Pastel)
+                </button>
+                <button @onclick="@(() => SelectBrightness("dark"))" class="btn brightness-btn" id="btn-dark">Dark(Rich)</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="theme-info">
+        Current: <strong id="current-theme">Blue Light</strong>
+    </div>
+
+</section>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                // Sync UI with current theme on load
+                await JS.InvokeVoidAsync("ThemeManager.syncUI");
+            }
+            catch (TaskCanceledException)
+            {
+                // Ignore task cancellation if the circuit is disconnected during initialization
+            }
+            catch (JSDisconnectedException)
+            {
+                // Ignore JS disconnection if the circuit has been disconnected
+            }
+        }
+    }
+
+    private async Task SelectColor(string color)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("ThemeManager.selectColorAndUpdateUI", color);
+        }
+        catch (TaskCanceledException)
+        {
+            // Ignore task cancellation during color selection
+        }
+        catch (JSDisconnectedException)
+        {
+            // Ignore JS disconnection errors during user interaction
+        }
+    }
+
+    private async Task SelectBrightness(string brightness)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("ThemeManager.selectBrightnessAndUpdateUI", brightness);
+        }
+        catch (TaskCanceledException)
+        {
+            // Ignore task cancellation during brightness selection
+        }
+        catch (JSDisconnectedException)
+        {
+            // Ignore JS disconnection errors during user interaction
+        }
+    }
+}

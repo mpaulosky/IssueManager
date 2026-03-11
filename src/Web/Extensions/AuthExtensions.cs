@@ -7,8 +7,6 @@
 // Project Name :  Web
 // =============================================
 
-using Auth0.AspNetCore.Authentication;
-
 namespace Web.Extensions;
 
 /// <summary>

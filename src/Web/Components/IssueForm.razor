@@ -3,43 +3,35 @@
 @inject ICategoryApiClient CategoryClient
 @inject IStatusApiClient StatusClient
 
-<div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm p-6">
+<div class="card">
 	<EditForm Model="@_formModel" OnValidSubmit="@OnFormSubmit">
 		<DataAnnotationsValidator />
-		<ValidationSummary class="mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 p-3 text-sm text-red-700 dark:text-red-400" />
+		<ValidationSummary class="validation-summary" />
 
 		<div class="space-y-5">
 			<!-- Title -->
 			<div>
-				<label for="title" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">
+				<label for="title" class="form-label">
 					Title <span class="text-red-500" aria-hidden="true">*</span>
 				</label>
-				<InputText
-					id="title"
-					@bind-Value="_formModel.Title"
-					class="form-input"
-					placeholder="Enter issue title"
-					aria-required="true" />
+				<InputText id="title" @bind-Value="_formModel.Title" class="form-input" placeholder="Enter issue title"
+									 aria-required="true" />
 				<ValidationMessage For="@(() => _formModel.Title)" class="validation-message" />
 			</div>
 
 			<!-- Description -->
 			<div>
-				<label for="description" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">
+				<label for="description" class="form-label">
 					Description
 				</label>
-				<InputTextArea
-					id="description"
-					@bind-Value="_formModel.Description"
-					class="form-input resize-y"
-					rows="5"
-					placeholder="Enter issue description (optional)" />
+				<InputTextArea id="description" @bind-Value="_formModel.Description" class="form-input resize-y" rows="5"
+											 placeholder="Enter issue description (optional)" />
 				<ValidationMessage For="@(() => _formModel.Description)" class="validation-message" />
 			</div>
 
 			<!-- Category -->
 			<div>
-				<label for="category" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">
+				<label for="category" class="form-label">
 					Category
 				</label>
 				@if (_isLoadingData)
@@ -61,7 +53,7 @@
 
 			<!-- Status -->
 			<div>
-				<label for="status" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">
+				<label for="status" class="form-label">
 					Status
 				</label>
 				@if (_isLoadingData)
@@ -84,11 +76,7 @@
 
 		<!-- Actions -->
 		<div class="mt-6 flex items-center gap-3">
-			<button
-				type="submit"
-				class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
-				disabled="@IsSubmitting"
-				aria-busy="@IsSubmitting">
+			<button type="submit" class="btn-action" disabled="@IsSubmitting" aria-busy="@IsSubmitting">
 				@if (IsSubmitting)
 				{
 					<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
@@ -101,11 +89,7 @@
 
 			@if (OnCancel.HasDelegate)
 			{
-				<button
-					type="button"
-					class="inline-flex items-center px-5 py-2.5 rounded-lg bg-[var(--bg-hover)] hover:bg-[var(--border-color)] text-[var(--text-main)] text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
-					@onclick="HandleCancel"
-					disabled="@IsSubmitting">
+				<button type="button" class="btn-ghost" @onclick="HandleCancel" disabled="@IsSubmitting">
 					Cancel
 				</button>
 			}

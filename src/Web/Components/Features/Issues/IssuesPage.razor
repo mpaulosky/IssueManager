@@ -12,27 +12,22 @@
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 	<div class="flex items-center justify-between mb-6">
-		<h1 class="text-2xl font-bold text-[var(--text-main)]">Issues</h1>
-		<a href="/issues/create" class="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
+		<h1 class="page-title">Issues</h1>
+		<a href="/issues/create" class="btn-sm-action">
 			New Issue
 		</a>
 	</div>
 
 	<!-- Filter bar -->
-	<div class="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] shadow-sm p-4 mb-6">
+	<div class="card mb-6">
 		<div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 			<div>
-				<label for="search" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">Search</label>
-				<input
-					id="search"
-					type="text"
-					@bind="_searchTerm"
-					@bind:event="oninput"
-					class="form-input"
-					placeholder="Search title/description..." />
+				<label for="search" class="form-label">Search</label>
+				<input id="search" type="text" @bind="_searchTerm" @bind:event="oninput" class="form-input"
+							 placeholder="Search title/description..." />
 			</div>
 			<div>
-				<label for="status-filter" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">Status</label>
+				<label for="status-filter" class="form-label">Status</label>
 				<select id="status-filter" @bind="_statusFilter" class="form-input">
 					<option value="">All statuses</option>
 					@foreach (var status in _statuses)
@@ -42,7 +37,7 @@
 				</select>
 			</div>
 			<div>
-				<label for="category-filter" class="block text-sm font-medium text-[var(--text-main)] mb-1.5">Category</label>
+				<label for="category-filter" class="form-label">Category</label>
 				<select id="category-filter" @bind="_categoryFilter" class="form-input">
 					<option value="">All categories</option>
 					@foreach (var category in _categories)
@@ -52,14 +47,10 @@
 				</select>
 			</div>
 			<div class="flex gap-2">
-				<button
-					@onclick="() => LoadIssues(1)"
-					class="flex-1 px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
+				<button @onclick="() => LoadIssues(1)" class="flex-1 btn-sm-action">
 					Search
 				</button>
-				<button
-					@onclick="ClearFilters"
-					class="flex-1 px-4 py-2 border border-[var(--border-color)] text-[var(--text-main)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors text-sm font-medium">
+				<button @onclick="ClearFilters" class="flex-1 btn-outline">
 					Clear
 				</button>
 			</div>
@@ -79,7 +70,7 @@
 		<RowContent>
 			<tr class="bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] transition-colors">
 				<td class="px-6 py-4">
-					<a href="/issues/@context.Id.ToString()" class="text-[var(--color-primary)] hover:underline font-medium">
+					<a href="/issues/@context.Id.ToString()" class="link-primary font-medium">
 						@context.Title
 					</a>
 				</td>
@@ -92,14 +83,14 @@
 				<td class="px-6 py-4 text-right">
 					<AuthorizeView Roles="Admin" Context="authCtx">
 						<Authorized>
-							<a href="/issues/@context.Id.ToString()/edit" class="text-[var(--color-primary)] hover:underline text-sm">
+							<a href="/issues/@context.Id.ToString()/edit" class="link-primary text-sm">
 								Edit
 							</a>
 						</Authorized>
 						<NotAuthorized>
 							@if (_currentUserName != null && _currentUserName == context.Author.Name)
 							{
-								<a href="/issues/@context.Id.ToString()/edit" class="text-[var(--color-primary)] hover:underline text-sm">
+								<a href="/issues/@context.Id.ToString()/edit" class="link-primary text-sm">
 									Edit
 								</a>
 							}
