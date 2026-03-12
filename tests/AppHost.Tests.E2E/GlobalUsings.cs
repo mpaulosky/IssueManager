@@ -10,6 +10,7 @@
 global using System.Diagnostics.CodeAnalysis;
 
 global using AppHost.Tests.E2E.Fixtures;
+global using AppHost.Tests.E2E.Helpers;
 
 global using Aspire.Hosting;
 global using Aspire.Hosting.ApplicationModel;
@@ -21,6 +22,7 @@ global using Microsoft.AspNetCore.Builder;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Diagnostics.HealthChecks;
 global using Microsoft.Extensions.Hosting;
+global using Microsoft.Playwright;
 
 global using OpenTelemetry.Metrics;
 global using OpenTelemetry.Trace;
