@@ -269,7 +269,7 @@ public class Auth0AuthenticationStateProviderTests
 
 		// Assert
 		result.User.Identity!.IsAuthenticated.Should().BeTrue();
-		// Invalid JSON is logged as warning, no roles extracted
+		result.User.Claims.Where(c => c.Type == ClaimTypes.Role).Should().BeEmpty();
 	}
 
 	[Fact]

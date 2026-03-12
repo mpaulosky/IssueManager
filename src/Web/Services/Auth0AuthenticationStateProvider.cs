@@ -65,11 +65,11 @@ public class Auth0AuthenticationStateProvider : AuthenticationStateProvider
 
 			if (finalRoles.Count > 0)
 			{
-				_logger.LogInformation("User roles extracted: {Roles}", string.Join(", ", finalRoles));
+				_logger.LogDebug("User roles extracted: {Roles}", string.Join(", ", finalRoles));
 			}
 			else
 			{
-				_logger.LogWarning("No roles found for authenticated user. Check Auth0 Post-Login Action configuration.");
+				_logger.LogDebug("No roles found for authenticated user. Check Auth0 Post-Login Action configuration.");
 			}
 
 			ClaimsPrincipal claimsPrincipal = new(identity);
@@ -153,10 +153,15 @@ public class Auth0AuthenticationStateProvider : AuthenticationStateProvider
 	/// <summary>
 	/// Adds a role claim if it doesn't already exist in the identity.
 	/// </summary>
-	private static void AddRoleIfNotExists(ClaimsIdentity identity, string role)
+	private static void AddRoleIfNotExists(ClaimsIdentity identity, string? role)
 	{
+		if (string.IsNullOrWhiteSpace(role))
+		{
+			return;
+		}
+
 		string trimmedRole = role.Trim();
-		if (!string.IsNullOrEmpty(trimmedRole) && !identity.HasClaim(ClaimTypes.Role, trimmedRole))
+		if (!identity.HasClaim(ClaimTypes.Role, trimmedRole))
 		{
 			identity.AddClaim(new Claim(ClaimTypes.Role, trimmedRole));
 		}
