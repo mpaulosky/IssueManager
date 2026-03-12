@@ -1,4 +1,4 @@
-﻿@page "/profile"
+﻿@page "/user/profile"
 
 @using System.Security.Claims
 @attribute [Authorize]
@@ -16,18 +16,9 @@
 					<div>
 						<h3 class="text-lg mb-2">Basic Information</h3>
 						<div class="space-y-2">
-							<p class="font-bold text-gray-900 dark:text-gray-100">
-								<span>Name:</span>
-								<h4>@_username</h4>
-							</p>
-							<p class="font-bold text-gray-900 dark:text-gray-100">
-								<span>Email:</span>
-								<h4>@_emailAddress</h4>
-							</p>
-							<p class="font-bold text-gray-900 dark:text-gray-100">
-								<span>User ID:</span>
-								<h4>@_userId</h4>
-							</p>
+							<h4 class="font-bold text-gray-900 dark:text-gray-100"><span>Name:</span>@_username</h4>
+							<h4 class="font-bold text-gray-900 dark:text-gray-100"><span>Email:</span>@_emailAddress</h4>
+							<h4 class="font-bold text-gray-900 dark:text-gray-100"><span>User ID:</span>@_userId</h4>
 						</div>
 					</div>
 

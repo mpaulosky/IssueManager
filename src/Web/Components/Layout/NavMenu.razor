@@ -19,7 +19,6 @@
 				<AuthorizeView>
 					<Authorized>
 						<a href="/issues/create" class="text-sm font-medium">New Issue</a>
-						<a href="/profile" class="text-sm font-medium">Profile</a>
 					</Authorized>
 				</AuthorizeView>
 				<AuthorizeView Roles="Admin">
@@ -38,7 +37,7 @@
 				<div class="hidden md:flex items-center gap-2">
 					<AuthorizeView>
 						<Authorized>
-							<div class="px-3 py-2 text-sm">Hello, @context.User.Identity?.Name!</div>
+							<a href="/user/profile" class="text-sm font-medium">Hello, @context.User.Identity?.Name!</a>
 							<a href="/auth/logout" class="text-sm font-medium">
 								<span class="bi bi-box-arrow-right" aria-hidden="true"></span> Log out
 							</a>

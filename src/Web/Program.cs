@@ -19,6 +19,7 @@ builder.Services.AddTransient<TokenForwardingHandler>();
 builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents();
 
+builder.Services.AddOutputCache();
 builder.Services.AddRadzenComponents();
 builder.Services.AddBlazoredLocalStorage();
 

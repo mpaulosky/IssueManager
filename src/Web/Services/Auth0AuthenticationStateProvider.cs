@@ -26,6 +26,12 @@ public class Auth0AuthenticationStateProvider : AuthenticationStateProvider
 		_logger = logger;
 	}
 
+	/// <summary>
+	/// The custom claim namespace used by Auth0 Actions to pass role information.
+	/// Configure this in your Auth0 Post-Login Action to match.
+	/// </summary>
+	private const string RolesClaimNamespace = "https://articlesite.com/roles";
+
 	public override Task<AuthenticationState> GetAuthenticationStateAsync()
 	{
 		HttpContext? httpContext = _httpContextAccessor.HttpContext;
@@ -35,38 +41,35 @@ public class Auth0AuthenticationStateProvider : AuthenticationStateProvider
 			ClaimsPrincipal user = httpContext.User;
 
 			// Log user claims for debugging
-			_logger.LogInformation("User authenticated with claims:");
+			_logger.LogDebug("User authenticated with {ClaimCount} claims", user.Claims.Count());
 
 			foreach (Claim claim in user.Claims)
 			{
-				_logger.LogInformation("Claim: {Type} = {Value}", claim.Type, claim.Value);
+				_logger.LogDebug("Claim: {Type} = {Value}", claim.Type, claim.Value);
 			}
 
 			// Create a new ClaimsIdentity with the existing claims plus any additional processing
 			ClaimsIdentity identity = new(user.Identity);
 
-			// Add role claims if they exist
-			string? rolesClaim = user.FindFirst("https://articlesite.com/roles")?.Value;
+			// Extract roles from the custom namespace claim (Auth0 Post-Login Action)
+			ExtractRolesFromCustomNamespace(user, identity);
 
-			if (!string.IsNullOrEmpty(rolesClaim))
+			// Check for Auth0 roles in the standard "roles" claim location
+			ExtractRolesFromStandardClaim(user, identity);
+
+			// Log the final roles for debugging
+			var finalRoles = identity.Claims
+				.Where(c => c.Type == ClaimTypes.Role)
+				.Select(c => c.Value)
+				.ToList();
+
+			if (finalRoles.Count > 0)
 			{
-				string[] roles = rolesClaim.Split(',', StringSplitOptions.RemoveEmptyEntries);
-
-				foreach (string role in roles)
-				{
-					identity.AddClaim(new Claim(ClaimTypes.Role, role.Trim()));
-				}
+				_logger.LogDebug("User roles extracted: {Roles}", string.Join(", ", finalRoles));
 			}
-
-			// Check for Auth0 roles in the standard location
-			IEnumerable<Claim> auth0Roles = user.FindAll("roles");
-
-			foreach (Claim roleClaim in auth0Roles)
+			else
 			{
-				if (!identity.HasClaim(ClaimTypes.Role, roleClaim.Value))
-				{
-					identity.AddClaim(new Claim(ClaimTypes.Role, roleClaim.Value));
-				}
+				_logger.LogDebug("No roles found for authenticated user. Check Auth0 Post-Login Action configuration.");
 			}
 
 			ClaimsPrincipal claimsPrincipal = new(identity);
@@ -78,6 +81,90 @@ public class Auth0AuthenticationStateProvider : AuthenticationStateProvider
 		ClaimsPrincipal anonymous = new(new ClaimsIdentity());
 
 		return Task.FromResult(new AuthenticationState(anonymous));
+	}
+
+	/// <summary>
+	/// Extracts roles from the custom namespace claim set by Auth0 Post-Login Action.
+	/// Handles both comma-separated string format and JSON array format.
+	/// </summary>
+	private void ExtractRolesFromCustomNamespace(ClaimsPrincipal user, ClaimsIdentity identity)
+	{
+		// Find all claims with the custom namespace (Auth0 may send multiple claims for arrays)
+		var namespaceClaims = user.FindAll(RolesClaimNamespace).ToList();
+
+		foreach (Claim claim in namespaceClaims)
+		{
+			string value = claim.Value.Trim();
+
+			if (string.IsNullOrEmpty(value))
+			{
+				continue;
+			}
+
+			// Handle JSON array format: ["Admin", "Author"]
+			if (value.StartsWith('[') && value.EndsWith(']'))
+			{
+				try
+				{
+					var roles = System.Text.Json.JsonSerializer.Deserialize<string[]>(value);
+					if (roles != null)
+					{
+						foreach (string role in roles)
+						{
+							AddRoleIfNotExists(identity, role);
+						}
+					}
+				}
+				catch (System.Text.Json.JsonException ex)
+				{
+					_logger.LogWarning(ex, "Failed to parse roles JSON array: {Value}", value);
+				}
+			}
+			// Handle comma-separated string format: "Admin,Author"
+			else if (value.Contains(','))
+			{
+				string[] roles = value.Split(',', StringSplitOptions.RemoveEmptyEntries);
+				foreach (string role in roles)
+				{
+					AddRoleIfNotExists(identity, role);
+				}
+			}
+			// Handle single role value
+			else
+			{
+				AddRoleIfNotExists(identity, value);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Extracts roles from the standard "roles" claim used by some Auth0 configurations.
+	/// </summary>
+	private void ExtractRolesFromStandardClaim(ClaimsPrincipal user, ClaimsIdentity identity)
+	{
+		IEnumerable<Claim> auth0Roles = user.FindAll("roles");
+
+		foreach (Claim roleClaim in auth0Roles)
+		{
+			AddRoleIfNotExists(identity, roleClaim.Value);
+		}
+	}
+
+	/// <summary>
+	/// Adds a role claim if it doesn't already exist in the identity.
+	/// </summary>
+	private static void AddRoleIfNotExists(ClaimsIdentity identity, string? role)
+	{
+		if (string.IsNullOrWhiteSpace(role))
+		{
+			return;
+		}
+
+		string trimmedRole = role.Trim();
+		if (!identity.HasClaim(ClaimTypes.Role, trimmedRole))
+		{
+			identity.AddClaim(new Claim(ClaimTypes.Role, trimmedRole));
+		}
 	}
 
 }
