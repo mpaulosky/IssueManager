@@ -4,10 +4,10 @@
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
-// Project Name :  AppHost.Tests.Unit
+// Project Name :  AppHost.Tests.E2E
 // =============================================
 
-namespace AppHost.Fixtures;
+namespace AppHost.Tests.E2E.Fixtures;
 
 /// <summary>
 /// Shared fixture for AppHost integration tests that require DistributedApplicationTestingBuilder.

@@ -344,3 +344,35 @@ DevOps on IssueManager (.NET 10, GitHub Actions, Aspire, NuGet centralized packa
   - Status: Blocked on workflow completion, will merge when available
 
 **Key Takeaway:** VSA refactoring executed without CI breakage. Clean builds throughout, full test coverage, enforced via new architecture tests.
+
+### 2026-03-11: Issue #108 — Playwright E2E Infrastructure Setup (PR #111)
+
+**Context:** Sprint 2 of Auth0 RBAC milestone. Set up Playwright E2E testing infrastructure for future browser-based tests.
+
+**Changes Made:**
+1. **Project Rename:** `AppHost.Tests.Unit` → `AppHost.Tests.E2E`
+   - Renamed folder and .csproj file
+   - Updated IssueManager.sln reference
+   - Updated namespaces: `AppHost` → `AppHost.Tests.E2E`, `AppHost.Fixtures` → `AppHost.Tests.E2E.Fixtures`
+   - Updated copyright headers in all 8 .cs files
+
+2. **NuGet Packages:**
+   - Added `Microsoft.Playwright.NUnit` to `Directory.Packages.props` (v1.58.0)
+   - `Microsoft.Playwright` was already present at v1.58.0
+
+3. **CI Workflow (`squad-test.yml`):**
+   - Renamed job `test-apphost-unit` → `test-apphost-e2e`
+   - Added Playwright browser installation step: `pwsh bin/Release/net10.0/playwright.ps1 install --with-deps chromium`
+   - Updated all dependency references (coverage, report jobs)
+   - Updated job summary variable names
+
+4. **Pre-Push Hook:**
+   - Updated project mapping: `*"tests/AppHost.Tests.Unit/"*` → `*"tests/AppHost.Tests.E2E/"*`
+
+**Key Files:**
+- `tests/AppHost.Tests.E2E/` — renamed E2E test project
+- `.github/workflows/squad-test.yml` — CI job `test-apphost-e2e`
+- `scripts/hooks/pre-push` — updated project mapping
+
+**Commit:** 43d6a0d on branch `squad/108-playwright-e2e-infrastructure`
+**PR:** #111

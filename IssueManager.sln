@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Tests.Unit", "tests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.Tests.Unit", "tests\Web.Tests.Unit\Web.Tests.Unit.csproj", "{C70C88E5-BD07-499C-B1B5-58A500554A8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppHost.Tests.Unit", "tests\AppHost.Tests.Unit\AppHost.Tests.Unit.csproj", "{F126271E-4644-4437-AA30-926604FC8E09}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppHost.Tests.E2E", "tests\AppHost.Tests.E2E\AppHost.Tests.E2E.csproj", "{F126271E-4644-4437-AA30-926604FC8E09}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
