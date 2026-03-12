@@ -757,3 +757,32 @@ History file currently at 37KB. If exceeded 12KB limit in future, will require s
    - This separation ensures explicit ID ownership at the application layer
 
 **Outcome:** All 35 Create handler unit tests pass. Integration tests verified fixed (skipped in CI due to no Docker).
+
+---
+
+## 2026-03-12 — Playwright E2E Role-Based Navigation Tests
+
+**Task:** Issue #109 — Implement Playwright E2E tests for role-based navigation.
+
+**New Test Structure:**
+- `tests/AppHost.Tests.E2E/Fixtures/PlaywrightFixture.cs` — Shared fixture initializing Aspire AppHost + Playwright browser
+- `tests/AppHost.Tests.E2E/Fixtures/PlaywrightCollection.cs` — xUnit collection definition for shared fixture
+- `tests/AppHost.Tests.E2E/Helpers/Auth0LoginHelper.cs` — Browser-based Auth0 OIDC authentication helper
+- `tests/AppHost.Tests.E2E/Navigation/` — 5 test classes with 30 total tests
+
+**Key Patterns:**
+1. **PlaywrightFixture** extends Aspire testing — builds the distributed app, starts it, waits for `web` resource to be running, then initializes Playwright browser
+2. **Test credentials from environment variables** — `E2E_TEST_{ROLE}_EMAIL` / `E2E_TEST_{ROLE}_PASSWORD` for Admin, Author, User roles; tests skip gracefully when not configured
+3. **Browser context isolation** — Each test creates a fresh context via `fixture.NewPageAsync()` with `IgnoreHTTPSErrors = true`
+4. **Auth0 Universal Login flow** — Navigate to `/auth/login`, fill form on Auth0 hosted page, wait for redirect back to app
+5. **Graceful skip pattern** — Tests check `fixture.IsAvailable` and throw `SkipException.ForSkip()` when Aspire/Docker initialization fails
+6. **LocatorIsVisibleOptions.Timeout is obsolete** — Causes warnings but still works; the property is deprecated in newer Playwright
+
+**Test Coverage:**
+- AdminNavigationTests (6): Login, 4 admin menu items visible, navigation to each admin page
+- AuthorNavigationTests (5): Login, basic menu items visible, admin items NOT visible, navigation
+- UserNavigationTests (5): Login, basic menu items visible, admin items NOT visible, New Issue visible
+- UnauthenticatedNavigationTests (7): Login button visible, logout NOT visible, protected routes redirect, public pages accessible
+- LogoutTests (7): Logout works for each role, protected content hidden after logout
+
+**PR:** #112 (closes #109)
