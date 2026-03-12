@@ -4,10 +4,10 @@
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
-// Project Name :  AppHost.Tests.Unit
+// Project Name :  AppHost.Tests.E2E
 // =======================================================
 
-namespace AppHost;
+namespace AppHost.Tests.E2E;
 
 /// <summary>
 /// Unit tests for RedisServices extension methods.

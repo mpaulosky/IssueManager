@@ -4,12 +4,12 @@
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
-// Project Name :  AppHost.Tests.Unit
+// Project Name :  AppHost.Tests.E2E
 // =======================================================
 
 global using System.Diagnostics.CodeAnalysis;
 
-global using AppHost.Fixtures;
+global using AppHost.Tests.E2E.Fixtures;
 
 global using Aspire.Hosting;
 global using Aspire.Hosting.ApplicationModel;
