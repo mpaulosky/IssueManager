@@ -116,6 +116,10 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 			// Act
 			await page.GotoAsync(fixture.WebUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
+			// Verify we are in unauthenticated state before checking menu visibility
+			var loginLink = page.Locator("a[href='/auth/login']");
+			await loginLink.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible, Timeout = 5000 });
+
 			// Assert
 			var categoriesLink = page.Locator("a[href='/categories']");
 			var statusesLink = page.Locator("a[href='/statuses']");

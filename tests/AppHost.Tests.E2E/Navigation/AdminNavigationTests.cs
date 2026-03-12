@@ -80,6 +80,9 @@ public class AdminNavigationTests(PlaywrightFixture fixture)
 				credentials.Value.Email,
 				credentials.Value.Password);
 
+			// Verify login succeeded
+			(await Auth0LoginHelper.IsLoggedInAsync(page)).Should().BeTrue("Admin should be logged in before checking navigation");
+
 			// Act - Navigate to home page to see the nav menu
 			await page.GotoAsync(fixture.WebUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 

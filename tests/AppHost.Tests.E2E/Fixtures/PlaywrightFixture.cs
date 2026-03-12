@@ -10,7 +10,7 @@
 namespace AppHost.Tests.E2E.Fixtures;
 
 /// <summary>
-/// Playwright fixture that extends DistributedApplicationFixture.
+/// Playwright fixture that hosts the Aspire AppHost for end-to-end tests.
 /// Initializes Playwright and provides browser/page instances for E2E tests.
 /// Starts the Aspire AppHost and captures the Web app URL for browser navigation.
 /// </summary>
@@ -100,13 +100,13 @@ public sealed class PlaywrightFixture : IAsyncLifetime
 
 			// Wait for the web app to be running
 			await _notificationService.WaitForResourceAsync(
-				"web",
+				Website,
 				KnownResourceStates.Running,
 				CancellationToken.None).WaitAsync(TimeSpan.FromMinutes(3));
 
 			// Get the web app URL
-			_webUrl = _app.GetEndpoint("web", "https")?.ToString()
-				?? _app.GetEndpoint("web", "http")?.ToString();
+			_webUrl = _app.GetEndpoint(Website, "https")?.ToString()
+				?? _app.GetEndpoint(Website, "http")?.ToString();
 
 			if (string.IsNullOrEmpty(_webUrl))
 			{

@@ -98,6 +98,10 @@ public class LogoutTests(PlaywrightFixture fixture)
 			await Auth0LoginHelper.LogoutAsync(page, fixture.WebUrl);
 			await page.GotoAsync(fixture.WebUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
+			// Verify we are in unauthenticated state before checking menu visibility
+			var loginLink = page.Locator("a[href='/auth/login']");
+			await loginLink.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible, Timeout = 5000 });
+
 			// Assert - Admin menu items should be hidden
 			var categoriesLink = page.Locator("a[href='/categories']");
 			var statusesLink = page.Locator("a[href='/statuses']");
@@ -192,6 +196,10 @@ public class LogoutTests(PlaywrightFixture fixture)
 			// Act - Log out
 			await Auth0LoginHelper.LogoutAsync(page, fixture.WebUrl);
 			await page.GotoAsync(fixture.WebUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+
+			// Verify we are in unauthenticated state before checking menu visibility
+			var loginLink = page.Locator("a[href='/auth/login']");
+			await loginLink.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible, Timeout = 5000 });
 
 			// Assert
 			var newIssueLinkAfter = page.Locator("a[href='/issues/create']");

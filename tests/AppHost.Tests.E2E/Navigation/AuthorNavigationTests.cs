@@ -122,6 +122,9 @@ public class AuthorNavigationTests(PlaywrightFixture fixture)
 				credentials.Value.Email,
 				credentials.Value.Password);
 
+			// Verify login succeeded before checking menu visibility
+			(await Auth0LoginHelper.IsLoggedInAsync(page)).Should().BeTrue("Author should be logged in before checking navigation");
+
 			// Act - Navigate to home page to see the nav menu
 			await page.GotoAsync(fixture.WebUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
