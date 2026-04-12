@@ -59,3 +59,16 @@ Frontend Developer on IssueManager (.NET 10, Blazor Interactive Server Rendering
 - Old horizontal-layer structure (Handlers/, Pages/, Services/) replaced with feature-based folder organization
 - Test project renamed: Blazor.Tests → Web.Tests.Bunit (path: 	ests/Web.Tests.Bunit/)
 - All test references should use the new project name
+
+### Dependabot Lockfile Review — PR #113 (2026-04-12)
+- `src/Web/package.json` only declares Tailwind build dependencies; `picomatch` is transitive from `@parcel/watcher` in the frontend toolchain
+- Safe lockfile-only security PRs in `src/Web/` can be validated with green CI plus a clean `npm ci --ignore-scripts` run in an isolated worktree
+- Dependabot lockfile bumps may add nested wasm helper entries in `package-lock.json` without changing `package.json`; treat that as acceptable when the target package version is correct and install validation stays clean
+- AppHost E2E cancellations were present in PR #113, but the required checks for the dependency bump were green and the PR remained safe to merge
+
+### 2026-04-12: Dependabot picomatch Security Bump (PR #113)
+- Reviewed and merged PR #113 updating picomatch 4.0.3 -> 4.0.4 in src/Web/package-lock.json
+- Security patch for picomatch advisories; CI validation passed
+- Tailwind optional wasm helper entries updated as expected lockfile churn
+- Merged to main; created reusable `.squad/skills/dependabot-lockfile-review/` skill for future Web dependency reviews
+- Decision recorded in `.squad/decisions.md`
