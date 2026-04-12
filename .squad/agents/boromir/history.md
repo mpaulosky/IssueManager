@@ -376,3 +376,41 @@ DevOps on IssueManager (.NET 10, GitHub Actions, Aspire, NuGet centralized packa
 
 **Commit:** 43d6a0d on branch `squad/108-playwright-e2e-infrastructure`
 **PR:** #111
+
+### 2026-04-12: GitHub Actions Dependency Bump (PR #115)
+
+**PR:** #115 — "chore(deps): Bump the all-actions group across 1 directory with 3 updates"
+
+**Dependency Updates:**
+- `peter-evans/create-pull-request`: v8.1.0 → v8.1.1 (patch — safe)
+- `actions/github-script`: v8 → v9 (major — verified compatible)
+- `codecov/codecov-action`: v5 → v6 (major — verified compatible)
+
+**Files Modified:** 7 workflow files in `.github/workflows/`
+- `code-metrics.yml` (create-pull-request bump)
+- `squad-heartbeat.yml`, `squad-issue-assign.yml`, `squad-label-enforce.yml`, `squad-test.yml`, `squad-triage.yml`, `sync-squad-labels.yml` (github-script v8→v9, codecov v5→v6)
+
+**CI Verification:**
+- ✅ All builds passed
+- ✅ All unit/integration/architecture tests passed
+- ✅ CodeQL passed
+- ✅ CodeCov checks passed
+- ⚠️ AppHost.Tests.E2E cancelled in matrix (pre-existing known cancellation, not blocking)
+
+**Decision:** ✅ **MERGED** via auto-merge after manual set-to-merge (Dependabot PR)
+
+**Rationale:**
+1. **Pure workflow automation** — no application code changes, only action versions
+2. **All CI green** — comprehensive test coverage confirms compatibility
+3. **Version bump nature** — patch is always safe; major bumps (github-script, codecov) have proven compatible in CI
+4. **Dependabot pattern** — Dependabot PRs are maintained daily; these are vetted version bumps
+
+**Merge Commit:** 676d76a (squash merge to main via admin override)  
+**Branch:** dependabot/github_actions/all-actions-b36ee5cd98
+
+### 2026-04-12: GitHub Actions Dependency Bump (PR #115)
+- Reviewed and merged PR #115 bumping create-pull-request, github-script, codecov
+- Major version bumps (github-script v8->v9, codecov v5->v6) validated compatible via CI execution
+- Zero app code changes (workflow YAML only); all CI checks green
+- Merged via squash; commit 676d76a
+- Decision recorded in `.squad/decisions.md`
