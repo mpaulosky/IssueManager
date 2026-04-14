@@ -29,6 +29,16 @@ public record CreateIssueCommand
 	/// Gets or sets the labels to attach to the issue.
 	/// </summary>
 	public List<string>? Labels { get; init; }
+
+	/// <summary>
+	/// Gets or sets the category ID for the issue.
+	/// </summary>
+	public string? CategoryId { get; init; }
+
+	/// <summary>
+	/// Gets or sets the status ID for the issue.
+	/// </summary>
+	public string? StatusId { get; init; }
 }
 
 /// <summary>
