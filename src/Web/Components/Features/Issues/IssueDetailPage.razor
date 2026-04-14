@@ -217,8 +217,7 @@
 			_availableStatuses = await StatusClient.GetAllAsync();
 			if (_issue != null)
 			{
-				var allComments = await CommentClient.GetAllAsync();
-				_comments = allComments.Where(c => c.Issue.Id.ToString() == Id);
+				_comments = await CommentClient.GetAllAsync(issueId: Id);
 			}
 		}
 		finally

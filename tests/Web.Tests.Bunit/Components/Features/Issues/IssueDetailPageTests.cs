@@ -194,6 +194,23 @@ public class IssueDetailPageTests : ComponentTestBase
 	}
 
 	[Fact]
+	public void IssueDetailPage_CallsGetAllAsync_WithIssueId()
+	{
+		// Arrange
+		var issue = MakeIssue("Issue Filter Check");
+		_mockIssueClient.GetByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+			.Returns(Task.FromResult<IssueDto?>(issue));
+
+		// Act
+		TestContext.Render<IssueDetailPage>(p =>
+			p.Add(c => c.Id, issue.Id.ToString()));
+
+		// Assert — server-side filter: issueId must be passed, not null/empty
+		_mockCommentClient.Received(1)
+			.GetAllAsync(issue.Id.ToString(), Arg.Any<CancellationToken>());
+	}
+
+	[Fact]
 	public async Task IssueDetailPage_PostsComment_WhenTextEnteredAndPostButtonClicked()
 	{
 		// Arrange
