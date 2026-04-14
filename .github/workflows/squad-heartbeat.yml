@@ -3,7 +3,7 @@ name: Squad Heartbeat (Ralph)
 on:
   schedule:
     # Proactive polling every 30 minutes
-    - cron: '*/30 * * * *'
+    - cron: '*/15 * * * *'
 
   # React to completed work or new squad work
   issues:
