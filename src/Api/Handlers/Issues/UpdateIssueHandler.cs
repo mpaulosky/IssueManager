@@ -51,7 +51,7 @@ public class UpdateIssueHandler
 			return Result.Fail<IssueDto>($"Issue with ID '{command.Id}' is archived and cannot be updated.", ResultErrorCode.Conflict);
 
 		var category = getResult.Value.Category;
-		if (command.CategoryId.HasValue && command.CategoryId.Value != ObjectId.Empty)
+		if (command.CategoryId.HasValue)
 		{
 			var categoryResult = await _categoryRepository.GetByIdAsync(command.CategoryId.Value, cancellationToken);
 			if (!categoryResult.Success || categoryResult.Value is null)
@@ -60,7 +60,7 @@ public class UpdateIssueHandler
 		}
 
 		var status = getResult.Value.Status;
-		if (command.StatusId.HasValue && command.StatusId.Value != ObjectId.Empty)
+		if (command.StatusId.HasValue)
 		{
 			var statusResult = await _statusRepository.GetByIdAsync(command.StatusId.Value, cancellationToken);
 			if (!statusResult.Success || statusResult.Value is null)
