@@ -7,6 +7,7 @@
 // Project Name :  Api
 // =======================================================
 
+using Api.Data.Interfaces;
 using Api.Services;
 
 namespace Api.Handlers.Issues;
@@ -17,15 +18,24 @@ namespace Api.Handlers.Issues;
 public class CreateIssueHandler
 {
 	private readonly IIssueRepository _repository;
+	private readonly ICategoryRepository _categoryRepository;
+	private readonly IStatusRepository _statusRepository;
 	private readonly CreateIssueValidator _validator;
 	private readonly ICurrentUserService _currentUserService;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="CreateIssueHandler"/> class.
 	/// </summary>
-	public CreateIssueHandler(IIssueRepository repository, CreateIssueValidator validator, ICurrentUserService currentUserService)
+	public CreateIssueHandler(
+		IIssueRepository repository,
+		ICategoryRepository categoryRepository,
+		IStatusRepository statusRepository,
+		CreateIssueValidator validator,
+		ICurrentUserService currentUserService)
 	{
 		_repository = repository;
+		_categoryRepository = categoryRepository;
+		_statusRepository = statusRepository;
 		_validator = validator;
 		_currentUserService = currentUserService;
 	}
@@ -43,15 +53,18 @@ public class CreateIssueHandler
 			? new UserDto(_currentUserService.UserId ?? string.Empty, _currentUserService.Name ?? string.Empty, _currentUserService.Email ?? string.Empty)
 			: UserDto.Empty;
 
+		var category = await LookupByIdAsync(command.CategoryId, CategoryDto.Empty, _categoryRepository.GetByIdAsync, cancellationToken);
+		var status = await LookupByIdAsync(command.StatusId, StatusDto.Empty, _statusRepository.GetByIdAsync, cancellationToken);
+
 		var model = new Issue
 		{
 			Id = ObjectId.GenerateNewId(),
 			Title = command.Title,
 			Description = command.Description ?? string.Empty,
 			DateCreated = DateTime.UtcNow,
-			Status = StatusDto.Empty,
+			Status = status,
 			Author = author,
-			Category = CategoryDto.Empty
+			Category = category
 		};
 
 		var result = await _repository.CreateAsync(model.ToDto(), cancellationToken);
@@ -59,5 +72,20 @@ public class CreateIssueHandler
 			return Result.Fail<IssueDto>(result.Error ?? "Failed to create issue.");
 
 		return Result.Ok(result.Value!);
+	}
+
+	private static async Task<T> LookupByIdAsync<T>(
+		string? id,
+		T defaultValue,
+		Func<ObjectId, CancellationToken, Task<Result<T>>> getById,
+		CancellationToken cancellationToken)
+	{
+		if (!string.IsNullOrEmpty(id) && ObjectId.TryParse(id, out var objectId))
+		{
+			var result = await getById(objectId, cancellationToken);
+			if (result.Success && result.Value is not null)
+				return result.Value;
+		}
+		return defaultValue;
 	}
 }

@@ -23,12 +23,14 @@ public class CreateIssueHandlerTests
 	{
 		fixture.ThrowIfUnavailable();
 		_repository = new IssueRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
+		var categoryRepository = Substitute.For<ICategoryRepository>();
+		var statusRepository = Substitute.For<IStatusRepository>();
 		var currentUserService = Substitute.For<ICurrentUserService>();
 		currentUserService.UserId.Returns("test-user-id");
 		currentUserService.Name.Returns("Test User");
 		currentUserService.Email.Returns("test@example.com");
 		currentUserService.IsAuthenticated.Returns(true);
-		_handler = new CreateIssueHandler(_repository, new CreateIssueValidator(), currentUserService);
+		_handler = new CreateIssueHandler(_repository, categoryRepository, statusRepository, new CreateIssueValidator(), currentUserService);
 	}
 
 	[Fact]

@@ -29,7 +29,9 @@
 			var command = new CreateIssueCommand
 			{
 				Title = request.Title,
-				Description = request.Description
+				Description = request.Description,
+				CategoryId = request.CategoryId,
+				StatusId = request.StatusId
 			};
 			await IssueClient.CreateAsync(command);
 			Nav.NavigateTo("/issues");
