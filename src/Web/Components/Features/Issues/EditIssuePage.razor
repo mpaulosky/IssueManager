@@ -92,7 +92,10 @@
 			var command = new UpdateIssueCommand
 			{
 				Id = ObjectId.Parse(Id),
-				Description = request.Description
+				Title = request.Title,
+				Description = request.Description,
+				CategoryId = ObjectId.TryParse(request.CategoryId, out var catId) ? catId : (ObjectId?)null,
+				StatusId = ObjectId.TryParse(request.StatusId, out var statId) ? statId : (ObjectId?)null
 			};
 			await IssueClient.UpdateAsync(Id, command);
 			Nav.NavigateTo($"/issues/{Id}");
