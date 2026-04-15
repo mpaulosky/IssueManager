@@ -110,9 +110,11 @@ public class ServiceCollectionExtensionsTests
 		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateStatusValidator));
 		services.Should().Contain(sd => sd.ServiceType == typeof(CreateCategoryValidator));
 		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateCategoryValidator));
+		services.Should().Contain(sd => sd.ServiceType == typeof(DeleteCategoryValidator));
 		services.Should().Contain(sd => sd.ServiceType == typeof(CreateCommentValidator));
 		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateCommentValidator));
 		services.Should().Contain(sd => sd.ServiceType == typeof(DeleteCommentValidator));
+		services.Should().Contain(sd => sd.ServiceType == typeof(DeleteStatusValidator));
 	}
 
 	[Fact]
@@ -156,11 +158,13 @@ public class ServiceCollectionExtensionsTests
 		services.Should().Contain(sd => sd.ServiceType == typeof(GetCategoryHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(ListCategoriesHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateCategoryHandler));
+		services.Should().Contain(sd => sd.ServiceType == typeof(DeleteCategoryHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(CreateCommentHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(GetCommentHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(ListCommentsHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateCommentHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(DeleteCommentHandler));
+		services.Should().Contain(sd => sd.ServiceType == typeof(DeleteStatusHandler));
 	}
 
 	[Fact]
