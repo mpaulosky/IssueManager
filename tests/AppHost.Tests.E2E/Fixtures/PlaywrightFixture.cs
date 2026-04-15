@@ -95,8 +95,9 @@ public sealed class PlaywrightFixture : IAsyncLifetime
 
 			_notificationService = _app.Services.GetRequiredService<ResourceNotificationService>();
 
-			// Start the distributed application
-			await _app.StartAsync(CancellationToken.None);
+			// Start the distributed application with a timeout so unhealthy containers don't hang CI
+			using var startCts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+			await _app.StartAsync(startCts.Token);
 
 			// Wait for the web app to be running
 			await _notificationService.WaitForResourceAsync(
