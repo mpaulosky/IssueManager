@@ -110,11 +110,9 @@ public class ServiceCollectionExtensionsTests
 		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateStatusValidator));
 		services.Should().Contain(sd => sd.ServiceType == typeof(CreateCategoryValidator));
 		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateCategoryValidator));
-		services.Should().Contain(sd => sd.ServiceType == typeof(DeleteCategoryValidator));
 		services.Should().Contain(sd => sd.ServiceType == typeof(CreateCommentValidator));
 		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateCommentValidator));
 		services.Should().Contain(sd => sd.ServiceType == typeof(DeleteCommentValidator));
-		services.Should().Contain(sd => sd.ServiceType == typeof(DeleteStatusValidator));
 	}
 
 	[Fact]

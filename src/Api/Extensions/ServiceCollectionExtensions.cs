@@ -53,11 +53,9 @@ public static class ServiceCollectionExtensions
 		services.AddSingleton<UpdateStatusValidator>();
 		services.AddSingleton<CreateCategoryValidator>();
 		services.AddSingleton<UpdateCategoryValidator>();
-		services.AddSingleton<DeleteCategoryValidator>();
 		services.AddSingleton<CreateCommentValidator>();
 		services.AddSingleton<UpdateCommentValidator>();
 		services.AddSingleton<DeleteCommentValidator>();
-		services.AddSingleton<DeleteStatusValidator>();
 
 		return services;
 	}
@@ -86,7 +84,6 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<ListCommentsHandler>();
 		services.AddScoped<UpdateCommentHandler>();
 		services.AddScoped<DeleteCommentHandler>();
-		services.AddScoped<DeleteStatusHandler>();
 
 		return services;
 	}

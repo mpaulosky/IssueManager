@@ -18,14 +18,12 @@ namespace Api.Handlers.Statuses;
 public class DeleteStatusHandlerTests
 {
 	private readonly IStatusRepository _repository;
-	private readonly DeleteStatusValidator _validator;
 	private readonly DeleteStatusHandler _handler;
 
 	public DeleteStatusHandlerTests()
 	{
 		_repository = Substitute.For<IStatusRepository>();
-		_validator = new DeleteStatusValidator();
-		_handler = new DeleteStatusHandler(_repository, _validator);
+		_handler = new DeleteStatusHandler(_repository);
 	}
 
 	[Fact]

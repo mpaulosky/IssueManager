@@ -18,14 +18,12 @@ namespace Api.Handlers.Categories;
 public class DeleteCategoryHandlerTests
 {
 	private readonly ICategoryRepository _repository;
-	private readonly DeleteCategoryValidator _validator;
 	private readonly DeleteCategoryHandler _handler;
 
 	public DeleteCategoryHandlerTests()
 	{
 		_repository = Substitute.For<ICategoryRepository>();
-		_validator = new DeleteCategoryValidator();
-		_handler = new DeleteCategoryHandler(_repository, _validator);
+		_handler = new DeleteCategoryHandler(_repository);
 	}
 
 	[Fact]
