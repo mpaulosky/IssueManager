@@ -39,7 +39,7 @@ public class IssueEndpointsTests : IDisposable
 		// Arrange
 		IReadOnlyList<IssueDto> items = [];
 		_factory.IssueRepository
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Result<(IReadOnlyList<IssueDto> Items, long Total)>.Ok((items, 0L)));
 
 		// Act
