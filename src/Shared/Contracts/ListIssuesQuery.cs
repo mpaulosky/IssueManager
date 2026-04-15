@@ -32,4 +32,14 @@ public record ListIssuesQuery
 	/// Gets or sets the author name for filtering by author.
 	/// </summary>
 	public string? AuthorName { get; init; }
+
+	/// <summary>
+	/// Gets or sets the status name for filtering by status.
+	/// </summary>
+	public string? StatusName { get; init; }
+
+	/// <summary>
+	/// Gets or sets the category name for filtering by category.
+	/// </summary>
+	public string? CategoryName { get; init; }
 }
