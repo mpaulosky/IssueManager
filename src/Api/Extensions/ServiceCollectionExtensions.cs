@@ -73,6 +73,7 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<GetStatusHandler>();
 		services.AddScoped<ListStatusesHandler>();
 		services.AddScoped<UpdateStatusHandler>();
+		services.AddScoped<DeleteStatusHandler>();
 		services.AddScoped<CreateCategoryHandler>();
 		services.AddScoped<GetCategoryHandler>();
 		services.AddScoped<ListCategoriesHandler>();
