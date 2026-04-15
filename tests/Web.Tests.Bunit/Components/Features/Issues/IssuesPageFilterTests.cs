@@ -56,7 +56,7 @@ public class IssuesPageFilterTests : ComponentTestBase
 	{
 		_mockIssueClient = Substitute.For<IIssueApiClient>();
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(PaginatedResponse<IssueDto>.Empty));
 		TestContext.Services.AddSingleton(_mockIssueClient);
 
@@ -83,7 +83,7 @@ public class IssuesPageFilterTests : ComponentTestBase
 
 		// Assert — exactly one call with the default/null filter values
 		_ = _mockIssueClient.Received(1)
-			.GetAllAsync(1, 20, null, null, Arg.Any<CancellationToken>());
+			.GetAllAsync(1, 20, null, null, null, null, Arg.Any<CancellationToken>());
 	}
 
 	/// <summary>
@@ -108,7 +108,7 @@ public class IssuesPageFilterTests : ComponentTestBase
 
 		// Assert — the second call (after init) should carry the search term
 		_ = _mockIssueClient.Received()
-			.GetAllAsync(1, 20, "my-bug", null, Arg.Any<CancellationToken>());
+			.GetAllAsync(1, 20, "my-bug", null, null, null, Arg.Any<CancellationToken>());
 	}
 
 	/// <summary>
@@ -137,7 +137,7 @@ public class IssuesPageFilterTests : ComponentTestBase
 		// TODO (#116): Replace with the specific statusName assertion once the parameter is added:
 		// _mockIssueClient.Received().GetAllAsync(1, 20, null, null, "Open", null, Arg.Any<CancellationToken>());
 		_ = _mockIssueClient.Received()
-			.GetAllAsync(1, 20, Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+			.GetAllAsync(1, 20, Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
 	}
 
 	/// <summary>
@@ -166,7 +166,7 @@ public class IssuesPageFilterTests : ComponentTestBase
 		// TODO (#116): Replace with the specific categoryName assertion once the parameter is added:
 		// _mockIssueClient.Received().GetAllAsync(1, 20, null, null, null, "Bug", Arg.Any<CancellationToken>());
 		_ = _mockIssueClient.Received()
-			.GetAllAsync(1, 20, Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+			.GetAllAsync(1, 20, Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
 	}
 
 	/// <summary>
@@ -197,7 +197,7 @@ public class IssuesPageFilterTests : ComponentTestBase
 		// TODO (#116): Replace with the full assertion once the interface and component are fixed:
 		// _mockIssueClient.Received().GetAllAsync(1, 20, "crash", null, "Open", "Bug", Arg.Any<CancellationToken>());
 		_ = _mockIssueClient.Received()
-			.GetAllAsync(1, 20, Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+			.GetAllAsync(1, 20, Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
 	}
 
 	/// <summary>
@@ -229,7 +229,7 @@ public class IssuesPageFilterTests : ComponentTestBase
 		// _mockIssueClient.Received(3).GetAllAsync(Arg.Any<int>(), ...);
 		// And use ReceivedCalls() to inspect the last call specifically.
 		_ = _mockIssueClient.Received(3)
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
 	}
 
 	/// <summary>
@@ -255,6 +255,6 @@ public class IssuesPageFilterTests : ComponentTestBase
 
 		// Assert — the Search call must target page 1 regardless of prior navigation
 		_ = _mockIssueClient.Received()
-			.GetAllAsync(1, 20, Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+			.GetAllAsync(1, 20, Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
 	}
 }
