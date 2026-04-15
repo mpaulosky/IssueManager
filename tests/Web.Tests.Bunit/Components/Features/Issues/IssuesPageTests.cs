@@ -25,7 +25,7 @@ public class IssuesPageTests : ComponentTestBase
 	{
 		_mockIssueClient = Substitute.For<IIssueApiClient>();
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(PaginatedResponse<IssueDto>.Empty));
 		TestContext.Services.AddSingleton(_mockIssueClient);
 	}
@@ -111,7 +111,7 @@ public class IssuesPageTests : ComponentTestBase
 			1,
 			20);
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(response));
 
 		// Act
@@ -129,7 +129,7 @@ public class IssuesPageTests : ComponentTestBase
 
 		// Assert
 		_mockIssueClient.Received(1)
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -143,6 +143,6 @@ public class IssuesPageTests : ComponentTestBase
 
 		// Assert — once on init, once on clear
 		_ = _mockIssueClient.Received(2)
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
 	}
 }
