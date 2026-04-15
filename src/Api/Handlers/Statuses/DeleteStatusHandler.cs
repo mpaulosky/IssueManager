@@ -1,11 +1,11 @@
-// =======================================================
+// =============================================
 // Copyright (c) 2026. All rights reserved.
 // File Name :     DeleteStatusHandler.cs
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
 // Project Name :  Api
-// =======================================================
+// =============================================
 
 namespace Api.Handlers.Statuses;
 

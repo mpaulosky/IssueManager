@@ -70,6 +70,20 @@ public static class StatusEndpoints
 		.Produces(StatusCodes.Status404NotFound)
 		.RequireAuthorization();
 
+		group.MapDelete("{id}", async (string id, DeleteStatusHandler handler) =>
+		{
+			if (!ObjectId.TryParse(id, out var objectId))
+				return Results.BadRequest("Invalid ID format");
+			var command = new DeleteStatusCommand { Id = objectId };
+			var result = await handler.Handle(command);
+			return result.Success ? Results.NoContent() : Results.NotFound();
+		})
+		.WithName("DeleteStatus")
+		.WithSummary("Delete (archive) a status")
+		.Produces(StatusCodes.Status204NoContent)
+		.Produces(StatusCodes.Status404NotFound)
+		.RequireAuthorization();
+
 		return app;
 	}
 }

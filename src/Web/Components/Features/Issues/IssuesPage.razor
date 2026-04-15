@@ -153,7 +153,7 @@
 		_currentPage = page;
 		try
 		{
-			var response = await IssueClient.GetAllAsync(page, 20);
+			var response = await IssueClient.GetAllAsync(page, 20, _searchTerm, null, _statusFilter, _categoryFilter);
 			_issues = response.Items;
 			_totalPages = response.TotalPages;
 		}
