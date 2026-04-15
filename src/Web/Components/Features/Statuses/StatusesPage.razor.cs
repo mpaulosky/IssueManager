@@ -27,10 +27,11 @@ public partial class StatusesPage : ComponentBase
 	private StatusEditModel? _editingStatus;
 	private bool _isLoading = true;
 
-	// Archive dialog state
-	private bool _showArchiveDialog = false;
-	private string? _statusToArchiveId = null;
-	private string? _statusToArchiveName = null;
+	private StatusEditModel? _archiveTarget;
+
+	private bool _showArchiveConfirm;
+
+	private string? _errorMessage;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -108,32 +109,37 @@ public partial class StatusesPage : ComponentBase
 		await StatusClient.UpdateAsync(status.Id, command);
 	}
 
-	private void ShowArchiveDialog(string id, string name)
+	private void InitiateArchive(StatusEditModel status)
 	{
-		_statusToArchiveId = id;
-		_statusToArchiveName = name;
-		_showArchiveDialog = true;
+		_archiveTarget = status;
+		_showArchiveConfirm = true;
 	}
 
-	private async Task HandleArchiveConfirm()
+	private async Task ConfirmArchive()
 	{
-		_showArchiveDialog = false;
-		if (string.IsNullOrEmpty(_statusToArchiveId)) return;
+		_showArchiveConfirm = false;
 
-		var success = await StatusClient.ArchiveAsync(_statusToArchiveId);
+		if (_archiveTarget is null) return;
+
+		var success = await StatusClient.ArchiveAsync(_archiveTarget.Id);
+
 		if (success)
 		{
-			_statuses = _statuses.Where(s => s.Id != _statusToArchiveId).ToList();
-			await InvokeAsync(StateHasChanged);
+			_statuses = _statuses.Where(s => s != _archiveTarget).ToList();
+			if (_grid is not null)
+				await _grid.Reload();
 		}
-		_statusToArchiveId = null;
-		_statusToArchiveName = null;
+		else
+		{
+			_errorMessage = "Failed to archive the status. Please try again.";
+		}
+
+		_archiveTarget = null;
 	}
 
-	private void HandleArchiveCancel()
+	private void CancelArchive()
 	{
-		_showArchiveDialog = false;
-		_statusToArchiveId = null;
-		_statusToArchiveName = null;
+		_showArchiveConfirm = false;
+		_archiveTarget = null;
 	}
 }

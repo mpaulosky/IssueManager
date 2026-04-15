@@ -40,6 +40,7 @@ public partial class CategoriesPage : ComponentBase
 	private bool _showArchiveDialog = false;
 	private string? _categoryToArchiveId = null;
 	private string _archiveConfirmMessage = "";
+	private string? _errorMessage;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -149,6 +150,10 @@ public partial class CategoriesPage : ComponentBase
 		{
 			_categories = _categories.Where(c => c.Id != _categoryToArchiveId).ToList();
 			await InvokeAsync(StateHasChanged);
+		}
+		else
+		{
+			_errorMessage = "Failed to archive the category. Please try again.";
 		}
 		_categoryToArchiveId = null;
 	}

@@ -5,60 +5,66 @@
 <PageTitle>Statuses — IssueManager</PageTitle>
 
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-<div class="flex items-center justify-between mb-6">
-<h1 class="page-title">Statuses</h1>
-<RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Text="Add Status" Click="@InsertRow"
-Disabled="@(_insertingStatus != null || _editingStatus != null)" class="px-4 py-2 text-sm" />
+	<div class="flex items-center justify-between mb-6">
+		<h1 class="page-title">Statuses</h1>
+		<RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Text="Add Status" Click="@InsertRow"
+									Disabled="@(_insertingStatus != null || _editingStatus != null)" class="px-4 py-2 text-sm" />
+	</div>
+
+	@if (_isLoading)
+	{
+		<div class="loading-state">Loading...</div>
+	}
+	else
+	{
+		<div class="card-flush">
+			<RadzenDataGrid @ref="_grid" Data="@_statuses" TItem="StatusEditModel" EditMode="DataGridEditMode.Single"
+											RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" AllowSorting="true" AllowPaging="true" PageSize="10">
+				<Columns>
+					<RadzenDataGridColumn TItem="StatusEditModel" Property="StatusName" Title="Status Name" Width="200px">
+						<EditTemplate Context="status">
+							<RadzenTextBox @bind-Value="status.StatusName" Style="width:100%" Name="StatusName" />
+							<RadzenRequiredValidator Component="StatusName" Text="Name is required" Popup="true" />
+						</EditTemplate>
+					</RadzenDataGridColumn>
+					<RadzenDataGridColumn TItem="StatusEditModel" Property="StatusDescription" Title="Description">
+						<EditTemplate Context="status">
+							<RadzenTextBox @bind-Value="status.StatusDescription" Style="width:100%" Name="StatusDesc" />
+						</EditTemplate>
+					</RadzenDataGridColumn>
+					<RadzenDataGridColumn TItem="StatusEditModel" Context="status" Filterable="false" Sortable="false"
+																TextAlign="TextAlign.Right" Width="140px" Title="Actions">
+						<Template Context="status">
+							<RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
+														Click="@(() => EditRow(status))" @onclick:stopPropagation="true" />
+							<AuthorizeView Roles="Admin">
+								<RadzenButton id="@($"archive-{status.Id}")" Icon="archive" ButtonStyle="ButtonStyle.Danger"
+															Size="ButtonSize.Small" Class="ms-1"
+															Click="@(() => InitiateArchive(status))" @onclick:stopPropagation="true" />
+							</AuthorizeView>
+						</Template>
+						<EditTemplate Context="status">
+							<RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small"
+														Click="@(() => SaveRow(status))" />
+							<RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
+														Click="@(() => CancelEdit(status))" Class="ms-1" />
+						</EditTemplate>
+					</RadzenDataGridColumn>
+				</Columns>
+			</RadzenDataGrid>
+		</div>
+	}
 </div>
 
-@if (_isLoading)
+@if (!string.IsNullOrEmpty(_errorMessage))
 {
-<div class="loading-state">Loading...</div>
+	<div id="archive-error" class="mt-4 text-red-600 text-sm">@_errorMessage</div>
 }
-else
-{
-<div class="card-flush">
-<RadzenDataGrid @ref="_grid" Data="@_statuses" TItem="StatusEditModel" EditMode="DataGridEditMode.Single"
-RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" AllowSorting="true" AllowPaging="true" PageSize="10">
-<Columns>
-<RadzenDataGridColumn TItem="StatusEditModel" Property="StatusName" Title="Status Name" Width="200px">
-<EditTemplate Context="status">
-<RadzenTextBox @bind-Value="status.StatusName" Style="width:100%" Name="StatusName" />
-<RadzenRequiredValidator Component="StatusName" Text="Name is required" Popup="true" />
-</EditTemplate>
-</RadzenDataGridColumn>
-<RadzenDataGridColumn TItem="StatusEditModel" Property="StatusDescription" Title="Description">
-<EditTemplate Context="status">
-<RadzenTextBox @bind-Value="status.StatusDescription" Style="width:100%" Name="StatusDesc" />
-</EditTemplate>
-</RadzenDataGridColumn>
-<RadzenDataGridColumn TItem="StatusEditModel" Context="status" Filterable="false" Sortable="false"
-TextAlign="TextAlign.Right" Width="180px" Title="Actions">
-<Template Context="status">
-<RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
-Click="@(() => EditRow(status))" @onclick:stopPropagation="true" />
-<AuthorizeView Policy="Admin">
-<Authorized>
-<RadzenButton Icon="archive" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
-Click="@(() => ShowArchiveDialog(status.Id, status.StatusName))" @onclick:stopPropagation="true"
-Class="ms-1" />
-</Authorized>
-</AuthorizeView>
-</Template>
-<EditTemplate Context="status">
-<RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small"
-Click="@(() => SaveRow(status))" />
-<RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
-Click="@(() => CancelEdit(status))" Class="ms-1" />
-</EditTemplate>
-</RadzenDataGridColumn>
-</Columns>
-</RadzenDataGrid>
-</div>
-}
-</div>
 
-<!-- Archive Confirmation Dialog -->
-<ConfirmDialog IsVisible="@_showArchiveDialog" Title="Archive Status"
- Message="@($"Archive '{_statusToArchiveName}'? Issues with this status will need to be reassigned.")"
- ConfirmText="Archive" CancelText="Cancel" OnConfirm="HandleArchiveConfirm" OnCancel="HandleArchiveCancel" />
+<ConfirmDialog IsVisible="@_showArchiveConfirm"
+							 Title="Archive Status"
+							 Message="Are you sure you want to archive this status? It will be hidden from the list."
+							 ConfirmText="Yes, Archive"
+							 CancelText="Cancel"
+							 OnConfirm="ConfirmArchive"
+							 OnCancel="CancelArchive" />

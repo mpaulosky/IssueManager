@@ -24,7 +24,7 @@ public interface IStatusApiClient
 	/// <summary>Updates an existing status.</summary>
 	Task<StatusDto?> UpdateAsync(string id, UpdateStatusCommand command, CancellationToken cancellationToken = default);
 
-	/// <summary>Archives a status by its identifier.</summary>
+	/// <summary>Archives (soft-deletes) a status by its identifier.</summary>
 	Task<bool> ArchiveAsync(string id, CancellationToken cancellationToken = default);
 }
 
@@ -76,15 +76,8 @@ public class StatusApiClient : IStatusApiClient
 	/// <inheritdoc/>
 	public async Task<bool> ArchiveAsync(string id, CancellationToken cancellationToken = default)
 	{
-		try
-		{
-			var response = await _httpClient.DeleteAsync($"/api/v1/statuses/{id}", cancellationToken).ConfigureAwait(false);
-			return response.IsSuccessStatusCode;
-		}
-		catch (HttpRequestException)
-		{
-			return false;
-		}
+		var response = await _httpClient.DeleteAsync($"/api/v1/statuses/{id}", cancellationToken).ConfigureAwait(false);
+		return response.IsSuccessStatusCode;
 	}
 
 }
