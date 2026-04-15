@@ -156,11 +156,13 @@ public class ServiceCollectionExtensionsTests
 		services.Should().Contain(sd => sd.ServiceType == typeof(GetCategoryHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(ListCategoriesHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateCategoryHandler));
+		services.Should().Contain(sd => sd.ServiceType == typeof(DeleteCategoryHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(CreateCommentHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(GetCommentHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(ListCommentsHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateCommentHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(DeleteCommentHandler));
+		services.Should().Contain(sd => sd.ServiceType == typeof(DeleteStatusHandler));
 	}
 
 	[Fact]

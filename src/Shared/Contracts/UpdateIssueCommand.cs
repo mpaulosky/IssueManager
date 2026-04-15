@@ -29,6 +29,16 @@ public record UpdateIssueCommand
 	public string? Description { get; init; }
 
 	/// <summary>
+	/// Gets or sets the category ID to assign to the issue.
+	/// </summary>
+	public ObjectId? CategoryId { get; init; }
+
+	/// <summary>
+	/// Gets or sets the status ID to assign to the issue.
+	/// </summary>
+	public ObjectId? StatusId { get; init; }
+
+	/// <summary>
 	/// Gets or sets whether the issue is approved for public display.
 	/// </summary>
 	public bool? ApprovedForRelease { get; init; }

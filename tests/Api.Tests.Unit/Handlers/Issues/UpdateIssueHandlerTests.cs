@@ -18,14 +18,18 @@ namespace Api.Handlers.Issues;
 public class UpdateIssueHandlerTests
 {
 	private readonly IIssueRepository _repository;
+	private readonly ICategoryRepository _categoryRepository;
+	private readonly IStatusRepository _statusRepository;
 	private readonly UpdateIssueValidator _validator;
 	private readonly UpdateIssueHandler _handler;
 
 	public UpdateIssueHandlerTests()
 	{
 		_repository = Substitute.For<IIssueRepository>();
+		_categoryRepository = Substitute.For<ICategoryRepository>();
+		_statusRepository = Substitute.For<IStatusRepository>();
 		_validator = new UpdateIssueValidator();
-		_handler = new UpdateIssueHandler(_repository, _validator);
+		_handler = new UpdateIssueHandler(_repository, _categoryRepository, _statusRepository, _validator);
 	}
 
 	[Fact]
@@ -282,5 +286,185 @@ public class UpdateIssueHandlerTests
 
 		// Assert
 		result.Value!.Description.Should().BeEmpty();
+	}
+
+	[Fact]
+	public async Task Handle_WithCategoryId_UpdatesCategory()
+	{
+		// Arrange
+		var issueId = ObjectId.GenerateNewId();
+		var categoryId = ObjectId.GenerateNewId();
+		var newCategory = new CategoryDto(categoryId, "New Category", "New cat desc", DateTime.UtcNow, null, false, UserDto.Empty);
+
+		var existingIssue = new IssueDto(
+			issueId,
+			"Original Title",
+			"Original Description",
+			DateTime.UtcNow.AddDays(-1),
+			null,
+			UserDto.Empty,
+			CategoryDto.Empty,
+			StatusDto.Empty,
+			false,
+			UserDto.Empty,
+			false,
+			false);
+
+		var command = new UpdateIssueCommand
+		{
+			Id = issueId,
+			Title = "Updated Title",
+			CategoryId = categoryId
+		};
+
+		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
+			.Returns(Result.Ok(existingIssue));
+
+		_categoryRepository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
+			.Returns(Result.Ok(newCategory));
+
+		var updatedIssue = existingIssue with { Title = command.Title, Description = string.Empty, Category = newCategory };
+		_repository.UpdateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result.Ok(updatedIssue));
+
+		// Act
+		var result = await _handler.Handle(command, CancellationToken.None);
+
+		// Assert
+		result.Success.Should().BeTrue();
+		result.Value!.Category.CategoryName.Should().Be("New Category");
+		await _categoryRepository.Received(1).GetByIdAsync(categoryId, Arg.Any<CancellationToken>());
+	}
+
+	[Fact]
+	public async Task Handle_WithStatusId_UpdatesStatus()
+	{
+		// Arrange
+		var issueId = ObjectId.GenerateNewId();
+		var statusId = ObjectId.GenerateNewId();
+		var newStatus = new StatusDto(statusId, "In Progress", "Being worked on", DateTime.UtcNow, null, false, UserDto.Empty);
+
+		var existingIssue = new IssueDto(
+			issueId,
+			"Original Title",
+			"Original Description",
+			DateTime.UtcNow.AddDays(-1),
+			null,
+			UserDto.Empty,
+			CategoryDto.Empty,
+			StatusDto.Empty,
+			false,
+			UserDto.Empty,
+			false,
+			false);
+
+		var command = new UpdateIssueCommand
+		{
+			Id = issueId,
+			Title = "Updated Title",
+			StatusId = statusId
+		};
+
+		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
+			.Returns(Result.Ok(existingIssue));
+
+		_statusRepository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
+			.Returns(Result.Ok(newStatus));
+
+		var updatedIssue = existingIssue with { Title = command.Title, Description = string.Empty, Status = newStatus };
+		_repository.UpdateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>())
+			.Returns(Result.Ok(updatedIssue));
+
+		// Act
+		var result = await _handler.Handle(command, CancellationToken.None);
+
+		// Assert
+		result.Success.Should().BeTrue();
+		result.Value!.Status.StatusName.Should().Be("In Progress");
+		await _statusRepository.Received(1).GetByIdAsync(statusId, Arg.Any<CancellationToken>());
+	}
+
+	[Fact]
+	public async Task Handle_WithInvalidCategoryId_ReturnsNotFoundFailure()
+	{
+		// Arrange
+		var issueId = ObjectId.GenerateNewId();
+		var categoryId = ObjectId.GenerateNewId();
+
+		var existingIssue = new IssueDto(
+			issueId,
+			"Original Title",
+			"Original Description",
+			DateTime.UtcNow.AddDays(-1),
+			null,
+			UserDto.Empty,
+			CategoryDto.Empty,
+			StatusDto.Empty,
+			false,
+			UserDto.Empty,
+			false,
+			false);
+
+		var command = new UpdateIssueCommand
+		{
+			Id = issueId,
+			Title = "Updated Title",
+			CategoryId = categoryId
+		};
+
+		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
+			.Returns(Result.Ok(existingIssue));
+
+		_categoryRepository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
+			.Returns(Result.Fail<CategoryDto>("Not found"));
+
+		// Act
+		var result = await _handler.Handle(command, CancellationToken.None);
+
+		// Assert
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.NotFound);
+	}
+
+	[Fact]
+	public async Task Handle_WithInvalidStatusId_ReturnsNotFoundFailure()
+	{
+		// Arrange
+		var issueId = ObjectId.GenerateNewId();
+		var statusId = ObjectId.GenerateNewId();
+
+		var existingIssue = new IssueDto(
+			issueId,
+			"Original Title",
+			"Original Description",
+			DateTime.UtcNow.AddDays(-1),
+			null,
+			UserDto.Empty,
+			CategoryDto.Empty,
+			StatusDto.Empty,
+			false,
+			UserDto.Empty,
+			false,
+			false);
+
+		var command = new UpdateIssueCommand
+		{
+			Id = issueId,
+			Title = "Updated Title",
+			StatusId = statusId
+		};
+
+		_repository.GetByIdAsync(issueId, Arg.Any<CancellationToken>())
+			.Returns(Result.Ok(existingIssue));
+
+		_statusRepository.GetByIdAsync(statusId, Arg.Any<CancellationToken>())
+			.Returns(Result.Fail<StatusDto>("Not found"));
+
+		// Act
+		var result = await _handler.Handle(command, CancellationToken.None);
+
+		// Assert
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.NotFound);
 	}
 }

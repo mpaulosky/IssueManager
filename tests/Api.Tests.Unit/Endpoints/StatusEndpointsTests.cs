@@ -181,4 +181,60 @@ public class StatusEndpointsTests : IDisposable
 		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 	}
 
+	[Fact]
+	public async Task DeleteStatus_WithValidId_ReturnsNoContent()
+	{
+		// Arrange
+		var statusId = ObjectId.GenerateNewId();
+		var statusDto = new StatusDto(
+			statusId,
+			"Test Status",
+			"Description",
+			DateTime.UtcNow,
+			null,
+			false,
+			UserDto.Empty);
+		_factory.StatusRepository
+			.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
+			.Returns(Result.Ok(statusDto));
+		_factory.StatusRepository
+			.ArchiveAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
+			.Returns(Result.Ok());
+
+		// Act
+		var response = await _authenticatedClient.DeleteAsync($"/api/v1/statuses/{statusId}", TestContext.Current.CancellationToken);
+
+		// Assert
+		response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+	}
+
+	[Fact]
+	public async Task DeleteStatus_WithoutAuthentication_ReturnsUnauthorized()
+	{
+		// Arrange
+		var statusId = ObjectId.GenerateNewId();
+
+		// Act
+		var response = await _client.DeleteAsync($"/api/v1/statuses/{statusId}", TestContext.Current.CancellationToken);
+
+		// Assert
+		response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+	}
+
+	[Fact]
+	public async Task DeleteStatus_NotFound_Returns404()
+	{
+		// Arrange
+		var statusId = ObjectId.GenerateNewId();
+		_factory.StatusRepository
+			.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
+			.Returns(Result<StatusDto>.Fail("Not found"));
+
+		// Act
+		var response = await _authenticatedClient.DeleteAsync($"/api/v1/statuses/{statusId}", TestContext.Current.CancellationToken);
+
+		// Assert
+		response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+	}
+
 }

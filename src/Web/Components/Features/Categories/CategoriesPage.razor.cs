@@ -36,6 +36,12 @@ public partial class CategoriesPage : ComponentBase
 
 	private bool _isLoading = true;
 
+	// Archive state
+	private bool _showArchiveDialog = false;
+	private string? _categoryToArchiveId = null;
+	private string _archiveConfirmMessage = "";
+	private string? _errorMessage;
+
 	protected override async Task OnInitializedAsync()
 	{
 		await LoadCategories();
@@ -119,6 +125,46 @@ public partial class CategoriesPage : ComponentBase
 		};
 
 		await CategoryClient.UpdateAsync(cat.Id, command);
+	}
+
+	/// <summary>
+	/// Shows the archive confirmation dialog.
+	/// </summary>
+	private void HandleArchive(string categoryId, string categoryName)
+	{
+		_categoryToArchiveId = categoryId;
+		_archiveConfirmMessage = $"Archive '{categoryName}'? It will no longer appear in issue forms.";
+		_showArchiveDialog = true;
+	}
+
+	/// <summary>
+	/// Handles the archive confirmation.
+	/// </summary>
+	private async Task HandleArchiveConfirm()
+	{
+		_showArchiveDialog = false;
+		if (string.IsNullOrEmpty(_categoryToArchiveId)) return;
+
+		var success = await CategoryClient.ArchiveAsync(_categoryToArchiveId);
+		if (success)
+		{
+			_categories = _categories.Where(c => c.Id != _categoryToArchiveId).ToList();
+			await InvokeAsync(StateHasChanged);
+		}
+		else
+		{
+			_errorMessage = "Failed to archive the category. Please try again.";
+		}
+		_categoryToArchiveId = null;
+	}
+
+	/// <summary>
+	/// Handles the archive cancellation.
+	/// </summary>
+	private void HandleArchiveCancel()
+	{
+		_showArchiveDialog = false;
+		_categoryToArchiveId = null;
 	}
 
 }

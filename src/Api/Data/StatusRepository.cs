@@ -80,9 +80,8 @@ public class StatusRepository : IStatusRepository
 			.Limit(pageSize)
 			.ToListAsync(cancellationToken);
 
-		return entities.Count > 0
-				? Result.Ok((Items: (IReadOnlyList<StatusDto>)entities.Select(x => x.ToDto()).ToList(), Total: total))
-				: Result.Fail<(IReadOnlyList<StatusDto> Items, long Total)>("Statuses not found.");
+		IReadOnlyList<StatusDto> items = entities.Select(x => x.ToDto()).ToList();
+		return Result.Ok((items, total));
 	}
 
 	/// <inheritdoc />

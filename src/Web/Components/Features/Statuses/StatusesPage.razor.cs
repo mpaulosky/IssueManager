@@ -27,6 +27,12 @@ public partial class StatusesPage : ComponentBase
 	private StatusEditModel? _editingStatus;
 	private bool _isLoading = true;
 
+	private StatusEditModel? _archiveTarget;
+
+	private bool _showArchiveConfirm;
+
+	private string? _errorMessage;
+
 	protected override async Task OnInitializedAsync()
 	{
 		await LoadStatuses();
@@ -101,5 +107,39 @@ public partial class StatusesPage : ComponentBase
 			StatusDescription = status.StatusDescription
 		};
 		await StatusClient.UpdateAsync(status.Id, command);
+	}
+
+	private void InitiateArchive(StatusEditModel status)
+	{
+		_archiveTarget = status;
+		_showArchiveConfirm = true;
+	}
+
+	private async Task ConfirmArchive()
+	{
+		_showArchiveConfirm = false;
+
+		if (_archiveTarget is null) return;
+
+		var success = await StatusClient.ArchiveAsync(_archiveTarget.Id);
+
+		if (success)
+		{
+			_statuses = _statuses.Where(s => s != _archiveTarget).ToList();
+			if (_grid is not null)
+				await _grid.Reload();
+		}
+		else
+		{
+			_errorMessage = "Failed to archive the status. Please try again.";
+		}
+
+		_archiveTarget = null;
+	}
+
+	private void CancelArchive()
+	{
+		_showArchiveConfirm = false;
+		_archiveTarget = null;
 	}
 }

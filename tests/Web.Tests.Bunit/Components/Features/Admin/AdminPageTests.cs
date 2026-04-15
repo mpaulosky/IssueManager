@@ -31,7 +31,7 @@ public class AdminPageTests : IDisposable
 
 		_mockIssueClient = Substitute.For<IIssueApiClient>();
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(PaginatedResponse<IssueDto>.Empty));
 		_ctx.Services.AddSingleton(_mockIssueClient);
 	}
@@ -81,7 +81,7 @@ public class AdminPageTests : IDisposable
 
 		// Assert
 		_mockIssueClient.Received(1)
-			.GetAllAsync(Arg.Any<int>(), 100, Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+			.GetAllAsync(Arg.Any<int>(), 100, Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -102,7 +102,7 @@ public class AdminPageTests : IDisposable
 		// Arrange
 		var issue = MakePendingIssue("My Pending Bug");
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 
 		// Act
@@ -118,7 +118,7 @@ public class AdminPageTests : IDisposable
 		// Arrange
 		var issue = MakePendingIssue("Info Issue");
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 
 		// Act
@@ -137,7 +137,7 @@ public class AdminPageTests : IDisposable
 		// Arrange
 		var approvedIssue = MakePendingIssue("Approved Issue") with { ApprovedForRelease = true };
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(approvedIssue)));
 
 		// Act
@@ -154,7 +154,7 @@ public class AdminPageTests : IDisposable
 		// Arrange
 		var rejectedIssue = MakePendingIssue("Rejected Issue") with { Rejected = true };
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(rejectedIssue)));
 
 		// Act
@@ -172,7 +172,7 @@ public class AdminPageTests : IDisposable
 		var issue1 = MakePendingIssue("Issue One");
 		var issue2 = MakePendingIssue("Issue Two");
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue1, issue2)));
 
 		// Act
@@ -194,7 +194,7 @@ public class AdminPageTests : IDisposable
 		var issue = MakePendingIssue("Issue To Approve");
 		var updatedIssue = issue with { ApprovedForRelease = true };
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 		_mockIssueClient
 			.UpdateAsync(issue.Id.ToString(), Arg.Any<UpdateIssueCommand>(), Arg.Any<CancellationToken>())
@@ -220,7 +220,7 @@ public class AdminPageTests : IDisposable
 		var issue = MakePendingIssue("Issue To Approve");
 		var updatedIssue = issue with { ApprovedForRelease = true };
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 		_mockIssueClient
 			.UpdateAsync(issue.Id.ToString(), Arg.Any<UpdateIssueCommand>(), Arg.Any<CancellationToken>())
@@ -241,7 +241,7 @@ public class AdminPageTests : IDisposable
 		// Arrange
 		var issue = MakePendingIssue("Issue That Stays");
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 		_mockIssueClient
 			.UpdateAsync(issue.Id.ToString(), Arg.Any<UpdateIssueCommand>(), Arg.Any<CancellationToken>())
@@ -265,7 +265,7 @@ public class AdminPageTests : IDisposable
 		var issue = MakePendingIssue("Issue To Reject");
 		var updatedIssue = issue with { Rejected = true };
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 		_mockIssueClient
 			.UpdateAsync(issue.Id.ToString(), Arg.Any<UpdateIssueCommand>(), Arg.Any<CancellationToken>())
@@ -291,7 +291,7 @@ public class AdminPageTests : IDisposable
 		var issue = MakePendingIssue("Issue To Reject");
 		var updatedIssue = issue with { Rejected = true };
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 		_mockIssueClient
 			.UpdateAsync(issue.Id.ToString(), Arg.Any<UpdateIssueCommand>(), Arg.Any<CancellationToken>())
@@ -312,7 +312,7 @@ public class AdminPageTests : IDisposable
 		// Arrange
 		var issue = MakePendingIssue("Rejection Fails");
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 		_mockIssueClient
 			.UpdateAsync(issue.Id.ToString(), Arg.Any<UpdateIssueCommand>(), Arg.Any<CancellationToken>())
@@ -335,7 +335,7 @@ public class AdminPageTests : IDisposable
 		// Arrange
 		var issue = MakePendingIssue("Title To Edit");
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 
 		var cut = _ctx.Render<AdminPage>();
@@ -353,7 +353,7 @@ public class AdminPageTests : IDisposable
 		// Arrange
 		var issue = MakePendingIssue("Dual Edit Issue");
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 
 		var cut = _ctx.Render<AdminPage>();
@@ -375,7 +375,7 @@ public class AdminPageTests : IDisposable
 		var issue = MakePendingIssue("Original Title");
 		var updatedIssue = issue with { Title = "Updated Title" };
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 		_mockIssueClient
 			.UpdateAsync(issue.Id.ToString(), Arg.Any<UpdateIssueCommand>(), Arg.Any<CancellationToken>())
@@ -403,7 +403,7 @@ public class AdminPageTests : IDisposable
 		var issue = MakePendingIssue("Title To Save");
 		var updatedIssue = issue with { Title = "Saved Title" };
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 		_mockIssueClient
 			.UpdateAsync(Arg.Any<string>(), Arg.Any<UpdateIssueCommand>(), Arg.Any<CancellationToken>())
@@ -426,7 +426,7 @@ public class AdminPageTests : IDisposable
 		// Arrange
 		var issue = MakePendingIssue("Title To Cancel");
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 
 		var cut = _ctx.Render<AdminPage>();
@@ -447,7 +447,7 @@ public class AdminPageTests : IDisposable
 		// Arrange
 		var issue = MakePendingIssue("Issue", "Description To Edit");
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 
 		var cut = _ctx.Render<AdminPage>();
@@ -465,7 +465,7 @@ public class AdminPageTests : IDisposable
 		// Arrange
 		var issue = MakePendingIssue("Clear Title On Desc Edit");
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 
 		var cut = _ctx.Render<AdminPage>();
@@ -487,7 +487,7 @@ public class AdminPageTests : IDisposable
 		var issue = MakePendingIssue("Issue", "Original Description");
 		var updatedIssue = issue with { Description = "Updated Description" };
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 		_mockIssueClient
 			.UpdateAsync(issue.Id.ToString(), Arg.Any<UpdateIssueCommand>(), Arg.Any<CancellationToken>())
@@ -515,7 +515,7 @@ public class AdminPageTests : IDisposable
 		var issue = MakePendingIssue("Issue", "Desc To Save");
 		var updatedIssue = issue with { Description = "Saved Description" };
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 		_mockIssueClient
 			.UpdateAsync(Arg.Any<string>(), Arg.Any<UpdateIssueCommand>(), Arg.Any<CancellationToken>())
@@ -538,7 +538,7 @@ public class AdminPageTests : IDisposable
 		// Arrange
 		var issue = MakePendingIssue("Issue", "Description To Cancel");
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 
 		var cut = _ctx.Render<AdminPage>();

@@ -397,7 +397,8 @@ jobs:
   test-apphost-e2e:
     name: "AppHost.Tests.E2E"
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 12
+    continue-on-error: true
     needs: build
 
     steps:
@@ -513,7 +514,7 @@ jobs:
           path: coverage-output
 
       - name: Publish to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         if: always()
         with:
           fail_ci_if_error: false

@@ -23,7 +23,11 @@ public class UpdateIssueHandlerIntegrationTests
 	{
 		fixture.ThrowIfUnavailable();
 		_repository = new IssueRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
-		_handler = new UpdateIssueHandler(_repository, new UpdateIssueValidator());
+		_handler = new UpdateIssueHandler(
+			_repository,
+			Substitute.For<ICategoryRepository>(),
+			Substitute.For<IStatusRepository>(),
+			new UpdateIssueValidator());
 	}
 
 	private static IssueDto CreateTestIssueDto(string title, string description, bool archived = false) =>

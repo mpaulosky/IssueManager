@@ -35,7 +35,7 @@ public class ListIssuesHandler
 		if (!validationResult.IsValid)
 			throw new ValidationException(validationResult.Errors);
 
-		var result = await _repository.GetAllAsync(query.Page, query.PageSize, query.SearchTerm, query.AuthorName, cancellationToken);
+		var result = await _repository.GetAllAsync(query.Page, query.PageSize, query.SearchTerm, query.AuthorName, query.StatusName, query.CategoryName, cancellationToken);
 		var (items, total) = result.Value;
 
 		return new PaginatedResponse<IssueDto>(items, total, query.Page, query.PageSize);
