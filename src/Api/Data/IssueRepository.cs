@@ -72,6 +72,8 @@ public class IssueRepository : IIssueRepository
 			int pageSize,
 			string? searchTerm = null,
 			string? authorName = null,
+			string? statusName = null,
+			string? categoryName = null,
 			CancellationToken cancellationToken = default)
 	{
 		var filterBuilder = Builders<Issue>.Filter;
@@ -92,6 +94,16 @@ public class IssueRepository : IIssueRepository
 		if (!string.IsNullOrWhiteSpace(authorName))
 		{
 			filters.Add(filterBuilder.Regex(x => x.Author.Name, new BsonRegularExpression(authorName, "i")));
+		}
+
+		if (!string.IsNullOrWhiteSpace(statusName))
+		{
+			filters.Add(filterBuilder.Regex(x => x.Status.StatusName, new BsonRegularExpression(statusName, "i")));
+		}
+
+		if (!string.IsNullOrWhiteSpace(categoryName))
+		{
+			filters.Add(filterBuilder.Regex(x => x.Category.CategoryName, new BsonRegularExpression(categoryName, "i")));
 		}
 
 		var filter = filterBuilder.And(filters);
