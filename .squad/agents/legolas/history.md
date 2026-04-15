@@ -72,3 +72,15 @@ Frontend Developer on IssueManager (.NET 10, Blazor Interactive Server Rendering
 - Tailwind optional wasm helper entries updated as expected lockfile churn
 - Merged to main; created reusable `.squad/skills/dependabot-lockfile-review/` skill for future Web dependency reviews
 - Decision recorded in `.squad/decisions.md`
+
+### 2026-04-12: E2E Playwright Tests for Issues CRUD (PR #142)
+- Implemented 6 E2E test scenarios in `tests/AppHost.Tests.E2E/Issues/IssuesCrudFlowTests.cs`
+- Test patterns: Use `[Collection("PlaywrightE2E")]` attribute, `PlaywrightFixture fixture` constructor parameter, and `try/finally` with page context cleanup
+- All tests check fixture availability and test credentials before running
+- Defensive testing: Assertions check for UI element existence, not specific data (works with empty database)
+- Route pattern: `/issues`, `/issues/create`, `/issues/{Id}/edit`, `/categories`
+- Auth pattern: Use `Auth0LoginHelper.GetTestCredentials("ADMIN")` and `Auth0LoginHelper.LoginAsync(page, testBaseUrl, username, password, 30000)`
+- Timeout strategy: Most WaitFor operations use 15000ms, Auth0LoginHelper uses 30000ms default
+- FluentAssertions style: `.Should().BeTrue()`, `.Should().Contain()`, `.Should().NotBeNull()`
+- GlobalUsings: E2E project has global usings for Xunit, FluentAssertions, Playwright, fixtures, and helpers — no additional using statements needed
+- Build verification: Tests build successfully with warnings consistent with existing E2E tests
