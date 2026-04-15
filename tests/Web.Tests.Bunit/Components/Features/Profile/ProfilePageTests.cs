@@ -31,7 +31,7 @@ public class ProfilePageTests : IDisposable
 
 		_mockIssueClient = Substitute.For<IIssueApiClient>();
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(PaginatedResponse<IssueDto>.Empty));
 		_ctx.Services.AddSingleton(_mockIssueClient);
 	}
@@ -81,7 +81,7 @@ public class ProfilePageTests : IDisposable
 
 		// Assert
 		_mockIssueClient.Received(1)
-			.GetAllAsync(Arg.Any<int>(), 200, Arg.Any<string?>(), "testuser", Arg.Any<CancellationToken>());
+			.GetAllAsync(Arg.Any<int>(), 200, Arg.Any<string?>(), "testuser", Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
 	}
 
 	// ─── Issue Filtering ─────────────────────────────────────────────────────────
@@ -92,7 +92,7 @@ public class ProfilePageTests : IDisposable
 		// Arrange — approved: ApprovedForRelease=true, Rejected=false, Archived=false
 		var issue = MakeIssue("Approved Issue") with { ApprovedForRelease = true };
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 
 		// Act
@@ -109,7 +109,7 @@ public class ProfilePageTests : IDisposable
 		// Arrange — pending: ApprovedForRelease=false, Rejected=false, Archived=false (defaults)
 		var issue = MakeIssue("Pending Issue");
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 
 		// Act
@@ -126,7 +126,7 @@ public class ProfilePageTests : IDisposable
 		// Arrange — rejected: Rejected=true
 		var issue = MakeIssue("Rejected Issue") with { Rejected = true };
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 
 		// Act
@@ -143,7 +143,7 @@ public class ProfilePageTests : IDisposable
 		// Arrange — archived: Archived=true, ApprovedForRelease=false, Rejected=false
 		var issue = MakeIssue("Archived Issue") with { Archived = true };
 		_mockIssueClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(MakeResponse(issue)));
 
 		// Act
@@ -180,7 +180,7 @@ public class ProfilePageTests : IDisposable
 
 		var mockClient = Substitute.For<IIssueApiClient>();
 		mockClient
-			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+			.GetAllAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult(PaginatedResponse<IssueDto>.Empty));
 		ctx.Services.AddSingleton(mockClient);
 
