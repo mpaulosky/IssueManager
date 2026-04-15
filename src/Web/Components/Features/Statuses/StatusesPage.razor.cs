@@ -27,6 +27,11 @@ public partial class StatusesPage : ComponentBase
 	private StatusEditModel? _editingStatus;
 	private bool _isLoading = true;
 
+	// Archive dialog state
+	private bool _showArchiveDialog = false;
+	private string? _statusToArchiveId = null;
+	private string? _statusToArchiveName = null;
+
 	protected override async Task OnInitializedAsync()
 	{
 		await LoadStatuses();
@@ -101,5 +106,34 @@ public partial class StatusesPage : ComponentBase
 			StatusDescription = status.StatusDescription
 		};
 		await StatusClient.UpdateAsync(status.Id, command);
+	}
+
+	private void ShowArchiveDialog(string id, string name)
+	{
+		_statusToArchiveId = id;
+		_statusToArchiveName = name;
+		_showArchiveDialog = true;
+	}
+
+	private async Task HandleArchiveConfirm()
+	{
+		_showArchiveDialog = false;
+		if (string.IsNullOrEmpty(_statusToArchiveId)) return;
+
+		var success = await StatusClient.ArchiveAsync(_statusToArchiveId);
+		if (success)
+		{
+			_statuses = _statuses.Where(s => s.Id != _statusToArchiveId).ToList();
+			await InvokeAsync(StateHasChanged);
+		}
+		_statusToArchiveId = null;
+		_statusToArchiveName = null;
+	}
+
+	private void HandleArchiveCancel()
+	{
+		_showArchiveDialog = false;
+		_statusToArchiveId = null;
+		_statusToArchiveName = null;
 	}
 }

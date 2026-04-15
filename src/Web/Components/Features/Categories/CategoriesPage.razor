@@ -33,10 +33,17 @@
 						</EditTemplate>
 					</RadzenDataGridColumn>
 					<RadzenDataGridColumn TItem="CategoryEditModel" Context="cat" Filterable="false" Sortable="false"
-																TextAlign="TextAlign.Right" Width="140px" Title="Actions">
+																TextAlign="TextAlign.Right" Width="180px" Title="Actions">
 						<Template Context="cat">
 							<RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
 														Click="@(() => EditRow(cat))" @onclick:stopPropagation="true" />
+							<AuthorizeView Policy="Admin">
+								<Authorized>
+									<RadzenButton Icon="archive" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
+																Click="@(() => HandleArchive(cat.Id, cat.CategoryName))" @onclick:stopPropagation="true"
+																Class="ms-1" />
+								</Authorized>
+							</AuthorizeView>
 						</Template>
 						<EditTemplate Context="cat">
 							<RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small"
@@ -50,3 +57,8 @@
 		</div>
 	}
 </div>
+
+<!-- Archive Confirmation Dialog -->
+<ConfirmDialog IsVisible="@_showArchiveDialog" Title="Archive Category"
+							 Message="@_archiveConfirmMessage" ConfirmText="Archive"
+							 CancelText="Cancel" OnConfirm="HandleArchiveConfirm" OnCancel="HandleArchiveCancel" />

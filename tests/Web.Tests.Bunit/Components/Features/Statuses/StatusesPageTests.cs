@@ -27,6 +27,7 @@ public class StatusesPageTests : IDisposable
 	{
 		_ctx = new BunitContext();
 		_ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+		_ctx.AddAuthorization();
 		_mockStatusClient = Substitute.For<IStatusApiClient>();
 		_mockStatusClient.GetAllAsync(Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IEnumerable<StatusDto>>([]));

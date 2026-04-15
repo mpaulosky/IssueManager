@@ -23,6 +23,9 @@ public interface ICategoryApiClient
 
 	/// <summary>Updates an existing category.</summary>
 	Task<CategoryDto?> UpdateAsync(string id, UpdateCategoryCommand command, CancellationToken cancellationToken = default);
+
+	/// <summary>Archives a category.</summary>
+	Task<bool> ArchiveAsync(string id, CancellationToken cancellationToken = default);
 }
 
 /// <summary>Typed HTTP client for the Categories API.</summary>
@@ -68,6 +71,20 @@ public class CategoryApiClient : ICategoryApiClient
 		return response.IsSuccessStatusCode
 			? await response.Content.ReadFromJsonAsync<CategoryDto>(cancellationToken).ConfigureAwait(false)
 			: null;
+	}
+
+	/// <inheritdoc/>
+	public async Task<bool> ArchiveAsync(string id, CancellationToken cancellationToken = default)
+	{
+		try
+		{
+			var response = await _httpClient.DeleteAsync($"/api/v1/categories/{id}", cancellationToken).ConfigureAwait(false);
+			return response.IsSuccessStatusCode;
+		}
+		catch (HttpRequestException)
+		{
+			return false;
+		}
 	}
 
 }

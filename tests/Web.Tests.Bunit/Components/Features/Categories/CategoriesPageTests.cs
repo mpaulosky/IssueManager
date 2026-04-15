@@ -27,6 +27,7 @@ public class CategoriesPageTests : IDisposable
 	{
 		_ctx = new BunitContext();
 		_ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+		_ctx.AddAuthorization();
 		_mockCategoryClient = Substitute.For<ICategoryApiClient>();
 		_mockCategoryClient.GetAllAsync(Arg.Any<CancellationToken>())
 			.Returns(Task.FromResult<IEnumerable<CategoryDto>>([]));
