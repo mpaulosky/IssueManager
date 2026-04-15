@@ -23,7 +23,7 @@ public class DeleteCategoryHandlerIntegrationTests
 	{
 		fixture.ThrowIfUnavailable();
 		_repository = new CategoryRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
-		_handler = new DeleteCategoryHandler(_repository, new DeleteCategoryValidator());
+		_handler = new DeleteCategoryHandler(_repository);
 	}
 
 	private static CategoryDto CreateTestCategoryDto(string name, string description = "Test description", bool archived = false) =>

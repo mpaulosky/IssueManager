@@ -23,7 +23,7 @@ public class DeleteStatusHandlerIntegrationTests
 	{
 		fixture.ThrowIfUnavailable();
 		_repository = new StatusRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
-		_handler = new DeleteStatusHandler(_repository, new DeleteStatusValidator());
+		_handler = new DeleteStatusHandler(_repository);
 	}
 
 	private static StatusDto CreateTestStatusDto(string name, string description = "Test description", bool archived = false) =>
