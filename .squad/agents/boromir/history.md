@@ -414,3 +414,28 @@ DevOps on IssueManager (.NET 10, GitHub Actions, Aspire, NuGet centralized packa
 - Zero app code changes (workflow YAML only); all CI checks green
 - Merged via squash; commit 676d76a
 - Decision recorded in `.squad/decisions.md`
+
+### 2026-04-15: Removal of squad-heartbeat.yml Workflow (PR #145)
+
+**Task:** Remove the squad-heartbeat GitHub Actions workflow file from the repository.
+
+**Actions Taken:**
+1. **Staged Changes:** `git add -A` — prepared `.github/workflows/squad-heartbeat.yml` (deleted) for commit
+2. **Committed:** Message "Remove squad-heartbeat.yml workflow" with Copilot co-author trailer
+3. **Pushed:** Branch `copilot/push-changes-to-origin-main` to origin
+4. **Created PR:** PR #145 with title "Remove squad-heartbeat.yml workflow" and descriptive body
+5. **Merged:** PR #145 via `gh pr merge --merge` (squash merge to main)
+
+**Files Modified:**
+- `.github/workflows/squad-heartbeat.yml` — deleted (315 lines)
+
+**Commit:** 37e2f9c on branch `copilot/push-changes-to-origin-main`  
+**PR:** #145 (merged)
+
+**Outcome:** ✅ Workflow successfully removed from repository; PR merged to main
+
+## Learnings
+
+- **Workflow Lifecycle:** Removing unused workflows keeps the CI/CD pipeline clean and reduces maintenance burden
+- **Clean Deletion Pattern:** Staging deleted files, committing with clear messages, and creating focused PRs maintains audit trail and enables quick rollback if needed
+- **Boromir Role Clarity:** This task demonstrates Boromir's ownership over GitHub Actions workflow maintenance — adding, updating, or removing workflows is core DevOps responsibility
