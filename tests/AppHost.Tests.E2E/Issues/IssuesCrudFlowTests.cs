@@ -182,7 +182,7 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 			var searchSelector = "input[type='search'], input[placeholder*='search' i], input[aria-label*='search' i]";
 			var searchInput = page.Locator(searchSelector);
 
-			if (await searchInput.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 5000 }))
+			if (await searchInput.IsVisibleAsync())
 			{
 				// If filter UI exists, test it
 				await searchInput.FillAsync("test");
@@ -271,7 +271,7 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 			var archiveButtonSelector = "button:has-text('Archive'), button[aria-label*='archive' i], button[title*='archive' i]";
 			var archiveButton = page.Locator(archiveButtonSelector);
 
-			if (await archiveButton.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 5000 }))
+			if (await archiveButton.IsVisibleAsync())
 			{
 				// Archive button found - verify it's visible
 				(await archiveButton.First.IsVisibleAsync()).Should().BeTrue("archive button should be visible");

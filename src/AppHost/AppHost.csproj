@@ -1,10 +1,6 @@
-<Project Sdk="Aspire.AppHost.Sdk/13.1.2">
+<Project Sdk="Aspire.AppHost.Sdk/13.4.2">
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net10.0</TargetFramework>
-		<LangVersion>14.0</LangVersion>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>AppHost</RootNamespace>
 		<UserSecretsId>bbbd06b3-39ee-4f7b-a804-ed311d5e2aeb</UserSecretsId>
 	</PropertyGroup>
@@ -13,6 +9,9 @@
 		<PackageReference Include="Aspire.Hosting" />
 		<PackageReference Include="Aspire.Hosting.MongoDB" />
 		<PackageReference Include="Aspire.Hosting.Redis" />
+		<!-- Force non-vulnerable transitive dependency versions -->
+		<PackageReference Include="SharpCompress" />
+		<PackageReference Include="Snappier" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -134,13 +134,13 @@ public class AuthorNavigationTests(PlaywrightFixture fixture)
 			var adminLink = page.Locator("a[href='/admin']");
 			var sampleDataLink = page.Locator("a[href='/sample-data']");
 
-			(await categoriesLink.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 2000 }))
+			(await categoriesLink.IsVisibleAsync())
 				.Should().BeFalse("Author should NOT see Categories link");
-			(await statusesLink.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 2000 }))
+			(await statusesLink.IsVisibleAsync())
 				.Should().BeFalse("Author should NOT see Statuses link");
-			(await adminLink.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 2000 }))
+			(await adminLink.IsVisibleAsync())
 				.Should().BeFalse("Author should NOT see Admin link");
-			(await sampleDataLink.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 2000 }))
+			(await sampleDataLink.IsVisibleAsync())
 				.Should().BeFalse("Author should NOT see Sample Data link");
 		}
 		finally

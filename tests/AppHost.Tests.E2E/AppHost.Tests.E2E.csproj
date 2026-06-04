@@ -1,10 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
-		<LangVersion>14.0</LangVersion>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
 		<OutputType>Exe</OutputType>
@@ -20,6 +16,9 @@
 		<PackageReference Include="Coverlet.Collector" />
 		<PackageReference Include="Aspire.Hosting.Testing" />
 		<PackageReference Include="Microsoft.Playwright" />
+		<!-- Force non-vulnerable transitive dependency versions -->
+		<PackageReference Include="SharpCompress" />
+		<PackageReference Include="Snappier" />
 	</ItemGroup>
 
 	<ItemGroup>

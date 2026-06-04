@@ -1,11 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
-		<LangVersion>14.0</LangVersion>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>Api</RootNamespace>
-		<InvariantGlobalization>false</InvariantGlobalization>
 		<UserSecretsId>37795a0b-dd55-4ca7-a0ac-d5b6effd8208</UserSecretsId>
 	</PropertyGroup>
 
@@ -16,7 +11,7 @@
 		<PackageReference Include="MongoDB.Entities" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
 	</ItemGroup>
-	
+
 	<ItemGroup>
 		<ProjectCapability Include="CanEvaluateItemsWithTargetFramework" />
 	</ItemGroup>
@@ -27,6 +22,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Data\Interfaces\" />
+		<Folder Include="Data\Interfaces\" />
 	</ItemGroup>
 </Project>

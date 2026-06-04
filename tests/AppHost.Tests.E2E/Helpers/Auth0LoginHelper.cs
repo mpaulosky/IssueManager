@@ -118,7 +118,7 @@ public static class Auth0LoginHelper
 	{
 		// Look for the "Hello, username!" text or "Log out" link
 		var logoutLink = page.Locator("a[href='/auth/logout']");
-		return await logoutLink.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 5000 });
+		return await logoutLink.IsVisibleAsync();
 	}
 
 	/// <summary>
@@ -129,6 +129,6 @@ public static class Auth0LoginHelper
 	public static async Task<bool> IsLoginButtonVisibleAsync(IPage page)
 	{
 		var loginLink = page.Locator("a[href='/auth/login']");
-		return await loginLink.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 5000 });
+		return await loginLink.IsVisibleAsync();
 	}
 }

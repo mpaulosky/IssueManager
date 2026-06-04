@@ -90,7 +90,7 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 
 			// Assert
 			var newIssueLink = page.Locator("a[href='/issues/create']");
-			(await newIssueLink.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 2000 }))
+			(await newIssueLink.IsVisibleAsync())
 				.Should().BeFalse("Unauthenticated user should NOT see New Issue link");
 		}
 		finally
@@ -126,13 +126,13 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 			var adminLink = page.Locator("a[href='/admin']");
 			var sampleDataLink = page.Locator("a[href='/sample-data']");
 
-			(await categoriesLink.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 2000 }))
+			(await categoriesLink.IsVisibleAsync())
 				.Should().BeFalse("Unauthenticated user should NOT see Categories link");
-			(await statusesLink.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 2000 }))
+			(await statusesLink.IsVisibleAsync())
 				.Should().BeFalse("Unauthenticated user should NOT see Statuses link");
-			(await adminLink.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 2000 }))
+			(await adminLink.IsVisibleAsync())
 				.Should().BeFalse("Unauthenticated user should NOT see Admin link");
-			(await sampleDataLink.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 2000 }))
+			(await sampleDataLink.IsVisibleAsync())
 				.Should().BeFalse("Unauthenticated user should NOT see Sample Data link");
 		}
 		finally

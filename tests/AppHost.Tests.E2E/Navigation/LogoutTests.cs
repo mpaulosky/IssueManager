@@ -108,13 +108,13 @@ public class LogoutTests(PlaywrightFixture fixture)
 			var adminLink = page.Locator("a[href='/admin']");
 			var sampleDataLink = page.Locator("a[href='/sample-data']");
 
-			(await categoriesLink.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 2000 }))
+			(await categoriesLink.IsVisibleAsync())
 				.Should().BeFalse("Categories link should be hidden after logout");
-			(await statusesLink.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 2000 }))
+			(await statusesLink.IsVisibleAsync())
 				.Should().BeFalse("Statuses link should be hidden after logout");
-			(await adminLink.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 2000 }))
+			(await adminLink.IsVisibleAsync())
 				.Should().BeFalse("Admin link should be hidden after logout");
-			(await sampleDataLink.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 2000 }))
+			(await sampleDataLink.IsVisibleAsync())
 				.Should().BeFalse("Sample Data link should be hidden after logout");
 		}
 		finally
@@ -203,7 +203,7 @@ public class LogoutTests(PlaywrightFixture fixture)
 
 			// Assert
 			var newIssueLinkAfter = page.Locator("a[href='/issues/create']");
-			(await newIssueLinkAfter.IsVisibleAsync(new LocatorIsVisibleOptions { Timeout = 2000 }))
+			(await newIssueLinkAfter.IsVisibleAsync())
 				.Should().BeFalse("New Issue link should be hidden after logout");
 		}
 		finally
