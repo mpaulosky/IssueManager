@@ -3,12 +3,14 @@
 [![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![xUnit Tests](https://img.shields.io/badge/Tests-xUnit-blueviolet?logo=github)](https://github.com/mpaulosky/IssueManager/actions/workflows/squad-ci.yml)
+[![Latest Release](https://img.shields.io/github/v/release/mpaulosky/IssueManager?logo=github&color=blue&label=Release)](https://github.com/mpaulosky/IssueManager/releases/latest)
 
 [![CI/CD](https://github.com/mpaulosky/IssueManager/actions/workflows/squad-ci.yml/badge.svg)](https://github.com/mpaulosky/IssueManager/actions/workflows/squad-ci.yml)
 [![Test Suite](https://github.com/mpaulosky/IssueManager/actions/workflows/squad-test.yml/badge.svg)](https://github.com/mpaulosky/IssueManager/actions/workflows/squad-test.yml)
 
 [![CodeCov Coverage](https://codecov.io/gh/mpaulosky/IssueManager/branch/main/graph/badge.svg)](https://codecov.io/gh/mpaulosky/IssueManager)
 [![Coverage Trend](https://img.shields.io/badge/Coverage-Trend-blue?logo=codecov)](https://codecov.io/gh/mpaulosky/IssueManager/commits/main)
+[![Coverage Gate](https://img.shields.io/badge/Coverage%20Gate-≥80%25-brightgreen?logo=codecov)](https://github.com/mpaulosky/IssueManager/actions/workflows/squad-test.yml)
 
 [![Open Issues](https://img.shields.io/github/issues/mpaulosky/IssueManager?color=0366d6)](https://github.com/mpaulosky/IssueManager/issues?q=is%3Aopen+is%3Aissue)
 [![Closed Issues](https://img.shields.io/github/issues-closed/mpaulosky/IssueManager?color=6f42c1)](https://github.com/mpaulosky/IssueManager/issues?q=is%3Aclosed+is%3Aissue)
