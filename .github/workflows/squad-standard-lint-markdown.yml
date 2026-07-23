@@ -1,6 +1,7 @@
+---
 name: lint-markdown
 
-on:
+"on":
   pull_request:
     branches: [dev, main]
   workflow_dispatch:
@@ -9,16 +10,19 @@ jobs:
   lint-markdown:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v5
-        with:
-          node-version: "20"
-      - name: Run markdownlint
-        run: |
-          files=$(git ls-files '*.md')
-          if [ -z "$files" ]; then
-            echo "No markdown files found."
-            exit 0
-          fi
-          npx --yes markdownlint-cli $files
+      - uses: actions/checkout@v7
 
+      - name: Run markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v24
+        with:
+          globs: |
+            **/*.md
+            !**/node_modules/**
+            !**/bin/**
+            !**/obj/**
+            !.squad/**
+            !.copilot/**
+            !.github/agents/**
+            !.github/skills/**
+            !.github/copilot-instructions.md
+          config: ".markdownlint.json"
