@@ -1,6 +1,7 @@
+---
 name: lint-markdown
 
-on:
+"on":
   pull_request:
     branches: [dev, main]
   workflow_dispatch:
@@ -9,16 +10,41 @@ jobs:
   lint-markdown:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
       - uses: actions/setup-node@v5
         with:
           node-version: "20"
-      - name: Run markdownlint
+
+      - name: Collect changed markdown files
+        id: changed-md
+        shell: bash
         run: |
-          files=$(git ls-files '*.md')
-          if [ -z "$files" ]; then
-            echo "No markdown files found."
+          exclude_pattern='^(node_modules/|.*(/bin/|/obj/)|\.squad/|\.copilot/)'
+          exclude_pattern+="|\.github/agents/|\.github/skills/"
+          exclude_pattern+="|\.github/copilot-instructions\.md$"
+
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          mapfile -t files < <(
+            git diff --name-only \
+              "origin/${{ github.base_ref }}...HEAD" \
+              -- '*.md' \
+              | grep -Ev "$exclude_pattern"
+          )
+
+          if [[ ${#files[@]} -eq 0 ]]; then
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          npx --yes markdownlint-cli $files
 
+          printf '%s\n' "${files[@]}" > changed-markdown-files.txt
+          echo "has_files=true" >> "$GITHUB_OUTPUT"
+
+      - name: Run markdownlint
+        if: steps.changed-md.outputs.has_files == 'true'
+        shell: bash
+        run: |
+          mapfile -t files < changed-markdown-files.txt
+          npx --yes markdownlint-cli --config .markdownlint.json "${files[@]}"

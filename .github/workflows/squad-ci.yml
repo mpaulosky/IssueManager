@@ -1,20 +1,21 @@
+---
 name: Squad CI
 # Fast restore/build gate for feature branches and PRs into protected main.
 
-on:
+"on":
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened, ready_for_review]
     paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
-      - '.squad/**'
+      - "docs/**"
+      - "**/*.md"
+      - ".squad/**"
   push:
     branches-ignore: [main]
     paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
-      - '.squad/**'
+      - "docs/**"
+      - "**/*.md"
+      - ".squad/**"
 
 permissions:
   contents: read
@@ -37,9 +38,9 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
-          global-json-file: Global.json
+          global-json-file: global.json
 
       - name: Discover solution file
         run: |
@@ -49,7 +50,8 @@ jobs:
             echo "::error::No *.slnx file found at the repository root."
             exit 1
           elif [[ $count -gt 1 ]]; then
-            echo "::error::Multiple *.slnx files found at the repository root: ${matches[*]}"
+            echo "::error::Multiple *.slnx files found"
+            echo "::error::${matches[*]}"
             exit 1
           fi
           echo "SOLUTION_FILE=${matches[0]}" >> "$GITHUB_ENV"
