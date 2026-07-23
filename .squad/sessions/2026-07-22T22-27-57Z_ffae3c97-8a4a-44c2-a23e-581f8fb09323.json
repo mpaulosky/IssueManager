@@ -1,0 +1,13 @@
+{
+  "id": "ffae3c97-8a4a-44c2-a23e-581f8fb09323",
+  "createdAt": "2026-07-22T22:27:44.216Z",
+  "lastActiveAt": "2026-07-22T22:29:54.115Z",
+  "messages": [
+    {
+      "role": "agent",
+      "agentName": "coordinator",
+      "content": "**Version:** GPT-5.4 mini (`gpt-5.4-mini`)",
+      "timestamp": "2026-07-22T22:27:57.926Z"
+    }
+  ]
+}
