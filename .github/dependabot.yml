@@ -6,10 +6,11 @@
 
 version: 2
 updates:
-  
+
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
       day: "sunday"
@@ -22,11 +23,13 @@ updates:
       - "mpaulosky"
     groups:
       all-actions:
-        patterns: [ "*" ]
+        patterns:
+          - "*"
 
   # Maintain dependencies for nuget
   - package-ecosystem: "nuget"
     directory: "/nuget/helpers/lib/NuGetUpdater"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
       day: "sunday"
@@ -39,11 +42,13 @@ updates:
       - "mpaulosky"
     groups:
       all-actions:
-        patterns: [ "*" ]
+        patterns:
+          - "*"
 
-  #Maintain DotNet Sdk
+  # Maintain DotNet Sdk
   - package-ecosystem: "dotnet-sdk"
     directory: "/nuget/helpers/lib/NuGetUpdater"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
       day: "sunday"
@@ -56,4 +61,5 @@ updates:
       - "mpaulosky"
     groups:
       all-actions:
-        patterns: [ "*" ]
+        patterns:
+          - "*"
