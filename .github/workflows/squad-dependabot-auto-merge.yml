@@ -40,6 +40,10 @@ jobs:
                 core.info(`Auto-merge already enabled for PR #${pullNumber}.`);
                 return;
               }
+              if (message.includes("unstable")) {
+                core.warning(`PR #${pullNumber} is in unstable status; auto-merge was not enabled. It will be retried on the next synchronize event.`);
+                return;
+              }
               throw error;
             }
 
