@@ -1,3 +1,4 @@
+---
 name: Dependabot Auto-Merge
 
 on:
@@ -46,4 +47,3 @@ jobs:
               }
               throw error;
             }
-
