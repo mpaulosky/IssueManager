@@ -1,10 +1,11 @@
 ---
+# yamllint disable rule:line-length
 name: Dependabot Auto-Merge
 
-on:
+"on":
   pull_request_target:
     types: [opened, reopened, synchronize, ready_for_review]
-    branches: [dev]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -25,7 +26,7 @@ jobs:
           script: |
             const pullRequestId = context.payload.pull_request.node_id;
             const pullNumber = context.payload.pull_request.number;
-            const enableAutoMerge = async () => {
+            try {
               await github.graphql(
                 `mutation EnableAutoMerge($pullRequestId: ID!) {
                    enablePullRequestAutoMerge(input: { pullRequestId: $pullRequestId, mergeMethod: SQUASH }) {
@@ -34,33 +35,12 @@ jobs:
                  }`,
                 { pullRequestId }
               );
-            };
-
-            const maxAttempts = 6;
-            const retryDelayMs = 10000;
-
-            for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-              try {
-                await enableAutoMerge();
-                core.info(`Enabled auto-merge for PR #${pullNumber}.`);
+              core.info(`Enabled auto-merge for PR #${pullNumber}.`);
+            } catch (error) {
+              const message = error.message ?? String(error);
+              if (message.includes("already enabled")) {
+                core.info(`Auto-merge already enabled for PR #${pullNumber}.`);
                 return;
-              } catch (error) {
-                const message = error.message ?? String(error);
-                if (message.includes("already enabled")) {
-                  core.info(`Auto-merge already enabled for PR #${pullNumber}.`);
-                  return;
-                }
-                if (message.includes("unstable")) {
-                  if (attempt === maxAttempts) {
-                    core.warning(`PR #${pullNumber} remained in unstable status after ${maxAttempts} attempts; skipping auto-merge enablement for this run.`);
-                    return;
-                  }
-
-                  core.info(`PR #${pullNumber} is in unstable status. Retrying auto-merge enablement (${attempt}/${maxAttempts})...`);
-                  await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
-                  continue;
-                }
-
-                throw error;
               }
+              throw error;
             }

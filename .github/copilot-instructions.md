@@ -1,46 +1,73 @@
-# Copilot Coding Agent — Squad Instructions
+# Articles Copilot Instructions
 
-You are working on a project that uses **Squad**, an AI team framework. When picking up issues autonomously, follow these guidelines.
+## Project context
 
-## Team Context
+- This repository is a .NET 10 application and workflow-standard distribution repository.
+- Treat repository configuration as authoritative. Check `Directory.Build.props`, `global.json`, `Directory.Packages.props`, and the relevant project file before making framework or package assumptions.
+- The main implementation is under `src/`; tests are under `tests/`; repository automation and agent guidance are under `.github/`.
+- Review `ARCHITECTURE.md` and the relevant documentation under `docs/` when a change crosses project or policy boundaries.
 
-Before starting work on any issue:
+## Working agreements
 
-1. Read `.squad/team.md` for the team roster, member roles, and your capability profile.
-2. Read `.squad/routing.md` for work routing rules.
-3. If the issue has a `squad:{member}` label, read that member's charter at `.squad/agents/{member}/charter.md` to understand their domain expertise and coding style — work in their voice.
+- Start from the smallest concrete code path that owns the requested behavior.
+- Keep changes focused. Preserve existing user changes and do not reset, clean, checkout, amend, or overwrite unrelated work.
+- Inspect `git status --short` and the relevant staged and unstaged diffs before editing when the worktree may be dirty.
+- Do not commit, push, or change repository history unless the user explicitly asks.
+- Never add secrets, credentials, connection strings, or tokens to source, configuration, tests, or documentation. Use configuration and environment variables instead.
+- Flag user input that is used without validation or sanitization.
+- Prefer existing abstractions, project patterns, and shared configuration over new infrastructure.
+- Keep public APIs and class members documented with XML `/// <summary>` comments.
 
-## Capability Self-Check
+## .NET and C#
 
-Before starting work, check your capability profile in `.squad/team.md` under the **Coding Agent → Capabilities** section.
+- Target .NET 10 and use the repository's configured latest C# language version.
+- Nullable reference types, analyzers, code style enforcement, and warnings-as-errors are enabled by `Directory.Build.props`.
+- Use central package management through `Directory.Packages.props`; make the smallest justified package change.
+- Follow the repository `.editorconfig`, including tabs for C# and Razor files and two-space Markdown indentation.
+- Avoid empty catch blocks and `Thread.Sleep` in production code.
+- Keep exception handling explicit: log meaningful context and rethrow or handle the error deliberately.
 
-- **🟢 Good fit** — proceed autonomously.
-- **🟡 Needs review** — proceed, but note in the PR description that a squad member should review.
-- **🔴 Not suitable** — do NOT start work. Instead, comment on the issue:
+## Blazor and UI
+
+- Follow the Blazor-specific guidance in `.github/instructions/blazor.instructions.md` for Razor components, code-behind, and component CSS.
+- Use Tailwind CSS v4 and the existing CSS-first styles under `src/Web/Styles/` for UI changes.
+- Reuse existing components, tokens, and accessibility patterns before introducing new UI primitives.
+- Keep user-facing states complete, including loading, empty, validation, error, and authorization states where applicable.
+
+## Data and backend
+
+- Follow the existing domain, CQRS, repository, and dependency-injection boundaries instead of bypassing them from UI code.
+- Keep MongoDB access behind the established infrastructure abstractions and compose filters with typed driver APIs.
+- Treat schema or persistence changes as compatibility-sensitive; include focused tests and document migration or rollout implications.
+
+## Testing and validation
+
+- Use xUnit v3 with FluentAssertions and NSubstitute where appropriate, following nearby test conventions.
+- Use TDD for new behavior and bug fixes when practical. Test methods should retain the repository's `// Arrange`, `// Act`, and `// Assert` markers.
+- Follow the repository's lint rules for test method naming and organization.
+- Never change the object under test code to make a test pass. Instead, fix the implementation or the test to reflect the intended behavior.
+- Run the narrowest relevant test or validation command during iteration. Typical commands are:
+
+  ```bash
+  dotnet test Articles.slnx
+  dotnet build Articles.slnx --configuration Release
+  npx --yes markdownlint-cli2 "**/*.md"
   ```
-  🤖 This issue doesn't match my capability profile (reason: {why}). Suggesting reassignment to a squad member.
-  ```
 
-## Branch Naming
+- For a focused .NET test, use `dotnet test --filter FullyQualifiedName~{Namespace}.{ClassName}.{MethodName}` or filter to the test class.
+- Before a push or PR-ready handoff, run the repository's full required validation. The local pre-push hook also checks branch naming, changed YAML/Markdown files, and every `.slnx` solution it discovers.
+- Report exactly which validation commands ran and whether they passed. Do not claim tests or builds that were not run.
 
-Use the squad branch convention:
-```
-squad/{issue-number}-{kebab-case-slug}
-```
-Example: `squad/42-fix-login-validation`
+## Documentation and automation
 
-## PR Guidelines
+- Use the Markdown guidance in `.github/instructions/markdown.instructions.md` for documentation changes.
+- Keep workflow YAML compatible with the repository's lint rules and preserve existing security permissions and triggers unless the task requires a change.
+- Update documentation when behavior, setup, validation, or public workflow changes.
+- Do not modify generated release-review sections manually unless the task specifically concerns that generator output.
 
-When opening a PR:
-- Reference the issue: `Closes #{issue-number}`
-- If the issue had a `squad:{member}` label, mention the member: `Working as {member} ({role})`
-- If this is a 🟡 needs-review task, add to the PR description: `⚠️ This task was flagged as "needs review" — please have a squad member review before merging.`
-- Follow any project conventions in `.squad/decisions.md`
+## Response expectations
 
-## Decisions
-
-If you make a decision that affects other team members, write it to:
-```
-.squad/decisions/inbox/copilot-{brief-slug}.md
-```
-The Scribe will merge it into the shared decisions file.
+- Lead implementation responses with a one-sentence decision rationale.
+- Summarize the files changed, behavior changed, and validation performed.
+- Mention relevant limitations, failed checks, or remaining risks plainly.
+- If the requested scope is ambiguous or a change could affect unrelated user work, ask before staging or committing.
