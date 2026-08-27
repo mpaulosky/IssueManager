@@ -15,7 +15,7 @@
 		<PackageReference Include="bunit" />
 		<PackageReference Include="FluentAssertions" />
 		<PackageReference Include="NSubstitute" />
-		<PackageReference Include="Coverlet.Collector" />
+		<PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
 	</ItemGroup>
 
 	<ItemGroup>

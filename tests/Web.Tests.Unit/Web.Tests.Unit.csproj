@@ -12,7 +12,7 @@
 		<PackageReference Include="Microsoft.NET.Test.Sdk" />
 		<PackageReference Include="FluentAssertions" />
 		<PackageReference Include="NSubstitute" />
-		<PackageReference Include="Coverlet.Collector" />
+		<PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
 	</ItemGroup>
 
 	<ItemGroup>
