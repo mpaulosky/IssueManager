@@ -16,11 +16,12 @@ Prompts for autonomous project planning and implementation with GitHub Copilot, 
 
 ## How It Works
 
-Structured Autonomy is a three-phase workflow designed to maximize the value you get from AI-assisted development while keeping premium requests low. The system follows a simple principle: **use premium models sparingly for thinking, use cheap models liberally for doing**.
+Structured Autonomy is a three-phase workflow designed to maximize the value you get from AI-assisted development while keeping premium requests low.
+The system follows a simple principle: **use premium models sparingly for thinking, use cheap models liberally for doing**.
 
 ### The Workflow
 
-```
+```text
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │    sa-plan      │ ──▶ │   sa-generate   │ ──▶ │   sa-implement  │
 │  (1 request)    │     │   (1 request)   │     │  (many requests)│
@@ -30,20 +31,20 @@ Structured Autonomy is a three-phase workflow designed to maximize the value you
 
 **Phase 1: Plan** — You describe what you want to build. The planning agent researches your codebase, reads documentation, and breaks your feature into logical commits. Output: `plans/{feature-name}/plan.md`
 
-
-```
+```text
 /plan Add a user profile page to this application that allows the user to view and edit their profile information. 
 ```
 
-**Phase 2: Generate** — The generator takes your plan and produces complete, copy-paste ready implementation instructions with full code blocks. No placeholders, no TODOs—just working code based on your actual codebase patterns. Output: `plans/{feature-name}/implementation.md`
+**Phase 2: Generate** — The generator takes your plan and produces complete, copy-paste ready implementation instructions with full code blocks.
+No placeholders, no TODOs—just working code based on your actual codebase patterns. Output: `plans/{feature-name}/implementation.md`
 
-```
+```text
 /generate #plan.md
 ```
 
 **Phase 3: Implement** — The implementation agent follows the generated instructions step-by-step, checking off items as it goes and stopping at defined commit boundaries for you to verify and commit.
 
-```
+```text
 /implement #implementation.md
 ```
 
@@ -59,12 +60,14 @@ Each workflow operates on a single feature branch targeting a single pull reques
 
 ### Why This Approach Works
 
-**Cost Efficiency** — Premium models (Claude Opus, GPT-5.1-Codex) are expensive but excel at reasoning and planning. You use them exactly twice: once to understand your request and once to generate the implementation. The actual coding work uses free models that can iterate as many times as needed.
+**Cost Efficiency** — Premium models (Claude Opus, GPT-5.1-Codex) are expensive but excel at reasoning and planning.
+You use them exactly twice: once to understand your request and once to generate the implementation. The actual coding work uses free models that can iterate as many times as needed.
 
-**Better Code Quality** — Because the planning phase researches your codebase first, the generated code follows your existing patterns, naming conventions, and architecture. You're not fighting against AI suggestions that don't fit your project.
+**Better Code Quality** — Because the planning phase researches your codebase first, the generated code follows your existing patterns, naming conventions, and architecture.
+You're not fighting against AI suggestions that don't fit your project.
 
-**Developer Engagement** — The step-by-step implementation with manual commit points keeps you in the loop. You're reviewing and testing real changes at each step, not staring at a massive diff at the end wondering what happened.
+**Developer Engagement** — The step-by-step implementation with manual commit points keeps you in the loop.
+You're reviewing and testing real changes at each step, not staring at a massive diff at the end wondering what happened.
 
-**Familiar Workflow** — This isn't a new way of working—it's your existing git workflow with AI assistance. Feature branches, incremental commits, PR reviews. The AI handles the tedious parts while you stay in control of the process.
-
-
+**Familiar Workflow** — This isn't a new way of working—it's your existing git workflow with AI assistance.
+Feature branches, incremental commits, PR reviews. The AI handles the tedious parts while you stay in control of the process.

@@ -14,7 +14,7 @@
 		<PackageReference Include="FluentAssertions" />
 		<PackageReference Include="FluentValidation" />
 		<PackageReference Include="NSubstitute" />
-		<PackageReference Include="Coverlet.Collector" />
+		<PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
 	</ItemGroup>
 

@@ -16,7 +16,8 @@
 		<PackageReference Include="Testcontainers" />
 		<PackageReference Include="Testcontainers.MongoDB" />
 		<PackageReference Include="MongoDB.Driver" />
-		<PackageReference Include="Coverlet.Collector" />
+		<PackageReference Include="SSH.NET" />
+		<PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
 	</ItemGroup>
 
 	<ItemGroup>

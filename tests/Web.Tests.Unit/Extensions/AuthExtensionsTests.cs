@@ -22,7 +22,11 @@ public class AuthExtensionsTests
 	{
 		// Arrange
 		var builder = WebApplication.CreateBuilder();
-		// No Auth0: Domain or Auth0: ClientId configured
+		// No Auth0: Domain or Auth0: ClientId configured.
+		// Clear any ambient Auth0__* environment variables (e.g. from CI secrets)
+		// so this test reflects an unconfigured environment.
+		builder.Configuration["Auth0:Domain"] = null;
+		builder.Configuration["Auth0:ClientId"] = null;
 
 		// Act
 		var result = builder.AddAuth0();

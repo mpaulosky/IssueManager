@@ -1,7 +1,8 @@
 ---
+# yamllint disable rule:line-length
 name: Squad PR Auto-Label
 
-on:
+"on":
   pull_request_target:
     types: [opened, reopened, synchronize]
 
@@ -30,7 +31,7 @@ jobs:
             const labelNames = currentLabels.map(l => l.name);
 
             // Check if already has squad labels
-            const hasSquadLabel = labelNames.some(name => 
+            const hasSquadLabel = labelNames.some(name =>
               name === 'squad' || name.startsWith('squad:')
             );
 
