@@ -40,11 +40,12 @@ public class ListIssuesHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Items.Should().HaveCount(20);
-		result.Page.Should().Be(1);
-		result.PageSize.Should().Be(20);
-		result.Total.Should().Be(42);
-		result.TotalPages.Should().Be(3); // 42 / 20 = 2.1 → 3 pages
+		result.Success.Should().BeTrue();
+		result.Value!.Items.Should().HaveCount(20);
+		result.Value!.Page.Should().Be(1);
+		result.Value!.PageSize.Should().Be(20);
+		result.Value!.Total.Should().Be(42);
+		result.Value!.TotalPages.Should().Be(3); // 42 / 20 = 2.1 → 3 pages
 	}
 
 	[Fact]
@@ -61,11 +62,11 @@ public class ListIssuesHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Items.Should().HaveCount(10);
-		result.Page.Should().Be(2);
-		result.PageSize.Should().Be(10);
-		result.Total.Should().Be(42);
-		result.TotalPages.Should().Be(5); // 42 / 10 = 4.2 → 5 pages
+		result.Value!.Items.Should().HaveCount(10);
+		result.Value!.Page.Should().Be(2);
+		result.Value!.PageSize.Should().Be(10);
+		result.Value!.Total.Should().Be(42);
+		result.Value!.TotalPages.Should().Be(5); // 42 / 10 = 4.2 → 5 pages
 	}
 
 	[Fact]
@@ -82,11 +83,11 @@ public class ListIssuesHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Items.Should().HaveCount(2);
-		result.Page.Should().Be(3);
-		result.PageSize.Should().Be(20);
-		result.Total.Should().Be(42);
-		result.TotalPages.Should().Be(3);
+		result.Value!.Items.Should().HaveCount(2);
+		result.Value!.Page.Should().Be(3);
+		result.Value!.PageSize.Should().Be(20);
+		result.Value!.Total.Should().Be(42);
+		result.Value!.TotalPages.Should().Be(3);
 	}
 
 	[Fact]
@@ -102,11 +103,11 @@ public class ListIssuesHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Items.Should().BeEmpty();
-		result.Page.Should().Be(1);
-		result.PageSize.Should().Be(20);
-		result.Total.Should().Be(0);
-		result.TotalPages.Should().Be(0);
+		result.Value!.Items.Should().BeEmpty();
+		result.Value!.Page.Should().Be(1);
+		result.Value!.PageSize.Should().Be(20);
+		result.Value!.Total.Should().Be(0);
+		result.Value!.TotalPages.Should().Be(0);
 	}
 
 	[Fact]
@@ -122,51 +123,54 @@ public class ListIssuesHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Items.Should().BeEmpty();
-		result.Page.Should().Be(10);
-		result.TotalPages.Should().Be(3);
+		result.Value!.Items.Should().BeEmpty();
+		result.Value!.Page.Should().Be(10);
+		result.Value!.TotalPages.Should().Be(3);
 	}
 
 	[Fact]
-	public async Task Handle_InvalidPage_ThrowsValidationException()
+	public async Task Handle_InvalidPage_ReturnsValidationFailure()
 	{
 		// Arrange
 		var query = new ListIssuesQuery { Page = 0, PageSize = 20 };
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-		.WithMessage("*Page*greater than or equal to 1*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
+		result.Error.Should().Contain("Page").And.Contain("greater than or equal to 1");
 	}
 
 	[Fact]
-	public async Task Handle_InvalidPageSize_ThrowsValidationException()
+	public async Task Handle_InvalidPageSize_ReturnsValidationFailure()
 	{
 		// Arrange
 		var query = new ListIssuesQuery { Page = 1, PageSize = 0 };
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-		.WithMessage("*Page size*between 1 and 100*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
+		result.Error.Should().Contain("Page size").And.Contain("between 1 and 100");
 	}
 
 	[Fact]
-	public async Task Handle_PageSizeExceedsMax_ThrowsValidationException()
+	public async Task Handle_PageSizeExceedsMax_ReturnsValidationFailure()
 	{
 		// Arrange
 		var query = new ListIssuesQuery { Page = 1, PageSize = 101 };
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(query, CancellationToken.None);
+		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-		.WithMessage("*Page size*between 1 and 100*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
+		result.Error.Should().Contain("Page size").And.Contain("between 1 and 100");
 	}
 
 	[Fact]
@@ -184,7 +188,7 @@ public class ListIssuesHandlerTests
 
 		// Assert
 		await _repository.Received(1).GetAllAsync(1, 20, null, null, null, null, Arg.Any<CancellationToken>());
-		result.Items.Should().HaveCount(10);
+		result.Value!.Items.Should().HaveCount(10);
 	}
 
 	[Fact]
@@ -208,10 +212,10 @@ public class ListIssuesHandlerTests
 		var result = await _handler.Handle(query, CancellationToken.None);
 
 		// Assert
-		result.Items.Should().HaveCount(3);
-		result.Items[0].Title.Should().Be("Issue 3"); // Newest first
-		result.Items[1].Title.Should().Be("Issue 2");
-		result.Items[2].Title.Should().Be("Issue 1"); // Oldest last
+		result.Value!.Items.Should().HaveCount(3);
+		result.Value!.Items[0].Title.Should().Be("Issue 3"); // Newest first
+		result.Value!.Items[1].Title.Should().Be("Issue 2");
+		result.Value!.Items[2].Title.Should().Be("Issue 1"); // Oldest last
 	}
 
 	private static List<IssueDto> GenerateIssueDtos(int count)

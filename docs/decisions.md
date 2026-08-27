@@ -142,3 +142,23 @@ applied to other repositories still running squad. The full squad-era decision l
 session trail are not lost — they remain available in git history if ever needed;
 this document instead carries forward only the durable architectural decisions worth
 keeping in front of future work.
+
+### 2026-08-27: Result\<T\> is always returned, never bypassed by throwing, and maps to HTTP through one place
+
+The existing rule that all API handlers return `Task<Result<T>>` (see the 2026-03-03
+entry) is absolute: a handler must never throw for an expected failure case (validation,
+not-found, conflict). `ResultExtensions.ToHttpResult()` in `src/Api/Extensions/` is the
+single place that maps a `Result`/`Result<T>` outcome to an HTTP response, and every
+route in every `*Endpoints.cs` file uses it rather than hand-rolling its own
+`result.Success ? ... : ...` branch. The canonical `ResultErrorCode` → status mapping is:
+`NotFound` → 404, `Validation` → 400, `Conflict` → 409, `Concurrency` → 409 (the
+optimistic-concurrency version detail travels in `Result.Details` for callers that want
+it, rather than warranting a distinct status code like 412). A failed `Result` carrying
+`ResultErrorCode.None` is a contract violation, not a client error — `ToHttpResult()`
+throws rather than silently returning 400, so a handler that forgets to set a real error
+code fails loudly instead of shipping a wrong status code. FluentValidation failures are
+collapsed to a single message string (matching every other handler's `Result.Error`
+shape) rather than preserved as structured per-field errors. List endpoints that have no
+validatable input (Categories, Statuses, Comments) are not wrapped in `Result<T>` just
+for uniformity; only `ListIssuesHandler` needs it, because it's the only one with
+parameters that can actually fail validation.

@@ -31,11 +31,11 @@ public static class StatusEndpoints
 
 		group.MapGet("{id}", async (string id, GetStatusHandler handler) =>
 		{
-			if (!ObjectId.TryParse(id, out var objectId))
-				return Results.BadRequest("Invalid ID format");
+			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
+				return badRequest;
 			var query = new GetStatusQuery(objectId);
 			var result = await handler.Handle(query);
-			return result.Success ? Results.Ok(result.Value) : Results.NotFound();
+			return result.ToHttpResult(Results.Ok);
 		})
 		.WithName("GetStatus")
 		.WithSummary("Get a status by ID")
@@ -44,8 +44,8 @@ public static class StatusEndpoints
 
 		group.MapPost("", async (CreateStatusCommand command, CreateStatusHandler handler) =>
 		{
-			var status = await handler.Handle(command);
-			return Results.Created($"/api/v1/statuses/{status.Id}", status);
+			var result = await handler.Handle(command);
+			return result.ToHttpResult(value => Results.Created($"/api/v1/statuses/{value.Id}", value));
 		})
 		.WithName("CreateStatus")
 		.WithSummary("Create a new status")
@@ -55,13 +55,11 @@ public static class StatusEndpoints
 
 		group.MapPatch("{id}", async (string id, UpdateStatusCommand command, UpdateStatusHandler handler) =>
 		{
-			if (!ObjectId.TryParse(id, out var objectId))
-				return Results.BadRequest("Invalid ID format");
+			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
+				return badRequest;
 			var commandWithId = command with { Id = objectId };
 			var result = await handler.Handle(commandWithId);
-			if (!result.Success)
-				return result.ErrorCode == ResultErrorCode.NotFound ? Results.NotFound() : Results.BadRequest(result.Error);
-			return Results.Ok(result.Value);
+			return result.ToHttpResult(Results.Ok);
 		})
 		.WithName("UpdateStatus")
 		.WithSummary("Update an existing status")
@@ -72,11 +70,11 @@ public static class StatusEndpoints
 
 		group.MapDelete("{id}", async (string id, DeleteStatusHandler handler) =>
 		{
-			if (!ObjectId.TryParse(id, out var objectId))
-				return Results.BadRequest("Invalid ID format");
+			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
+				return badRequest;
 			var command = new DeleteStatusCommand { Id = objectId };
 			var result = await handler.Handle(command);
-			return result.Success ? Results.NoContent() : Results.NotFound();
+			return result.ToHttpResult(_ => Results.NoContent());
 		})
 		.WithName("DeleteStatus")
 		.WithSummary("Delete (archive) a status")

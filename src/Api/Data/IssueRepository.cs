@@ -34,7 +34,7 @@ public class IssueRepository : IIssueRepository
 
 		var update = Builders<Issue>.Update.Set(x => x.Archived, true);
 		var result = await _collection.UpdateOneAsync(x => x.Id == issueId, update, cancellationToken: cancellationToken);
-		return result.ModifiedCount > 0 ? Result.Ok() : Result.Fail("Issue not found or already archived.");
+		return result.ModifiedCount > 0 ? Result.Ok() : Result.Fail("Issue not found or already archived.", ResultErrorCode.NotFound);
 	}
 
 	/// <inheritdoc />
@@ -56,7 +56,7 @@ public class IssueRepository : IIssueRepository
 
 		var entity = await _collection.Find(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
 
-		return entity is not null ? Result.Ok(entity.ToDto()) : Result.Fail<IssueDto>("Issue not found.");
+		return entity is not null ? Result.Ok(entity.ToDto()) : Result.Fail<IssueDto>("Issue not found.", ResultErrorCode.NotFound);
 	}
 
 	/// <inheritdoc />
@@ -132,7 +132,7 @@ public class IssueRepository : IIssueRepository
 				cancellationToken: cancellationToken);
 
 		return result.ModifiedCount > 0 ? Result.Ok(model.ToDto()) :
-				Result.Fail<IssueDto>("Issue not found or update failed.");
+				Result.Fail<IssueDto>("Issue not found or update failed.", ResultErrorCode.NotFound);
 	}
 
 	/// <inheritdoc />

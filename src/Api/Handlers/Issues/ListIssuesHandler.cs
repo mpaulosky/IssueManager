@@ -29,15 +29,15 @@ public class ListIssuesHandler
 	/// <summary>
 	/// Handles the retrieval of a paginated list of issues.
 	/// </summary>
-	public async Task<PaginatedResponse<IssueDto>> Handle(ListIssuesQuery query, CancellationToken cancellationToken = default)
+	public async Task<Result<PaginatedResponse<IssueDto>>> Handle(ListIssuesQuery query, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(query, cancellationToken);
 		if (!validationResult.IsValid)
-			throw new ValidationException(validationResult.Errors);
+			return Result.Fail<PaginatedResponse<IssueDto>>("Validation failed: " + string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)), ResultErrorCode.Validation);
 
 		var result = await _repository.GetAllAsync(query.Page, query.PageSize, query.SearchTerm, query.AuthorName, query.StatusName, query.CategoryName, cancellationToken);
 		var (items, total) = result.Value;
 
-		return new PaginatedResponse<IssueDto>(items, total, query.Page, query.PageSize);
+		return Result.Ok(new PaginatedResponse<IssueDto>(items, total, query.Page, query.PageSize));
 	}
 }

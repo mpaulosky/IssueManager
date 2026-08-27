@@ -31,11 +31,11 @@ public static class CommentEndpoints
 
 		group.MapGet("{id}", async (string id, GetCommentHandler handler) =>
 		{
-			if (!ObjectId.TryParse(id, out var objectId))
-				return Results.BadRequest("Invalid ID format");
+			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
+				return badRequest;
 			var query = new GetCommentQuery(objectId);
 			var result = await handler.Handle(query);
-			return result.Success ? Results.Ok(result.Value) : Results.NotFound();
+			return result.ToHttpResult(Results.Ok);
 		})
 		.WithName("GetComment")
 		.WithSummary("Get a comment by ID")
@@ -44,8 +44,8 @@ public static class CommentEndpoints
 
 		group.MapPost("", async (CreateCommentCommand command, CreateCommentHandler handler) =>
 		{
-			var comment = await handler.Handle(command);
-			return Results.Created($"/api/v1/comments/{comment.Id}", comment);
+			var result = await handler.Handle(command);
+			return result.ToHttpResult(value => Results.Created($"/api/v1/comments/{value.Id}", value));
 		})
 		.WithName("CreateComment")
 		.WithSummary("Create a new comment")
@@ -55,13 +55,11 @@ public static class CommentEndpoints
 
 		group.MapPatch("{id}", async (string id, UpdateCommentCommand command, UpdateCommentHandler handler) =>
 		{
-			if (!ObjectId.TryParse(id, out var objectId))
-				return Results.BadRequest("Invalid ID format");
+			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
+				return badRequest;
 			var commandWithId = command with { Id = objectId };
 			var result = await handler.Handle(commandWithId);
-			if (!result.Success)
-				return result.ErrorCode == ResultErrorCode.NotFound ? Results.NotFound() : Results.BadRequest(result.Error);
-			return Results.Ok(result.Value);
+			return result.ToHttpResult(Results.Ok);
 		})
 		.WithName("UpdateComment")
 		.WithSummary("Update an existing comment")
@@ -72,11 +70,11 @@ public static class CommentEndpoints
 
 		group.MapDelete("{id}", async (string id, DeleteCommentHandler handler) =>
 		{
-			if (!ObjectId.TryParse(id, out var objectId))
-				return Results.BadRequest("Invalid ID format");
+			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
+				return badRequest;
 			var command = new DeleteCommentCommand { Id = objectId };
 			var result = await handler.Handle(command);
-			return result.Success ? Results.NoContent() : Results.NotFound();
+			return result.ToHttpResult(_ => Results.NoContent());
 		})
 		.WithName("DeleteComment")
 		.WithSummary("Delete (archive) a comment")

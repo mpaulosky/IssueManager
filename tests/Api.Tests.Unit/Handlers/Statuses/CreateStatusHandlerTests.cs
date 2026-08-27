@@ -45,16 +45,16 @@ public class CreateStatusHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.StatusName.Should().Be(command.StatusName);
-		result.StatusDescription.Should().Be(command.StatusDescription);
+		result.Success.Should().BeTrue();
+		result.Value!.StatusName.Should().Be(command.StatusName);
+		result.Value!.StatusDescription.Should().Be(command.StatusDescription);
 		await _repository.Received(1).CreateAsync(Arg.Is<StatusDto>(s =>
 			s.StatusName == command.StatusName &&
 			s.StatusDescription == command.StatusDescription), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_EmptyStatusName_ThrowsValidationException()
+	public async Task Handle_EmptyStatusName_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateStatusCommand
@@ -64,15 +64,16 @@ public class CreateStatusHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Status name*required*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
+		result.Error.Should().Contain("Status name").And.Contain("required");
 	}
 
 	[Fact]
-	public async Task Handle_StatusNameTooShort_ThrowsValidationException()
+	public async Task Handle_StatusNameTooShort_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateStatusCommand
@@ -82,15 +83,16 @@ public class CreateStatusHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Status name*at least 2 characters*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
+		result.Error.Should().Contain("Status name").And.Contain("at least 2 characters");
 	}
 
 	[Fact]
-	public async Task Handle_StatusNameTooLong_ThrowsValidationException()
+	public async Task Handle_StatusNameTooLong_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateStatusCommand
@@ -100,15 +102,16 @@ public class CreateStatusHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Status name*100 characters*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
+		result.Error.Should().Contain("Status name").And.Contain("100 characters");
 	}
 
 	[Fact]
-	public async Task Handle_StatusDescriptionTooLong_ThrowsValidationException()
+	public async Task Handle_StatusDescriptionTooLong_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateStatusCommand
@@ -118,11 +121,12 @@ public class CreateStatusHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Status description*500 characters*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
+		result.Error.Should().Contain("Status description").And.Contain("500 characters");
 	}
 
 	[Fact]
@@ -142,11 +146,11 @@ public class CreateStatusHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.StatusDescription.Should().BeEmpty();
+		result.Value!.StatusDescription.Should().BeEmpty();
 	}
 
 	[Fact]
-	public async Task Handle_RepositoryFails_ThrowsInvalidOperationException()
+	public async Task Handle_RepositoryFails_ReturnsFailureResult()
 	{
 		// Arrange
 		var command = new CreateStatusCommand
@@ -159,10 +163,10 @@ public class CreateStatusHandlerTests
 			.Returns(Result.Fail<StatusDto>("Database error"));
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<InvalidOperationException>()
-			.WithMessage("Database error");
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Database error");
 	}
 }

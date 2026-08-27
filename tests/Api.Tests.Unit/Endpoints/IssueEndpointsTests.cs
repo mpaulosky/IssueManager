@@ -50,6 +50,16 @@ public class IssueEndpointsTests : IDisposable
 	}
 
 	[Fact]
+	public async Task ListIssues_WithInvalidQuery_ReturnsBadRequest()
+	{
+		// Act
+		var response = await _client.GetAsync("/api/v1/issues?page=0").ConfigureAwait(false);
+
+		// Assert
+		response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+	}
+
+	[Fact]
 	public async Task GetIssue_WithValidId_ReturnsOk_WhenIssueExists()
 	{
 		// Arrange
@@ -85,7 +95,7 @@ public class IssueEndpointsTests : IDisposable
 		var id = ObjectId.GenerateNewId();
 		_factory.IssueRepository
 			.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
-			.Returns(Result<IssueDto>.Fail("Not found"));
+			.Returns(Result<IssueDto>.Fail("Not found", ResultErrorCode.NotFound));
 
 		// Act
 		var response = await _client.GetAsync($"/api/v1/issues/{id}").ConfigureAwait(false);

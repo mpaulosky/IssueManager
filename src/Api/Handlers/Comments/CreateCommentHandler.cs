@@ -49,14 +49,12 @@ public class CreateCommentHandler
 	/// </summary>
 	/// <param name="command">The command containing the comment information to create.</param>
 	/// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
-	/// <returns>A task that represents the asynchronous operation. The task result contains the created comment as a <see cref="CommentDto"/>.</returns>
-	/// <exception cref="ValidationException">Thrown when the command fails validation.</exception>
-	/// <exception cref="InvalidOperationException">Thrown when the comment cannot be created in the repository.</exception>
-	public async Task<CommentDto> Handle(CreateCommentCommand command, CancellationToken cancellationToken = default)
+	/// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="Result{T}"/> wrapping the created comment as a <see cref="CommentDto"/>, or a validation/repository failure.</returns>
+	public async Task<Result<CommentDto>> Handle(CreateCommentCommand command, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
 		if (!validationResult.IsValid)
-			throw new ValidationException(validationResult.Errors);
+			return Result.Fail<CommentDto>("Validation failed: " + string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)), ResultErrorCode.Validation);
 
 		var author = _currentUserService.IsAuthenticated
 			? new UserDto(_currentUserService.UserId ?? string.Empty, _currentUserService.Name ?? string.Empty, _currentUserService.Email ?? string.Empty)
@@ -76,10 +74,6 @@ public class CreateCommentHandler
 			false,
 			UserDto.Empty);
 
-		var result = await _repository.CreateAsync(dto, cancellationToken);
-		if (result.Failure)
-			throw new InvalidOperationException(result.Error);
-
-		return result.Value!;
+		return await _repository.CreateAsync(dto, cancellationToken);
 	}
 }
