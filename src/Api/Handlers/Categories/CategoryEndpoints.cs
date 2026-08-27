@@ -27,11 +27,11 @@ public static class CategoryEndpoints
 
 		group.MapGet("{id}", async (string id, GetCategoryHandler handler) =>
 		{
-			if (!ObjectId.TryParse(id, out var objectId))
-				return Results.BadRequest("Invalid ID format");
+			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
+				return badRequest;
 			var query = new GetCategoryQuery(objectId);
 			var result = await handler.Handle(query);
-			return result.Success ? Results.Ok(result.Value) : Results.NotFound();
+			return result.ToHttpResult(Results.Ok);
 		})
 		.WithName("GetCategory")
 		.WithSummary("Get a category by ID")
@@ -40,8 +40,8 @@ public static class CategoryEndpoints
 
 		group.MapPost("", async (CreateCategoryCommand command, CreateCategoryHandler handler) =>
 		{
-			var category = await handler.Handle(command);
-			return Results.Created($"/api/v1/categories/{category.Id}", category);
+			var result = await handler.Handle(command);
+			return result.ToHttpResult(value => Results.Created($"/api/v1/categories/{value.Id}", value));
 		})
 		.WithName("CreateCategory")
 		.WithSummary("Create a new category")
@@ -51,13 +51,11 @@ public static class CategoryEndpoints
 
 		group.MapPatch("{id}", async (string id, UpdateCategoryCommand command, UpdateCategoryHandler handler) =>
 		{
-			if (!ObjectId.TryParse(id, out var objectId))
-				return Results.BadRequest("Invalid ID format");
+			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
+				return badRequest;
 			var commandWithId = command with { Id = objectId };
 			var result = await handler.Handle(commandWithId);
-			if (!result.Success)
-				return result.ErrorCode == ResultErrorCode.NotFound ? Results.NotFound() : Results.BadRequest(result.Error);
-			return Results.Ok(result.Value);
+			return result.ToHttpResult(Results.Ok);
 		})
 		.WithName("UpdateCategory")
 		.WithSummary("Update an existing category")
@@ -68,11 +66,11 @@ public static class CategoryEndpoints
 
 		group.MapDelete("{id}", async (string id, DeleteCategoryHandler handler) =>
 		{
-			if (!ObjectId.TryParse(id, out var objectId))
-				return Results.BadRequest("Invalid ID format");
+			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
+				return badRequest;
 			var command = new DeleteCategoryCommand { Id = objectId };
 			var result = await handler.Handle(command);
-			return result.Success ? Results.NoContent() : Results.NotFound();
+			return result.ToHttpResult(_ => Results.NoContent());
 		})
 		.WithName("DeleteCategory")
 		.WithSummary("Delete (archive) a category")

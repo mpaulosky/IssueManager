@@ -47,16 +47,16 @@ public class CreateCategoryHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.CategoryName.Should().Be(command.CategoryName);
-		result.CategoryDescription.Should().Be(command.CategoryDescription);
+		result.Success.Should().BeTrue();
+		result.Value!.CategoryName.Should().Be(command.CategoryName);
+		result.Value!.CategoryDescription.Should().Be(command.CategoryDescription);
 		await _repository.Received(1).CreateAsync(Arg.Is<CategoryDto>(c =>
 			c.CategoryName == command.CategoryName &&
 			c.CategoryDescription == command.CategoryDescription), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_EmptyCategoryName_ThrowsValidationException()
+	public async Task Handle_EmptyCategoryName_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateCategoryCommand
@@ -66,15 +66,16 @@ public class CreateCategoryHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Category name*required*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
+		result.Error.Should().Contain("Category name").And.Contain("required");
 	}
 
 	[Fact]
-	public async Task Handle_CategoryNameTooShort_ThrowsValidationException()
+	public async Task Handle_CategoryNameTooShort_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateCategoryCommand
@@ -84,15 +85,16 @@ public class CreateCategoryHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Category name*at least 2 characters*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
+		result.Error.Should().Contain("Category name").And.Contain("at least 2 characters");
 	}
 
 	[Fact]
-	public async Task Handle_CategoryNameTooLong_ThrowsValidationException()
+	public async Task Handle_CategoryNameTooLong_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateCategoryCommand
@@ -102,15 +104,16 @@ public class CreateCategoryHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Category name*100 characters*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
+		result.Error.Should().Contain("Category name").And.Contain("100 characters");
 	}
 
 	[Fact]
-	public async Task Handle_CategoryDescriptionTooLong_ThrowsValidationException()
+	public async Task Handle_CategoryDescriptionTooLong_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateCategoryCommand
@@ -120,11 +123,12 @@ public class CreateCategoryHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Category description*500 characters*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
+		result.Error.Should().Contain("Category description").And.Contain("500 characters");
 	}
 
 	[Fact]
@@ -146,11 +150,11 @@ public class CreateCategoryHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.CategoryDescription.Should().BeEmpty();
+		result.Value!.CategoryDescription.Should().BeEmpty();
 	}
 
 	[Fact]
-	public async Task Handle_RepositoryFails_ThrowsInvalidOperationException()
+	public async Task Handle_RepositoryFails_ReturnsFailureResult()
 	{
 		// Arrange
 		var command = new CreateCategoryCommand
@@ -163,10 +167,10 @@ public class CreateCategoryHandlerTests
 			.Returns(Result<CategoryDto>.Fail("Database error"));
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<InvalidOperationException>()
-			.WithMessage("Database error");
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Database error");
 	}
 }

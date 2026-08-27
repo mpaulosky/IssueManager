@@ -59,9 +59,9 @@ public class IssueRepositorySearchTests
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Items.Should().HaveCount(2);
-		result.Total.Should().Be(2);
-		result.Items.Should().Contain(i => i.Title.Contains("Bug", StringComparison.OrdinalIgnoreCase));
+		result.Value!.Items.Should().HaveCount(2);
+		result.Value!.Total.Should().Be(2);
+		result.Value!.Items.Should().Contain(i => i.Title.Contains("Bug", StringComparison.OrdinalIgnoreCase));
 	}
 
 	[Fact]
@@ -82,9 +82,9 @@ public class IssueRepositorySearchTests
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Items.Should().HaveCount(2);
-		result.Total.Should().Be(2);
-		result.Items.Should().OnlyContain(i => i.Author.Name == "Alice");
+		result.Value!.Items.Should().HaveCount(2);
+		result.Value!.Total.Should().Be(2);
+		result.Value!.Items.Should().OnlyContain(i => i.Author.Name == "Alice");
 	}
 
 	[Fact]
@@ -108,9 +108,9 @@ public class IssueRepositorySearchTests
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Items.Should().HaveCount(2);
-		result.Total.Should().Be(2);
-		result.Items.Should().NotContain(i => i.Archived);
+		result.Value!.Items.Should().HaveCount(2);
+		result.Value!.Total.Should().Be(2);
+		result.Value!.Items.Should().NotContain(i => i.Archived);
 	}
 
 	[Fact]
@@ -139,10 +139,10 @@ public class IssueRepositorySearchTests
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Items.Should().HaveCount(2);
-		result.Total.Should().Be(2);
-		result.Items.Should().OnlyContain(i => i.Author.Name == "Alice");
-		result.Items.Should().OnlyContain(i => i.Title.Contains("bug", StringComparison.OrdinalIgnoreCase));
+		result.Value!.Items.Should().HaveCount(2);
+		result.Value!.Total.Should().Be(2);
+		result.Value!.Items.Should().OnlyContain(i => i.Author.Name == "Alice");
+		result.Value!.Items.Should().OnlyContain(i => i.Title.Contains("bug", StringComparison.OrdinalIgnoreCase));
 	}
 
 	[Fact]
@@ -163,8 +163,8 @@ public class IssueRepositorySearchTests
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Items.Should().HaveCount(3);
-		result.Total.Should().Be(3);
+		result.Value!.Items.Should().HaveCount(3);
+		result.Value!.Total.Should().Be(3);
 	}
 
 	[Fact]
@@ -185,8 +185,8 @@ public class IssueRepositorySearchTests
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Items.Should().HaveCount(2);
-		result.Total.Should().Be(2);
+		result.Value!.Items.Should().HaveCount(2);
+		result.Value!.Total.Should().Be(2);
 	}
 
 	[Fact]
@@ -205,8 +205,8 @@ public class IssueRepositorySearchTests
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Items.Should().BeEmpty();
-		result.Total.Should().Be(0);
+		result.Value!.Items.Should().BeEmpty();
+		result.Value!.Total.Should().Be(0);
 	}
 
 	[Fact]
@@ -225,8 +225,8 @@ public class IssueRepositorySearchTests
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Items.Should().BeEmpty();
-		result.Total.Should().Be(0);
+		result.Value!.Items.Should().BeEmpty();
+		result.Value!.Total.Should().Be(0);
 	}
 
 	[Fact]
@@ -258,10 +258,10 @@ public class IssueRepositorySearchTests
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Items.Should().HaveCount(10);
-		result.Total.Should().Be(30);
-		result.Page.Should().Be(2);
-		result.TotalPages.Should().Be(3);
-		result.Items.Should().OnlyContain(i => i.Author.Name == "Alice");
+		result.Value!.Items.Should().HaveCount(10);
+		result.Value!.Total.Should().Be(30);
+		result.Value!.Page.Should().Be(2);
+		result.Value!.TotalPages.Should().Be(3);
+		result.Value!.Items.Should().OnlyContain(i => i.Author.Name == "Alice");
 	}
 }

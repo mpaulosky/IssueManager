@@ -85,7 +85,7 @@ public class CommentEndpointsTests : IDisposable
 		var id = ObjectId.GenerateNewId();
 		_factory.CommentRepository
 			.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
-			.Returns(Result<CommentDto>.Fail("Not found"));
+			.Returns(Result<CommentDto>.Fail("Not found", ResultErrorCode.NotFound));
 
 		// Act
 		var response = await _client.GetAsync($"/api/v1/comments/{id}").ConfigureAwait(false);
@@ -133,6 +133,19 @@ public class CommentEndpointsTests : IDisposable
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Created);
+	}
+
+	[Fact]
+	public async Task CreateComment_WithInvalidCommand_ReturnsBadRequest()
+	{
+		// Arrange
+		var command = new { Title = "Test Comment", CommentText = "", IssueId = ObjectId.GenerateNewId().ToString() };
+
+		// Act
+		var response = await _authenticatedClient.PostAsJsonAsync("/api/v1/comments", command).ConfigureAwait(false);
+
+		// Assert
+		response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 	}
 
 	[Fact]

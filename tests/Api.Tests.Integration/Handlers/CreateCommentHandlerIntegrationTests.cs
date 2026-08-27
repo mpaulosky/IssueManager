@@ -45,15 +45,15 @@ public class CreateCommentHandlerIntegrationTests
 		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.Title.Should().Be("New Comment");
-		result.Description.Should().Be("New comment text");
-		result.Id.Should().NotBe(ObjectId.Empty);
-		result.Archived.Should().BeFalse();
+		result.Success.Should().BeTrue();
+		result.Value!.Title.Should().Be("New Comment");
+		result.Value!.Description.Should().Be("New comment text");
+		result.Value!.Id.Should().NotBe(ObjectId.Empty);
+		result.Value!.Archived.Should().BeFalse();
 	}
 
 	[Fact]
-	public async Task Handle_InvalidCommand_ThrowsValidationException()
+	public async Task Handle_InvalidCommand_ReturnsValidationFailure()
 	{
 		// Arrange - Empty title is invalid
 		var command = new CreateCommentCommand
@@ -63,10 +63,11 @@ public class CreateCommentHandlerIntegrationTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>();
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
@@ -84,7 +85,7 @@ public class CreateCommentHandlerIntegrationTests
 		var created = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert - Verify it can be retrieved
-		var retrieved = await _repository.GetByIdAsync(created.Id, TestContext.Current.CancellationToken);
+		var retrieved = await _repository.GetByIdAsync(created.Value!.Id, TestContext.Current.CancellationToken);
 		retrieved.Should().NotBeNull();
 		retrieved.Value?.Title.Should().Be("Retrievable Comment");
 		retrieved.Value?.Description.Should().Be("Test comment text");

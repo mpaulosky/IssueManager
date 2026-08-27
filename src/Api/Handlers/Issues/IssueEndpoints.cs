@@ -33,7 +33,7 @@ public static class IssueEndpoints
 				CategoryName = categoryName
 			};
 			var result = await handler.Handle(query);
-			return Results.Ok(result);
+			return result.ToHttpResult(Results.Ok);
 		})
 		.WithName("ListIssues")
 		.WithSummary("Get a paginated list of issues")
@@ -43,11 +43,11 @@ public static class IssueEndpoints
 		// Get Issue by ID
 		group.MapGet("{id}", async (string id, GetIssueHandler handler) =>
 		{
-			if (!ObjectId.TryParse(id, out var objectId))
-				return Results.BadRequest("Invalid ID format");
+			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
+				return badRequest;
 			var query = new GetIssueQuery(objectId);
 			var result = await handler.Handle(query);
-			return result.Success ? Results.Ok(result.Value) : Results.NotFound();
+			return result.ToHttpResult(Results.Ok);
 		})
 		.WithName("GetIssue")
 		.WithSummary("Get an issue by ID")
@@ -58,11 +58,7 @@ public static class IssueEndpoints
 		group.MapPost("", async (CreateIssueCommand command, CreateIssueHandler handler) =>
 		{
 			var result = await handler.Handle(command);
-			if (!result.Success)
-				return result.ErrorCode == ResultErrorCode.Validation
-					? Results.BadRequest(result.Error)
-					: Results.BadRequest(result.Error);
-			return Results.Created($"/api/v1/issues/{result.Value!.Id}", result.Value);
+			return result.ToHttpResult(value => Results.Created($"/api/v1/issues/{value.Id}", value));
 		})
 		.WithName("CreateIssue")
 		.WithSummary("Create a new issue")
@@ -73,15 +69,11 @@ public static class IssueEndpoints
 		// Update Issue
 		group.MapPatch("{id}", async (string id, UpdateIssueCommand command, UpdateIssueHandler handler) =>
 		{
-			if (!ObjectId.TryParse(id, out var objectId))
-				return Results.BadRequest("Invalid ID format");
+			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
+				return badRequest;
 			var commandWithId = command with { Id = objectId };
 			var result = await handler.Handle(commandWithId);
-			if (!result.Success)
-				return result.ErrorCode == ResultErrorCode.NotFound ? Results.NotFound()
-					: result.ErrorCode == ResultErrorCode.Conflict ? Results.Conflict(result.Error)
-					: Results.BadRequest(result.Error);
-			return Results.Ok(result.Value);
+			return result.ToHttpResult(Results.Ok);
 		})
 		.WithName("UpdateIssue")
 		.WithSummary("Update an existing issue")
@@ -93,14 +85,11 @@ public static class IssueEndpoints
 		// Update Issue Status (Admin only)
 		group.MapPatch("{id}/status", async (string id, UpdateIssueStatusCommand command, UpdateIssueStatusHandler handler) =>
 		{
-			if (!ObjectId.TryParse(id, out var objectId))
-				return Results.BadRequest("Invalid ID format");
+			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
+				return badRequest;
 			var commandWithId = command with { IssueId = objectId };
 			var result = await handler.Handle(commandWithId);
-			if (!result.Success)
-				return result.ErrorCode == ResultErrorCode.NotFound ? Results.NotFound()
-					: Results.BadRequest(result.Error);
-			return Results.Ok(result.Value);
+			return result.ToHttpResult(Results.Ok);
 		})
 		.WithName("UpdateIssueStatus")
 		.WithSummary("Update the status of an issue")
@@ -112,11 +101,11 @@ public static class IssueEndpoints
 		// Delete Issue (soft-delete)
 		group.MapDelete("{id}", async (string id, DeleteIssueHandler handler) =>
 		{
-			if (!ObjectId.TryParse(id, out var objectId))
-				return Results.BadRequest("Invalid ID format");
+			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
+				return badRequest;
 			var command = new DeleteIssueCommand { Id = objectId };
 			var result = await handler.Handle(command);
-			return result.Success ? Results.NoContent() : Results.NotFound();
+			return result.ToHttpResult(_ => Results.NoContent());
 		})
 		.WithName("DeleteIssue")
 		.WithSummary("Delete (archive) an issue")

@@ -80,7 +80,7 @@ public class CategoryEndpointsTests : IDisposable
 		var id = ObjectId.GenerateNewId();
 		_factory.CategoryRepository
 			.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
-			.Returns(Result<CategoryDto>.Fail("Not found"));
+			.Returns(Result<CategoryDto>.Fail("Not found", ResultErrorCode.NotFound));
 
 		// Act
 		var response = await _client.GetAsync($"/api/v1/categories/{id}").ConfigureAwait(false);
@@ -123,6 +123,19 @@ public class CategoryEndpointsTests : IDisposable
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Created);
+	}
+
+	[Fact]
+	public async Task CreateCategory_WithInvalidCommand_ReturnsBadRequest()
+	{
+		// Arrange
+		var command = new { CategoryName = "", CategoryDescription = "Description" };
+
+		// Act
+		var response = await _authenticatedClient.PostAsJsonAsync("/api/v1/categories", command).ConfigureAwait(false);
+
+		// Assert
+		response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 	}
 
 	[Fact]
@@ -228,7 +241,7 @@ public class CategoryEndpointsTests : IDisposable
 		var categoryId = ObjectId.GenerateNewId();
 		_factory.CategoryRepository
 			.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
-			.Returns(Result<CategoryDto>.Fail("Not found"));
+			.Returns(Result<CategoryDto>.Fail("Not found", ResultErrorCode.NotFound));
 
 		// Act
 		var response = await _authenticatedClient.DeleteAsync($"/api/v1/categories/{categoryId}").ConfigureAwait(false);

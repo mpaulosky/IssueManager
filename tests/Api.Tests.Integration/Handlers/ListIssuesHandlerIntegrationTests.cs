@@ -45,11 +45,11 @@ public class ListIssuesHandlerIntegrationTests
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Items.Should().HaveCount(20);
-		result.Page.Should().Be(1);
-		result.PageSize.Should().Be(20);
-		result.Total.Should().Be(50);
-		result.TotalPages.Should().Be(3); // 50 / 20 = 2.5 → 3 pages
+		result.Value!.Items.Should().HaveCount(20);
+		result.Value!.Page.Should().Be(1);
+		result.Value!.PageSize.Should().Be(20);
+		result.Value!.Total.Should().Be(50);
+		result.Value!.TotalPages.Should().Be(3); // 50 / 20 = 2.5 → 3 pages
 	}
 
 	[Fact]
@@ -68,9 +68,9 @@ public class ListIssuesHandlerIntegrationTests
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Items.Should().HaveCount(20);
-		result.Page.Should().Be(2);
-		result.Total.Should().Be(50);
+		result.Value!.Items.Should().HaveCount(20);
+		result.Value!.Page.Should().Be(2);
+		result.Value!.Total.Should().Be(50);
 	}
 
 	[Fact]
@@ -97,8 +97,8 @@ public class ListIssuesHandlerIntegrationTests
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Total.Should().Be(7); // 10 - 3 archived = 7
-		result.Items.Should().HaveCount(7);
+		result.Value!.Total.Should().Be(7); // 10 - 3 archived = 7
+		result.Value!.Items.Should().HaveCount(7);
 	}
 
 	[Fact]
@@ -111,9 +111,9 @@ public class ListIssuesHandlerIntegrationTests
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Items.Should().BeEmpty();
-		result.Total.Should().Be(0);
-		result.TotalPages.Should().Be(0);
+		result.Value!.Items.Should().BeEmpty();
+		result.Value!.Total.Should().Be(0);
+		result.Value!.TotalPages.Should().Be(0);
 	}
 
 	[Fact]
@@ -132,10 +132,10 @@ public class ListIssuesHandlerIntegrationTests
 		var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Items.Should().HaveCount(2); // 42 - 40 = 2 on the last page
-		result.Page.Should().Be(3);
-		result.Total.Should().Be(42);
-		result.TotalPages.Should().Be(3);
+		result.Value!.Items.Should().HaveCount(2); // 42 - 40 = 2 on the last page
+		result.Value!.Page.Should().Be(3);
+		result.Value!.Total.Should().Be(42);
+		result.Value!.TotalPages.Should().Be(3);
 	}
 
 	[Fact]
@@ -157,8 +157,8 @@ public class ListIssuesHandlerIntegrationTests
 		stopwatch.Stop();
 
 		// Assert
-		result.Items.Should().HaveCount(20);
-		result.Total.Should().Be(100);
+		result.Value!.Items.Should().HaveCount(20);
+		result.Value!.Total.Should().Be(100);
 		stopwatch.ElapsedMilliseconds.Should().BeLessThan(1000); // < 1 second
 	}
 
@@ -185,7 +185,7 @@ public class ListIssuesHandlerIntegrationTests
 		var result = await listTask;
 
 		// Assert - List should be consistent (snapshot isolation)
-		result.Items.Should().HaveCount(20);
-		result.Total.Should().BeOneOf(20, 21); // Either before or after concurrently create
+		result.Value!.Items.Should().HaveCount(20);
+		result.Value!.Total.Should().BeOneOf(20, 21); // Either before or after concurrently create
 	}
 }

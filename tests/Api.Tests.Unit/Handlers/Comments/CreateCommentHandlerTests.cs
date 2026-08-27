@@ -53,16 +53,16 @@ public class CreateCommentHandlerTests
 		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.Title.Should().Be(command.Title);
-		result.Description.Should().Be(command.CommentText);
+		result.Success.Should().BeTrue();
+		result.Value!.Title.Should().Be(command.Title);
+		result.Value!.Description.Should().Be(command.CommentText);
 		await _repository.Received(1).CreateAsync(Arg.Is<CommentDto>(c =>
 			c.Title == command.Title &&
 			c.Description == command.CommentText), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
-	public async Task Handle_EmptyCommentText_ThrowsValidationException()
+	public async Task Handle_EmptyCommentText_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateCommentCommand
@@ -73,15 +73,16 @@ public class CreateCommentHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Comment text*required*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
+		result.Error.Should().Contain("Comment text").And.Contain("required");
 	}
 
 	[Fact]
-	public async Task Handle_CommentTextTooLong_ThrowsValidationException()
+	public async Task Handle_CommentTextTooLong_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateCommentCommand
@@ -92,15 +93,16 @@ public class CreateCommentHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Comment text*5000 characters*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
+		result.Error.Should().Contain("Comment text").And.Contain("5000 characters");
 	}
 
 	[Fact]
-	public async Task Handle_EmptyIssueId_ThrowsValidationException()
+	public async Task Handle_EmptyIssueId_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateCommentCommand
@@ -111,15 +113,16 @@ public class CreateCommentHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Issue ID*required*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
+		result.Error.Should().Contain("Issue ID").And.Contain("required");
 	}
 
 	[Fact]
-	public async Task Handle_InvalidObjectIdForIssueId_ThrowsValidationException()
+	public async Task Handle_InvalidObjectIdForIssueId_ReturnsValidationFailure()
 	{
 		// Arrange
 		var command = new CreateCommentCommand
@@ -130,15 +133,16 @@ public class CreateCommentHandlerTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>()
-			.WithMessage("*Issue ID*valid ObjectId*");
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
+		result.Error.Should().Contain("Issue ID").And.Contain("valid ObjectId");
 	}
 
 	[Fact]
-	public async Task Handle_RepositoryFails_ThrowsInvalidOperationException()
+	public async Task Handle_RepositoryFails_ReturnsFailureResult()
 	{
 		// Arrange
 		var command = new CreateCommentCommand
@@ -152,11 +156,11 @@ public class CreateCommentHandlerTests
 			.Returns(Result<CommentDto>.Fail("Database error"));
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(command, CancellationToken.None);
 
 		// Assert
-		await act.Should().ThrowAsync<InvalidOperationException>()
-			.WithMessage("Database error");
+		result.Success.Should().BeFalse();
+		result.Error.Should().Be("Database error");
 	}
 
 	[Fact]

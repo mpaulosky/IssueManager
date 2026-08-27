@@ -80,7 +80,7 @@ public class StatusEndpointsTests : IDisposable
 		var id = ObjectId.GenerateNewId();
 		_factory.StatusRepository
 			.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
-			.Returns(Result<StatusDto>.Fail("Not found"));
+			.Returns(Result<StatusDto>.Fail("Not found", ResultErrorCode.NotFound));
 
 		// Act
 		var response = await _client.GetAsync($"/api/v1/statuses/{id}", TestContext.Current.CancellationToken);
@@ -123,6 +123,19 @@ public class StatusEndpointsTests : IDisposable
 
 		// Assert
 		response.StatusCode.Should().Be(HttpStatusCode.Created);
+	}
+
+	[Fact]
+	public async Task CreateStatus_WithInvalidCommand_ReturnsBadRequest()
+	{
+		// Arrange
+		var command = new { StatusName = "", StatusDescription = "Description" };
+
+		// Act
+		var response = await _authenticatedClient.PostAsJsonAsync("/api/v1/statuses", command, cancellationToken: TestContext.Current.CancellationToken);
+
+		// Assert
+		response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 	}
 
 	[Fact]
@@ -228,7 +241,7 @@ public class StatusEndpointsTests : IDisposable
 		var statusId = ObjectId.GenerateNewId();
 		_factory.StatusRepository
 			.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
-			.Returns(Result<StatusDto>.Fail("Not found"));
+			.Returns(Result<StatusDto>.Fail("Not found", ResultErrorCode.NotFound));
 
 		// Act
 		var response = await _authenticatedClient.DeleteAsync($"/api/v1/statuses/{statusId}", TestContext.Current.CancellationToken);

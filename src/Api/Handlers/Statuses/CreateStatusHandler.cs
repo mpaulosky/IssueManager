@@ -40,14 +40,12 @@ public class CreateStatusHandler
 	/// </summary>
 	/// <param name="command">The command containing the status information to create.</param>
 	/// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
-	/// <returns>A task that represents the asynchronous operation. The task result contains the created status as a <see cref="StatusDto"/>.</returns>
-	/// <exception cref="ValidationException">Thrown when the command fails validation.</exception>
-	/// <exception cref="InvalidOperationException">Thrown when the status cannot be created in the repository.</exception>
-	public async Task<StatusDto> Handle(CreateStatusCommand command, CancellationToken cancellationToken = default)
+	/// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="Result{T}"/> wrapping the created status as a <see cref="StatusDto"/>, or a validation/repository failure.</returns>
+	public async Task<Result<StatusDto>> Handle(CreateStatusCommand command, CancellationToken cancellationToken = default)
 	{
 		var validationResult = await _validator.ValidateAsync(command, cancellationToken);
 		if (!validationResult.IsValid)
-			throw new ValidationException(validationResult.Errors);
+			return Result.Fail<StatusDto>("Validation failed: " + string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)), ResultErrorCode.Validation);
 
 		var dto = new StatusDto(
 			ObjectId.GenerateNewId(),
@@ -58,10 +56,6 @@ public class CreateStatusHandler
 			false,
 			UserDto.Empty);
 
-		var result = await _repository.CreateAsync(dto, cancellationToken);
-		if (result.Failure)
-			throw new InvalidOperationException(result.Error);
-
-		return result.Value!;
+		return await _repository.CreateAsync(dto, cancellationToken);
 	}
 }

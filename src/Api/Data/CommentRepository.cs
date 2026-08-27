@@ -34,7 +34,7 @@ public class CommentRepository : ICommentRepository
 
 		var update = Builders<Comment>.Update.Set(x => x.Archived, true);
 		var result = await _collection.UpdateOneAsync(x => x.Id == commentId, update, cancellationToken: cancellationToken);
-		return result.ModifiedCount > 0 ? Result.Ok() : Result.Fail("Comment not found or already archived.");
+		return result.ModifiedCount > 0 ? Result.Ok() : Result.Fail("Comment not found or already archived.", ResultErrorCode.NotFound);
 	}
 
 	/// <inheritdoc />
@@ -53,7 +53,7 @@ public class CommentRepository : ICommentRepository
 	{
 		var entity = await _collection.Find(x => x.Id == commentId).FirstOrDefaultAsync(cancellationToken);
 
-		return entity is not null ? Result.Ok(entity.ToDto()) : Result.Fail<CommentDto>("Comment not found.");
+		return entity is not null ? Result.Ok(entity.ToDto()) : Result.Fail<CommentDto>("Comment not found.", ResultErrorCode.NotFound);
 	}
 
 	/// <inheritdoc />
@@ -132,7 +132,7 @@ public class CommentRepository : ICommentRepository
 				cancellationToken: cancellationToken);
 
 		return result.ModifiedCount > 0 ? Result.Ok(model.ToDto()) :
-				Result.Fail<CommentDto>("Comment not found or update failed.");
+				Result.Fail<CommentDto>("Comment not found or update failed.", ResultErrorCode.NotFound);
 	}
 
 	/// <inheritdoc />

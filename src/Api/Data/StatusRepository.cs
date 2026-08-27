@@ -34,7 +34,7 @@ public class StatusRepository : IStatusRepository
 
 		var update = Builders<Status>.Update.Set(x => x.Archived, true);
 		var result = await _collection.UpdateOneAsync(x => x.Id == statusId, update, cancellationToken: cancellationToken);
-		return result.ModifiedCount > 0 ? Result.Ok() : Result.Fail("Status not found or already archived.");
+		return result.ModifiedCount > 0 ? Result.Ok() : Result.Fail("Status not found or already archived.", ResultErrorCode.NotFound);
 	}
 
 	/// <inheritdoc />
@@ -56,7 +56,7 @@ public class StatusRepository : IStatusRepository
 
 		var entity = await _collection.Find(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
 
-		return entity is not null ? Result.Ok(entity.ToDto()) : Result.Fail<StatusDto>("Status not found.");
+		return entity is not null ? Result.Ok(entity.ToDto()) : Result.Fail<StatusDto>("Status not found.", ResultErrorCode.NotFound);
 	}
 
 	/// <inheritdoc />
@@ -98,7 +98,7 @@ public class StatusRepository : IStatusRepository
 				cancellationToken: cancellationToken);
 
 		return result.ModifiedCount > 0 ? Result.Ok(model.ToDto()) :
-				Result.Fail<StatusDto>("Status not found or update failed.");
+				Result.Fail<StatusDto>("Status not found or update failed.", ResultErrorCode.NotFound);
 	}
 
 	public async Task<Result<long>> CountAsync(CancellationToken cancellationToken = default)

@@ -40,15 +40,15 @@ public class CreateCategoryHandlerIntegrationTests
 		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
-		result.Should().NotBeNull();
-		result.CategoryName.Should().Be("New Category");
-		result.CategoryDescription.Should().Be("New Description");
-		result.Id.Should().NotBe(ObjectId.Empty);
-		result.Archived.Should().BeFalse();
+		result.Success.Should().BeTrue();
+		result.Value!.CategoryName.Should().Be("New Category");
+		result.Value!.CategoryDescription.Should().Be("New Description");
+		result.Value!.Id.Should().NotBe(ObjectId.Empty);
+		result.Value!.Archived.Should().BeFalse();
 	}
 
 	[Fact]
-	public async Task Handle_InvalidCommand_ThrowsValidationException()
+	public async Task Handle_InvalidCommand_ReturnsValidationFailure()
 	{
 		// Arrange - Empty category name is invalid
 		var command = new CreateCategoryCommand
@@ -58,10 +58,11 @@ public class CreateCategoryHandlerIntegrationTests
 		};
 
 		// Act
-		Func<Task> act = async () => await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert
-		await act.Should().ThrowAsync<ValidationException>();
+		result.Success.Should().BeFalse();
+		result.ErrorCode.Should().Be(ResultErrorCode.Validation);
 	}
 
 	[Fact]
@@ -78,7 +79,7 @@ public class CreateCategoryHandlerIntegrationTests
 		var created = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
 		// Assert - Verify it can be retrieved
-		var retrieved = await _repository.GetByIdAsync(created.Id, TestContext.Current.CancellationToken);
+		var retrieved = await _repository.GetByIdAsync(created.Value!.Id, TestContext.Current.CancellationToken);
 		retrieved.Should().NotBeNull();
 		retrieved.Value?.CategoryName.Should().Be("Retrievable Category");
 		retrieved.Value?.CategoryDescription.Should().Be("Test Description");
