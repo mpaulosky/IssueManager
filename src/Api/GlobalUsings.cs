@@ -10,6 +10,7 @@
 global using Api.Data;
 global using Api.Data.Interfaces;
 global using Api.Extensions;
+global using Api.Handlers;
 global using Api.Handlers.Categories;
 global using Api.Handlers.Comments;
 global using Api.Handlers.Issues;

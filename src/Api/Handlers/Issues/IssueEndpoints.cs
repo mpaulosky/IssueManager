@@ -99,12 +99,11 @@ public static class IssueEndpoints
 		.RequireAuthorization("Admin");
 
 		// Delete Issue (soft-delete)
-		group.MapDelete("{id}", async (string id, DeleteIssueHandler handler) =>
+		group.MapDelete("{id}", async (string id, DeleteHandler<IssueDto> handler) =>
 		{
 			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
 				return badRequest;
-			var command = new DeleteIssueCommand { Id = objectId };
-			var result = await handler.Handle(command);
+			var result = await handler.Handle(objectId);
 			return result.ToHttpResult(_ => Results.NoContent());
 		})
 		.WithName("DeleteIssue")

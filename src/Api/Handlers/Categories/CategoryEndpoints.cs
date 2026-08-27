@@ -64,12 +64,11 @@ public static class CategoryEndpoints
 		.Produces(StatusCodes.Status404NotFound)
 		.RequireAuthorization();
 
-		group.MapDelete("{id}", async (string id, DeleteCategoryHandler handler) =>
+		group.MapDelete("{id}", async (string id, DeleteHandler<CategoryDto> handler) =>
 		{
 			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
 				return badRequest;
-			var command = new DeleteCategoryCommand { Id = objectId };
-			var result = await handler.Handle(command);
+			var result = await handler.Handle(objectId);
 			return result.ToHttpResult(_ => Results.NoContent());
 		})
 		.WithName("DeleteCategory")

@@ -21,7 +21,7 @@ public record CategoryDto(
 	DateTime DateCreated,
 	DateTime? DateModified,
 	bool Archived,
-	UserDto ArchivedBy)
+	UserDto ArchivedBy) : IArchivableDto
 {
 	/// <summary>
 	///   Initializes a new instance of the <see cref="CategoryDto" /> record.

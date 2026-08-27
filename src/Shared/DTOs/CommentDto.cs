@@ -26,7 +26,7 @@ public record CommentDto(
 	bool Archived,
 	UserDto ArchivedBy,
 	bool IsAnswer,
-	UserDto AnswerSelectedBy)
+	UserDto AnswerSelectedBy) : IArchivableDto
 {
 	/// <summary>
 	///   Initializes a new instance of the <see cref="CommentDto" /> record.
