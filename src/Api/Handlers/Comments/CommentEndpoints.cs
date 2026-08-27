@@ -68,12 +68,11 @@ public static class CommentEndpoints
 		.Produces(StatusCodes.Status404NotFound)
 		.RequireAuthorization();
 
-		group.MapDelete("{id}", async (string id, DeleteCommentHandler handler) =>
+		group.MapDelete("{id}", async (string id, DeleteHandler<CommentDto> handler) =>
 		{
 			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
 				return badRequest;
-			var command = new DeleteCommentCommand { Id = objectId };
-			var result = await handler.Handle(command);
+			var result = await handler.Handle(objectId);
 			return result.ToHttpResult(_ => Results.NoContent());
 		})
 		.WithName("DeleteComment")

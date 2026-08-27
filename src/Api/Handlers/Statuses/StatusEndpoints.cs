@@ -68,12 +68,11 @@ public static class StatusEndpoints
 		.Produces(StatusCodes.Status404NotFound)
 		.RequireAuthorization();
 
-		group.MapDelete("{id}", async (string id, DeleteStatusHandler handler) =>
+		group.MapDelete("{id}", async (string id, DeleteHandler<StatusDto> handler) =>
 		{
 			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
 				return badRequest;
-			var command = new DeleteStatusCommand { Id = objectId };
-			var result = await handler.Handle(command);
+			var result = await handler.Handle(objectId);
 			return result.ToHttpResult(_ => Results.NoContent());
 		})
 		.WithName("DeleteStatus")

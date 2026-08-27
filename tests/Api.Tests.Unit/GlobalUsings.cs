@@ -14,6 +14,7 @@ global using System.Security.Claims;
 global using System.Text.Encodings.Web;
 
 global using Api.Data;
+global using Api.Handlers;
 global using Api.Handlers.Categories;
 global using Api.Handlers.Comments;
 global using Api.Handlers.Issues;

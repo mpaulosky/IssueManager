@@ -46,7 +46,6 @@ public static class ServiceCollectionExtensions
 	{
 		services.AddSingleton<CreateIssueValidator>();
 		services.AddSingleton<UpdateIssueValidator>();
-		services.AddSingleton<DeleteIssueValidator>();
 		services.AddSingleton<ListIssuesQueryValidator>();
 		services.AddSingleton<UpdateIssueStatusValidator>();
 		services.AddSingleton<CreateStatusValidator>();
@@ -55,7 +54,6 @@ public static class ServiceCollectionExtensions
 		services.AddSingleton<UpdateCategoryValidator>();
 		services.AddSingleton<CreateCommentValidator>();
 		services.AddSingleton<UpdateCommentValidator>();
-		services.AddSingleton<DeleteCommentValidator>();
 
 		return services;
 	}
@@ -65,7 +63,6 @@ public static class ServiceCollectionExtensions
 	{
 		services.AddScoped<CreateIssueHandler>();
 		services.AddScoped<UpdateIssueHandler>();
-		services.AddScoped<DeleteIssueHandler>();
 		services.AddScoped<ListIssuesHandler>();
 		services.AddScoped<GetIssueHandler>();
 		services.AddScoped<UpdateIssueStatusHandler>();
@@ -73,17 +70,23 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<GetStatusHandler>();
 		services.AddScoped<ListStatusesHandler>();
 		services.AddScoped<UpdateStatusHandler>();
-		services.AddScoped<DeleteStatusHandler>();
 		services.AddScoped<CreateCategoryHandler>();
 		services.AddScoped<GetCategoryHandler>();
 		services.AddScoped<ListCategoriesHandler>();
 		services.AddScoped<UpdateCategoryHandler>();
-		services.AddScoped<DeleteCategoryHandler>();
 		services.AddScoped<CreateCommentHandler>();
 		services.AddScoped<GetCommentHandler>();
 		services.AddScoped<ListCommentsHandler>();
 		services.AddScoped<UpdateCommentHandler>();
-		services.AddScoped<DeleteCommentHandler>();
+
+		services.AddScoped<DeleteHandler<IssueDto>>(sp =>
+			new DeleteHandler<IssueDto>(sp.GetRequiredService<IIssueRepository>(), "Issue"));
+		services.AddScoped<DeleteHandler<CategoryDto>>(sp =>
+			new DeleteHandler<CategoryDto>(sp.GetRequiredService<ICategoryRepository>(), "Category"));
+		services.AddScoped<DeleteHandler<StatusDto>>(sp =>
+			new DeleteHandler<StatusDto>(sp.GetRequiredService<IStatusRepository>(), "Status"));
+		services.AddScoped<DeleteHandler<CommentDto>>(sp =>
+			new DeleteHandler<CommentDto>(sp.GetRequiredService<ICommentRepository>(), "Comment"));
 
 		return services;
 	}

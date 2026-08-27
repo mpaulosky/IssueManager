@@ -178,3 +178,21 @@ model already has — so the generic base can filter by id and set the archived 
 without knowing the concrete model type. The entity's own repository interface
 (`ICategoryRepository`, etc.) should extend `IRepository<TDto>` rather than
 re-declaring the 5 shared method signatures.
+
+### 2026-08-27: Delete (soft-delete/archive) is one generic handler, not one class per entity
+
+`DeleteHandler<TDto>` in `src/Api/Handlers/` is the entire delete-by-archive
+implementation for every entity — there is no `DeleteIssueHandler`/`DeleteCategoryHandler`/
+etc. anymore. Once every repository spoke through `IRepository<TDto>`, the four per-entity
+Delete handlers had zero remaining behavioral difference beyond an entity-name string, so a
+single `DeleteHandler<TDto>` (constrained `where TDto : IArchivableDto`) is registered once
+per entity in DI (`services.AddScoped<DeleteHandler<CategoryDto>>(...)`, etc.) and each
+`*Endpoints.cs` Delete route takes `DeleteHandler<CategoryDto>` (etc.) directly as its
+minimal-API handler parameter — there is no per-entity class to add when a new entity gets
+delete support, only a DTO implementing `IArchivableDto` and one DI registration line.
+`Handle(ObjectId id, ...)` takes a bare id, not a command object — the four
+`Delete*Command` record types were deleted because each was nothing but `ObjectId Id`,
+with no information a plain id doesn't already carry. The two FluentValidation validators
+that existed only to check `Id` is not empty (`DeleteIssueValidator`, `DeleteCommentValidator`)
+were deleted too; `DeleteHandler<TDto>` does that check inline, matching what half the
+original handlers already did without a validator class.

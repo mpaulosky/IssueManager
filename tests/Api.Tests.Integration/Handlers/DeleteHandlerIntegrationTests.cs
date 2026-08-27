@@ -1,6 +1,6 @@
 // =======================================================
 // Copyright (c) 2026. All rights reserved.
-// File Name :     DeleteCategoryHandlerIntegrationTests.cs
+// File Name :     DeleteHandlerIntegrationTests.cs
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
@@ -10,36 +10,37 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for DeleteCategoryHandler (soft-delete via Archived) with a real MongoDB database.
+/// Integration tests for the generic DeleteHandler{TDto} (soft-delete via Archived) with a real
+/// MongoDB database. Exercised once through CategoryDto/CategoryRepository - the logic is
+/// identical for every entity, so this single instantiation covers the shared behavior for all
+/// of them.
 /// </summary>
 [Collection("CategoryIntegration")]
 [ExcludeFromCodeCoverage]
-public class DeleteCategoryHandlerIntegrationTests
+public class DeleteHandlerIntegrationTests
 {
 	private readonly ICategoryRepository _repository;
-	private readonly DeleteCategoryHandler _handler;
+	private readonly DeleteHandler<CategoryDto> _handler;
 
-	public DeleteCategoryHandlerIntegrationTests(MongoDbFixture fixture)
+	public DeleteHandlerIntegrationTests(MongoDbFixture fixture)
 	{
 		fixture.ThrowIfUnavailable();
 		_repository = new CategoryRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
-		_handler = new DeleteCategoryHandler(_repository);
+		_handler = new DeleteHandler<CategoryDto>(_repository, "Category");
 	}
 
 	private static CategoryDto CreateTestCategoryDto(string name, string description = "Test description", bool archived = false) =>
 		new(ObjectId.GenerateNewId(), name, description, DateTime.UtcNow, null, archived, UserDto.Empty);
 
 	[Fact]
-	public async Task Handle_ValidCategory_SetsArchivedInDatabase()
+	public async Task Handle_ValidId_SetsArchivedInDatabase()
 	{
 		// Arrange - Create a category
 		var category = CreateTestCategoryDto("Category to Delete", "This will be archived");
 		var created = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
 
-		var command = new DeleteCategoryCommand { Id = created.Value!.Id };
-
 		// Act
-		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(created.Value!.Id, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
@@ -52,14 +53,13 @@ public class DeleteCategoryHandlerIntegrationTests
 	}
 
 	[Fact]
-	public async Task Handle_NonExistentCategory_ReturnsNotFoundFailure()
+	public async Task Handle_NonExistentId_ReturnsNotFoundFailure()
 	{
 		// Arrange
 		var nonExistentId = ObjectId.GenerateNewId();
-		var command = new DeleteCategoryCommand { Id = nonExistentId };
 
 		// Act
-		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(nonExistentId, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -67,16 +67,14 @@ public class DeleteCategoryHandlerIntegrationTests
 	}
 
 	[Fact]
-	public async Task Handle_AlreadyArchivedCategory_IsIdempotent()
+	public async Task Handle_AlreadyArchived_IsIdempotent()
 	{
 		// Arrange - Create an already archived category
 		var archivedCategory = CreateTestCategoryDto("Already Archived", "Already archived", archived: true);
 		var created = await _repository.CreateAsync(archivedCategory, TestContext.Current.CancellationToken);
 
-		var command = new DeleteCategoryCommand { Id = created.Value!.Id };
-
 		// Act - Delete already archived category (should be idempotent)
-		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.Handle(created.Value!.Id, TestContext.Current.CancellationToken);
 
 		// Assert - Should still return true
 		result.Success.Should().BeTrue();
@@ -88,16 +86,14 @@ public class DeleteCategoryHandlerIntegrationTests
 	}
 
 	[Fact]
-	public async Task Handle_CategoryNotDeleted_RecordStillExists()
+	public async Task Handle_ArchivedEntity_RecordStillExists()
 	{
 		// Arrange - Create a category
 		var category = CreateTestCategoryDto("Category to Archive", "Should still exist in DB");
 		var created = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
 
-		var command = new DeleteCategoryCommand { Id = created.Value!.Id };
-
 		// Act - Soft delete
-		await _handler.Handle(command, TestContext.Current.CancellationToken);
+		await _handler.Handle(created.Value!.Id, TestContext.Current.CancellationToken);
 
 		// Assert - Record should still exist (soft delete)
 		var dbCategory = await _repository.GetByIdAsync(created.Value.Id, TestContext.Current.CancellationToken);
@@ -107,17 +103,15 @@ public class DeleteCategoryHandlerIntegrationTests
 	}
 
 	[Fact]
-	public async Task Handle_CreatedAndDeletedCategory_NotReturnedInList()
+	public async Task Handle_CreatedAndDeletedEntity_NotReturnedInList()
 	{
 		// Arrange - Create a category via repository
 		var category = CreateTestCategoryDto("Category for List Test", "Will be archived");
 		var created = await _repository.CreateAsync(category, TestContext.Current.CancellationToken);
 		created.Value.Should().NotBeNull();
 
-		var command = new DeleteCategoryCommand { Id = created.Value!.Id };
-
 		// Act - Archive the category
-		await _handler.Handle(command, TestContext.Current.CancellationToken);
+		await _handler.Handle(created.Value!.Id, TestContext.Current.CancellationToken);
 
 		// Assert - GetAll (paginated) should exclude archived categories
 		var result = await _repository.GetAllAsync(1, 100, TestContext.Current.CancellationToken);

@@ -1,6 +1,6 @@
 // =======================================================
 // Copyright (c) 2026. All rights reserved.
-// File Name :     DeleteCategoryHandlerTests.cs
+// File Name :     DeleteHandlerTests.cs
 // Company :       mpaulosky
 // Author :        Matthew Paulosky
 // Solution Name : IssueManager
@@ -9,25 +9,27 @@
 
 using Api.Data.Interfaces;
 
-namespace Api.Handlers.Categories;
+namespace Api.Handlers;
 
 /// <summary>
-/// Unit tests for DeleteCategoryHandler (soft-delete via Archived).
+/// Unit tests for the generic DeleteHandler{TDto} (soft-delete via Archived). Exercised once
+/// through CategoryDto/ICategoryRepository - the logic is identical for every entity, so this
+/// single instantiation covers the shared behavior for all of them.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class DeleteCategoryHandlerTests
+public class DeleteHandlerTests
 {
 	private readonly ICategoryRepository _repository;
-	private readonly DeleteCategoryHandler _handler;
+	private readonly DeleteHandler<CategoryDto> _handler;
 
-	public DeleteCategoryHandlerTests()
+	public DeleteHandlerTests()
 	{
 		_repository = Substitute.For<ICategoryRepository>();
-		_handler = new DeleteCategoryHandler(_repository);
+		_handler = new DeleteHandler<CategoryDto>(_repository, "Category");
 	}
 
 	[Fact]
-	public async Task Handle_ValidCategory_SetsIsArchivedToTrue()
+	public async Task Handle_ValidId_SetsArchivedToTrue()
 	{
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
@@ -40,8 +42,6 @@ public class DeleteCategoryHandlerTests
 			false,
 			UserDto.Empty);
 
-		var command = new DeleteCategoryCommand { Id = categoryId };
-
 		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
 			.Returns(Result<CategoryDto>.Ok(category));
 
@@ -49,7 +49,7 @@ public class DeleteCategoryHandlerTests
 			.Returns(Result.Ok());
 
 		// Act
-		var result = await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(categoryId, CancellationToken.None);
 
 		// Assert
 		result.Success.Should().BeTrue();
@@ -59,17 +59,16 @@ public class DeleteCategoryHandlerTests
 	}
 
 	[Fact]
-	public async Task Handle_NonExistentCategory_ReturnsNotFoundResult()
+	public async Task Handle_NonExistentId_ReturnsNotFoundResult()
 	{
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
-		var command = new DeleteCategoryCommand { Id = categoryId };
 
 		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
 			.Returns(Result<CategoryDto>.Fail("Not found"));
 
 		// Act
-		var result = await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(categoryId, CancellationToken.None);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -77,7 +76,7 @@ public class DeleteCategoryHandlerTests
 	}
 
 	[Fact]
-	public async Task Handle_AlreadyArchivedCategory_IsIdempotent()
+	public async Task Handle_AlreadyArchived_IsIdempotent()
 	{
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
@@ -90,13 +89,11 @@ public class DeleteCategoryHandlerTests
 			true,
 			UserDto.Empty);
 
-		var command = new DeleteCategoryCommand { Id = categoryId };
-
 		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
 			.Returns(Result<CategoryDto>.Ok(archivedCategory));
 
 		// Act
-		var result = await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(categoryId, CancellationToken.None);
 
 		// Assert
 		result.Success.Should().BeTrue();
@@ -108,11 +105,8 @@ public class DeleteCategoryHandlerTests
 	[Fact]
 	public async Task Handle_EmptyId_ReturnsValidationFailure()
 	{
-		// Arrange
-		var command = new DeleteCategoryCommand { Id = ObjectId.Empty };
-
 		// Act
-		var result = await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(ObjectId.Empty, CancellationToken.None);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -133,8 +127,6 @@ public class DeleteCategoryHandlerTests
 			false,
 			UserDto.Empty);
 
-		var command = new DeleteCategoryCommand { Id = categoryId };
-
 		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
 			.Returns(Result<CategoryDto>.Ok(category));
 
@@ -142,7 +134,7 @@ public class DeleteCategoryHandlerTests
 			.Returns(Result.Fail("Archive failed"));
 
 		// Act
-		var result = await _handler.Handle(command, CancellationToken.None);
+		var result = await _handler.Handle(categoryId, CancellationToken.None);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -150,7 +142,7 @@ public class DeleteCategoryHandlerTests
 	}
 
 	[Fact]
-	public async Task Handle_ValidCategory_PassesCancellationToken()
+	public async Task Handle_ValidId_PassesCancellationToken()
 	{
 		// Arrange
 		var categoryId = ObjectId.GenerateNewId();
@@ -164,8 +156,6 @@ public class DeleteCategoryHandlerTests
 			false,
 			UserDto.Empty);
 
-		var command = new DeleteCategoryCommand { Id = categoryId };
-
 		_repository.GetByIdAsync(categoryId, Arg.Any<CancellationToken>())
 			.Returns(Result<CategoryDto>.Ok(category));
 
@@ -173,7 +163,7 @@ public class DeleteCategoryHandlerTests
 			.Returns(Result.Ok());
 
 		// Act
-		await _handler.Handle(command, cancellationToken);
+		await _handler.Handle(categoryId, cancellationToken);
 
 		// Assert
 		await _repository.Received(1).GetByIdAsync(categoryId, Arg.Any<CancellationToken>());

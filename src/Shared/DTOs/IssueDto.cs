@@ -26,7 +26,7 @@ public record IssueDto(
 	bool Archived,
 	UserDto ArchivedBy,
 	bool ApprovedForRelease,
-	bool Rejected)
+	bool Rejected) : IArchivableDto
 {
 	/// <summary>
 	///   Initializes a new instance of the <see cref="IssueDto" /> record.
