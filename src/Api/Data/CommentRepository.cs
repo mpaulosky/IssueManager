@@ -12,49 +12,21 @@ namespace Api.Data;
 /// <summary>
 /// MongoDB implementation of the comment repository.
 /// </summary>
-public class CommentRepository : ICommentRepository
+public class CommentRepository : MongoRepository<Comment, CommentDto>, ICommentRepository
 {
-	private readonly IMongoCollection<Comment> _collection;
-
 	/// <summary>
 	/// Initializes a new instance of the <see cref="CommentRepository"/> class.
 	/// </summary>
 	public CommentRepository(string connectionString, string databaseName = "IssueManagerDb")
+		: base(connectionString, databaseName, "comments", "Comment")
 	{
-		var client = new MongoClient(connectionString);
-		var database = client.GetDatabase(databaseName);
-		_collection = database.GetCollection<Comment>("comments");
 	}
 
 	/// <inheritdoc />
-	public async Task<Result> ArchiveAsync(ObjectId commentId, CancellationToken cancellationToken = default)
-	{
-		if (commentId == ObjectId.Empty)
-			return Result.Fail("Comment ID cannot be empty.");
-
-		var update = Builders<Comment>.Update.Set(x => x.Archived, true);
-		var result = await _collection.UpdateOneAsync(x => x.Id == commentId, update, cancellationToken: cancellationToken);
-		return result.ModifiedCount > 0 ? Result.Ok() : Result.Fail("Comment not found or already archived.", ResultErrorCode.NotFound);
-	}
+	protected override CommentDto ToDto(Comment model) => model.ToDto();
 
 	/// <inheritdoc />
-	public async Task<Result<CommentDto>> CreateAsync(CommentDto comment, CancellationToken cancellationToken = default)
-	{
-		if (comment.Id == ObjectId.Empty)
-			return Result.Fail<CommentDto>("Comment ID cannot be empty.");
-
-		var model = comment.ToModel();
-		await _collection.InsertOneAsync(model, cancellationToken: cancellationToken);
-		return Result.Ok(model.ToDto());
-	}
-
-	/// <inheritdoc />
-	public async Task<Result<CommentDto>> GetByIdAsync(ObjectId commentId, CancellationToken cancellationToken = default)
-	{
-		var entity = await _collection.Find(x => x.Id == commentId).FirstOrDefaultAsync(cancellationToken);
-
-		return entity is not null ? Result.Ok(entity.ToDto()) : Result.Fail<CommentDto>("Comment not found.", ResultErrorCode.NotFound);
-	}
+	protected override Comment ToModel(CommentDto dto) => dto.ToModel();
 
 	/// <inheritdoc />
 	public async Task<Result<IReadOnlyList<CommentDto>>> GetAllAsync(string? issueId = null, CancellationToken cancellationToken = default)
@@ -67,7 +39,7 @@ public class CommentRepository : ICommentRepository
 			filter = filterBuilder.Eq(c => c.Issue.Id, objectId);
 		}
 
-		var entities = await _collection.Find(filter).ToListAsync(cancellationToken);
+		var entities = await Collection.Find(filter).ToListAsync(cancellationToken);
 		return Result.Ok<IReadOnlyList<CommentDto>>(entities.Select(x => x.ToDto()).ToList().AsReadOnly());
 	}
 
@@ -78,8 +50,8 @@ public class CommentRepository : ICommentRepository
 			CancellationToken cancellationToken = default)
 	{
 		var filter = Builders<Comment>.Filter.Eq(x => x.Archived, false);
-		var total = await _collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
-		var entities = await _collection
+		var total = await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
+		var entities = await Collection
 			.Find(filter)
 			.Skip((page - 1) * pageSize)
 			.Limit(pageSize)
@@ -98,7 +70,7 @@ public class CommentRepository : ICommentRepository
 			return Result.Fail<IEnumerable<CommentDto>>("User ID cannot be empty.");
 		}
 
-		var entities = await _collection.Find(x => x.Author.Id == userId).ToListAsync(cancellationToken);
+		var entities = await Collection.Find(x => x.Author.Id == userId).ToListAsync(cancellationToken);
 
 		return entities.Count > 0
 				? Result.Ok(entities.Select(x => x.ToDto()).ToList().AsReadOnly() as IEnumerable<CommentDto>)
@@ -111,28 +83,11 @@ public class CommentRepository : ICommentRepository
 		if (issue.Id == ObjectId.Empty)
 			return Result.Fail<IEnumerable<CommentDto>>("Issue ID cannot be empty.");
 
-		var entities = await _collection.Find(x => x.Issue.Id == issue.Id).ToListAsync(cancellationToken);
+		var entities = await Collection.Find(x => x.Issue.Id == issue.Id).ToListAsync(cancellationToken);
 
 		return entities.Count > 0
 				? Result.Ok(entities.Select(x => x.ToDto()).ToList().AsReadOnly() as IEnumerable<CommentDto>)
 				: Result.Fail<IEnumerable<CommentDto>>("No comments found for the specified issue.");
-	}
-
-	/// <inheritdoc />
-	public async Task<Result<CommentDto>> UpdateAsync(CommentDto dto, CancellationToken cancellationToken = default)
-	{
-		if (dto.Id == ObjectId.Empty)
-			return Result.Fail<CommentDto>("Comment ID cannot be empty.");
-
-		var model = dto.ToModel();
-
-		var result = await _collection.ReplaceOneAsync(
-				x => x.Id == model.Id,
-				model,
-				cancellationToken: cancellationToken);
-
-		return result.ModifiedCount > 0 ? Result.Ok(model.ToDto()) :
-				Result.Fail<CommentDto>("Comment not found or update failed.", ResultErrorCode.NotFound);
 	}
 
 	/// <inheritdoc />
@@ -143,7 +98,7 @@ public class CommentRepository : ICommentRepository
 			return Result.Fail("User ID cannot be empty.");
 		}
 
-		var comment = await _collection.Find(x => x.Id == itemId).FirstOrDefaultAsync(cancellationToken);
+		var comment = await Collection.Find(x => x.Id == itemId).FirstOrDefaultAsync(cancellationToken);
 		if (comment is null)
 		{
 			return Result.Fail("Comment not found.", ResultErrorCode.NotFound);
@@ -155,16 +110,9 @@ public class CommentRepository : ICommentRepository
 		}
 
 		comment.DateModified = DateTime.UtcNow;
-		var result = await _collection.ReplaceOneAsync(x => x.Id == itemId, comment, cancellationToken: cancellationToken);
+		var result = await Collection.ReplaceOneAsync(x => x.Id == itemId, comment, cancellationToken: cancellationToken);
 		return result.ModifiedCount > 0
 			? Result.Ok()
 			: Result.Fail("Comment could not be updated.", ResultErrorCode.NotFound);
 	}
-
-	/// <inheritdoc />
-	public async Task<Result<long>> CountAsync(CancellationToken cancellationToken = default)
-	{
-		return Result.Ok(await _collection.CountDocumentsAsync(_ => true, cancellationToken: cancellationToken));
-	}
-
 }

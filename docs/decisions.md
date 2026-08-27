@@ -162,3 +162,19 @@ shape) rather than preserved as structured per-field errors. List endpoints that
 validatable input (Categories, Statuses, Comments) are not wrapped in `Result<T>` just
 for uniformity; only `ListIssuesHandler` needs it, because it's the only one with
 parameters that can actually fail validation.
+
+### 2026-08-27: New MongoDB-backed entities inherit MongoRepository, not a hand-written CRUD class
+
+`MongoRepository<TModel, TDto>` in `src/Api/Data/` implements the shared CRUD contract
+(`IRepository<TDto>`: archive, create, get-by-id, get-all, update, count) once. A new
+entity's concrete repository (e.g. `CategoryRepository`) should inherit
+`MongoRepository<TModel, TDto>`, pass its collection name and entity name to the base
+constructor, override `ToDto`/`ToModel` with one-line calls to the entity's existing
+static mapper (`src/Shared/Mappers/`), and add only its own genuinely distinctive query
+methods (filtered listings, lookups, vote/relationship operations) — it should never
+reimplement the 5 shared CRUD methods by hand. The entity's model class must implement
+`IEntity` (`Shared.Abstractions`) — just `ObjectId Id` and `bool Archived`, which every
+model already has — so the generic base can filter by id and set the archived flag
+without knowing the concrete model type. The entity's own repository interface
+(`ICategoryRepository`, etc.) should extend `IRepository<TDto>` rather than
+re-declaring the 5 shared method signatures.
