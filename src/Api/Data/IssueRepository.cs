@@ -12,59 +12,21 @@ namespace Api.Data;
 /// <summary>
 /// MongoDB implementation of the issue repository.
 /// </summary>
-public class IssueRepository : IIssueRepository
+public class IssueRepository : MongoRepository<Issue, IssueDto>, IIssueRepository
 {
-	private readonly IMongoCollection<Issue> _collection;
-
 	/// <summary>
 	/// Initializes a new instance of the <see cref="IssueRepository"/> class.
 	/// </summary>
 	public IssueRepository(string connectionString, string databaseName = "IssueManagerDb")
+		: base(connectionString, databaseName, "issues", "Issue")
 	{
-		var client = new MongoClient(connectionString);
-		var database = client.GetDatabase(databaseName);
-		_collection = database.GetCollection<Issue>("issues");
 	}
 
 	/// <inheritdoc />
-	public async Task<Result> ArchiveAsync(ObjectId issueId, CancellationToken cancellationToken = default)
-	{
-		if (issueId == ObjectId.Empty)
-			return Result.Fail("Issue ID cannot be empty.");
-
-		var update = Builders<Issue>.Update.Set(x => x.Archived, true);
-		var result = await _collection.UpdateOneAsync(x => x.Id == issueId, update, cancellationToken: cancellationToken);
-		return result.ModifiedCount > 0 ? Result.Ok() : Result.Fail("Issue not found or already archived.", ResultErrorCode.NotFound);
-	}
+	protected override IssueDto ToDto(Issue model) => model.ToDto();
 
 	/// <inheritdoc />
-	public async Task<Result<IssueDto>> CreateAsync(IssueDto issue, CancellationToken cancellationToken = default)
-	{
-		if (issue.Id == ObjectId.Empty)
-			return Result.Fail<IssueDto>("Issue ID cannot be empty.");
-
-		var model = issue.ToModel();
-		await _collection.InsertOneAsync(model, cancellationToken: cancellationToken);
-		return Result.Ok(model.ToDto());
-	}
-
-	/// <inheritdoc />
-	public async Task<Result<IssueDto>> GetByIdAsync(ObjectId issueId, CancellationToken cancellationToken = default)
-	{
-		if (!ObjectId.TryParse(issueId.ToString(), out var id))
-			return Result.Fail<IssueDto>("Invalid issue ID format.");
-
-		var entity = await _collection.Find(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
-
-		return entity is not null ? Result.Ok(entity.ToDto()) : Result.Fail<IssueDto>("Issue not found.", ResultErrorCode.NotFound);
-	}
-
-	/// <inheritdoc />
-	public async Task<Result<IReadOnlyList<IssueDto>>> GetAllAsync(CancellationToken cancellationToken = default)
-	{
-		var entities = await _collection.Find(_ => true).ToListAsync(cancellationToken);
-		return Result.Ok<IReadOnlyList<IssueDto>>(entities.Select(x => x.ToDto()).ToList().AsReadOnly());
-	}
+	protected override Issue ToModel(IssueDto dto) => dto.ToModel();
 
 	/// <inheritdoc />
 	public async Task<Result<(IReadOnlyList<IssueDto> Items, long Total)>> GetAllAsync(
@@ -107,8 +69,8 @@ public class IssueRepository : IIssueRepository
 		}
 
 		var filter = filterBuilder.And(filters);
-		var total = await _collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
-		var entities = await _collection
+		var total = await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
+		var entities = await Collection
 			.Find(filter)
 			.Skip((page - 1) * pageSize)
 			.Limit(pageSize)
@@ -117,28 +79,4 @@ public class IssueRepository : IIssueRepository
 		IReadOnlyList<IssueDto> items = entities.Select(x => x.ToDto()).ToList();
 		return Result.Ok((items, total));
 	}
-
-	/// <inheritdoc />
-	public async Task<Result<IssueDto>> UpdateAsync(IssueDto dto, CancellationToken cancellationToken = default)
-	{
-		if (dto.Id == ObjectId.Empty)
-			return Result.Fail<IssueDto>("Issue ID cannot be empty.");
-
-		var model = dto.ToModel();
-
-		var result = await _collection.ReplaceOneAsync(
-				x => x.Id == model.Id,
-				model,
-				cancellationToken: cancellationToken);
-
-		return result.ModifiedCount > 0 ? Result.Ok(model.ToDto()) :
-				Result.Fail<IssueDto>("Issue not found or update failed.", ResultErrorCode.NotFound);
-	}
-
-	/// <inheritdoc />
-	public async Task<Result<long>> CountAsync(CancellationToken cancellationToken = default)
-	{
-		return Result.Ok(await _collection.CountDocumentsAsync(_ => true, cancellationToken: cancellationToken));
-	}
-
 }

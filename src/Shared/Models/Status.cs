@@ -13,7 +13,7 @@ namespace Shared.Models;
 ///   Status class
 /// </summary>
 [Serializable]
-public class Status
+public class Status : IEntity
 {
 	/// <summary>
 	///   Gets or sets the identifier.

@@ -10,7 +10,7 @@
 namespace Shared.Models;
 
 [Serializable]
-public class Comment
+public class Comment : IEntity
 {
 	/// <summary>
 	///   Gets or sets the identifier.

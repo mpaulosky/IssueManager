@@ -13,7 +13,7 @@ namespace Shared.Models;
 ///   Issue class
 /// </summary>
 [Serializable]
-public class Issue
+public class Issue : IEntity
 {
 	/// <summary>
 	///   Gets or sets the identifier.

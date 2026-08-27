@@ -13,7 +13,7 @@ namespace Shared.Models;
 ///   Category class
 /// </summary>
 [Serializable]
-public class Category
+public class Category : IEntity
 {
 	/// <summary>
 	///   Gets or sets the identifier.
