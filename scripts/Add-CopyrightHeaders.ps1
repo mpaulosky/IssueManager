@@ -298,7 +298,7 @@ if ($stats.Fixed -gt 0) {
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "   1. Review the changes: git diff" -ForegroundColor Gray
-Write-Host "   2. Run pre-push hook to validate: bash scripts/hooks/pre-push" -ForegroundColor Gray
+Write-Host "   2. Run pre-push hook to validate: bash .github/hooks/pre-push" -ForegroundColor Gray
 Write-Host "   3. Commit the changes: git add . && git commit -m 'chore: add copyright headers'" -ForegroundColor Gray
 
 exit 0

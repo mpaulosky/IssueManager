@@ -254,6 +254,4 @@ filterBuilder.AnyEq(x => x.Tags, tagValue)
 
 ## See Also
 
-- Sam's history: `.squad/agents/sam/history.md` (Search/Filter implementation section)
-- Team decision: `.squad/decisions/inbox/sam-search-filter.md`
 - MongoDB Filter Builders: <https://www.mongodb.com/docs/drivers/csharp/current/fundamentals/builders/>
