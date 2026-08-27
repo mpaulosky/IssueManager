@@ -6,5 +6,5 @@ confidence: high
 
 ## Steps
 
-- Run `dotnet test Articles.slnx --nologo` and ensure all tests pass with zero failures before push.
+- Run `dotnet test IssueManager.slnx --nologo` and ensure all tests pass with zero failures before push.
 - If any test fails, fix the issue before pushing.
