@@ -86,7 +86,7 @@ public static class RedisServices
 	private static ResourceCommandState OnUpdateResourceState(UpdateCommandStateContext context)
 	{
 
-		var logger = context.ServiceProvider.GetRequiredService<ILogger<Program>>();
+		var logger = context.Services.GetRequiredService<ILogger<Program>>();
 		if (logger.IsEnabled(LogLevel.Information))
 		{
 			logger.LogInformation("Updating resource state: {ResourceSnapshot}", context.ResourceSnapshot);
