@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IssueManager — Docs</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f7f7fb;
+    --surface: #ffffff;
+    --surface-2: #f0f1f6;
+    --text: #1a1b26;
+    --text-muted: #5c5f72;
+    --border: #e2e3ec;
+    --accent: #512bd4;
+    --accent-2: #7c5cff;
+    --code-bg: #1a1b26;
+    --code-text: #e7e7f0;
+    --badge-bg: #eef0ff;
+    --shadow: 0 1px 2px rgba(20, 20, 40, 0.04), 0 8px 24px rgba(20, 20, 40, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101117;
+      --surface: #171821;
+      --surface-2: #1e1f2b;
+      --text: #edecf5;
+      --text-muted: #a0a3b8;
+      --border: #2b2d3d;
+      --accent: #9b8cff;
+      --accent-2: #7c5cff;
+      --code-bg: #0c0d13;
+      --code-text: #dcdcef;
+      --badge-bg: #23243a;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, pre {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  code {
+    background: var(--surface-2);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 1rem 1.25rem;
+    border-radius: 10px;
+    overflow-x: auto;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+
+  header.hero {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+    color: #fff;
+    padding: 3.5rem 1.5rem 3rem;
+  }
+  .hero-inner { max-width: 960px; margin: 0 auto; }
+  .hero h1 { font-size: 2.4rem; margin: 0 0 0.5rem; letter-spacing: -0.02em; }
+  .hero p.tagline { font-size: 1.1rem; opacity: 0.92; max-width: 60ch; margin: 0 0 1.5rem; }
+  .badges { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .badges img { display: block; height: 20px; }
+
+  main { max-width: 960px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+
+  section { margin-bottom: 3rem; }
+  section h2 {
+    font-size: 1.5rem;
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem 1.75rem;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+  .stack-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+  }
+  .stack-item strong { color: var(--accent); }
+
+  ol.steps { padding-left: 1.25rem; }
+  ol.steps li { margin-bottom: 0.6rem; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  thead th {
+    text-align: left;
+    background: var(--surface-2);
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+  tbody td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+  .muted { color: var(--text-muted); font-size: 0.92em; }
+  .table-wrap { overflow-x: auto; border-radius: 12px; }
+  .pill {
+    display: inline-block;
+    background: var(--badge-bg);
+    color: var(--accent);
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .empty-state {
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+  }
+  footer {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 2rem 1.5rem 3rem;
+    font-size: 0.9rem;
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <h1>IssueManager</h1>
+    <p class="tagline">
+      An issue management application built with modern architecture patterns and
+      async/reactive workflows — demonstrating vertical slice architecture, CQRS, and
+      MongoDB integration in a production-ready .NET application.
+    </p>
+    <div class="badges">
+      <a href="https://dotnet.microsoft.com/"><img src="https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet" alt=".NET 10" /></a>
+      <a href="../LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License" /></a>
+      <a href="https://github.com/mpaulosky/IssueManager/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/Tests-xUnit-blueviolet?logo=github" alt="xUnit Tests" /></a>
+      <a href="https://github.com/mpaulosky/IssueManager/releases/latest"><img src="https://img.shields.io/github/v/release/mpaulosky/IssueManager?logo=github&color=blue&label=Release" alt="Latest Release" /></a>
+      <a href="https://github.com/mpaulosky/IssueManager/actions/workflows/ci.yml"><img src="https://github.com/mpaulosky/IssueManager/actions/workflows/ci.yml/badge.svg" alt="CI/CD" /></a>
+      <a href="https://codecov.io/gh/mpaulosky/IssueManager"><img src="https://codecov.io/gh/mpaulosky/IssueManager/branch/main/graph/badge.svg" alt="CodeCov Coverage" /></a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section id="quick-start">
+    <h2>Quick Start</h2>
+    <div class="card">
+      <ol class="steps">
+        <li><strong>Prerequisites:</strong> .NET 10 SDK, Docker (for MongoDB)</li>
+        <li>
+          <strong>Clone &amp; Restore:</strong>
+          <pre><code>git clone https://github.com/mpaulosky/IssueManager.git
+cd IssueManager
+dotnet restore</code></pre>
+        </li>
+        <li><strong>Run:</strong> <code>dotnet run --project AppHost</code> (Aspire orchestration)</li>
+        <li><strong>Open:</strong> <code>https://localhost:5001</code> (Blazor UI)</li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="tech-stack">
+    <h2>Tech Stack</h2>
+    <div class="grid-2">
+      <div class="stack-item"><strong>.NET 10</strong> — Latest stable framework</div>
+      <div class="stack-item"><strong>Aspire</strong> — Service orchestration &amp; local dev</div>
+      <div class="stack-item"><strong>Blazor</strong> — Interactive web UI (server-side rendering)</div>
+      <div class="stack-item"><strong>MongoDB.EntityFramework</strong> — Data access</div>
+      <div class="stack-item"><strong>CQRS</strong> — Command/query separation</div>
+      <div class="stack-item"><strong>Vertical Slice Architecture</strong> — Feature-based organization</div>
+    </div>
+  </section>
+
+  <section id="architecture">
+    <h2>Architecture</h2>
+    <div class="card">
+      <p>
+        Features are organized as vertical slices—each slice owns its complete stack from API
+        to UI. Commands handle writes, queries handle reads. MongoDB is our primary data store.
+        Aspire manages service topology and local development.
+      </p>
+    </div>
+  </section>
+
+  <section id="blogs">
+    <h2>Blog Posts</h2>
+    <p class="muted">
+      Commit summaries generated via <code>scripts/New-BlogPost.ps1</code> and release notes
+      generated via <code>scripts/New-ReleaseBlogPost.ps1</code>, both stored in
+      <a href="blogs/">docs/blogs/</a>.
+    </p>
+    <div class="table-wrap">
+      <table id="blogs-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Title</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>2026-08-29</td><td><a href="blogs/2026-08-29-release-v0.0.19.md">Release v0.0.19</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-08-29</td><td><a href="blogs/2026-08-29-release-v0.0.18.md">Release v0.0.18</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-08-29</td><td><a href="blogs/2026-08-29-ci-skip-buildtest-jobs-when-only-unrelated-files-change-177.md">ci: skip build/test jobs when only unrelated files change (#177)</a></td><td><span class="pill">commit</span></td></tr>
+          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.17.md">Release v0.0.17</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.16.md">Release v0.0.16</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.15.md">Release v0.0.15</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.14.md">Release v0.0.14</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.13.md">Release v0.0.13</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.12.md">Release v0.0.12</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.11.md">Release v0.0.11</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.10.md">Release v0.0.10</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.9.md">Release v0.0.9</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-07-24</td><td><a href="blogs/2026-07-24-release-v0.0.9-108.md">Release v0.0.9-108</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-02-27</td><td><a href="blogs/2026-02-27-release-v0.0.8.md">Release v0.0.8</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-02-27</td><td><a href="blogs/2026-02-27-release-v0.0.7.md">Release v0.0.7</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-02-27</td><td><a href="blogs/2026-02-27-release-v0.0.6.md">Release v0.0.6</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-02-20</td><td><a href="blogs/2026-02-20-release-v0.0.5.md">Release v0.0.5</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-02-20</td><td><a href="blogs/2026-02-20-release-v0.0.4.md">Release v0.0.4</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-02-20</td><td><a href="blogs/2026-02-20-release-v0.0.3.md">Release v0.0.3</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-02-20</td><td><a href="blogs/2026-02-20-release-v0.0.2.md">Release v0.0.2</a></td><td><span class="pill">release</span></td></tr>
+          <tr><td>2026-02-20</td><td><a href="blogs/2026-02-20-release-v0.0.1.md">Release v0.0.1</a></td><td><span class="pill">release</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="releases">
+    <h2>Release Documents</h2>
+    <p class="muted">
+      See the full history in
+      <a href="CHANGELOG.md">CHANGELOG.md</a> or on
+      <a href="https://github.com/mpaulosky/IssueManager/releases">GitHub Releases</a>.
+    </p>
+    <div class="table-wrap">
+      <table id="releases-table">
+        <thead>
+          <tr>
+            <th>Version</th>
+            <th>Published</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>v0.0.19</td><td>2026-08-29</td><td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.19">Release notes</a></td></tr>
+          <tr><td>v0.0.18</td><td>2026-08-29</td><td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.18">Release notes</a></td></tr>
+          <tr><td>v0.0.17</td><td>2026-08-27</td><td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.17">Release notes</a></td></tr>
+          <tr><td>v0.0.16</td><td>2026-08-27</td><td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.16">Release notes</a></td></tr>
+          <tr><td>v0.0.15</td><td>2026-08-27</td><td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.15">Release notes</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="contributing">
+    <h2>Contributing</h2>
+    <div class="card">
+      <p>
+        See <a href="CONTRIBUTING.md">CONTRIBUTING.md</a> and
+        <a href="CODE_OF_CONDUCT.md">CODE_OF_CONDUCT.md</a> for community guidelines. Work
+        happens on feature/fix/chore branches with PR review before merging to <code>main</code>.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  IssueManager · <a href="https://github.com/mpaulosky/IssueManager">GitHub</a> ·
+  <a href="../LICENSE">MIT License</a>
+</footer>
+
+<script>
+  // Progressive enhancement: refresh the blog/release tables from GitHub's API when
+  // this page is served over http(s). Falls back silently to the static rows above
+  // when offline, opened via file://, or the API is unreachable/rate-limited.
+  (function () {
+    var REPO = "mpaulosky/IssueManager";
+
+    function fmtDate(iso) {
+      return iso ? iso.slice(0, 10) : "";
+    }
+
+    function renderReleases(releases) {
+      var tbody = document.querySelector("#releases-table tbody");
+      if (!releases || !releases.length) return;
+      tbody.innerHTML = releases.slice(0, 10).map(function (r) {
+        return "<tr><td>" + r.tag_name + "</td><td>" + fmtDate(r.published_at) +
+          "</td><td><a href=\"" + r.html_url + "\">Release notes</a></td></tr>";
+      }).join("");
+    }
+
+    function renderBlogs(files) {
+      var tbody = document.querySelector("#blogs-table tbody");
+      var posts = files.filter(function (f) { return f.name.endsWith(".md"); })
+        .sort(function (a, b) { return b.name.localeCompare(a.name); });
+      if (!posts.length) return;
+      tbody.innerHTML = posts.map(function (f) {
+        var date = f.name.slice(0, 10);
+        var titleSlug = f.name.slice(11).replace(/\.md$/, "");
+        return "<tr><td>" + date + "</td><td><a href=\"blogs/" + f.name + "\">" +
+          titleSlug + "</a></td><td><span class=\"pill\">docs/blogs</span></td></tr>";
+      }).join("");
+    }
+
+    if (window.location.protocol === "file:") return;
+
+    fetch("https://api.github.com/repos/" + REPO + "/releases?per_page=10")
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (data) { if (data) renderReleases(data); })
+      .catch(function () {});
+
+    fetch("https://api.github.com/repos/" + REPO + "/contents/docs/blogs")
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (data) { if (Array.isArray(data)) renderBlogs(data); })
+      .catch(function () {});
+  })();
+</script>
+
+</body>
+</html>

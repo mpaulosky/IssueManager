@@ -2,6 +2,43 @@
 
 Utility scripts for repository maintenance and developer workflows.
 
+## New-BlogPost.ps1
+
+Generates a Markdown blog post summarizing a commit's message and diff, writes it to
+`docs/blogs/`, and stages it with `git add` so it ships in the same push as the change it
+documents.
+
+### Usage
+
+```powershell
+# Summarize the current HEAD commit
+.\scripts\New-BlogPost.ps1
+
+# Summarize a specific commit with a custom title
+.\scripts\New-BlogPost.ps1 -Ref HEAD~1 -Title "Consolidated Mongo repositories"
+```
+
+Run it after committing your change and before pushing — the generated post is staged, so
+include it in the same commit (`git commit --amend`) or a follow-up commit before you push.
+
+## New-ReleaseBlogPost.ps1
+
+Generates a Markdown blog post documenting a GitHub release (via `gh release view`) and stages
+it in `docs/blogs/`. Requires the GitHub CLI (`gh`) authenticated against this repo.
+
+### Usage
+
+```powershell
+# Document the latest release
+.\scripts\New-ReleaseBlogPost.ps1
+
+# Document a specific release
+.\scripts\New-ReleaseBlogPost.ps1 -Tag v0.0.19
+
+# Backfill posts for every release (skips any that already exist)
+.\scripts\New-ReleaseBlogPost.ps1 -All
+```
+
 ## cleanup-merged-branches.ps1
 
 Automatically cleans up local branches whose remote tracking branches have been deleted (typically after PR merge).
