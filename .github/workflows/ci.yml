@@ -13,6 +13,14 @@ name: Build and Test Suite
 # changed and the downstream jobs are skipped via `if:` when they didn't.
 # GitHub treats a skipped required check as passing, so docs/config-only
 # PRs still merge cleanly without paying for a full build+test run.
+#
+# NOTE: The "Tests: *" required checks are matrix entries (one per test
+# project, named by discover-tests' output). A job's `if:` is implicitly
+# ANDed with success(), so without always() on "discover-tests" and "test"
+# below, a skipped "build" would skip them too - and a skipped matrix job
+# never creates its named check runs at all, leaving the required checks
+# permanently missing (not skipped) and blocking merge. always() keeps
+# both jobs running so each matrix entry reports SKIPPED by name.
 
 permissions:
   issues: write
@@ -175,7 +183,13 @@ jobs:
             ${{ runner.os }}-build-
 
   discover-tests:
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    # always(): this job must still populate the test matrix (so the
+    # per-project "Tests: *" required checks below get a named, skipped
+    # check run instead of never reporting at all) even when "build" was
+    # skipped because no src/tests files changed. Without always(), the
+    # implicit `success()` gate would skip this job whenever its "build"
+    # dependency skips, leaving the matrix empty.
+    if: ${{ always() && github.actor != 'dependabot[bot]' }}
     name: Discover Test Projects
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -233,11 +247,20 @@ jobs:
           echo "::notice::tests/"
 
   test:
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    # always() + needs.changes.outputs.code: each matrix entry is a required
+    # status check by exact name (see the ruleset), so this job must still
+    # run (and be marked SKIPPED per matrix entry) when code didn't change,
+    # rather than never reporting at all - which is what happened before
+    # always() was added, since the implicit `success()` gate skipped this
+    # job whenever "build" skipped.
+    if: >-
+      ${{ always() && needs.changes.outputs.code == 'true' &&
+      github.actor != 'dependabot[bot]' }}
     name: "Tests: ${{ matrix.test_name }}"
     runs-on: ubuntu-latest
     timeout-minutes: 45
     needs:
+      - changes
       - build
       - discover-tests
     strategy:
