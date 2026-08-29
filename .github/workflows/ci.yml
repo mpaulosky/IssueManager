@@ -247,15 +247,16 @@ jobs:
           echo "::notice::tests/"
 
   test:
-    # always() + needs.changes.outputs.code: each matrix entry is a required
-    # status check by exact name (see the ruleset), so this job must still
-    # run (and be marked SKIPPED per matrix entry) when code didn't change,
-    # rather than never reporting at all - which is what happened before
-    # always() was added, since the implicit `success()` gate skipped this
-    # job whenever "build" skipped.
-    if: >-
-      ${{ always() && needs.changes.outputs.code == 'true' &&
-      github.actor != 'dependabot[bot]' }}
+    # always(): each matrix entry is a required status check by exact name
+    # (see the ruleset). A matrix job that is skipped at the JOB level
+    # collapses into a single unexpanded "Tests: ${{ matrix.test_name }}"
+    # check instead of one per matrix entry - so the named required checks
+    # never get created and merges stay blocked forever. Keeping the job
+    # itself always-on lets the matrix expand normally; the individual
+    # steps below are gated on needs.changes.outputs.code instead, so each
+    # matrix entry still reports (as a quick no-op success) even when the
+    # code didn't change.
+    if: ${{ always() && github.actor != 'dependabot[bot]' }}
     name: "Tests: ${{ matrix.test_name }}"
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -293,16 +294,17 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Restore dependencies
+        if: needs.changes.outputs.code == 'true'
         run: dotnet restore
 
       - name: Build test project
-        if: ${{ matrix.build_before_test }}
+        if: needs.changes.outputs.code == 'true' && matrix.build_before_test
         run: >-
           dotnet build "${{ matrix.project_path }}" --configuration Release
           --no-restore
 
       - name: Install Playwright browsers
-        if: ${{ matrix.requires_playwright }}
+        if: needs.changes.outputs.code == 'true' && matrix.requires_playwright
         run: |
           project_dir="$(dirname "${{ matrix.project_path }}")"
           playwright_script=$(find "$project_dir/bin/Release" \
@@ -316,6 +318,7 @@ jobs:
 
       - name: Run tests
         id: run-tests
+        if: needs.changes.outputs.code == 'true'
         run: |
           mkdir -p test-results
 
@@ -347,14 +350,15 @@ jobs:
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
-        if: always()
+        if: always() && needs.changes.outputs.code == 'true'
         with:
           name: test-results-${{ matrix.test_id }}
           path: test-results
+          if-no-files-found: ignore
 
       - name: Upload Playwright diagnostics
         uses: actions/upload-artifact@v7
-        if: ${{ matrix.requires_playwright }}
+        if: needs.changes.outputs.code == 'true' && matrix.requires_playwright
         with:
           name: playwright-artifacts-${{ matrix.test_id }}
           path: tests/E2E.Tests/bin/Release/**/TestResults/playwright-artifacts/
