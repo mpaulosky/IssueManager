@@ -60,7 +60,6 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<CreateIssueHandler>();
 		services.AddScoped<UpdateIssueHandler>();
 		services.AddScoped<ListIssuesHandler>();
-		services.AddScoped<GetIssueHandler>();
 		services.AddScoped<UpdateIssueStatusHandler>();
 		services.AddScoped<CreateCommentHandler>();
 		services.AddScoped<GetCommentHandler>();

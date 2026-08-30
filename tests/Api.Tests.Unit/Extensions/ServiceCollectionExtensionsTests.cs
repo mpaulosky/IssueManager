@@ -139,7 +139,6 @@ public class ServiceCollectionExtensionsTests
 		services.Should().Contain(sd => sd.ServiceType == typeof(CreateIssueHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateIssueHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(ListIssuesHandler));
-		services.Should().Contain(sd => sd.ServiceType == typeof(GetIssueHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateIssueStatusHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(TaxonomyCrudHandler<CategoryDto, CreateCategoryCommand, UpdateCategoryCommand>));
 		services.Should().Contain(sd => sd.ServiceType == typeof(TaxonomyCrudHandler<StatusDto, CreateStatusCommand, UpdateStatusCommand>));
