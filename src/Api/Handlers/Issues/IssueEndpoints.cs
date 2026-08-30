@@ -9,8 +9,6 @@
 
 using Api.Handlers;
 
-using static Api.Handlers.Issues.GetIssueHandler;
-
 namespace Api.Handlers.Issues;
 
 /// <summary>Registers Issue endpoints on the route builder.</summary>
@@ -41,12 +39,11 @@ public static class IssueEndpoints
 		.Produces(StatusCodes.Status400BadRequest);
 
 		// Get Issue by ID
-		group.MapGet("{id}", async (string id, GetIssueHandler handler) =>
+		group.MapGet("{id}", async (string id, IIssueRepository repository) =>
 		{
 			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
 				return badRequest;
-			var query = new GetIssueQuery(objectId);
-			var result = await handler.Handle(query);
+			var result = await repository.GetByIdAsync(objectId);
 			return result.ToHttpResult(Results.Ok);
 		})
 		.WithName("GetIssue")
