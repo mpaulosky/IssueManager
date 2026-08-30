@@ -109,4 +109,26 @@ public abstract class MongoRepository<TModel, TDto> : IRepository<TDto>
 	{
 		return Result.Ok(await Collection.CountDocumentsAsync(_ => true, cancellationToken: cancellationToken));
 	}
+
+	/// <summary>
+	/// Gets a page of non-archived entities along with the total non-archived count.
+	/// Shared by any repository whose listing needs only archived-filtering and skip/limit
+	/// (entities with additional filter criteria, e.g. search/author/status, implement their own).
+	/// </summary>
+	protected async Task<Result<(IReadOnlyList<TDto> Items, long Total)>> GetPagedAsync(
+			int page,
+			int pageSize,
+			CancellationToken cancellationToken = default)
+	{
+		var filter = Builders<TModel>.Filter.Eq(x => x.Archived, false);
+		var total = await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
+		var entities = await Collection
+			.Find(filter)
+			.Skip((page - 1) * pageSize)
+			.Limit(pageSize)
+			.ToListAsync(cancellationToken);
+
+		IReadOnlyList<TDto> items = entities.Select(ToDto).ToList();
+		return Result.Ok((items, total));
+	}
 }

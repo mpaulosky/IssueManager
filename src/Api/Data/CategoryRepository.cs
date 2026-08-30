@@ -29,20 +29,8 @@ public class CategoryRepository : MongoRepository<Category, CategoryDto>, ICateg
 	protected override Category ToModel(CategoryDto dto) => dto.ToModel();
 
 	/// <inheritdoc />
-	public async Task<Result<(IReadOnlyList<CategoryDto> Items, long Total)>> GetAllAsync(
+	public Task<Result<(IReadOnlyList<CategoryDto> Items, long Total)>> GetAllAsync(
 			int page,
 			int pageSize,
-			CancellationToken cancellationToken = default)
-	{
-		var filter = Builders<Category>.Filter.Eq(x => x.Archived, false);
-		var total = await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
-		var entities = await Collection
-			.Find(filter)
-			.Skip((page - 1) * pageSize)
-			.Limit(pageSize)
-			.ToListAsync(cancellationToken);
-
-		IReadOnlyList<CategoryDto> items = entities.Select(x => x.ToDto()).ToList();
-		return Result.Ok((items, total));
-	}
+			CancellationToken cancellationToken = default) => GetPagedAsync(page, pageSize, cancellationToken);
 }
