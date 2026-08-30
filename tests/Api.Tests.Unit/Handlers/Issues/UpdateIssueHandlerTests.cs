@@ -7,6 +7,7 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
+using Api.Builders;
 using Api.Data.Interfaces;
 
 namespace Api.Handlers.Issues;
@@ -37,19 +38,13 @@ public class UpdateIssueHandlerTests
 	{
 		// Arrange
 		var issueId = ObjectId.GenerateNewId();
-		var existingIssue = new IssueDto(
-			issueId,
-			"Original Title",
-			"Original Description",
-			DateTime.UtcNow.AddDays(-1),
-			null,
-			UserDto.Empty,
-			CategoryDto.Empty,
-			StatusDto.Empty,
-			false,
-			UserDto.Empty,
-			false,
-			false);
+		var existingIssue = IssueBuilder.Default()
+			.WithId(issueId)
+			.WithTitle("Original Title")
+			.WithDescription("Original Description")
+			.WithCreatedAt(DateTime.UtcNow.AddDays(-1))
+			.WithStatus(StatusDto.Empty)
+			.Build();
 
 		var command = new UpdateIssueCommand
 		{
@@ -169,19 +164,14 @@ public class UpdateIssueHandlerTests
 	{
 		// Arrange
 		var issueId = ObjectId.GenerateNewId();
-		var archivedIssue = new IssueDto(
-			issueId,
-			"Archived Issue",
-			"This is archived",
-			DateTime.UtcNow.AddDays(-1),
-			null,
-			UserDto.Empty,
-			CategoryDto.Empty,
-			StatusDto.Empty,
-			true,
-			UserDto.Empty,
-			false,
-			false);
+		var archivedIssue = IssueBuilder.Default()
+			.WithId(issueId)
+			.WithTitle("Archived Issue")
+			.WithDescription("This is archived")
+			.WithCreatedAt(DateTime.UtcNow.AddDays(-1))
+			.WithStatus(StatusDto.Empty)
+			.AsArchived()
+			.Build();
 
 		var command = new UpdateIssueCommand
 		{
@@ -206,19 +196,13 @@ public class UpdateIssueHandlerTests
 	{
 		// Arrange
 		var issueId = ObjectId.GenerateNewId();
-		var existingIssue = new IssueDto(
-			issueId,
-			"Same Title",
-			"Same Description",
-			DateTime.UtcNow.AddDays(-1),
-			null,
-			UserDto.Empty,
-			CategoryDto.Empty,
-			StatusDto.Empty,
-			false,
-			UserDto.Empty,
-			false,
-			false);
+		var existingIssue = IssueBuilder.Default()
+			.WithId(issueId)
+			.WithTitle("Same Title")
+			.WithDescription("Same Description")
+			.WithCreatedAt(DateTime.UtcNow.AddDays(-1))
+			.WithStatus(StatusDto.Empty)
+			.Build();
 
 		var command = new UpdateIssueCommand
 		{
@@ -248,19 +232,13 @@ public class UpdateIssueHandlerTests
 	{
 		// Arrange
 		var issueId = ObjectId.GenerateNewId();
-		var existingIssue = new IssueDto(
-			issueId,
-			"Original Title",
-			"Original Description",
-			DateTime.UtcNow.AddDays(-1),
-			null,
-			UserDto.Empty,
-			CategoryDto.Empty,
-			StatusDto.Empty,
-			false,
-			UserDto.Empty,
-			false,
-			false);
+		var existingIssue = IssueBuilder.Default()
+			.WithId(issueId)
+			.WithTitle("Original Title")
+			.WithDescription("Original Description")
+			.WithCreatedAt(DateTime.UtcNow.AddDays(-1))
+			.WithStatus(StatusDto.Empty)
+			.Build();
 
 		var command = new UpdateIssueCommand
 		{
@@ -296,19 +274,13 @@ public class UpdateIssueHandlerTests
 		var categoryId = ObjectId.GenerateNewId();
 		var newCategory = new CategoryDto(categoryId, "New Category", "New cat desc", DateTime.UtcNow, null, false, UserDto.Empty);
 
-		var existingIssue = new IssueDto(
-			issueId,
-			"Original Title",
-			"Original Description",
-			DateTime.UtcNow.AddDays(-1),
-			null,
-			UserDto.Empty,
-			CategoryDto.Empty,
-			StatusDto.Empty,
-			false,
-			UserDto.Empty,
-			false,
-			false);
+		var existingIssue = IssueBuilder.Default()
+			.WithId(issueId)
+			.WithTitle("Original Title")
+			.WithDescription("Original Description")
+			.WithCreatedAt(DateTime.UtcNow.AddDays(-1))
+			.WithStatus(StatusDto.Empty)
+			.Build();
 
 		var command = new UpdateIssueCommand
 		{
@@ -344,19 +316,13 @@ public class UpdateIssueHandlerTests
 		var statusId = ObjectId.GenerateNewId();
 		var newStatus = new StatusDto(statusId, "In Progress", "Being worked on", DateTime.UtcNow, null, false, UserDto.Empty);
 
-		var existingIssue = new IssueDto(
-			issueId,
-			"Original Title",
-			"Original Description",
-			DateTime.UtcNow.AddDays(-1),
-			null,
-			UserDto.Empty,
-			CategoryDto.Empty,
-			StatusDto.Empty,
-			false,
-			UserDto.Empty,
-			false,
-			false);
+		var existingIssue = IssueBuilder.Default()
+			.WithId(issueId)
+			.WithTitle("Original Title")
+			.WithDescription("Original Description")
+			.WithCreatedAt(DateTime.UtcNow.AddDays(-1))
+			.WithStatus(StatusDto.Empty)
+			.Build();
 
 		var command = new UpdateIssueCommand
 		{
@@ -391,19 +357,13 @@ public class UpdateIssueHandlerTests
 		var issueId = ObjectId.GenerateNewId();
 		var categoryId = ObjectId.GenerateNewId();
 
-		var existingIssue = new IssueDto(
-			issueId,
-			"Original Title",
-			"Original Description",
-			DateTime.UtcNow.AddDays(-1),
-			null,
-			UserDto.Empty,
-			CategoryDto.Empty,
-			StatusDto.Empty,
-			false,
-			UserDto.Empty,
-			false,
-			false);
+		var existingIssue = IssueBuilder.Default()
+			.WithId(issueId)
+			.WithTitle("Original Title")
+			.WithDescription("Original Description")
+			.WithCreatedAt(DateTime.UtcNow.AddDays(-1))
+			.WithStatus(StatusDto.Empty)
+			.Build();
 
 		var command = new UpdateIssueCommand
 		{
@@ -433,19 +393,13 @@ public class UpdateIssueHandlerTests
 		var issueId = ObjectId.GenerateNewId();
 		var statusId = ObjectId.GenerateNewId();
 
-		var existingIssue = new IssueDto(
-			issueId,
-			"Original Title",
-			"Original Description",
-			DateTime.UtcNow.AddDays(-1),
-			null,
-			UserDto.Empty,
-			CategoryDto.Empty,
-			StatusDto.Empty,
-			false,
-			UserDto.Empty,
-			false,
-			false);
+		var existingIssue = IssueBuilder.Default()
+			.WithId(issueId)
+			.WithTitle("Original Title")
+			.WithDescription("Original Description")
+			.WithCreatedAt(DateTime.UtcNow.AddDays(-1))
+			.WithStatus(StatusDto.Empty)
+			.Build();
 
 		var command = new UpdateIssueCommand
 		{

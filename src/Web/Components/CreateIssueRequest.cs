@@ -9,6 +9,8 @@
 
 using System.ComponentModel.DataAnnotations;
 
+using MongoDB.Bson;
+
 namespace Web.Components;
 
 /// <summary>
@@ -43,4 +45,27 @@ public record CreateIssueRequest
 	/// Gets or sets the status ID for the issue.
 	/// </summary>
 	public string? StatusId { get; set; }
+
+	/// <summary>
+	/// Maps this request to a <see cref="CreateIssueCommand"/>.
+	/// </summary>
+	public CreateIssueCommand ToCreateCommand() => new()
+	{
+		Title = Title,
+		Description = Description,
+		CategoryId = CategoryId,
+		StatusId = StatusId
+	};
+
+	/// <summary>
+	/// Maps this request to an <see cref="UpdateIssueCommand"/> for the issue identified by <paramref name="id"/>.
+	/// </summary>
+	public UpdateIssueCommand ToUpdateCommand(string id) => new()
+	{
+		Id = ObjectId.Parse(id),
+		Title = Title,
+		Description = Description,
+		CategoryId = ObjectId.TryParse(CategoryId, out var categoryId) ? categoryId : null,
+		StatusId = ObjectId.TryParse(StatusId, out var statusId) ? statusId : null
+	};
 }

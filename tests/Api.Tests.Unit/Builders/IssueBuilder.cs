@@ -18,6 +18,7 @@ public class IssueBuilder
 	private ObjectId _id = ObjectId.GenerateNewId();
 	private string _title = "Default Test Issue";
 	private string _description = "Default test description";
+	private CategoryDto _category = CategoryDto.Empty;
 	private StatusDto _status = new(ObjectId.GenerateNewId(), "Open", "Issue is open", DateTime.UtcNow, null, false, UserDto.Empty);
 	private DateTime _dateCreated = DateTime.UtcNow;
 	private bool _archived;
@@ -25,6 +26,18 @@ public class IssueBuilder
 	public IssueBuilder WithId(string id)
 	{
 		_id = ObjectId.Parse(id);
+		return this;
+	}
+
+	public IssueBuilder WithId(ObjectId id)
+	{
+		_id = id;
+		return this;
+	}
+
+	public IssueBuilder WithCategory(CategoryDto category)
+	{
+		_category = category;
 		return this;
 	}
 
@@ -72,7 +85,7 @@ public class IssueBuilder
 			_dateCreated,
 			null,
 			UserDto.Empty,
-			CategoryDto.Empty,
+			_category,
 			_status,
 			_archived,
 			UserDto.Empty,

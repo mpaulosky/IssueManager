@@ -7,6 +7,7 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
+using Api.Builders;
 using Api.Data.Interfaces;
 
 namespace Api.Handlers.Issues;
@@ -48,19 +49,11 @@ public class CreateIssueHandlerTests
 			Description = "New issue description"
 		};
 
-		var createdIssue = new IssueDto(
-			ObjectId.GenerateNewId(),
-			command.Title,
-			command.Description ?? string.Empty,
-			DateTime.UtcNow,
-			null,
-			UserDto.Empty,
-			CategoryDto.Empty,
-			StatusDto.Empty,
-			false,
-			UserDto.Empty,
-			false,
-			false);
+		var createdIssue = IssueBuilder.Default()
+			.WithTitle(command.Title)
+			.WithDescription(command.Description ?? string.Empty)
+			.WithStatus(StatusDto.Empty)
+			.Build();
 
 		_repository.CreateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>())
 			.Returns(Result.Ok(createdIssue));
@@ -140,19 +133,11 @@ public class CreateIssueHandlerTests
 			Description = null
 		};
 
-		var createdIssue = new IssueDto(
-			ObjectId.GenerateNewId(),
-			command.Title,
-			string.Empty,
-			DateTime.UtcNow,
-			null,
-			UserDto.Empty,
-			CategoryDto.Empty,
-			StatusDto.Empty,
-			false,
-			UserDto.Empty,
-			false,
-			false);
+		var createdIssue = IssueBuilder.Default()
+			.WithTitle(command.Title)
+			.WithDescription(string.Empty)
+			.WithStatus(StatusDto.Empty)
+			.Build();
 
 		_repository.CreateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>())
 			.Returns(Result.Ok(createdIssue));
@@ -176,19 +161,11 @@ public class CreateIssueHandlerTests
 		};
 
 		var cancellationToken = new CancellationToken();
-		var createdIssue = new IssueDto(
-			ObjectId.GenerateNewId(),
-			command.Title,
-			command.Description ?? string.Empty,
-			DateTime.UtcNow,
-			null,
-			UserDto.Empty,
-			CategoryDto.Empty,
-			StatusDto.Empty,
-			false,
-			UserDto.Empty,
-			false,
-			false);
+		var createdIssue = IssueBuilder.Default()
+			.WithTitle(command.Title)
+			.WithDescription(command.Description ?? string.Empty)
+			.WithStatus(StatusDto.Empty)
+			.Build();
 
 		_repository.CreateAsync(Arg.Any<IssueDto>(), cancellationToken)
 			.Returns(Result.Ok(createdIssue));
@@ -225,19 +202,12 @@ public class CreateIssueHandlerTests
 			StatusId = statusId.ToString()
 		};
 
-		var createdIssue = new IssueDto(
-			ObjectId.GenerateNewId(),
-			command.Title,
-			command.Description ?? string.Empty,
-			DateTime.UtcNow,
-			null,
-			UserDto.Empty,
-			expectedCategory,
-			expectedStatus,
-			false,
-			UserDto.Empty,
-			false,
-			false);
+		var createdIssue = IssueBuilder.Default()
+			.WithTitle(command.Title)
+			.WithDescription(command.Description ?? string.Empty)
+			.WithCategory(expectedCategory)
+			.WithStatus(expectedStatus)
+			.Build();
 
 		_repository.CreateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>())
 			.Returns(Result.Ok(createdIssue));
@@ -265,19 +235,11 @@ public class CreateIssueHandlerTests
 			StatusId = null
 		};
 
-		var createdIssue = new IssueDto(
-			ObjectId.GenerateNewId(),
-			command.Title,
-			command.Description ?? string.Empty,
-			DateTime.UtcNow,
-			null,
-			UserDto.Empty,
-			CategoryDto.Empty,
-			StatusDto.Empty,
-			false,
-			UserDto.Empty,
-			false,
-			false);
+		var createdIssue = IssueBuilder.Default()
+			.WithTitle(command.Title)
+			.WithDescription(command.Description ?? string.Empty)
+			.WithStatus(StatusDto.Empty)
+			.Build();
 
 		_repository.CreateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>())
 			.Returns(Result.Ok(createdIssue));

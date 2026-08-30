@@ -7,6 +7,8 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
+using Api.Builders;
+
 namespace Api.Endpoints;
 
 /// <summary>
@@ -64,19 +66,12 @@ public class IssueEndpointsTests : IDisposable
 	{
 		// Arrange
 		var id = ObjectId.GenerateNewId();
-		var issueDto = new IssueDto(
-			id,
-			"Test Issue",
-			"Description",
-			DateTime.UtcNow,
-			null,
-			UserDto.Empty,
-			CategoryDto.Empty,
-			StatusDto.Empty,
-			false,
-			UserDto.Empty,
-			false,
-			false);
+		var issueDto = IssueBuilder.Default()
+			.WithId(id)
+			.WithTitle("Test Issue")
+			.WithDescription("Description")
+			.WithStatus(StatusDto.Empty)
+			.Build();
 		_factory.IssueRepository
 			.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
 			.Returns(Result<IssueDto>.Ok(issueDto));
@@ -119,19 +114,12 @@ public class IssueEndpointsTests : IDisposable
 	{
 		// Arrange
 		var issueId = ObjectId.GenerateNewId();
-		var issueDto = new IssueDto(
-			issueId,
-			"Test Issue",
-			"Description",
-			DateTime.UtcNow,
-			null,
-			UserDto.Empty,
-			CategoryDto.Empty,
-			StatusDto.Empty,
-			false,
-			UserDto.Empty,
-			false,
-			false);
+		var issueDto = IssueBuilder.Default()
+			.WithId(issueId)
+			.WithTitle("Test Issue")
+			.WithDescription("Description")
+			.WithStatus(StatusDto.Empty)
+			.Build();
 		_factory.IssueRepository
 			.CreateAsync(Arg.Any<IssueDto>(), Arg.Any<CancellationToken>())
 			.Returns(Result<IssueDto>.Ok(issueDto));
@@ -163,19 +151,12 @@ public class IssueEndpointsTests : IDisposable
 	{
 		// Arrange
 		var issueId = ObjectId.GenerateNewId();
-		var issueDto = new IssueDto(
-			issueId,
-			"Updated Issue",
-			"Description",
-			DateTime.UtcNow,
-			null,
-			UserDto.Empty,
-			CategoryDto.Empty,
-			StatusDto.Empty,
-			false,
-			UserDto.Empty,
-			false,
-			false);
+		var issueDto = IssueBuilder.Default()
+			.WithId(issueId)
+			.WithTitle("Updated Issue")
+			.WithDescription("Description")
+			.WithStatus(StatusDto.Empty)
+			.Build();
 		_factory.IssueRepository
 			.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
 			.Returns(Result<IssueDto>.Ok(issueDto));
@@ -211,19 +192,12 @@ public class IssueEndpointsTests : IDisposable
 	{
 		// Arrange
 		var issueId = ObjectId.GenerateNewId();
-		var issueDto = new IssueDto(
-			issueId,
-			"Test Issue",
-			"Description",
-			DateTime.UtcNow,
-			null,
-			UserDto.Empty,
-			CategoryDto.Empty,
-			StatusDto.Empty,
-			false,
-			UserDto.Empty,
-			false,
-			false);
+		var issueDto = IssueBuilder.Default()
+			.WithId(issueId)
+			.WithTitle("Test Issue")
+			.WithDescription("Description")
+			.WithStatus(StatusDto.Empty)
+			.Build();
 		_factory.IssueRepository
 			.GetByIdAsync(Arg.Any<ObjectId>(), Arg.Any<CancellationToken>())
 			.Returns(Result<IssueDto>.Ok(issueDto));

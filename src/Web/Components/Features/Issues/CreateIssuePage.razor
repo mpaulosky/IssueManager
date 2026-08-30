@@ -26,14 +26,7 @@
 		_isSubmitting = true;
 		try
 		{
-			var command = new CreateIssueCommand
-			{
-				Title = request.Title,
-				Description = request.Description,
-				CategoryId = request.CategoryId,
-				StatusId = request.StatusId
-			};
-			await IssueClient.CreateAsync(command);
+			await IssueClient.CreateAsync(request.ToCreateCommand());
 			Nav.NavigateTo("/issues");
 		}
 		finally

@@ -7,6 +7,7 @@
 // Project Name :  Api.Tests.Unit
 // =======================================================
 
+using Api.Builders;
 using Api.Data.Interfaces;
 
 namespace Api.Handlers.Issues;
@@ -223,19 +224,11 @@ public class ListIssuesHandlerTests
 		var issues = new List<IssueDto>();
 		for (int i = 0; i < count; i++)
 		{
-			issues.Add(new IssueDto(
-				ObjectId.GenerateNewId(),
-				$"Issue {i + 1}",
-				$"Description {i + 1}",
-				DateTime.UtcNow.AddDays(-i),
-				null,
-				UserDto.Empty,
-				CategoryDto.Empty,
-				new StatusDto(ObjectId.Empty, "Open", "Issue is open", DateTime.UtcNow, null, false, UserDto.Empty),
-				false,
-				UserDto.Empty,
-				false,
-				false));
+			issues.Add(IssueBuilder.Default()
+				.WithTitle($"Issue {i + 1}")
+				.WithDescription($"Description {i + 1}")
+				.WithCreatedAt(DateTime.UtcNow.AddDays(-i))
+				.Build());
 		}
 		return issues;
 	}

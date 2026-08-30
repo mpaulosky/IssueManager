@@ -230,4 +230,74 @@ public class CreateIssueRequestTests
 		// Act & Assert
 		request.StatusId.Should().Be(statusId);
 	}
+
+	[Fact]
+	public void ToCreateCommand_MapsAllFields()
+	{
+		// Arrange
+		var categoryId = ObjectId.GenerateNewId().ToString();
+		var statusId = ObjectId.GenerateNewId().ToString();
+		var request = new CreateIssueRequest
+		{
+			Title = "Test Issue",
+			Description = "Test description",
+			CategoryId = categoryId,
+			StatusId = statusId
+		};
+
+		// Act
+		var command = request.ToCreateCommand();
+
+		// Assert
+		command.Title.Should().Be(request.Title);
+		command.Description.Should().Be(request.Description);
+		command.CategoryId.Should().Be(categoryId);
+		command.StatusId.Should().Be(statusId);
+	}
+
+	[Fact]
+	public void ToUpdateCommand_MapsAllFieldsAndParsesIds()
+	{
+		// Arrange
+		var issueId = ObjectId.GenerateNewId();
+		var categoryId = ObjectId.GenerateNewId();
+		var statusId = ObjectId.GenerateNewId();
+		var request = new CreateIssueRequest
+		{
+			Title = "Test Issue",
+			Description = "Test description",
+			CategoryId = categoryId.ToString(),
+			StatusId = statusId.ToString()
+		};
+
+		// Act
+		var command = request.ToUpdateCommand(issueId.ToString());
+
+		// Assert
+		command.Id.Should().Be(issueId);
+		command.Title.Should().Be(request.Title);
+		command.Description.Should().Be(request.Description);
+		command.CategoryId.Should().Be(categoryId);
+		command.StatusId.Should().Be(statusId);
+	}
+
+	[Fact]
+	public void ToUpdateCommand_WithNullCategoryAndStatusId_MapsToNull()
+	{
+		// Arrange
+		var issueId = ObjectId.GenerateNewId();
+		var request = new CreateIssueRequest
+		{
+			Title = "Test Issue",
+			CategoryId = null,
+			StatusId = null
+		};
+
+		// Act
+		var command = request.ToUpdateCommand(issueId.ToString());
+
+		// Assert
+		command.CategoryId.Should().BeNull();
+		command.StatusId.Should().BeNull();
+	}
 }
