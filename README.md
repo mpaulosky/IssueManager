@@ -57,6 +57,7 @@ See [LICENSE](LICENSE) for details.
 | Date | Title | Tags |
 |------|-------|------|
 | 2026-08-30 | [refactor: delete pass-through GetIssueHandler, call repository directly](docs/blogs/2026-08-30-pr-186-refactor-delete-pass-through-getissuehandler-call-repository-directly.md) | release,automation |
+| 2026-08-30 | [refactor: hoist paginated GetAllAsync into MongoRepository base](docs/blogs/2026-08-30-pr-185-refactor-hoist-paginated-getallasync-into-mongorepository-base.md) | release,automation |
 | 2026-08-30 | [refactor: collapse Category/Status CRUD handlers into generic TaxonomyCrudHandler](docs/blogs/2026-08-30-pr-183-refactor-collapse-category-status-crud-handlers-into-generic-taxonomycrudhandler.md) | release,automation |
 | 2026-08-29 | [docs: add commit/release blog-post scripts and docs index page](docs/blogs/2026-08-29-pr-179-docs-add-commit-release-blog-post-scripts-and-docs-index-page.md) | release,automation |
 <!-- BLOG_END -->
