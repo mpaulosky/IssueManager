@@ -7,12 +7,11 @@
 // Project Name :  Shared
 // =======================================================
 
-using FluentValidation;
-
 namespace Shared.Contracts;
 
 /// <summary>
-/// Command for creating a new category.
+/// Command for creating a new category. Validated by the Api project's generic
+/// TaxonomyCommandValidator, configured through CategoryTaxonomyAdapter.
 /// </summary>
 public record CreateCategoryCommand
 {
@@ -25,29 +24,4 @@ public record CreateCategoryCommand
 	/// Gets or sets the description of the category.
 	/// </summary>
 	public string? CategoryDescription { get; init; }
-}
-
-/// <summary>
-/// Validates the <see cref="CreateCategoryCommand"/>.
-/// </summary>
-public class CreateCategoryValidator : AbstractValidator<CreateCategoryCommand>
-{
-	/// <summary>
-	/// Initializes a new instance of the <see cref="CreateCategoryValidator"/> class.
-	/// </summary>
-	public CreateCategoryValidator()
-	{
-		RuleFor(x => x.CategoryName)
-			.NotEmpty()
-			.WithMessage("Category name is required.")
-			.MinimumLength(2)
-			.WithMessage("Category name must be at least 2 characters long.")
-			.MaximumLength(100)
-			.WithMessage("Category name cannot exceed 100 characters.");
-
-		RuleFor(x => x.CategoryDescription)
-			.MaximumLength(500)
-			.WithMessage("Category description cannot exceed 500 characters.")
-			.When(x => !string.IsNullOrEmpty(x.CategoryDescription));
-	}
 }

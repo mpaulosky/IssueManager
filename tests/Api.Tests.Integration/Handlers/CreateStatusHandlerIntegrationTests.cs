@@ -10,20 +10,20 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for CreateStatusHandler with a real MongoDB database.
+/// Integration tests for the generic create path (TaxonomyCrudHandler via StatusTaxonomyAdapter), with a real MongoDB database.
 /// </summary>
 [Collection("StatusIntegration")]
 [ExcludeFromCodeCoverage]
 public class CreateStatusHandlerIntegrationTests
 {
 	private readonly IStatusRepository _repository;
-	private readonly CreateStatusHandler _handler;
+	private readonly TaxonomyCrudHandler<StatusDto, CreateStatusCommand, UpdateStatusCommand> _handler;
 
 	public CreateStatusHandlerIntegrationTests(MongoDbFixture fixture)
 	{
 		fixture.ThrowIfUnavailable();
 		_repository = new StatusRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
-		_handler = new CreateStatusHandler(_repository, new CreateStatusValidator());
+		_handler = new TaxonomyCrudHandler<StatusDto, CreateStatusCommand, UpdateStatusCommand>(_repository, StatusTaxonomyAdapter.Instance);
 	}
 
 	[Fact]
@@ -37,7 +37,7 @@ public class CreateStatusHandlerIntegrationTests
 		};
 
 		// Act
-		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.HandleCreate(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
@@ -58,7 +58,7 @@ public class CreateStatusHandlerIntegrationTests
 		};
 
 		// Act
-		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.HandleCreate(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -76,7 +76,7 @@ public class CreateStatusHandlerIntegrationTests
 		};
 
 		// Act - Create status
-		var created = await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var created = await _handler.HandleCreate(command, TestContext.Current.CancellationToken);
 
 		// Assert - Verify it can be retrieved
 		var retrieved = await _repository.GetByIdAsync(created.Value!.Id, TestContext.Current.CancellationToken);

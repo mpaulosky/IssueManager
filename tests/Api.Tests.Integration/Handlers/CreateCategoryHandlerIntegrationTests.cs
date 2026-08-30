@@ -10,20 +10,20 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for CreateCategoryHandler with a real MongoDB database.
+/// Integration tests for the generic create path (TaxonomyCrudHandler via CategoryTaxonomyAdapter), with a real MongoDB database.
 /// </summary>
 [Collection("CategoryIntegration")]
 [ExcludeFromCodeCoverage]
 public class CreateCategoryHandlerIntegrationTests
 {
 	private readonly ICategoryRepository _repository;
-	private readonly CreateCategoryHandler _handler;
+	private readonly TaxonomyCrudHandler<CategoryDto, CreateCategoryCommand, UpdateCategoryCommand> _handler;
 
 	public CreateCategoryHandlerIntegrationTests(MongoDbFixture fixture)
 	{
 		fixture.ThrowIfUnavailable();
 		_repository = new CategoryRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
-		_handler = new CreateCategoryHandler(_repository, new CreateCategoryValidator());
+		_handler = new TaxonomyCrudHandler<CategoryDto, CreateCategoryCommand, UpdateCategoryCommand>(_repository, CategoryTaxonomyAdapter.Instance);
 	}
 
 	[Fact]
@@ -37,7 +37,7 @@ public class CreateCategoryHandlerIntegrationTests
 		};
 
 		// Act
-		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.HandleCreate(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
@@ -58,7 +58,7 @@ public class CreateCategoryHandlerIntegrationTests
 		};
 
 		// Act
-		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.HandleCreate(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -76,7 +76,7 @@ public class CreateCategoryHandlerIntegrationTests
 		};
 
 		// Act - Create category
-		var created = await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var created = await _handler.HandleCreate(command, TestContext.Current.CancellationToken);
 
 		// Assert - Verify it can be retrieved
 		var retrieved = await _repository.GetByIdAsync(created.Value!.Id, TestContext.Current.CancellationToken);

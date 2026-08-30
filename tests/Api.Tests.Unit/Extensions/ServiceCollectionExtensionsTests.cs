@@ -105,10 +105,6 @@ public class ServiceCollectionExtensionsTests
 		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateIssueValidator));
 		services.Should().Contain(sd => sd.ServiceType == typeof(ListIssuesQueryValidator));
 		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateIssueStatusValidator));
-		services.Should().Contain(sd => sd.ServiceType == typeof(CreateStatusValidator));
-		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateStatusValidator));
-		services.Should().Contain(sd => sd.ServiceType == typeof(CreateCategoryValidator));
-		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateCategoryValidator));
 		services.Should().Contain(sd => sd.ServiceType == typeof(CreateCommentValidator));
 		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateCommentValidator));
 	}
@@ -145,14 +141,8 @@ public class ServiceCollectionExtensionsTests
 		services.Should().Contain(sd => sd.ServiceType == typeof(ListIssuesHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(GetIssueHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateIssueStatusHandler));
-		services.Should().Contain(sd => sd.ServiceType == typeof(CreateStatusHandler));
-		services.Should().Contain(sd => sd.ServiceType == typeof(GetStatusHandler));
-		services.Should().Contain(sd => sd.ServiceType == typeof(ListStatusesHandler));
-		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateStatusHandler));
-		services.Should().Contain(sd => sd.ServiceType == typeof(CreateCategoryHandler));
-		services.Should().Contain(sd => sd.ServiceType == typeof(GetCategoryHandler));
-		services.Should().Contain(sd => sd.ServiceType == typeof(ListCategoriesHandler));
-		services.Should().Contain(sd => sd.ServiceType == typeof(UpdateCategoryHandler));
+		services.Should().Contain(sd => sd.ServiceType == typeof(TaxonomyCrudHandler<CategoryDto, CreateCategoryCommand, UpdateCategoryCommand>));
+		services.Should().Contain(sd => sd.ServiceType == typeof(TaxonomyCrudHandler<StatusDto, CreateStatusCommand, UpdateStatusCommand>));
 		services.Should().Contain(sd => sd.ServiceType == typeof(CreateCommentHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(GetCommentHandler));
 		services.Should().Contain(sd => sd.ServiceType == typeof(ListCommentsHandler));

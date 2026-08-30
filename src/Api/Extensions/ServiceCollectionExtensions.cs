@@ -48,10 +48,6 @@ public static class ServiceCollectionExtensions
 		services.AddSingleton<UpdateIssueValidator>();
 		services.AddSingleton<ListIssuesQueryValidator>();
 		services.AddSingleton<UpdateIssueStatusValidator>();
-		services.AddSingleton<CreateStatusValidator>();
-		services.AddSingleton<UpdateStatusValidator>();
-		services.AddSingleton<CreateCategoryValidator>();
-		services.AddSingleton<UpdateCategoryValidator>();
 		services.AddSingleton<CreateCommentValidator>();
 		services.AddSingleton<UpdateCommentValidator>();
 
@@ -66,18 +62,17 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<ListIssuesHandler>();
 		services.AddScoped<GetIssueHandler>();
 		services.AddScoped<UpdateIssueStatusHandler>();
-		services.AddScoped<CreateStatusHandler>();
-		services.AddScoped<GetStatusHandler>();
-		services.AddScoped<ListStatusesHandler>();
-		services.AddScoped<UpdateStatusHandler>();
-		services.AddScoped<CreateCategoryHandler>();
-		services.AddScoped<GetCategoryHandler>();
-		services.AddScoped<ListCategoriesHandler>();
-		services.AddScoped<UpdateCategoryHandler>();
 		services.AddScoped<CreateCommentHandler>();
 		services.AddScoped<GetCommentHandler>();
 		services.AddScoped<ListCommentsHandler>();
 		services.AddScoped<UpdateCommentHandler>();
+
+		services.AddScoped<TaxonomyCrudHandler<CategoryDto, CreateCategoryCommand, UpdateCategoryCommand>>(sp =>
+			new TaxonomyCrudHandler<CategoryDto, CreateCategoryCommand, UpdateCategoryCommand>(
+				sp.GetRequiredService<ICategoryRepository>(), CategoryTaxonomyAdapter.Instance));
+		services.AddScoped<TaxonomyCrudHandler<StatusDto, CreateStatusCommand, UpdateStatusCommand>>(sp =>
+			new TaxonomyCrudHandler<StatusDto, CreateStatusCommand, UpdateStatusCommand>(
+				sp.GetRequiredService<IStatusRepository>(), StatusTaxonomyAdapter.Instance));
 
 		services.AddScoped<DeleteHandler<IssueDto>>(sp =>
 			new DeleteHandler<IssueDto>(sp.GetRequiredService<IIssueRepository>(), "Issue"));

@@ -16,21 +16,20 @@ public static class CategoryEndpoints
 	{
 		var group = app.MapGroup("/api/v1/categories").WithTags("Categories");
 
-		group.MapGet("", async (ListCategoriesHandler handler) =>
+		group.MapGet("", async (TaxonomyCrudHandler<CategoryDto, CreateCategoryCommand, UpdateCategoryCommand> handler) =>
 		{
-			var result = await handler.Handle();
+			var result = await handler.HandleList();
 			return Results.Ok(result);
 		})
 		.WithName("ListCategories")
 		.WithSummary("Get all categories")
 		.Produces<IEnumerable<CategoryDto>>(StatusCodes.Status200OK);
 
-		group.MapGet("{id}", async (string id, GetCategoryHandler handler) =>
+		group.MapGet("{id}", async (string id, ICategoryRepository repository) =>
 		{
 			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
 				return badRequest;
-			var query = new GetCategoryQuery(objectId);
-			var result = await handler.Handle(query);
+			var result = await repository.GetByIdAsync(objectId);
 			return result.ToHttpResult(Results.Ok);
 		})
 		.WithName("GetCategory")
@@ -38,9 +37,9 @@ public static class CategoryEndpoints
 		.Produces<CategoryDto>(StatusCodes.Status200OK)
 		.Produces(StatusCodes.Status404NotFound);
 
-		group.MapPost("", async (CreateCategoryCommand command, CreateCategoryHandler handler) =>
+		group.MapPost("", async (CreateCategoryCommand command, TaxonomyCrudHandler<CategoryDto, CreateCategoryCommand, UpdateCategoryCommand> handler) =>
 		{
-			var result = await handler.Handle(command);
+			var result = await handler.HandleCreate(command);
 			return result.ToHttpResult(value => Results.Created($"/api/v1/categories/{value.Id}", value));
 		})
 		.WithName("CreateCategory")
@@ -49,12 +48,12 @@ public static class CategoryEndpoints
 		.Produces(StatusCodes.Status400BadRequest)
 		.RequireAuthorization();
 
-		group.MapPatch("{id}", async (string id, UpdateCategoryCommand command, UpdateCategoryHandler handler) =>
+		group.MapPatch("{id}", async (string id, UpdateCategoryCommand command, TaxonomyCrudHandler<CategoryDto, CreateCategoryCommand, UpdateCategoryCommand> handler) =>
 		{
 			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
 				return badRequest;
 			var commandWithId = command with { Id = objectId };
-			var result = await handler.Handle(commandWithId);
+			var result = await handler.HandleUpdate(commandWithId);
 			return result.ToHttpResult(Results.Ok);
 		})
 		.WithName("UpdateCategory")
