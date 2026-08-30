@@ -29,20 +29,8 @@ public class StatusRepository : MongoRepository<Status, StatusDto>, IStatusRepos
 	protected override Status ToModel(StatusDto dto) => dto.ToModel();
 
 	/// <inheritdoc />
-	public async Task<Result<(IReadOnlyList<StatusDto> Items, long Total)>> GetAllAsync(
+	public Task<Result<(IReadOnlyList<StatusDto> Items, long Total)>> GetAllAsync(
 			int page,
 			int pageSize,
-			CancellationToken cancellationToken = default)
-	{
-		var filter = Builders<Status>.Filter.Eq(x => x.Archived, false);
-		var total = await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
-		var entities = await Collection
-			.Find(filter)
-			.Skip((page - 1) * pageSize)
-			.Limit(pageSize)
-			.ToListAsync(cancellationToken);
-
-		IReadOnlyList<StatusDto> items = entities.Select(x => x.ToDto()).ToList();
-		return Result.Ok((items, total));
-	}
+			CancellationToken cancellationToken = default) => GetPagedAsync(page, pageSize, cancellationToken);
 }
