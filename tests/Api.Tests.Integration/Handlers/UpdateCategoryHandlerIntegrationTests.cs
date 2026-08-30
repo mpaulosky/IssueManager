@@ -10,20 +10,20 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for UpdateCategoryHandler with a real MongoDB database.
+/// Integration tests for the generic update path (TaxonomyCrudHandler via CategoryTaxonomyAdapter), with a real MongoDB database.
 /// </summary>
 [Collection("CategoryIntegration")]
 [ExcludeFromCodeCoverage]
 public class UpdateCategoryHandlerIntegrationTests
 {
 	private readonly ICategoryRepository _repository;
-	private readonly UpdateCategoryHandler _handler;
+	private readonly TaxonomyCrudHandler<CategoryDto, CreateCategoryCommand, UpdateCategoryCommand> _handler;
 
 	public UpdateCategoryHandlerIntegrationTests(MongoDbFixture fixture)
 	{
 		fixture.ThrowIfUnavailable();
 		_repository = new CategoryRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
-		_handler = new UpdateCategoryHandler(_repository, new UpdateCategoryValidator());
+		_handler = new TaxonomyCrudHandler<CategoryDto, CreateCategoryCommand, UpdateCategoryCommand>(_repository, CategoryTaxonomyAdapter.Instance);
 	}
 
 	private static CategoryDto CreateTestCategoryDto(string name, string description = "Test description") =>
@@ -44,7 +44,7 @@ public class UpdateCategoryHandlerIntegrationTests
 		};
 
 		// Act
-		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.HandleUpdate(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
@@ -66,7 +66,7 @@ public class UpdateCategoryHandlerIntegrationTests
 		};
 
 		// Act
-		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.HandleUpdate(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -87,7 +87,7 @@ public class UpdateCategoryHandlerIntegrationTests
 		};
 
 		// Act
-		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.HandleUpdate(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();

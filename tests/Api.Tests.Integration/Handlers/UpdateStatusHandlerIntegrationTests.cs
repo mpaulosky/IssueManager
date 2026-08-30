@@ -10,20 +10,20 @@
 namespace Integration.Handlers;
 
 /// <summary>
-/// Integration tests for UpdateStatusHandler with a real MongoDB database.
+/// Integration tests for the generic update path (TaxonomyCrudHandler via StatusTaxonomyAdapter), with a real MongoDB database.
 /// </summary>
 [Collection("StatusIntegration")]
 [ExcludeFromCodeCoverage]
 public class UpdateStatusHandlerIntegrationTests
 {
 	private readonly IStatusRepository _repository;
-	private readonly UpdateStatusHandler _handler;
+	private readonly TaxonomyCrudHandler<StatusDto, CreateStatusCommand, UpdateStatusCommand> _handler;
 
 	public UpdateStatusHandlerIntegrationTests(MongoDbFixture fixture)
 	{
 		fixture.ThrowIfUnavailable();
 		_repository = new StatusRepository(fixture.ConnectionString, $"T{Guid.NewGuid():N}");
-		_handler = new UpdateStatusHandler(_repository, new UpdateStatusValidator());
+		_handler = new TaxonomyCrudHandler<StatusDto, CreateStatusCommand, UpdateStatusCommand>(_repository, StatusTaxonomyAdapter.Instance);
 	}
 
 	private static StatusDto CreateTestStatusDto(string name, string description = "Test description") =>
@@ -44,7 +44,7 @@ public class UpdateStatusHandlerIntegrationTests
 		};
 
 		// Act
-		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.HandleUpdate(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeTrue();
@@ -66,7 +66,7 @@ public class UpdateStatusHandlerIntegrationTests
 		};
 
 		// Act
-		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.HandleUpdate(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();
@@ -87,7 +87,7 @@ public class UpdateStatusHandlerIntegrationTests
 		};
 
 		// Act
-		var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+		var result = await _handler.HandleUpdate(command, TestContext.Current.CancellationToken);
 
 		// Assert
 		result.Success.Should().BeFalse();

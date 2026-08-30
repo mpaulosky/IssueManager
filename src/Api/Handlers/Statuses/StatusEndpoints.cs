@@ -7,10 +7,6 @@
 // Project Name :  Api
 // =============================================
 
-using Api.Handlers;
-
-using static Api.Handlers.Statuses.GetStatusHandler;
-
 namespace Api.Handlers.Statuses;
 
 /// <summary>Registers Status endpoints on the route builder.</summary>
@@ -20,21 +16,20 @@ public static class StatusEndpoints
 	{
 		var group = app.MapGroup("/api/v1/statuses").WithTags("Statuses");
 
-		group.MapGet("", async (ListStatusesHandler handler) =>
+		group.MapGet("", async (TaxonomyCrudHandler<StatusDto, CreateStatusCommand, UpdateStatusCommand> handler) =>
 		{
-			var result = await handler.Handle();
+			var result = await handler.HandleList();
 			return Results.Ok(result);
 		})
 		.WithName("ListStatuses")
 		.WithSummary("Get all statuses")
 		.Produces<IEnumerable<StatusDto>>(StatusCodes.Status200OK);
 
-		group.MapGet("{id}", async (string id, GetStatusHandler handler) =>
+		group.MapGet("{id}", async (string id, IStatusRepository repository) =>
 		{
 			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
 				return badRequest;
-			var query = new GetStatusQuery(objectId);
-			var result = await handler.Handle(query);
+			var result = await repository.GetByIdAsync(objectId);
 			return result.ToHttpResult(Results.Ok);
 		})
 		.WithName("GetStatus")
@@ -42,9 +37,9 @@ public static class StatusEndpoints
 		.Produces<StatusDto>(StatusCodes.Status200OK)
 		.Produces(StatusCodes.Status404NotFound);
 
-		group.MapPost("", async (CreateStatusCommand command, CreateStatusHandler handler) =>
+		group.MapPost("", async (CreateStatusCommand command, TaxonomyCrudHandler<StatusDto, CreateStatusCommand, UpdateStatusCommand> handler) =>
 		{
-			var result = await handler.Handle(command);
+			var result = await handler.HandleCreate(command);
 			return result.ToHttpResult(value => Results.Created($"/api/v1/statuses/{value.Id}", value));
 		})
 		.WithName("CreateStatus")
@@ -53,12 +48,12 @@ public static class StatusEndpoints
 		.Produces(StatusCodes.Status400BadRequest)
 		.RequireAuthorization();
 
-		group.MapPatch("{id}", async (string id, UpdateStatusCommand command, UpdateStatusHandler handler) =>
+		group.MapPatch("{id}", async (string id, UpdateStatusCommand command, TaxonomyCrudHandler<StatusDto, CreateStatusCommand, UpdateStatusCommand> handler) =>
 		{
 			if (!id.TryParseObjectIdOrBadRequest(out var objectId, out var badRequest))
 				return badRequest;
 			var commandWithId = command with { Id = objectId };
-			var result = await handler.Handle(commandWithId);
+			var result = await handler.HandleUpdate(commandWithId);
 			return result.ToHttpResult(Results.Ok);
 		})
 		.WithName("UpdateStatus")
