@@ -4,6 +4,7 @@ This directory contains concise release-review posts for merged PR releases.
 
 | Date | Title | Tags |
 |------|-------|------|
+| 2026-09-28 | [chore(web): Stop committing the generated app.css](2026-09-28-pr-220-chore-web-stop-committing-the-generated-app-css.md) | release,automation |
 | 2026-09-28 | [ci: Lint workflows and shell scripts before push and in CI](2026-09-28-pr-218-ci-lint-workflows-and-shell-scripts-before-push-and-in-ci.md) | release,automation |
 | 2026-09-28 | [chore(deps): Take Dependabot's NuGet updates, with two restore fixes](2026-09-28-pr-216-chore-deps-take-dependabot-s-nuget-updates-with-two-restore-fixes.md) | release,automation |
 | 2026-09-28 | [ci: Withhold secrets from Dependabot-authored PRs, whoever runs them](2026-09-28-pr-214-ci-withhold-secrets-from-dependabot-authored-prs-whoever-runs-them.md) | release,automation |
