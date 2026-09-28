@@ -40,6 +40,11 @@ updates:
     # one is usually caught upstream before it reaches a PR here.
     cooldown:
       default-days: 7
+    ignore:
+      # Microsoft.AspNetCore.OpenApi 10.x requires Microsoft.OpenApi < 3.0.0,
+      # so a 3.x bump breaks restore. Drop this once ASP.NET allows 3.x.
+      - dependency-name: "Microsoft.OpenApi"
+        update-types: ["version-update:semver-major"]
     labels:
       - "nuget"
       - "dependencies"
