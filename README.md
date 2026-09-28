@@ -57,6 +57,7 @@ See [LICENSE](LICENSE) for details.
 | Date | Title | Tags |
 |------|-------|------|
 | 2026-09-14 | [Rename squad-lint workflows to drop squad- prefix](docs/blogs/2026-09-14-pr-195-rename-squad-lint-workflows-to-drop-squad-prefix.md) | release,automation |
+| 2026-09-14 | [Bump outdated CodeQL, yamllint, and paths-filter action pins](docs/blogs/2026-09-14-pr-193-bump-outdated-codeql-yamllint-and-paths-filter-action-pins.md) | release,automation |
 | 2026-08-30 | [Narrow IssueDto test builder and unify Web issue mapping](docs/blogs/2026-08-30-pr-189-narrow-issuedto-test-builder-and-unify-web-issue-mapping.md) | release,automation |
 | 2026-08-30 | [refactor: delete pass-through GetIssueHandler, call repository directly](docs/blogs/2026-08-30-pr-186-refactor-delete-pass-through-getissuehandler-call-repository-directly.md) | release,automation |
 | 2026-08-30 | [refactor: hoist paginated GetAllAsync into MongoRepository base](docs/blogs/2026-08-30-pr-185-refactor-hoist-paginated-getallasync-into-mongorepository-base.md) | release,automation |
