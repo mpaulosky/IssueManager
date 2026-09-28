@@ -4,6 +4,7 @@ This directory contains concise release-review posts for merged PR releases.
 
 | Date | Title | Tags |
 |------|-------|------|
+| 2026-09-14 | [Rename squad-lint workflows to drop squad- prefix](2026-09-14-pr-195-rename-squad-lint-workflows-to-drop-squad-prefix.md) | release,automation |
 | 2026-09-14 | [Bump outdated CodeQL, yamllint, and paths-filter action pins](2026-09-14-pr-193-bump-outdated-codeql-yamllint-and-paths-filter-action-pins.md) | release,automation |
 | 2026-08-30 | [Narrow IssueDto test builder and unify Web issue mapping](2026-08-30-pr-189-narrow-issuedto-test-builder-and-unify-web-issue-mapping.md) | release,automation |
 | 2026-08-30 | [refactor: delete pass-through GetIssueHandler, call repository directly](2026-08-30-pr-186-refactor-delete-pass-through-getissuehandler-call-repository-directly.md) | release,automation |
