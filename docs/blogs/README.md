@@ -4,6 +4,7 @@ This directory contains concise release-review posts for merged PR releases.
 
 | Date | Title | Tags |
 |------|-------|------|
+| 2026-09-28 | [fix(scripts): Keep squad cleanup going when a local delete is refused](2026-09-28-pr-202-fix-scripts-keep-squad-cleanup-going-when-a-local-delete-is-refused.md) | release,automation |
 | 2026-09-28 | [fix(scripts): Update squad branch cleanup to the fail-safe version](2026-09-28-pr-200-fix-scripts-update-squad-branch-cleanup-to-the-fail-safe-version.md) | release,automation |
 | 2026-09-28 | [ci: Add nightly squad branch and worktree cleanup](2026-09-28-pr-198-ci-add-nightly-squad-branch-and-worktree-cleanup.md) | release,automation |
 | 2026-09-14 | [Rename squad-lint workflows to drop squad- prefix](2026-09-14-pr-195-rename-squad-lint-workflows-to-drop-squad-prefix.md) | release,automation |
