@@ -121,10 +121,17 @@
 		<AdditionalFiles Include="Components\Pages\RedirectToLoginPage.razor" />
 	</ItemGroup>
 
-	<!-- Optimized CSS build - only runs when source CSS changes -->
+	<!-- wwwroot/css/app.css is generated here and not committed, so a
+	     Tailwind bump can never leave a stale copy behind. -->
 	<Target Name="BuildTailwindCSS" BeforeTargets="PreBuildEvent" Condition="'$(SkipTailwindBuild)' != 'true'">
 		<Exec Command="npm run build:css" />
 		<Message Importance="high" Text="TailwindCSS compiled successfully" />
+		<!-- wwwroot/** was globbed when the project loaded, before this file
+		     existed, so add it now or a clean build leaves it out of the static
+		     web assets manifest and @Assets["css/app.css"] can't serve it. -->
+		<ItemGroup>
+			<Content Include="wwwroot/css/app.css" Exclude="@(Content)" />
+		</ItemGroup>
 	</Target>
 
 	<!-- Ensure npm packages are installed. npm ci installs exactly what
