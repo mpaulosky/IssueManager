@@ -56,9 +56,9 @@ See [LICENSE](LICENSE) for details.
 <!-- BLOG_START -->
 | Date | Title | Tags |
 |------|-------|------|
+| 2026-09-28 | [chore(deps): Fix Dependabot config](docs/blogs/2026-09-28-pr-208-chore-deps-fix-dependabot-config.md) | release,automation |
 | 2026-09-28 | [fix(ci): Merge as a user and handle UNSTABLE PRs in auto-merge](docs/blogs/2026-09-28-pr-205-fix-ci-merge-as-a-user-and-handle-unstable-prs-in-auto-merge.md) | release,automation |
 | 2026-09-28 | [fix(ci): Arm auto-merge when a PR opens](docs/blogs/2026-09-28-pr-204-fix-ci-arm-auto-merge-when-a-pr-opens.md) | release,automation |
 | 2026-09-28 | [fix(scripts): Keep squad cleanup going when a local delete is refused](docs/blogs/2026-09-28-pr-202-fix-scripts-keep-squad-cleanup-going-when-a-local-delete-is-refused.md) | release,automation |
 | 2026-09-28 | [fix(scripts): Update squad branch cleanup to the fail-safe version](docs/blogs/2026-09-28-pr-200-fix-scripts-update-squad-branch-cleanup-to-the-fail-safe-version.md) | release,automation |
-| 2026-09-28 | [ci: Add nightly squad branch and worktree cleanup](docs/blogs/2026-09-28-pr-198-ci-add-nightly-squad-branch-and-worktree-cleanup.md) | release,automation |
 <!-- BLOG_END -->
