@@ -56,9 +56,9 @@ See [LICENSE](LICENSE) for details.
 <!-- BLOG_START -->
 | Date | Title | Tags |
 |------|-------|------|
+| 2026-09-28 | [fix(ci): Arm auto-merge when a PR opens](docs/blogs/2026-09-28-pr-204-fix-ci-arm-auto-merge-when-a-pr-opens.md) | release,automation |
 | 2026-09-28 | [fix(scripts): Keep squad cleanup going when a local delete is refused](docs/blogs/2026-09-28-pr-202-fix-scripts-keep-squad-cleanup-going-when-a-local-delete-is-refused.md) | release,automation |
 | 2026-09-28 | [fix(scripts): Update squad branch cleanup to the fail-safe version](docs/blogs/2026-09-28-pr-200-fix-scripts-update-squad-branch-cleanup-to-the-fail-safe-version.md) | release,automation |
 | 2026-09-28 | [ci: Add nightly squad branch and worktree cleanup](docs/blogs/2026-09-28-pr-198-ci-add-nightly-squad-branch-and-worktree-cleanup.md) | release,automation |
 | 2026-09-14 | [Rename squad-lint workflows to drop squad- prefix](docs/blogs/2026-09-14-pr-195-rename-squad-lint-workflows-to-drop-squad-prefix.md) | release,automation |
-| 2026-09-14 | [Bump outdated CodeQL, yamllint, and paths-filter action pins](docs/blogs/2026-09-14-pr-193-bump-outdated-codeql-yamllint-and-paths-filter-action-pins.md) | release,automation |
 <!-- BLOG_END -->
