@@ -182,6 +182,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-
 
+  # Dependabot PRs run the test suite too: a dependency bump is exactly the
+  # change the tests must vet. The one exception is the Playwright (E2E)
+  # projects, which log in to Auth0 with real credentials: an unreviewed bump
+  # must not run with those, so discovery leaves them out for Dependabot and
+  # they run on main once the bump merges. No other test reads a secret.
   discover-tests:
     # always(): this job must still populate the test matrix (so the
     # per-project "Tests: *" required checks below get a named, skipped
@@ -189,7 +194,7 @@ jobs:
     # skipped because no src/tests files changed. Without always(), the
     # implicit `success()` gate would skip this job whenever its "build"
     # dependency skips, leaving the matrix empty.
-    if: ${{ always() && github.actor != 'dependabot[bot]' }}
+    if: ${{ always() }}
     name: Discover Test Projects
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -204,9 +209,12 @@ jobs:
 
       - name: Discover test projects
         id: discover
+        env:
+          DEPENDABOT: ${{ github.actor == 'dependabot[bot]' }}
         run: |
           matrix_json=$(python - <<'PY'
           import json
+          import os
           from pathlib import Path
 
           projects = []
@@ -217,6 +225,9 @@ jobs:
               is_e2e = "e2e" in lowered
               csproj_text = csproj.read_text()
               uses_playwright = "Microsoft.Playwright" in csproj_text
+              if uses_playwright and os.environ.get("DEPENDABOT") == "true":
+                  # Credentialed E2E: never on an unreviewed Dependabot bump.
+                  continue
               projects.append(
                   {
                       "project_path": csproj.as_posix(),
@@ -256,7 +267,7 @@ jobs:
     # steps below are gated on needs.changes.outputs.code instead, so each
     # matrix entry still reports (as a quick no-op success) even when the
     # code didn't change.
-    if: ${{ always() && github.actor != 'dependabot[bot]' }}
+    if: ${{ always() }}
     name: "Tests: ${{ matrix.test_name }}"
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -365,9 +376,7 @@ jobs:
           if-no-files-found: ignore
 
   coverage:
-    if: >-
-      ${{ always() && needs.changes.outputs.code == 'true' &&
-      github.actor != 'dependabot[bot]' }}
+    if: ${{ always() && needs.changes.outputs.code == 'true' }}
     name: Coverage Analysis
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -451,9 +460,7 @@ jobs:
           verbose: true
 
   report:
-    if: >-
-      ${{ always() && needs.changes.outputs.code == 'true' &&
-      github.actor != 'dependabot[bot]' }}
+    if: ${{ always() && needs.changes.outputs.code == 'true' }}
     name: Test Report Summary
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -471,9 +478,12 @@ jobs:
         with:
           path: all-test-results
 
+      # Dependabot runs get a read-only token whatever the job asks for, so the
+      # check run and PR comment this writes can't be published there. The
+      # "All Tests Passed" job still fails when a test did.
       - name: Publish test results
         uses: EnricoMi/publish-unit-test-result-action@v2.24.0
-        if: always()
+        if: ${{ always() && github.actor != 'dependabot[bot]' }}
         with:
           files: |
             all-test-results/**/*.trx
