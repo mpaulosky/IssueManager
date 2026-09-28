@@ -4,6 +4,7 @@ This directory contains concise release-review posts for merged PR releases.
 
 | Date | Title | Tags |
 |------|-------|------|
+| 2026-09-28 | [ci: Run the test suite on Dependabot PRs, except credentialed E2E](2026-09-28-pr-212-ci-run-the-test-suite-on-dependabot-prs-except-credentialed-e2e.md) | release,automation |
 | 2026-09-28 | [chore(deps): Fix Dependabot config](2026-09-28-pr-208-chore-deps-fix-dependabot-config.md) | release,automation |
 | 2026-09-28 | [fix(ci): Merge as a user and handle UNSTABLE PRs in auto-merge](2026-09-28-pr-205-fix-ci-merge-as-a-user-and-handle-unstable-prs-in-auto-merge.md) | release,automation |
 | 2026-09-28 | [fix(ci): Arm auto-merge when a PR opens](2026-09-28-pr-204-fix-ci-arm-auto-merge-when-a-pr-opens.md) | release,automation |
