@@ -127,9 +127,11 @@
 		<Message Importance="high" Text="TailwindCSS compiled successfully" />
 	</Target>
 
-	<!-- Ensure npm packages are installed -->
+	<!-- Ensure npm packages are installed. npm ci installs exactly what
+	     package-lock.json pins and never rewrites it, so a build leaves the
+	     working tree clean. -->
 	<Target Name="EnsureNodeModules" BeforeTargets="BuildTailwindCSS" Condition="'$(SkipTailwindBuild)' != 'true'">
-		<Exec Command="npm install" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="!Exists('node_modules')" />
+		<Exec Command="npm ci" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="!Exists('node_modules')" />
 		<Message Importance="high" Text="Node modules installed successfully" />
 	</Target>
 
