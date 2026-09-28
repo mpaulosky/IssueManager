@@ -42,6 +42,12 @@ indent_style = tab
 indent_size = 2
 tab_width = 2
 
+# npm owns package-lock.json and always writes it with two spaces; any other
+# style is rewritten on the next npm install.
+[package-lock.json]
+indent_style = space
+indent_size = 2
+
 #############################
 # Web files (Razor)
 #############################
