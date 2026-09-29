@@ -124,7 +124,7 @@
 	<!-- wwwroot/css/app.css is generated here and not committed, so a
 	     Tailwind bump can never leave a stale copy behind. -->
 	<Target Name="BuildTailwindCSS" BeforeTargets="PreBuildEvent" Condition="'$(SkipTailwindBuild)' != 'true'">
-		<Exec Command="npm run build:css" />
+		<Exec Command="pnpm run build:css" />
 		<Message Importance="high" Text="TailwindCSS compiled successfully" />
 		<!-- wwwroot/** was globbed when the project loaded, before this file
 		     existed, so add it now or a clean build leaves it out of the static
@@ -134,11 +134,11 @@
 		</ItemGroup>
 	</Target>
 
-	<!-- Ensure npm packages are installed. npm ci installs exactly what
-	     package-lock.json pins and never rewrites it, so a build leaves the
-	     working tree clean. -->
+	<!-- Ensure pnpm packages are installed. A frozen-lockfile install
+	     installs exactly what pnpm-lock.yaml pins and never rewrites it, so a
+	     build leaves the working tree clean. -->
 	<Target Name="EnsureNodeModules" BeforeTargets="BuildTailwindCSS" Condition="'$(SkipTailwindBuild)' != 'true'">
-		<Exec Command="npm ci" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="!Exists('node_modules')" />
+		<Exec Command="pnpm install --frozen-lockfile" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="!Exists('node_modules')" />
 		<Message Importance="high" Text="Node modules installed successfully" />
 	</Target>
 

@@ -74,7 +74,7 @@ updates:
         patterns:
           - "*"
 
-  # Maintain the npm packages (Tailwind CLI)
+  # Maintain the web project's pnpm packages (Tailwind CLI)
   - package-ecosystem: "npm"
     directory: "/src/Web"
     target-branch: "main"
