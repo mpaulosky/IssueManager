@@ -56,9 +56,9 @@ See [LICENSE](LICENSE) for details.
 <!-- BLOG_START -->
 | Date | Title | Tags |
 |------|-------|------|
+| 2026-09-29 | [build: write a single-document pnpm lockfile](docs/blogs/2026-09-29-pr-225-build-write-a-single-document-pnpm-lockfile.md) | release,automation |
 | 2026-09-29 | [build: switch the web project from npm to pnpm](docs/blogs/2026-09-29-pr-222-build-switch-the-web-project-from-npm-to-pnpm.md) | release,automation |
 | 2026-09-28 | [chore(web): Stop committing the generated app.css](docs/blogs/2026-09-28-pr-220-chore-web-stop-committing-the-generated-app-css.md) | release,automation |
 | 2026-09-28 | [ci: Lint workflows and shell scripts before push and in CI](docs/blogs/2026-09-28-pr-218-ci-lint-workflows-and-shell-scripts-before-push-and-in-ci.md) | release,automation |
 | 2026-09-28 | [chore(deps): Take Dependabot's NuGet updates, with two restore fixes](docs/blogs/2026-09-28-pr-216-chore-deps-take-dependabot-s-nuget-updates-with-two-restore-fixes.md) | release,automation |
-| 2026-09-28 | [ci: Withhold secrets from Dependabot-authored PRs, whoever runs them](docs/blogs/2026-09-28-pr-214-ci-withhold-secrets-from-dependabot-authored-prs-whoever-runs-them.md) | release,automation |
 <!-- BLOG_END -->
