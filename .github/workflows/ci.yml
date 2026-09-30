@@ -196,6 +196,26 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-
 
+  # Runs the git hook tests (.github/hooks/tests/pre-push.test.sh and
+  # pre-commit.test.sh) in throwaway repos with stubbed tools. Takes seconds,
+  # needs no build, and runs on every PR. Not a required status check.
+  hook-tests:
+    name: Hook tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          persist-credentials: false
+
+      - name: Run pre-push hook tests
+        run: bash .github/hooks/tests/pre-push.test.sh
+
+      - name: Run pre-commit hook tests
+        run: bash .github/hooks/tests/pre-commit.test.sh
+
   # Dependabot PRs run the test suite too: a dependency bump is exactly the
   # change the tests must vet. The one exception is the Playwright (E2E)
   # projects, which log in to Auth0 with real credentials. dependabot/*
