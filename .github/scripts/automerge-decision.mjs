@@ -36,7 +36,10 @@ export function decideAutoMerge(pr) {
   if (!pr.isSameRepo) {
     return { action: "skip", reason: "PR comes from a fork" };
   }
-  // release.yml arms auto-merge on its own blog PRs; GitHub finishes those.
+  // Two workflows arm GitHub's auto-merge on purpose, and GitHub finishes
+  // those PRs once the required checks pass: release.yml on its blog PRs, and
+  // dependabot-auto-merge.yml on Dependabot's, which merge without Copilot's
+  // review as they did before this gate.
   if (pr.autoMergeEnabled) {
     return { action: "skip", reason: "auto-merge is already armed" };
   }
