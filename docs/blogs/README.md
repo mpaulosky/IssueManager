@@ -4,6 +4,7 @@ This directory contains concise release-review posts for merged PR releases.
 
 | Date | Title | Tags |
 |------|-------|------|
+| 2026-09-30 | [ci(hooks): Adopt the shared branch-name standard](2026-09-30-pr-231-ci-hooks-adopt-the-shared-branch-name-standard.md) | release,automation |
 | 2026-09-30 | [ci(hooks): Lint the staged Markdown, not the working copy](2026-09-30-pr-228-ci-hooks-lint-the-staged-markdown-not-the-working-copy.md) | release,automation |
 | 2026-09-29 | [build: write a single-document pnpm lockfile](2026-09-29-pr-225-build-write-a-single-document-pnpm-lockfile.md) | release,automation |
 | 2026-09-29 | [build: switch the web project from npm to pnpm](2026-09-29-pr-222-build-switch-the-web-project-from-npm-to-pnpm.md) | release,automation |
