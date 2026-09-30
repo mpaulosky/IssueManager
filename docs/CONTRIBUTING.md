@@ -144,10 +144,11 @@ Please provide as much detail as possible, including steps to reproduce, expecte
 
 [Fork the Repository to your account]( [your repository fork URL] ).
 
-1. Create a new Branch from the develop branch with a reference to the existing Issue number.
+1. Create a new branch from `main` named for the Issue, such as `feature/{issue}-{slug}` or `fix/{issue}-{slug}`
+   (see Quick Start).
 1. Work on the issue.
 1. Create Unit, Integration tests for any code that require them. We use [your test frameworks, e.g., xUnit, bUnit] to test our code and components.
-1. When you are done Create a Pull Request from your branch to the develop branch.
+1. When you are done, create a Pull Request from your branch to `main`.
 1. Submit the Pull Request.
 
 **Note:** Pull requests without unit tests will be delayed until tests are added. All new features and bug fixes must
@@ -160,7 +161,7 @@ Any code that is written to support a component or new functionality are require
 1. All PRs are reviewed by maintainers and may require changes before merging.
 2. Automated checks (build, tests, lint) must pass before review.
 3. Be responsive to feedback and update your PR as needed.
-4. Once approved, your PR will be merged into `develop`.
+4. Once approved, your PR will be merged into `main`.
 
 ### Write code
 
