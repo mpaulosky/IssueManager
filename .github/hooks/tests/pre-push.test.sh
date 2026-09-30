@@ -166,6 +166,20 @@ expect "pushing a branch that isn't checked out is refused" refused tests-skippe
 run_hook feature/1-x "HEAD $SHA refs/heads/bad-name $ZERO"
 expect "pushing to a badly named branch is refused" refused tests-skipped "Branch name 'bad-name' does not match"
 
+# The branch standard: feature/, fix/ and hotfix/ carry an issue number;
+# chore/ doesn't. squad/ and sprint/ are retired.
+for branch in fix/2-fix-a-thing hotfix/3-urgent chore/tidy-up chore/upgrade-net10 feature/8-oauth2-login; do
+  run_hook "$branch" "refs/heads/$branch @HEAD@ refs/heads/$branch $ZERO"
+  expect "pushing a $branch branch runs the gates" allowed tests-ran
+done
+
+# Slugs are lowercase, and a chore/ slug starts with a letter, so it can't pass
+# for an issue-linked name.
+for branch in squad/4-old-style sprint/5-old-style feature/no-issue fix/no-issue hotfix/no-issue feature/9-Upper chore/tidy-Up chore/7-cleanup; do
+  run_hook feature/1-x "HEAD $SHA refs/heads/$branch $ZERO"
+  expect "pushing to $branch is refused" refused tests-skipped "Branch name '$branch' does not match"
+done
+
 run_hook feature/1-x "refs/heads/main $SHA refs/heads/dev $ZERO"
 expect "pushing to dev from a feature branch is refused" refused tests-skipped "Direct pushes to 'dev' are not allowed."
 

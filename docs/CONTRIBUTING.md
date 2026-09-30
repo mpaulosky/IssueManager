@@ -29,11 +29,13 @@ We have adopted a code of conduct from the Contributor Covenant. Contributors to
 ## Quick Start
 
 1. Fork the repository and clone your fork.
-2. Create a branch from `develop` (use a descriptive name, e.g. `feature/123-add-search`).
+2. Create a branch from `main`, named `feature/{issue}-{slug}`, `fix/{issue}-{slug}`, `hotfix/{issue}-{slug}` or
+   `chore/{slug}` for work without an issue (e.g. `feature/123-add-search`). Slugs are lowercase letters and digits in
+   words joined by `-`, and a `chore/` slug starts with a letter. The pre-push hook refuses any other name.
 3. Make your changes, following the code style and guidelines below.
 4. Add or update tests as needed.
 5. Commit with clear messages (see below).
-6. Push your branch and open a Pull Request to `develop`.
+6. Push your branch and open a Pull Request to `main`.
 7. Ensure all checks pass and respond to review feedback.
 
 ## What should I know before I get started
