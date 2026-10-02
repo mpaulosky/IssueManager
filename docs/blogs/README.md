@@ -4,6 +4,7 @@ This directory contains concise release-review posts for merged PR releases.
 
 | Date | Title | Tags |
 |------|-------|------|
+| 2026-10-02 | [chore: drop leaked Context7 MCP key and stale security policies](2026-10-02-pr-237-chore-drop-leaked-context7-mcp-key-and-stale-security-policies.md) | release,automation |
 | 2026-09-30 | [ci: Merge a PR only after Copilot's review and resolved threads](2026-09-30-pr-235-ci-merge-a-pr-only-after-copilot-s-review-and-resolved-threads.md) | release,automation |
 | 2026-09-30 | [docs: Point the rest of CONTRIBUTING.md at main](2026-09-30-pr-233-docs-point-the-rest-of-contributing-md-at-main.md) | release,automation |
 | 2026-09-30 | [ci(hooks): Adopt the shared branch-name standard](2026-09-30-pr-231-ci-hooks-adopt-the-shared-branch-name-standard.md) | release,automation |
