@@ -1,0 +1,7 @@
+# Source overrides on top of the root .editorconfig, which is Owned by the
+# repo-ci-baseline Template and overwritten on every Apply.
+
+[*.razor.cs]
+# IDE0044: Blazor @ref fields are assigned at render time, outside the constructor.
+# Roslyn cannot see this assignment, so 'make field readonly' is a false positive.
+dotnet_diagnostic.IDE0044.severity = none
