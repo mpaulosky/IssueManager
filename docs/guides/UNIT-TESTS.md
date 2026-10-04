@@ -5,12 +5,14 @@
 Unit tests verify individual components in isolation. They should be fast (<100ms), focused (test one thing), and have no external dependencies (no database, API calls, or file I/O).
 
 **When to use unit tests:**
+
 - Testing validators (FluentValidation rules)
 - Testing domain models (business logic)
 - Testing services with mocked dependencies
 - Testing pure functions and calculations
 
 **Frameworks used:**
+
 - **xUnit** — Test runner
 - **FluentAssertions** — Readable assertions
 - **FluentValidation** — Validation library
@@ -22,6 +24,7 @@ Unit tests verify individual components in isolation. They should be fast (<100m
 
 1. Add test file to `tests/Unit/` (or appropriate subfolder like `Validators/`, `Domain/`)
 2. Reference frameworks via GlobalUsings:
+
    ```csharp
    // tests/Unit/GlobalUsings.cs
    global using Xunit;
@@ -31,6 +34,7 @@ Unit tests verify individual components in isolation. They should be fast (<100m
    ```
 
 3. Create test class:
+
    ```csharp
    namespace IssueManager.Tests.Unit.Validators;
 
@@ -85,6 +89,7 @@ public void CreateIssueValidator_EmptyTitle_ReturnsValidationError()
 ```
 
 ### Key Points
+
 - **Arrange:** Create validator and command/query
 - **Act:** Call `validator.Validate(command)`
 - **Assert:** Check `IsValid`, `Errors` collection
@@ -143,6 +148,7 @@ count.Should().BeLessThanOrEqualTo(10);
 ## Testing Validation Rules
 
 ### Required Field
+
 ```csharp
 [Fact]
 public void Validator_EmptyRequiredField_ReturnsValidationError()
@@ -161,6 +167,7 @@ public void Validator_EmptyRequiredField_ReturnsValidationError()
 ```
 
 ### Length Constraints
+
 ```csharp
 [Fact]
 public void Validator_TitleTooShort_ReturnsValidationError()
@@ -197,6 +204,7 @@ public void Validator_TitleTooLong_ReturnsValidationError()
 ```
 
 ### Boundary Testing
+
 Always test exact boundaries:
 
 ```csharp
@@ -260,6 +268,7 @@ public async Task Service_CallsDependency_ReturnsResult()
 ## Best Practices
 
 ### ✅ Do
+
 - **Test one thing per test** — Focused tests are easier to debug
 - **Use descriptive names** — `Validator_EmptyTitle_ReturnsError` not `Test1`
 - **Test boundaries** — Min, max, exact values
@@ -268,6 +277,7 @@ public async Task Service_CallsDependency_ReturnsResult()
 - **Test both success and failure cases**
 
 ### ❌ Don't
+
 - **Test multiple scenarios in one test** — Split into separate tests
 - **Use magic numbers** — Use constants or variables with clear names
 - **Test implementation details** — Focus on observable behavior
@@ -277,6 +287,7 @@ public async Task Service_CallsDependency_ReturnsResult()
 ## Common Mistakes
 
 ### ❌ Testing Too Many Things
+
 ```csharp
 // Bad — Tests multiple scenarios
 [Fact]
@@ -290,6 +301,7 @@ public void Validator_MultipleScenarios_Works()
 ```
 
 ### ✅ Split Into Focused Tests
+
 ```csharp
 // Good — One scenario per test
 [Fact]
@@ -303,12 +315,14 @@ public void Validator_ValidTitle_IsValid() { /* ... */ }
 ```
 
 ### ❌ Weak Assertions
+
 ```csharp
 // Bad — Not specific enough
 result.Errors.Should().NotBeEmpty();
 ```
 
 ### ✅ Specific Assertions
+
 ```csharp
 // Good — Tests exact error
 result.Errors.Should().HaveCount(1);
@@ -319,6 +333,7 @@ result.Errors[0].ErrorMessage.Should().Contain("required");
 ## Test Patterns
 
 ### Instance vs. Static Validator
+
 ```csharp
 // Option 1: Instance per test
 [Fact]
@@ -339,6 +354,7 @@ public class MyValidatorTests
 ```
 
 ### Theory (Data-Driven Tests)
+
 Test multiple inputs with `[Theory]`:
 
 ```csharp
@@ -393,6 +409,7 @@ dotnet test tests/Unit --collect:"XPlat Code Coverage"
 ---
 
 **Real examples in the codebase:**
+
 - [`tests/Unit/Validators/CreateIssueValidatorTests.cs`](../../tests/Unit/Validators/CreateIssueValidatorTests.cs)
 - [`tests/Unit/Validators/UpdateIssueStatusValidatorTests.cs`](../../tests/Unit/Validators/UpdateIssueStatusValidatorTests.cs)
 - [`tests/Unit/Domain/IssueTests.cs`](../../tests/Unit/Domain/IssueTests.cs)

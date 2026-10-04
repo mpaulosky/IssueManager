@@ -5,6 +5,7 @@
 End-to-end (E2E) tests verify complete user workflows in a real browser. They test the entire application stack from UI to API to database.
 
 **When to use E2E tests:**
+
 - Testing critical user journeys (create issue, edit issue, etc.)
 - Testing multi-step workflows (login → create → edit → delete)
 - Testing UI interactions (clicks, form submissions, navigation)
@@ -12,15 +13,18 @@ End-to-end (E2E) tests verify complete user workflows in a real browser. They te
 - Smoke testing after deployment
 
 **Framework used:**
+
 - **Playwright** — Browser automation for .NET
 
 ## Setup
 
 ### Prerequisites
+
 - .NET 10 SDK
 - Playwright browsers installed
 
 ### Install Playwright
+
 ```bash
 # Install Playwright package
 dotnet add tests/E2E package Microsoft.Playwright
@@ -33,6 +37,7 @@ pwsh bin/Debug/net10.0/playwright.ps1 install
 
 1. Add test file to `tests/E2E/`
 2. Reference Playwright via GlobalUsings:
+
    ```csharp
    // tests/E2E/GlobalUsings.cs
    global using Xunit;
@@ -41,6 +46,7 @@ pwsh bin/Debug/net10.0/playwright.ps1 install
    ```
 
 3. Create test class:
+
    ```csharp
    namespace IssueManager.Tests.E2E;
 
@@ -98,6 +104,7 @@ public async Task CreateIssue_ValidData_CreatesIssueSuccessfully()
 ## Playwright Basics
 
 ### Navigate to Pages
+
 ```csharp
 // Navigate to URL
 await _page.GotoAsync("https://localhost:5001/issues");
@@ -114,6 +121,7 @@ await _page.ReloadAsync();
 ```
 
 ### Find Elements
+
 ```csharp
 // By CSS selector
 var titleInput = await _page.QuerySelectorAsync("#title");
@@ -131,6 +139,7 @@ var createButton = await _page.GetByTextAsync("Create Issue");
 ### Interact with Elements
 
 #### Fill Input Fields
+
 ```csharp
 // Text input
 await _page.FillAsync("#title", "My Issue Title");
@@ -144,6 +153,7 @@ await _page.FillAsync("#title", "New Title");
 ```
 
 #### Click Elements
+
 ```csharp
 // Click button
 await _page.ClickAsync("button[type='submit']");
@@ -159,6 +169,7 @@ await _page.ClickAsync(".context-menu-trigger", new PageClickOptions { Button = 
 ```
 
 #### Select Dropdowns
+
 ```csharp
 // Select by value
 await _page.SelectOptionAsync("#status", "Open");
@@ -171,6 +182,7 @@ await _page.SelectOptionAsync("#status", new SelectOptionValue { Index = 0 });
 ```
 
 #### Checkboxes and Radios
+
 ```csharp
 // Check checkbox
 await _page.CheckAsync("#agree-to-terms");
@@ -183,6 +195,7 @@ await _page.CheckAsync("#priority-high");
 ```
 
 ### Wait for Elements
+
 ```csharp
 // Wait for element to be visible
 await _page.WaitForSelectorAsync(".success-message");
@@ -201,6 +214,7 @@ await _page.WaitForSelectorAsync(".slow-element", new PageWaitForSelectorOptions
 ```
 
 ### Assertions
+
 ```csharp
 // Text content
 var text = await _page.TextContentAsync("h1");
@@ -225,6 +239,7 @@ _page.Url.Should().Contain("/issues");
 ## Common E2E Test Patterns
 
 ### Given-When-Then Pattern
+
 ```csharp
 [Fact]
 public async Task EditIssue_ValidData_UpdatesIssueSuccessfully()
@@ -245,6 +260,7 @@ public async Task EditIssue_ValidData_UpdatesIssueSuccessfully()
 ```
 
 ### Page Object Pattern
+
 Encapsulate page interactions in classes:
 
 ```csharp
@@ -291,6 +307,7 @@ public async Task CreateIssue_ValidData_CreatesIssueSuccessfully()
 ```
 
 ### Test Data Builders
+
 ```csharp
 public class IssueDataBuilder
 {
@@ -332,6 +349,7 @@ var issueData = new IssueDataBuilder()
 ## Testing Workflows
 
 ### Multi-Step Workflow
+
 ```csharp
 [Fact]
 public async Task IssueLifecycle_CreateEditDelete_WorksEndToEnd()
@@ -364,6 +382,7 @@ public async Task IssueLifecycle_CreateEditDelete_WorksEndToEnd()
 ```
 
 ### Testing Search and Filters
+
 ```csharp
 [Fact]
 public async Task IssueList_FilterByStatus_ShowsCorrectIssues()
@@ -388,6 +407,7 @@ public async Task IssueList_FilterByStatus_ShowsCorrectIssues()
 ## Configuration
 
 ### Headless vs. Headed Mode
+
 ```csharp
 // Headless (for CI)
 _browser = await _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
@@ -404,6 +424,7 @@ _browser = await _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
 ```
 
 ### Browser Selection
+
 ```csharp
 // Chromium (default)
 _browser = await _playwright.Chromium.LaunchAsync();
@@ -416,6 +437,7 @@ _browser = await _playwright.Webkit.LaunchAsync();
 ```
 
 ### Viewport and Device Emulation
+
 ```csharp
 // Desktop viewport
 _page = await _browser.NewPageAsync(new BrowserNewPageOptions
@@ -437,6 +459,7 @@ _page = await _browser.NewPageAsync(iPhone);
 ## Best Practices
 
 ### ✅ Do
+
 - **Test critical user journeys** — Focus on high-value workflows
 - **Use descriptive selectors** — Prefer IDs or data attributes over brittle CSS
 - **Wait for elements** — Don't rely on fixed timeouts
@@ -446,6 +469,7 @@ _page = await _browser.NewPageAsync(iPhone);
 - **Test one workflow per test** — Focused, clear failures
 
 ### ❌ Don't
+
 - **Test every edge case** — That's for unit/integration tests
 - **Use hardcoded sleeps** — Use Playwright's waiting strategies
 - **Test implementation details** — Focus on user-visible behavior
@@ -455,6 +479,7 @@ _page = await _browser.NewPageAsync(iPhone);
 ## Common Mistakes
 
 ### ❌ Using Thread.Sleep
+
 ```csharp
 // Bad — Brittle and slow
 await _page.ClickAsync("button");
@@ -463,6 +488,7 @@ var text = await _page.TextContentAsync(".result");
 ```
 
 ### ✅ Wait for Element
+
 ```csharp
 // Good — Wait for element to be visible
 await _page.ClickAsync("button");
@@ -471,12 +497,14 @@ var text = await _page.TextContentAsync(".result");
 ```
 
 ### ❌ Brittle Selectors
+
 ```csharp
 // Bad — Fragile, breaks with CSS changes
 var button = await _page.QuerySelectorAsync("div > div > button.btn.btn-primary");
 ```
 
 ### ✅ Semantic Selectors
+
 ```csharp
 // Good — Uses data attributes or IDs
 var button = await _page.QuerySelectorAsync("#submit-button");
@@ -486,12 +514,14 @@ var button = await _page.QuerySelectorAsync("[data-testid='submit-button']");
 ## Debugging E2E Failures
 
 ### Run in Headed Mode
+
 ```csharp
 Headless = false, // See browser actions
 SlowMo = 500 // Slow down by 500ms per action
 ```
 
 ### Take Screenshots
+
 ```csharp
 // On failure
 await _page.ScreenshotAsync(new PageScreenshotOptions
@@ -502,6 +532,7 @@ await _page.ScreenshotAsync(new PageScreenshotOptions
 ```
 
 ### Video Recording
+
 ```csharp
 var context = await _browser.NewContextAsync(new BrowserNewContextOptions
 {
@@ -514,6 +545,7 @@ await context.CloseAsync(); // Finalizes video
 ```
 
 ### Playwright Inspector
+
 ```bash
 # Set environment variable
 $env:PWDEBUG=1
@@ -521,14 +553,17 @@ dotnet test tests/E2E --filter "FullyQualifiedName~MyTest"
 ```
 
 ### Console Logs
+
 ```csharp
 _page.Console += (_, msg) => Console.WriteLine($"Browser console: {msg.Text}");
 ```
 
 ## Running E2E Tests
 
-### Prerequisites
+### Before Running Tests
+
 Ensure the application is running:
+
 ```bash
 # Terminal 1: Run the app
 dotnet run --project AppHost
@@ -538,6 +573,7 @@ dotnet test tests/E2E
 ```
 
 ### Run Tests
+
 ```bash
 # Run all E2E tests
 dotnet test tests/E2E
@@ -550,6 +586,7 @@ dotnet test tests/E2E
 ```
 
 ### CI/CD Integration
+
 ```yaml
 # GitHub Actions example
 - name: Run E2E Tests
@@ -562,16 +599,20 @@ dotnet test tests/E2E
 ## Performance Tuning
 
 ### Parallel Execution
+
 xUnit runs test classes in parallel, but each browser instance is isolated.
 
 ### Optimize Waits
+
 ```csharp
 // Use specific waits instead of WaitForLoadState
 await _page.WaitForSelectorAsync(".content");
 ```
 
 ### Reuse Browser Context
+
 Share browser context across tests in a class (advanced):
+
 ```csharp
 private static IBrowserContext _context = null!;
 

@@ -9,13 +9,13 @@ history lives in `docs/CHANGELOG.md` and git log instead.
 
 ---
 
-### 2026-02-25: NuGet package versions centralized in Directory.Packages.props
+## 2026-02-25: NuGet package versions centralized in Directory.Packages.props
 
 All NuGet package versions are managed centrally in `Directory.Packages.props` at the
 repo root. Individual `.csproj` files must not specify package versions. This prevents
 version drift across projects and simplifies upgrades to a single file.
 
-### 2026-02-25: IssueDto.Empty and CommentDto.Empty are not singletons
+## 2026-02-25: IssueDto.Empty and CommentDto.Empty are not singletons
 
 `IssueDto.Empty` (and `CommentDto.Empty`) is a static property, not a field — it calls
 `DateTime.UtcNow` on every access, so each access produces a new instance with a
@@ -23,7 +23,7 @@ different timestamp. Code and tests must never compare an instance against
 `IssueDto.Empty` as if it were a stable sentinel value; always assert on individual
 fields instead.
 
-### 2026-02-25: GenerateSlug's trailing underscore is intentional
+## 2026-02-25: GenerateSlug's trailing underscore is intentional
 
 `GenerateSlug` appends a trailing `_` when the input string both ends with a
 non-alphanumeric character and contains at least one other internal non-alphanumeric
@@ -31,14 +31,14 @@ non-alphanumeric character and contains at least one other internal non-alphanum
 `"C# Is Great!"` slugifies to `"c_is_great_"`. Anyone touching this helper or writing
 tests against it should match the actual output rather than "fixing" it.
 
-### 2026-02-26: Repository pattern — the interface is the contract
+## 2026-02-26: Repository pattern — the interface is the contract
 
 When a repository interface and its implementation/callers disagree, the interface is
 authoritative: implementations and callers are updated to match the interface, never
 the reverse. This keeps a single source of truth for repository contracts and avoids
 signature drift between interfaces and handlers.
 
-### 2026-02-27: MongoDB search/filter pattern via Builders\<T\>.Filter
+## 2026-02-27: MongoDB search/filter pattern via Builders\<T\>.Filter
 
 List/search endpoints that support optional filtering follow a consistent pattern
 using MongoDB's `Builders<T>.Filter` API: start from required base filters (e.g.
@@ -47,7 +47,7 @@ non-null/non-empty, use case-insensitive `BsonRegularExpression` for text search
 combine everything with `Filter.And()`. New filterable list endpoints should follow
 this same shape rather than inventing a new one.
 
-### 2026-02-27: Auth0 uses a passive-configuration pattern
+## 2026-02-27: Auth0 uses a passive-configuration pattern
 
 Auth0 authentication extensions check for required configuration (domain, client
 ID/audience) before wiring themselves up. If configuration is missing, they return
@@ -55,7 +55,7 @@ early without throwing, and the application runs in "open mode" with no authenti
 enforced. This is intentional graceful degradation, not a security bug — it exists so
 the app keeps building and running while Auth0 secrets are being provisioned.
 
-### 2026-02-27: CurrentUserService reads Auth0 JWT claims with a fallback strategy
+## 2026-02-27: CurrentUserService reads Auth0 JWT claims with a fallback strategy
 
 `ICurrentUserService` exposes the authenticated user's identity (UserId, Name, Email,
 IsAuthenticated) by reading claims from `HttpContext.User`. It tries the standard
@@ -63,7 +63,7 @@ IsAuthenticated) by reading claims from `HttpContext.User`. It tries the standar
 Auth0's own claim names (`sub`/`name`/`email`) if the standard ones aren't present,
 and handles unauthenticated requests gracefully rather than throwing.
 
-### 2026-02-28: API versioning strategy
+## 2026-02-28: API versioning strategy
 
 The API uses `Asp.Versioning.Http` with a default version of 1.0, assumes the default
 version when a client doesn't specify one, and reports supported versions in response
@@ -71,13 +71,13 @@ headers. Clients may select a version via URL segment, an `X-Api-Version` header
 `api-version` query string parameter. Existing `/api/v1/` routes continue to work
 unchanged.
 
-### 2026-02-28: Project confirmed non-commercial
+## 2026-02-28: Project confirmed non-commercial
 
 IssueManager is confirmed to be a non-commercial project. This is a standing licensing
 directive: dependencies whose free tier excludes commercial use (e.g. FluentAssertions
 v7+) may be adopted without a licensing review being triggered by this project's usage.
 
-### 2026-03-03: ObjectId parsing at the API boundary, Result\<T\> throughout
+## 2026-03-03: ObjectId parsing at the API boundary, Result\<T\> throughout
 
 IDs arrive from clients as strings and are parsed to `ObjectId` before reaching handler
 business logic — handler bodies never call `ObjectId.TryParse()` themselves. Commands
@@ -90,7 +90,7 @@ appropriate HTTP status code (404 for not-found, 409 for conflict, 400 for valid
 failure, etc.). Together these give fail-fast validation at the boundary and consistent,
 type-safe error handling from repository to HTTP response.
 
-### 2026-03-04: Auth0 roles require explicit claim mapping
+## 2026-03-04: Auth0 roles require explicit claim mapping
 
 Role-based authorization (`[Authorize(Roles = "Admin")]`, `<AuthorizeView Roles="Admin">`)
 depends on Auth0 including a roles claim in the JWT and on `AuthExtensions.cs` mapping
@@ -99,20 +99,20 @@ silently always returns `false` and every Admin-gated page silently denies acces
 does not throw or log an error, so this is easy to misdiagnose as an authorization bug
 rather than a missing claim mapping.
 
-### 2026-03-06: Web project uses Vertical Slice Architecture
+## 2026-03-06: Web project uses Vertical Slice Architecture
 
 The `src/Web` project is organized by feature slice rather than by horizontal layer:
 each feature owns its own folder containing its pages, components, and related code,
 instead of being split across separate `Pages/`, `Components/`, `Services/` layers.
 New Web features should follow the same self-contained-slice convention.
 
-### 2026-03-10: Direct pushes to main are blocked
+## 2026-03-10: Direct pushes to main are blocked
 
 The pre-push hook blocks direct pushes to `main` (or `master`). All work must go
 through a feature branch and a pull request. This was made an enforced gate after a
 direct push to main bypassed the PR/review process.
 
-### 2026-03-10: Create handlers generate ObjectIds; repositories validate them
+## 2026-03-10: Create handlers generate ObjectIds; repositories validate them
 
 For all `Create` operations, the handler is responsible for generating a new ID via
 `ObjectId.GenerateNewId()` when constructing the DTO/model being persisted — it does
@@ -123,7 +123,7 @@ operations. This gives explicit ID ownership at the application layer and makes
 surprise. Any new Create handler should follow this same generate-in-handler,
 validate-in-repository split.
 
-### 2026-04-15: Soft-delete architecture for Categories and Statuses
+## 2026-04-15: Soft-delete architecture for Categories and Statuses
 
 Categories and Statuses use soft delete rather than hard delete: "deleting" one sets
 an `IsArchived` flag instead of removing the row. Issues that reference an archived
@@ -131,7 +131,7 @@ Category or Status keep their association, but archived Categories/Statuses are
 excluded from active selection UI. This preserves historical/referential integrity for
 issues created against a Category or Status that is later retired.
 
-### 2026-08-27: Remove squad-team framework
+## 2026-08-27: Remove squad-team framework
 
 The repository switched to Claude Code for AI-assisted development, which does not
 interface with the squad-team framework (its agent charters, ceremonies, casting
@@ -143,7 +143,7 @@ session trail are not lost — they remain available in git history if ever need
 this document instead carries forward only the durable architectural decisions worth
 keeping in front of future work.
 
-### 2026-08-27: Result\<T\> is always returned, never bypassed by throwing, and maps to HTTP through one place
+## 2026-08-27: Result\<T\> is always returned, never bypassed by throwing, and maps to HTTP through one place
 
 The existing rule that all API handlers return `Task<Result<T>>` (see the 2026-03-03
 entry) is absolute: a handler must never throw for an expected failure case (validation,
@@ -163,7 +163,7 @@ validatable input (Categories, Statuses, Comments) are not wrapped in `Result<T>
 for uniformity; only `ListIssuesHandler` needs it, because it's the only one with
 parameters that can actually fail validation.
 
-### 2026-08-27: New MongoDB-backed entities inherit MongoRepository, not a hand-written CRUD class
+## 2026-08-27: New MongoDB-backed entities inherit MongoRepository, not a hand-written CRUD class
 
 `MongoRepository<TModel, TDto>` in `src/Api/Data/` implements the shared CRUD contract
 (`IRepository<TDto>`: archive, create, get-by-id, get-all, update, count) once. A new
@@ -179,7 +179,7 @@ without knowing the concrete model type. The entity's own repository interface
 (`ICategoryRepository`, etc.) should extend `IRepository<TDto>` rather than
 re-declaring the 5 shared method signatures.
 
-### 2026-08-27: Delete (soft-delete/archive) is one generic handler, not one class per entity
+## 2026-08-27: Delete (soft-delete/archive) is one generic handler, not one class per entity
 
 `DeleteHandler<TDto>` in `src/Api/Handlers/` is the entire delete-by-archive
 implementation for every entity — there is no `DeleteIssueHandler`/`DeleteCategoryHandler`/

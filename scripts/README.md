@@ -8,7 +8,7 @@ Generates a Markdown blog post summarizing a commit's message and diff, writes i
 `docs/blogs/`, and stages it with `git add` so it ships in the same push as the change it
 documents.
 
-### Usage
+### New-BlogPost Usage
 
 ```powershell
 # Summarize the current HEAD commit
@@ -26,7 +26,7 @@ include it in the same commit (`git commit --amend`) or a follow-up commit befor
 Generates a Markdown blog post documenting a GitHub release (via `gh release view`) and stages
 it in `docs/blogs/`. Requires the GitHub CLI (`gh`) authenticated against this repo.
 
-### Usage
+### New-ReleaseBlogPost Usage
 
 ```powershell
 # Document the latest release
@@ -51,7 +51,7 @@ Automatically cleans up local branches whose remote tracking branches have been 
 4. Skips protected branches (`main`, `develop`)
 5. Reports deleted and skipped branches
 
-### Usage
+### cleanup-merged-branches Usage
 
 ```powershell
 # Dry run - see what would be deleted
@@ -81,7 +81,7 @@ git gone -Force   # Force cleanup
 
 ### Example Output
 
-```
+```text
 🔄 Fetching from origin with prune...
 🔍 Scanning for orphaned local branches...
 

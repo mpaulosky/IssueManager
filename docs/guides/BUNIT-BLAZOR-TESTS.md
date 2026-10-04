@@ -5,6 +5,7 @@
 bUnit is a testing library for Blazor components. It renders components in a test context and allows you to interact with the rendered output, test parameters, event callbacks, and component lifecycle.
 
 **When to use bUnit:**
+
 - Testing component rendering
 - Testing component parameters and cascading parameters
 - Testing event callbacks (button clicks, form submissions)
@@ -12,6 +13,7 @@ bUnit is a testing library for Blazor components. It renders components in a tes
 - Testing forms and validation
 
 **Frameworks used:**
+
 - **bUnit** — Blazor component testing
 - **xUnit** — Test runner
 - **FluentAssertions** — Readable assertions
@@ -23,6 +25,7 @@ bUnit is a testing library for Blazor components. It renders components in a tes
 1. Add test file to `tests/BlazorTests/Components/`
 2. Inherit from `ComponentTestBase` (our custom base class)
 3. Reference frameworks via GlobalUsings:
+
    ```csharp
    // tests/BlazorTests/GlobalUsings.cs
    global using Bunit;
@@ -33,6 +36,7 @@ bUnit is a testing library for Blazor components. It renders components in a tes
    ```
 
 ### Base Class
+
 We provide `ComponentTestBase` for common setup:
 
 ```csharp
@@ -86,6 +90,7 @@ public class IssueFormTests : ComponentTestBase
 ## Basic Component Rendering
 
 ### Render a Component
+
 ```csharp
 [Fact]
 public void MyComponent_RendersCorrectly()
@@ -100,6 +105,7 @@ public void MyComponent_RendersCorrectly()
 ```
 
 ### Find Elements
+
 ```csharp
 // Find by CSS selector
 var button = component.Find("button");
@@ -115,6 +121,7 @@ component.Find("form").Should().NotBeNull();
 ```
 
 ### Assert Element Content
+
 ```csharp
 var submitButton = component.Find("button[type='submit']");
 submitButton.TextContent.Should().Contain("Create Issue");
@@ -126,6 +133,7 @@ titleInput.GetAttribute("value").Should().Be("Expected Title");
 ## Testing Component Parameters
 
 ### Pass Parameters
+
 ```csharp
 [Fact]
 public void IssueForm_ShowsCreateButtonText_WhenIsEditModeIsFalse()
@@ -155,6 +163,7 @@ public void IssueForm_ShowsUpdateButtonText_WhenIsEditModeIsTrue()
 ```
 
 ### Update Parameters After Rendering
+
 ```csharp
 [Fact]
 public void IssueForm_UpdatesFormFields_WhenInitialValuesParameterChanges()
@@ -180,6 +189,7 @@ public void IssueForm_UpdatesFormFields_WhenInitialValuesParameterChanges()
 ## Testing Event Callbacks
 
 ### OnSubmit Callback
+
 ```csharp
 [Fact]
 public async Task IssueForm_InvokesOnSubmitCallback_WhenFormIsSubmittedWithValidData()
@@ -214,6 +224,7 @@ public async Task IssueForm_InvokesOnSubmitCallback_WhenFormIsSubmittedWithValid
 ```
 
 ### OnCancel Callback
+
 ```csharp
 [Fact]
 public async Task IssueForm_InvokesOnCancelCallback_WhenCancelButtonIsClicked()
@@ -238,6 +249,7 @@ public async Task IssueForm_InvokesOnCancelCallback_WhenCancelButtonIsClicked()
 ## Testing Forms
 
 ### Interacting with Form Fields
+
 ```csharp
 // Text input
 var titleInput = component.Find("#title");
@@ -257,12 +269,14 @@ checkbox.Change(true);
 ```
 
 ### Submitting Forms
+
 ```csharp
 var form = component.Find("form");
 await form.SubmitAsync();
 ```
 
 ### Testing Validation
+
 ```csharp
 [Fact]
 public void IssueForm_ShowsValidationSummary_WhenRendered()
@@ -279,6 +293,7 @@ public void IssueForm_ShowsValidationSummary_WhenRendered()
 ## Testing Component State
 
 ### Conditional Rendering
+
 ```csharp
 [Fact]
 public void IssueForm_ShowsCancelButton_WhenOnCancelCallbackIsDefined()
@@ -310,6 +325,7 @@ public void IssueForm_HidesCancelButton_WhenOnCancelCallbackIsNotDefined()
 ```
 
 ### Loading/Disabled State
+
 ```csharp
 [Fact]
 public void IssueForm_DisablesButtons_WhenIsSubmittingIsTrue()
@@ -372,6 +388,7 @@ public class MyComponentTests : ComponentTestBase
 ## Testing Component Lifecycle
 
 ### OnInitialized / OnInitializedAsync
+
 ```csharp
 [Fact]
 public async Task MyComponent_LoadsData_OnInitialized()
@@ -393,6 +410,7 @@ public async Task MyComponent_LoadsData_OnInitialized()
 ```
 
 ### OnParametersSet / OnParametersSetAsync
+
 Use `SetParametersAndRender` to trigger lifecycle:
 
 ```csharp
@@ -417,6 +435,7 @@ public void MyComponent_ReactsToParameterChange()
 ## Best Practices
 
 ### ✅ Do
+
 - **Inherit from ComponentTestBase** — Reuse setup logic
 - **Test one thing per test** — Rendering, parameters, callbacks separately
 - **Use descriptive names** — `IssueForm_ShowsUpdateButton_WhenIsEditModeIsTrue`
@@ -425,6 +444,7 @@ public void MyComponent_ReactsToParameterChange()
 - **Clean up with IDisposable** — TestContext.Dispose()
 
 ### ❌ Don't
+
 - **Test implementation details** — Focus on rendered output
 - **Use Thread.Sleep** — Use async/await or bUnit's WaitFor
 - **Share TestContext between tests** — Each test should have its own
@@ -433,6 +453,7 @@ public void MyComponent_ReactsToParameterChange()
 ## Common Mistakes
 
 ### ❌ Not Awaiting Async Events
+
 ```csharp
 // Bad — Missing await
 var button = component.Find("button");
@@ -440,6 +461,7 @@ button.ClickAsync(new MouseEventArgs()); // Fire and forget
 ```
 
 ### ✅ Always Await Async Interactions
+
 ```csharp
 // Good — Await the event
 var button = component.Find("button");
@@ -447,6 +469,7 @@ await button.ClickAsync(new MouseEventArgs());
 ```
 
 ### ❌ Testing Too Many Things
+
 ```csharp
 // Bad — Tests rendering, parameters, and callbacks in one test
 [Fact]
@@ -454,6 +477,7 @@ public void IssueForm_Everything_Works() { /* ... */ }
 ```
 
 ### ✅ Split Into Focused Tests
+
 ```csharp
 [Fact]
 public void IssueForm_RendersCorrectly() { /* ... */ }
@@ -468,6 +492,7 @@ public async Task IssueForm_InvokesOnSubmitCallback() { /* ... */ }
 ## Common Patterns
 
 ### Arrange-Act-Assert with Components
+
 ```csharp
 [Fact]
 public void MyComponent_Scenario_ExpectedOutcome()
@@ -487,6 +512,7 @@ public void MyComponent_Scenario_ExpectedOutcome()
 ```
 
 ### Testing Conditional Rendering
+
 ```csharp
 // Test presence
 var element = component.Find(".my-element");
@@ -500,11 +526,13 @@ elements.Should().BeEmpty();
 ## Debugging Failed Tests
 
 1. **Inspect `component.Markup`** — See the rendered HTML
+
    ```csharp
    Console.WriteLine(component.Markup);
    ```
 
 2. **Use bUnit's MarkupMatches** — Compare exact HTML
+
    ```csharp
    component.MarkupMatches("<div>Expected HTML</div>");
    ```
@@ -536,5 +564,6 @@ dotnet watch test --project tests/BlazorTests
 ---
 
 **Real examples in the codebase:**
+
 - [`tests/BlazorTests/Components/IssueFormTests.cs`](../../tests/BlazorTests/Components/IssueFormTests.cs)
 - [`tests/BlazorTests/Fixtures/ComponentTestBase.cs`](../../tests/BlazorTests/Fixtures/ComponentTestBase.cs)

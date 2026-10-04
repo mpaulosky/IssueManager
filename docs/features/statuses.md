@@ -2,7 +2,8 @@
 
 ## Overview
 
-Statuses track the lifecycle of issues (e.g., "Open", "In Progress", "Closed", "On Hold"). Admins can manage statuses, including archiving (soft-deleting) them to retire statuses while preserving historical data.
+Statuses track the lifecycle of issues (e.g., "Open", "In Progress", "Closed", "On Hold").
+Admins can manage statuses, including archiving (soft-deleting) them to retire statuses while preserving historical data.
 
 ## DELETE /api/v1/statuses/{id}
 
@@ -16,6 +17,7 @@ Archives (soft-deletes) a status. Only administrators can perform this action.
 ### Behavior
 
 When a status is archived:
+
 - The status document is marked with `Archived = true`
 - The `ArchivedBy` field is set to the current user's ID
 - The `ArchivedAt` timestamp is recorded
@@ -25,14 +27,14 @@ When a status is archived:
 
 ### Example Request
 
-```
+```http
 DELETE /api/v1/statuses/507f1f77bcf86cd799439011
 Authorization: Bearer {token}
 ```
 
 ### Example Response
 
-```
+```http
 HTTP/1.1 204 No Content
 ```
 

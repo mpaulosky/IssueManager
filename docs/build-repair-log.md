@@ -26,7 +26,7 @@ Integration tests require Docker (TestContainers/MongoDB). Run separately from n
 #### Non-Integration Tests (filter: `FullyQualifiedName!~Integration`)
 
 | Project | Tests | Passed | Failed | Skipped |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Unit.Tests | — | ✅ | 0 | 0 |
 | Architecture.Tests | — | ✅ | 0 | 0 |
 | Blazor.Tests | — | ✅ | 0 | 0 |
@@ -35,7 +35,7 @@ Integration tests require Docker (TestContainers/MongoDB). Run separately from n
 #### Integration Tests (Docker required — MongoDB 8.0 via TestContainers)
 
 | Project | Tests | Passed | Failed | Skipped |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Integration.Tests | 46 | 46 | 0 | 0 |
 
 #### Overall
@@ -55,7 +55,7 @@ None required.
 ### Final Status
 
 | Check | Result |
-|---|---|
+| --- | --- |
 | `dotnet restore` | ✅ |
 | `dotnet build` (0 warnings, 0 errors) | ✅ |
 | All tests passing (378/378) | ✅ |
@@ -67,6 +67,7 @@ None required.
 ## Run: 2026-02-23 (previous)
 
 Full build-repair executed against IssueManager.sln. All three steps passed cleanly:
+
 - Restore: SUCCESS
 - Build (Release): 0 warnings, 0 errors
 - Tests: 130/130 passed (Unit: 62, Architecture: 9, Blazor: 13, Integration: 46)

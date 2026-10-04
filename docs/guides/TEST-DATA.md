@@ -5,6 +5,7 @@
 Test data management is critical for reliable, isolated tests. This guide covers patterns for creating test data, managing fixtures, and ensuring test isolation.
 
 **Key principles:**
+
 - **Isolation** — Each test creates its own data
 - **Repeatability** — Tests produce the same results every run
 - **Clarity** — Test data is easy to understand
@@ -13,6 +14,7 @@ Test data management is critical for reliable, isolated tests. This guide covers
 ## Test Data Patterns
 
 ### Inline Test Data
+
 Simplest approach: create data directly in the test.
 
 ```csharp
@@ -37,11 +39,13 @@ public async Task CreateIssue_ValidData_Succeeds()
 ```
 
 **When to use:**
+
 - Simple data
 - Data is specific to one test
 - Clarity is more important than DRY
 
 ### Test Data Builders
+
 Builder pattern for complex objects.
 
 ```csharp
@@ -100,11 +104,13 @@ public async Task CreateIssue_WithLabels_Succeeds()
 ```
 
 **When to use:**
+
 - Complex objects with many properties
 - Multiple tests need similar data with variations
 - Readable, fluent API is valuable
 
 ### Factory Methods
+
 Static methods or helpers to create common test data.
 
 ```csharp
@@ -162,11 +168,13 @@ public async Task GetIssue_ExistingId_ReturnsIssue()
 ```
 
 **When to use:**
+
 - Common data patterns reused across many tests
 - Simple, readable API
 - Don't need fluent chaining
 
 ### Object Mother Pattern
+
 Provides pre-configured objects for common scenarios.
 
 ```csharp
@@ -225,6 +233,7 @@ public async Task UpdateStatus_ClosedIssue_Succeeds()
 ```
 
 **When to use:**
+
 - Common domain scenarios (open issue, closed issue, etc.)
 - Named methods document intent
 - Multiple tests need the same "flavor" of object
@@ -232,6 +241,7 @@ public async Task UpdateStatus_ClosedIssue_Succeeds()
 ## Fixtures
 
 ### xUnit IAsyncLifetime
+
 For setup/teardown that runs once per test class.
 
 ```csharp
@@ -267,9 +277,11 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 ```
 
 ### xUnit Collection Fixtures
+
 Share fixtures across multiple test classes.
 
 **Define the fixture:**
+
 ```csharp
 public class MongoDbFixture : IAsyncLifetime
 {
@@ -298,6 +310,7 @@ public class MongoDbFixture : IAsyncLifetime
 ```
 
 **Define the collection:**
+
 ```csharp
 [CollectionDefinition("MongoDB")]
 public class MongoDbCollection : ICollectionFixture<MongoDbFixture>
@@ -306,6 +319,7 @@ public class MongoDbCollection : ICollectionFixture<MongoDbFixture>
 ```
 
 **Use in test classes:**
+
 ```csharp
 [Collection("MongoDB")]
 public class CreateIssueHandlerTests
@@ -328,11 +342,13 @@ public class CreateIssueHandlerTests
 ```
 
 **When to use:**
+
 - Expensive setup (MongoDB container, API server)
 - Multiple test classes need the same resource
 - Trade-off: faster tests, but test classes share state
 
 ### bUnit ComponentTestBase
+
 Base class for Blazor component tests.
 
 **Real example:** [`tests/BlazorTests/Fixtures/ComponentTestBase.cs`](../../tests/BlazorTests/Fixtures/ComponentTestBase.cs)
@@ -372,6 +388,7 @@ public class IssueFormTests : ComponentTestBase
 ## Test Isolation
 
 ### Unique Identifiers
+
 Use unique IDs to avoid collisions:
 
 ```csharp
@@ -390,6 +407,7 @@ public async Task CreateIssue_UniqueTitle_Succeeds()
 ```
 
 ### Per-Test Cleanup
+
 Clean up test data after each test:
 
 ```csharp
@@ -410,6 +428,7 @@ public async Task CreateAndDeleteIssue_Succeeds()
 ```
 
 ### Unique Test Databases
+
 Each test class uses a unique database name:
 
 ```csharp
@@ -429,6 +448,7 @@ public class GetIssueHandlerTests : IAsyncLifetime
 ## MongoDB Test Fixtures
 
 ### Ephemeral Containers
+
 TestContainers automatically destroys containers after tests:
 
 ```csharp
@@ -440,6 +460,7 @@ public async Task DisposeAsync()
 ```
 
 ### Seeding Test Data
+
 Seed data before tests:
 
 ```csharp
@@ -456,6 +477,7 @@ public async Task InitializeAsync()
 ```
 
 ### Collection-Level Cleanup
+
 Drop test collections after tests:
 
 ```csharp
@@ -474,6 +496,7 @@ public async Task DisposeAsync()
 ## Mock Services
 
 ### NSubstitute Basics
+
 Create mock services for unit tests:
 
 ```csharp
@@ -501,6 +524,7 @@ public async Task MyService_CallsRepository_ReturnsResult()
 ```
 
 ### Mocking in bUnit Tests
+
 Mock services for Blazor components:
 
 ```csharp
@@ -534,6 +558,7 @@ public class IssueListTests : ComponentTestBase
 ## Best Practices
 
 ### ✅ Do
+
 - **Create unique test data** — Use GUIDs or timestamps
 - **Use builders for complex objects** — Readable, maintainable
 - **Clean up resources** — IAsyncLifetime, IDisposable
@@ -542,6 +567,7 @@ public class IssueListTests : ComponentTestBase
 - **Document fixture behavior** — XML comments on setup/teardown
 
 ### ❌ Don't
+
 - **Share mutable state between tests** — Causes flaky tests
 - **Use hardcoded IDs** — Collisions and failures
 - **Leave test data in database** — Clean up after tests
@@ -551,6 +577,7 @@ public class IssueListTests : ComponentTestBase
 ## Common Mistakes
 
 ### ❌ Shared Mutable State
+
 ```csharp
 // Bad — Shared state across tests
 public class MyTests
@@ -566,6 +593,7 @@ public class MyTests
 ```
 
 ### ✅ Independent Test Data
+
 ```csharp
 // Good — Each test creates its own
 public class MyTests
@@ -587,12 +615,14 @@ public class MyTests
 ```
 
 ### ❌ Hardcoded IDs
+
 ```csharp
 // Bad — Collisions if tests run in parallel
 var issue = new Issue { Id = "test-123", Title = "Test" };
 ```
 
 ### ✅ Unique IDs
+
 ```csharp
 // Good — Unique ID
 var issue = new Issue { Id = Guid.NewGuid().ToString(), Title = "Test" };
@@ -601,17 +631,23 @@ var issue = new Issue { Id = Guid.NewGuid().ToString(), Title = "Test" };
 ## Performance Considerations
 
 ### Container Reuse
+
 Share expensive fixtures across test classes:
+
 - Use xUnit Collection Fixtures
 - Trade-off: faster tests, but shared state
 
 ### Parallel Execution
+
 xUnit runs test classes in parallel:
+
 - Each class gets its own fixture
 - Ensure test data is isolated
 
 ### Async Initialization
+
 Use `IAsyncLifetime` for async setup:
+
 ```csharp
 public async Task InitializeAsync()
 {
@@ -630,5 +666,6 @@ public async Task InitializeAsync()
 ---
 
 **Real examples in the codebase:**
+
 - [`tests/Integration/Fixtures/MongoDbFixture.cs`](../../tests/Integration/Fixtures/MongoDbFixture.cs)
 - [`tests/BlazorTests/Fixtures/ComponentTestBase.cs`](../../tests/BlazorTests/Fixtures/ComponentTestBase.cs)

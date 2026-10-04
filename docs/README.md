@@ -16,17 +16,20 @@
 [![Open PRs](https://img.shields.io/github/issues-pr/mpaulosky/IssueManager?color=28a745)](https://github.com/mpaulosky/IssueManager/pulls?q=is%3Aopen+is%3Apr)
 [![Closed PRs](https://img.shields.io/github/issues-pr-closed/mpaulosky/IssueManager?color=6f42c1)](https://github.com/mpaulosky/IssueManager/pulls?q=is%3Aclosed+is%3Apr)
 
-An issue management application built with modern architecture patterns and async/reactive workflows. IssueManager demonstrates vertical slice architecture, CQRS, and MongoDB integration in a production-ready .NET application.
+An issue management application built with modern architecture patterns and async/reactive workflows.
+IssueManager demonstrates vertical slice architecture, CQRS, and MongoDB integration in a production-ready .NET application.
 
 ## Quick Start
 
 1. **Prerequisites:** .NET 10 SDK, Docker (for MongoDB)
 2. **Clone & Restore:**
+
    ```bash
    git clone https://github.com/mpaulosky/IssueManager.git
    cd IssueManager
    dotnet restore
    ```
+
 3. **Run:** `dotnet run --project AppHost` (Aspire orchestration)
 4. **Open:** `https://localhost:5001` (Blazor UI)
 
@@ -41,7 +44,8 @@ An issue management application built with modern architecture patterns and asyn
 
 ## Architecture
 
-Features are organized as vertical slices—each slice owns its complete stack from API to UI. Commands handle writes, queries handle reads. MongoDB is our primary data store. Aspire manages service topology and local development.
+Features are organized as vertical slices—each slice owns its complete stack from API to UI. Commands handle writes, queries handle reads. MongoDB is our primary data store.
+Aspire manages service topology and local development.
 
 ## Contributing
 
@@ -55,7 +59,7 @@ See [LICENSE](LICENSE) for details.
 
 <!-- BLOG_START -->
 | Date | Title | Tags |
-|------|-------|------|
+| ------ | ------- | ------ |
 | 2026-10-02 | [chore: drop leaked Context7 MCP key and stale security policies](docs/blogs/2026-10-02-pr-237-chore-drop-leaked-context7-mcp-key-and-stale-security-policies.md) | release,automation |
 | 2026-09-30 | [ci: Merge a PR only after Copilot's review and resolved threads](docs/blogs/2026-09-30-pr-235-ci-merge-a-pr-only-after-copilot-s-review-and-resolved-threads.md) | release,automation |
 | 2026-09-30 | [docs: Point the rest of CONTRIBUTING.md at main](docs/blogs/2026-09-30-pr-233-docs-point-the-rest-of-contributing-md-at-main.md) | release,automation |
