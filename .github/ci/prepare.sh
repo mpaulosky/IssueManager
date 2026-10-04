@@ -18,8 +18,19 @@ set -euo pipefail
 job="${1:?usage: prepare.sh build|test [test-name]}"
 test_name="${2:-}"
 
+# Building src/Web runs the Tailwind CSS build through pnpm (its csproj runs
+# `pnpm install --frozen-lockfile` itself when node_modules is missing), and
+# the Bunit and E2E test projects build it too. Corepack provides the pnpm
+# version pinned by "packageManager" in src/Web/package.json; the build step
+# that first runs pnpm comes later, so it gets the no-prompt setting too.
+enable_pnpm() {
+  export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+  echo "COREPACK_ENABLE_DOWNLOAD_PROMPT=0" >> "${GITHUB_ENV:-/dev/null}"
+  corepack enable
+}
+
 case "$job" in
-  build) ;;
-  test) : "$test_name" ;;
+  build) enable_pnpm ;;
+  test) : "$test_name"; enable_pnpm ;;
   *) echo "prepare.sh: unknown job '$job'" >&2; exit 2 ;;
 esac
