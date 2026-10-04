@@ -41,3 +41,5 @@
 - [CQRS Pattern](https://learn.microsoft.com/azure/architecture/patterns/cqrs) – Command Query Responsibility Segregation for separating read and write operations
 - [Dependency Injection](https://learn.microsoft.com/aspnet/core/fundamentals/dependency-injection) – Built-in ASP.NET Core DI container
 - [Records](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/record) – Immutable DTOs for Commands, Queries, and Responses
+
+This line is a docs-only CI probe and is never merged.
