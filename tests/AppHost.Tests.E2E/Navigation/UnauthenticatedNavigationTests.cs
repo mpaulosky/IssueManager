@@ -68,7 +68,7 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that an unauthenticated user does NOT see the "New Issue" link.
 	/// </summary>
-	[Fact(Skip = "Fails: #246")]
+	[Fact]
 	public async Task Unauthenticated_DoesNotSeeNewIssueLink()
 	{
 		// Arrange
@@ -105,14 +105,14 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 			await page.GotoAsync(fixture.WebUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
 			// Verify we are in unauthenticated state before checking menu visibility
-			var loginLink = page.Locator("a[href='/auth/login']");
+			var loginLink = page.Locator("nav[aria-label='Main navigation'] a[href='/auth/login']");
 			await loginLink.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible, Timeout = 5000 });
 
 			// Assert
-			var categoriesLink = page.Locator("a[href='/categories']");
-			var statusesLink = page.Locator("a[href='/statuses']");
-			var adminLink = page.Locator("a[href='/admin']");
-			var sampleDataLink = page.Locator("a[href='/sample-data']");
+			var categoriesLink = page.Locator("nav[aria-label='Main navigation'] a[href='/categories']");
+			var statusesLink = page.Locator("nav[aria-label='Main navigation'] a[href='/statuses']");
+			var adminLink = page.Locator("nav[aria-label='Main navigation'] a[href='/admin']");
+			var sampleDataLink = page.Locator("nav[aria-label='Main navigation'] a[href='/sample-data']");
 
 			(await categoriesLink.IsVisibleAsync())
 				.Should().BeFalse("Unauthenticated user should NOT see Categories link");
@@ -133,7 +133,7 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 	/// Verifies that navigating to a protected route redirects to login.
 	/// The /issues/create route requires authorization.
 	/// </summary>
-	[Fact(Skip = "Fails: #246")]
+	[Fact]
 	public async Task Unauthenticated_ProtectedRouteRedirectsToLogin()
 	{
 		// Arrange

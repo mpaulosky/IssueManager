@@ -85,7 +85,7 @@ public class LogoutTests(PlaywrightFixture fixture)
 
 			// Verify admin menu items are visible
 			await page.GotoAsync(fixture.WebUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
-			var adminLinkBefore = page.Locator("a[href='/admin']");
+			var adminLinkBefore = page.Locator("nav[aria-label='Main navigation'] a[href='/admin']");
 			(await adminLinkBefore.IsVisibleAsync()).Should().BeTrue("Admin link should be visible before logout");
 
 			// Act - Log out
@@ -93,14 +93,14 @@ public class LogoutTests(PlaywrightFixture fixture)
 			await page.GotoAsync(fixture.WebUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
 			// Verify we are in unauthenticated state before checking menu visibility
-			var loginLink = page.Locator("a[href='/auth/login']");
+			var loginLink = page.Locator("nav[aria-label='Main navigation'] a[href='/auth/login']");
 			await loginLink.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible, Timeout = 5000 });
 
 			// Assert - Admin menu items should be hidden
-			var categoriesLink = page.Locator("a[href='/categories']");
-			var statusesLink = page.Locator("a[href='/statuses']");
-			var adminLink = page.Locator("a[href='/admin']");
-			var sampleDataLink = page.Locator("a[href='/sample-data']");
+			var categoriesLink = page.Locator("nav[aria-label='Main navigation'] a[href='/categories']");
+			var statusesLink = page.Locator("nav[aria-label='Main navigation'] a[href='/statuses']");
+			var adminLink = page.Locator("nav[aria-label='Main navigation'] a[href='/admin']");
+			var sampleDataLink = page.Locator("nav[aria-label='Main navigation'] a[href='/sample-data']");
 
 			(await categoriesLink.IsVisibleAsync())
 				.Should().BeFalse("Categories link should be hidden after logout");
@@ -157,7 +157,7 @@ public class LogoutTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that the "New Issue" link is hidden after logout.
 	/// </summary>
-	[Fact(Skip = "Fails: #246")]
+	[Fact]
 	public async Task Author_NewIssueLinkHiddenAfterLogout()
 	{
 		// Arrange
@@ -178,7 +178,7 @@ public class LogoutTests(PlaywrightFixture fixture)
 
 			// Verify "New Issue" link is visible while logged in
 			await page.GotoAsync(fixture.WebUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
-			var newIssueLinkBefore = page.Locator("a[href='/issues/create']");
+			var newIssueLinkBefore = page.Locator("nav[aria-label='Main navigation'] a[href='/issues/create']");
 			(await newIssueLinkBefore.IsVisibleAsync()).Should().BeTrue("New Issue link should be visible before logout");
 
 			// Act - Log out
@@ -186,11 +186,11 @@ public class LogoutTests(PlaywrightFixture fixture)
 			await page.GotoAsync(fixture.WebUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
 			// Verify we are in unauthenticated state before checking menu visibility
-			var loginLink = page.Locator("a[href='/auth/login']");
+			var loginLink = page.Locator("nav[aria-label='Main navigation'] a[href='/auth/login']");
 			await loginLink.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible, Timeout = 5000 });
 
 			// Assert
-			var newIssueLinkAfter = page.Locator("a[href='/issues/create']");
+			var newIssueLinkAfter = page.Locator("nav[aria-label='Main navigation'] a[href='/issues/create']");
 			(await newIssueLinkAfter.IsVisibleAsync())
 				.Should().BeFalse("New Issue link should be hidden after logout");
 		}
@@ -240,7 +240,7 @@ public class LogoutTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that protected routes redirect to login after logout.
 	/// </summary>
-	[Fact(Skip = "Fails: #246")]
+	[Fact]
 	public async Task User_ProtectedRouteRedirectsAfterLogout()
 	{
 		// Arrange

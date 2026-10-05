@@ -56,7 +56,7 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that a User sees appropriate menu items (Home, Issues).
 	/// </summary>
-	[Fact(Skip = "Fails: #246")]
+	[Fact]
 	public async Task User_SeesAppropriateMenuItems()
 	{
 		// Arrange
@@ -78,8 +78,8 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 			await page.GotoAsync(fixture.WebUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
 			// Assert - User should see basic menu items
-			var homeLink = page.Locator("a[href='/']").First;
-			var issuesLink = page.Locator("a[href='/issues']");
+			var homeLink = page.Locator("nav[aria-label='Main navigation'] a[href='/']").First;
+			var issuesLink = page.Locator("nav[aria-label='Main navigation'] a[href='/issues']");
 
 			(await homeLink.IsVisibleAsync()).Should().BeTrue("User should see Home link");
 			(await issuesLink.IsVisibleAsync()).Should().BeTrue("User should see Issues link");
@@ -118,10 +118,10 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 			await page.GotoAsync(fixture.WebUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
 			// Assert - User should NOT see admin-only menu items
-			var categoriesLink = page.Locator("a[href='/categories']");
-			var statusesLink = page.Locator("a[href='/statuses']");
-			var adminLink = page.Locator("a[href='/admin']");
-			var sampleDataLink = page.Locator("a[href='/sample-data']");
+			var categoriesLink = page.Locator("nav[aria-label='Main navigation'] a[href='/categories']");
+			var statusesLink = page.Locator("nav[aria-label='Main navigation'] a[href='/statuses']");
+			var adminLink = page.Locator("nav[aria-label='Main navigation'] a[href='/admin']");
+			var sampleDataLink = page.Locator("nav[aria-label='Main navigation'] a[href='/sample-data']");
 
 			(await categoriesLink.IsVisibleAsync())
 				.Should().BeFalse("User should NOT see Categories link");
@@ -175,7 +175,7 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that a User sees the "New Issue" link after login (Authorized users can create issues).
 	/// </summary>
-	[Fact(Skip = "Fails: #246")]
+	[Fact]
 	public async Task User_SeesNewIssueLinkAfterLogin()
 	{
 		// Arrange
@@ -197,7 +197,7 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 			await page.GotoAsync(fixture.WebUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
 			// Assert - All authenticated users can see "New Issue" link
-			var newIssueLink = page.Locator("a[href='/issues/create']");
+			var newIssueLink = page.Locator("nav[aria-label='Main navigation'] a[href='/issues/create']");
 			(await newIssueLink.IsVisibleAsync()).Should().BeTrue("Authenticated User should see New Issue link");
 		}
 		finally

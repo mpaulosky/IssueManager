@@ -81,10 +81,10 @@ public class AdminNavigationTests(PlaywrightFixture fixture)
 			await page.GotoAsync(fixture.WebUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
 			// Assert - Admin should see all admin menu items
-			var categoriesLink = page.Locator("a[href='/categories']");
-			var statusesLink = page.Locator("a[href='/statuses']");
-			var adminLink = page.Locator("a[href='/admin']");
-			var sampleDataLink = page.Locator("a[href='/sample-data']");
+			var categoriesLink = page.Locator("nav[aria-label='Main navigation'] a[href='/categories']");
+			var statusesLink = page.Locator("nav[aria-label='Main navigation'] a[href='/statuses']");
+			var adminLink = page.Locator("nav[aria-label='Main navigation'] a[href='/admin']");
+			var sampleDataLink = page.Locator("nav[aria-label='Main navigation'] a[href='/sample-data']");
 
 			(await categoriesLink.IsVisibleAsync()).Should().BeTrue("Admin should see Categories link");
 			(await statusesLink.IsVisibleAsync()).Should().BeTrue("Admin should see Statuses link");
