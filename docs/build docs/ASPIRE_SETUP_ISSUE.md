@@ -4,7 +4,7 @@
 
 The IssueManager AppHost fails to start with the following error:
 
-```
+```text
 Unhandled exception. System.AggregateException: One or more errors occurred. 
 (Property CliPath: The path to the DCP executable used for Aspire orchestration is required.; 
 Property DashboardPath: The path to the Aspire Dashboard binaries is missing.)
@@ -26,17 +26,20 @@ Property DashboardPath: The path to the Aspire Dashboard binaries is missing.)
 ### Why DCP is Missing
 
 This is a known issue in .NET Aspire versions 9.5.1+ where:
+
 - The Aspire orchestration packages (`aspire.hosting.orchestration.win-x64`) are incomplete
 - The `dcp.exe` file is missing from the NuGet package
 - Installation via `aspire.dev/install.ps1` does not include necessary DCP binaries
 
 **References:**
+
 - [GitHub Issue: dcp.exe missing in NuGet package](https://github.com/dotnet/aspire/issues/11866)
 - [Visual Studio Developer Community: Aspire fails after upgrade](https://developercommunity.visualstudio.com/t/Aspire-fails-to-run-after-VS-upgrade---/10994705)
 
 ## Attempted Solutions
 
 ### ✅ Completed
+
 1. Verified .NET 10.0.100 SDK installation
 2. Confirmed Aspire NuGet packages v13.1.1 in project
 3. Installed Aspire CLI via `irm https://aspire.dev/install.ps1 | iex`
@@ -44,6 +47,7 @@ This is a known issue in .NET Aspire versions 9.5.1+ where:
 5. Checked AppHost configuration - **valid** (no configuration issues)
 
 ### ❌ Failed/Incomplete
+
 1. `dotnet workload install aspire` - Aspire workload is deprecated (returns success but no actual workload)
 2. `dotnet nuget locals all --clear` - Permissions errors clearing cache
 3. `dotnet new install Aspire.ProjectTemplates --force` - Hangs during installation
@@ -52,6 +56,7 @@ This is a known issue in .NET Aspire versions 9.5.1+ where:
 ## Configuration Details
 
 ### AppHost Structure
+
 - **File:** `src/AppHost/Program.cs`
 - **Configuration:** MongoDB + API + Web projects (valid setup)
 - **Launch Settings:** Hard-coded dashboard URLs (potential secondary issue)
@@ -65,6 +70,7 @@ builder.Build().Run();  // ← Fails here with missing DCP
 ```
 
 ### LaunchSettings Issue
+
 - Dashboard endpoints are **hard-coded** in `Properties/launchSettings.json` (lines 12-14, 25-27)
 - Should allow Aspire to auto-configure these endpoints
 
@@ -89,7 +95,7 @@ builder.Build().Run();  // ← Fails here with missing DCP
 
 1. **Upgrade Aspire Packages**
    - Wait for patched version that includes DCP binaries
-   - Monitor: https://github.com/dotnet/aspire/issues/11866
+   - Monitor: <https://github.com/dotnet/aspire/issues/11866>
 
 2. **Use Dev Container**
    - Run entire development environment in Docker
@@ -102,13 +108,16 @@ builder.Build().Run();  // ← Fails here with missing DCP
 ## Documentation Updates Needed
 
 ### `README.md` (Prerequisites section, line 22)
+
 **Current:**
-```
+
+```text
 Prerequisites: .NET 10 SDK, Docker (for MongoDB)
 ```
 
 **Proposed:**
-```
+
+```text
 Prerequisites:
 - .NET 10.0 SDK
 - Docker Desktop or Podman (for MongoDB orchestration)
@@ -116,7 +125,9 @@ Prerequisites:
 ```
 
 ### New File: `.github/ASPIRE_SETUP.md`
+
 Should document:
+
 - Aspire installation steps
 - DCP executable requirements
 - Dashboard access URL

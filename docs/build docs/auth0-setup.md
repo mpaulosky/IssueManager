@@ -11,6 +11,8 @@ summary: Step-by-step Auth0 configuration guide for the IssueManager application
 post_date: 2026-02-27
 ---
 
+# Auth0 Setup Guide for IssueManager
+
 ## Prerequisites
 
 - An Auth0 account (free tier is sufficient for development)
@@ -77,12 +79,13 @@ exports.onExecutePostLogin = async (event, api) => {
 };
 ```
 
-6. Click **Deploy**
-7. Go to **Actions → Flows → Login**
-8. Drag the `Add Roles to Tokens` action into the flow between **Start** and **Complete**
-9. Click **Apply**
+1. Click **Deploy**
+2. Go to **Actions → Flows → Login**
+3. Drag the `Add Roles to Tokens` action into the flow between **Start** and **Complete**
+4. Click **Apply**
 
-> **Note:** The namespace `https://articlesite.com/roles` must match the constant defined in `Auth0AuthenticationStateProvider.cs`. You can customize this namespace, but ensure both the Auth0 Action and the code use the same value.
+> **Note:** The namespace `https://articlesite.com/roles` must match the constant defined in `Auth0AuthenticationStateProvider.cs`.
+> You can customize this namespace, but ensure both the Auth0 Action and the code use the same value.
 
 ## Local Development Configuration
 
@@ -109,7 +112,7 @@ dotnet user-secrets set "Auth0:Audience" "https://api.issuemanager.com"
 Add these secrets to the repository at **Settings → Secrets and variables → Actions**:
 
 | Secret Name | Value |
-|-------------|-------|
+| ------------- | ------- |
 | `AUTH0_DOMAIN` | `your-tenant.auth0.com` |
 | `AUTH0_CLIENT_ID` | Your Auth0 Web application Client ID |
 | `AUTH0_CLIENT_SECRET` | Your Auth0 Web application Client Secret |
@@ -118,6 +121,7 @@ Add these secrets to the repository at **Settings → Secrets and variables → 
 ## Verification
 
 Once configured, the application will:
+
 - Show a Login button in the navigation
 - Display role-specific menu items (Admin users see Categories, Statuses, Admin, Sample Data)
 - Protect API endpoints with JWT validation

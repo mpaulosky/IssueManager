@@ -5,6 +5,7 @@
 Integration tests verify that multiple components work together correctly. In IssueManager, this means testing full vertical slices: validator → handler → repository → MongoDB.
 
 **When to use integration tests:**
+
 - Testing handlers with real MongoDB persistence
 - Testing full CQRS vertical slices (command/query execution)
 - Testing repository methods with real database operations
@@ -12,6 +13,7 @@ Integration tests verify that multiple components work together correctly. In Is
 - Verifying database constraints and indexes
 
 **Frameworks used:**
+
 - **xUnit** — Test runner
 - **TestContainers** — Ephemeral MongoDB containers
 - **FluentAssertions** — Readable assertions
@@ -20,7 +22,9 @@ Integration tests verify that multiple components work together correctly. In Is
 ## Setup
 
 ### TestContainers
+
 TestContainers spins up a real MongoDB instance in a Docker container for each test run. This gives us:
+
 - Real database behavior (no mocking)
 - Isolated test data (container is destroyed after tests)
 - Fast setup (container is reused within a test class)
@@ -30,6 +34,7 @@ TestContainers spins up a real MongoDB instance in a Docker container for each t
 1. Add test file to `tests/Integration/Handlers/`
 2. Implement `IAsyncLifetime` for container lifecycle
 3. Reference frameworks via GlobalUsings:
+
    ```csharp
    // tests/Integration/GlobalUsings.cs
    global using Xunit;
@@ -118,6 +123,7 @@ public class CreateIssueHandlerTests : IAsyncLifetime
 ## Test Lifecycle with IAsyncLifetime
 
 ### Container Setup (InitializeAsync)
+
 ```csharp
 public async Task InitializeAsync()
 {
@@ -136,6 +142,7 @@ public async Task InitializeAsync()
 ```
 
 ### Container Teardown (DisposeAsync)
+
 ```csharp
 public async Task DisposeAsync()
 {
@@ -148,6 +155,7 @@ public async Task DisposeAsync()
 ## Testing Full Vertical Slices
 
 ### Test Pattern: Given-When-Then
+
 ```csharp
 [Fact]
 public async Task Handle_ValidCommand_StoresIssueInDatabase()
@@ -175,7 +183,9 @@ public async Task Handle_ValidCommand_StoresIssueInDatabase()
 ```
 
 ### Verify Persistence
+
 Always verify that data was actually saved:
+
 ```csharp
 // Act
 var result = await _handler.Handle(command);
@@ -192,6 +202,7 @@ retrieved!.Title.Should().Be(command.Title);
 ## Testing Validation Integration
 
 ### Test That Validation Errors Are Thrown
+
 ```csharp
 [Fact]
 public async Task Handle_EmptyTitle_ThrowsValidationException()
@@ -225,6 +236,7 @@ public async Task Handle_TitleTooShort_ThrowsValidationException()
 ## Testing Data Persistence
 
 ### Test Multiple Entities
+
 ```csharp
 [Fact]
 public async Task Handle_MultipleIssues_AllPersistedCorrectly()
@@ -247,6 +259,7 @@ public async Task Handle_MultipleIssues_AllPersistedCorrectly()
 ```
 
 ### Test Complex Objects (Labels, etc.)
+
 ```csharp
 [Fact]
 public async Task Handle_ValidCommandWithLabels_StoresIssueWithLabels()
@@ -275,6 +288,7 @@ public async Task Handle_ValidCommandWithLabels_StoresIssueWithLabels()
 ```
 
 ### Test Timestamps and Metadata
+
 ```csharp
 [Fact]
 public async Task Handle_CreatedIssue_HasCorrectTimestamps()
@@ -302,7 +316,9 @@ public async Task Handle_CreatedIssue_HasCorrectTimestamps()
 ## Test Data Management
 
 ### Isolation Between Tests
+
 Each test should create its own data:
+
 ```csharp
 // Good — Each test creates its own issue
 [Fact]
@@ -321,7 +337,9 @@ public async Task Test2()
 ```
 
 ### Unique IDs
+
 Use unique identifiers to avoid collisions:
+
 ```csharp
 var command = new CreateIssueCommand
 {
@@ -330,7 +348,9 @@ var command = new CreateIssueCommand
 ```
 
 ### Cleanup
+
 TestContainers automatically destroys the container after tests, so no manual cleanup is needed. However, if you need to clean up within a test:
+
 ```csharp
 // Delete test data
 await _repository.DeleteAsync(issueId);
@@ -341,6 +361,7 @@ await _repository.DeleteAsync(issueId);
 For faster test runs, share a container across multiple test classes:
 
 **`tests/Integration/Fixtures/MongoDbFixture.cs`:**
+
 ```csharp
 public class MongoDbFixture : IAsyncLifetime
 {
@@ -370,6 +391,7 @@ public class MongoDbFixture : IAsyncLifetime
 ```
 
 **Use with xUnit Collection Fixture:**
+
 ```csharp
 [CollectionDefinition("MongoDB")]
 public class MongoDbCollection : ICollectionFixture<MongoDbFixture>
@@ -393,14 +415,17 @@ public class CreateIssueHandlerTests
 ## Performance Tuning
 
 ### Container Startup Time
+
 - **First run:** ~5-10 seconds (Docker pull + container start)
 - **Subsequent runs:** ~2-3 seconds (cached image)
 - **Shared fixture:** Amortizes startup across tests
 
 ### Parallel Execution
+
 xUnit runs test classes in parallel by default. Each class gets its own container.
 
 ### Optimize Container Configuration
+
 ```csharp
 _mongoContainer = new MongoDbBuilder()
     .WithImage(MONGODB_IMAGE)
@@ -411,6 +436,7 @@ _mongoContainer = new MongoDbBuilder()
 ## Best Practices
 
 ### ✅ Do
+
 - **Use real database** — TestContainers gives you MongoDB behavior
 - **Test full vertical slices** — Validator → Handler → Repository
 - **Verify persistence** — Always check data was saved
@@ -419,6 +445,7 @@ _mongoContainer = new MongoDbBuilder()
 - **Use descriptive test names** — `Handle_ValidCommand_StoresIssueInDatabase`
 
 ### ❌ Don't
+
 - **Mock the database** — Use TestContainers for real integration tests
 - **Share state between tests** — Each test should be independent
 - **Skip cleanup** — TestContainers handles this, but be aware
@@ -427,6 +454,7 @@ _mongoContainer = new MongoDbBuilder()
 ## Common Mistakes
 
 ### ❌ Not Verifying Persistence
+
 ```csharp
 // Bad — Only checks return value
 var result = await _handler.Handle(command);
@@ -434,6 +462,7 @@ result.Should().NotBeNull();
 ```
 
 ### ✅ Always Verify Persistence
+
 ```csharp
 // Good — Verifies database persistence
 var result = await _handler.Handle(command);
@@ -444,6 +473,7 @@ retrieved.Should().NotBeNull();
 ```
 
 ### ❌ Shared Mutable State
+
 ```csharp
 // Bad — Shared state across tests
 private Issue _sharedIssue = new Issue { /* ... */ };
@@ -456,6 +486,7 @@ public async Task Test2() { /* Also modifies _sharedIssue */ }
 ```
 
 ### ✅ Independent Test Data
+
 ```csharp
 // Good — Each test creates its own data
 [Fact]
@@ -476,16 +507,19 @@ public async Task Test2()
 ## Debugging Integration Test Failures
 
 ### Check MongoDB Container Logs
+
 ```bash
 docker logs <container_id>
 ```
 
 ### Verify Connection String
+
 ```csharp
 Console.WriteLine($"Connection string: {_mongoContainer.GetConnectionString()}");
 ```
 
 ### Add Debug Logging to Handler/Repository
+
 ```csharp
 // In handler
 Console.WriteLine($"Creating issue: {command.Title}");
@@ -494,6 +528,7 @@ Console.WriteLine($"Created issue with ID: {result.Id}");
 ```
 
 ### Use Test Explorer in Visual Studio
+
 - Set breakpoints in tests
 - Run tests in Debug mode
 - Inspect variables and step through code
@@ -517,11 +552,13 @@ dotnet watch test --project tests/Integration
 ### Running Locally vs. CI
 
 **Local:**
+
 - Docker must be running
 - Container images are cached after first run
 - Fast feedback loop
 
 **CI (GitHub Actions, etc.):**
+
 - Docker-in-Docker or Docker socket mount
 - Container images are cached per build
 - Parallel test execution
@@ -536,6 +573,7 @@ dotnet watch test --project tests/Integration
 ---
 
 **Real examples in the codebase:**
+
 - [`tests/Integration/Handlers/CreateIssueHandlerTests.cs`](../../tests/Integration/Handlers/CreateIssueHandlerTests.cs)
 - [`tests/Integration/Handlers/GetIssueHandlerTests.cs`](../../tests/Integration/Handlers/GetIssueHandlerTests.cs)
 - [`tests/Integration/Handlers/UpdateIssueStatusHandlerTests.cs`](../../tests/Integration/Handlers/UpdateIssueStatusHandlerTests.cs)

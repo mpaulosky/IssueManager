@@ -2,9 +2,11 @@
 
 ## Overview
 
-Architecture tests enforce design rules and constraints at compile time. They use reflection to analyze assemblies and verify that your code follows architectural principles (layer dependencies, naming conventions, etc.).
+Architecture tests enforce design rules and constraints at compile time.
+They use reflection to analyze assemblies and verify that your code follows architectural principles (layer dependencies, naming conventions, etc.).
 
 **When to use architecture tests:**
+
 - Enforcing layer boundaries (e.g., Domain must not depend on Infrastructure)
 - Verifying naming conventions (e.g., all validators end with "Validator")
 - Ensuring dependency rules (e.g., no circular dependencies)
@@ -12,6 +14,7 @@ Architecture tests enforce design rules and constraints at compile time. They us
 - Preventing unwanted dependencies (e.g., domain doesn't depend on MongoDB)
 
 **Framework used:**
+
 - **NetArchTest.Rules** — Fluent API for architecture rules
 
 ## Setup
@@ -20,6 +23,7 @@ Architecture tests enforce design rules and constraints at compile time. They us
 
 1. Add test file to `tests/Architecture/`
 2. Reference NetArchTest via GlobalUsings:
+
    ```csharp
    // tests/Architecture/GlobalUsings.cs
    global using Xunit;
@@ -28,6 +32,7 @@ Architecture tests enforce design rules and constraints at compile time. They us
    ```
 
 3. Create test class:
+
    ```csharp
    namespace IssueManager.Tests.Architecture;
 
@@ -68,6 +73,7 @@ public void SharedLayer_ShouldNotDependOnHigherLayers()
 ## NetArchTest Basics
 
 ### Structure of a Rule
+
 ```csharp
 var result = Types.InAssembly(assembly)
     .That()                                  // Filter criteria (optional)
@@ -80,6 +86,7 @@ result.IsSuccessful.Should().BeTrue("Reason for rule");
 ```
 
 ### Common Filters (That)
+
 ```csharp
 // By namespace
 .That().ResideInNamespace("IssueManager.Shared.Domain")
@@ -101,6 +108,7 @@ result.IsSuccessful.Should().BeTrue("Reason for rule");
 ```
 
 ### Common Assertions (Should/ShouldNot)
+
 ```csharp
 // Dependencies
 .Should().HaveDependencyOn("FluentValidation")
@@ -122,6 +130,7 @@ result.IsSuccessful.Should().BeTrue("Reason for rule");
 ## Example Architecture Rules
 
 ### 1. Domain Models Should Not Depend on Infrastructure
+
 ```csharp
 [Fact]
 public void DomainModels_ShouldNotDependOnInfrastructure()
@@ -144,6 +153,7 @@ public void DomainModels_ShouldNotDependOnInfrastructure()
 ```
 
 ### 2. Validators Should Follow Naming Convention
+
 ```csharp
 [Fact]
 public void Validators_ShouldFollowNamingConvention()
@@ -170,6 +180,7 @@ public void Validators_ShouldFollowNamingConvention()
 ```
 
 ### 3. Validators Should Only Depend on FluentValidation
+
 ```csharp
 [Fact]
 public void Validators_ShouldOnlyDependOnFluentValidationAndDomain()
@@ -194,6 +205,7 @@ public void Validators_ShouldOnlyDependOnFluentValidationAndDomain()
 ```
 
 ### 4. Validators Should Not Depend on Higher Layers
+
 ```csharp
 [Fact]
 public void Validators_ShouldNotDependOnHigherLayers()
@@ -216,6 +228,7 @@ public void Validators_ShouldNotDependOnHigherLayers()
 ```
 
 ### 5. Domain Models Should Be Records (Immutable)
+
 ```csharp
 [Fact]
 public void DomainModels_ShouldBeRecords()
@@ -243,6 +256,7 @@ public void DomainModels_ShouldBeRecords()
 ```
 
 ### 6. Api Layer Should Not Depend on Web Layer
+
 ```csharp
 [Fact]
 public void ApiLayer_ShouldNotDependOnWebLayer()
@@ -272,6 +286,7 @@ public void ApiLayer_ShouldNotDependOnWebLayer()
 ```
 
 ### 7. ServiceDefaults Should Have Minimal Dependencies
+
 ```csharp
 [Fact]
 public void ServiceDefaults_ShouldHaveMinimalDependencies()
@@ -296,17 +311,22 @@ public void ServiceDefaults_ShouldHaveMinimalDependencies()
 ## Why Architecture Tests Matter
 
 ### Prevent Accidental Dependencies
+
 Without tests, developers might accidentally:
+
 - Reference Web from Api
 - Use MongoDB types in Domain
 - Skip naming conventions
 
 ### Document Architectural Decisions
+
 Tests serve as executable documentation:
+
 - "Why can't I use MongoDB in Domain?" → See the architecture test
 - "What's the naming convention for validators?" → See the test
 
 ### Enforce Clean Architecture
+
 - **Domain** — Pure business logic (no infra)
 - **Application** — Handlers, validators (depend on domain)
 - **Infrastructure** — MongoDB, APIs (depend on application)
@@ -315,12 +335,15 @@ Tests serve as executable documentation:
 ## How to Add New Architecture Rules
 
 ### Step 1: Identify the Rule
+
 What constraint do you want to enforce?
+
 - "All handlers should follow CQRS pattern"
 - "All repositories should implement IRepository"
 - "All DTOs should be records"
 
 ### Step 2: Write the Test
+
 ```csharp
 [Fact]
 public void Handlers_ShouldFollowCQRSNamingConvention()
@@ -340,17 +363,20 @@ public void Handlers_ShouldFollowCQRSNamingConvention()
 ```
 
 ### Step 3: Run the Test
+
 ```bash
 dotnet test tests/Architecture --filter "FullyQualifiedName~Handlers_ShouldFollowCQRSNamingConvention"
 ```
 
 ### Step 4: Fix Violations or Update Rule
+
 - If the test fails, either fix the code or adjust the rule
 - Document why the rule exists in the test assertion message
 
 ## Best Practices
 
 ### ✅ Do
+
 - **Write descriptive assertion messages** — Explain why the rule exists
 - **Test one architectural constraint per test** — Focused, clear failures
 - **Use meaningful test names** — `DomainModels_ShouldNotDependOnInfrastructure`
@@ -358,6 +384,7 @@ dotnet test tests/Architecture --filter "FullyQualifiedName~Handlers_ShouldFollo
 - **Run architecture tests in CI** — Catch violations early
 
 ### ❌ Don't
+
 - **Test implementation details** — Focus on architectural constraints
 - **Over-constrain** — Only enforce rules that add value
 - **Ignore failures** — Architecture tests should always pass
@@ -366,17 +393,20 @@ dotnet test tests/Architecture --filter "FullyQualifiedName~Handlers_ShouldFollo
 ## Common Mistakes
 
 ### ❌ Vague Assertion Messages
+
 ```csharp
 result.IsSuccessful.Should().BeTrue();
 ```
 
 ### ✅ Descriptive Assertion Messages
+
 ```csharp
 result.IsSuccessful.Should().BeTrue(
     "Domain models must be persistence-agnostic and not depend on MongoDB or any other infrastructure");
 ```
 
 ### ❌ Testing Multiple Rules in One Test
+
 ```csharp
 // Bad — Tests naming AND dependencies
 [Fact]
@@ -389,6 +419,7 @@ public void Validators_ShouldFollowAllRules()
 ```
 
 ### ✅ Split Into Focused Tests
+
 ```csharp
 [Fact]
 public void Validators_ShouldFollowNamingConvention() { /* ... */ }
@@ -403,20 +434,25 @@ public void Validators_ShouldInheritFromAbstractValidator() { /* ... */ }
 ## Debugging Architecture Test Failures
 
 ### Read the Assertion Message
+
 NetArchTest provides detailed failure information:
-```
+
+```text
 Expected result.IsSuccessful to be true because Domain models must be persistence-agnostic, but found 2 violations:
   - IssueManager.Shared.Domain.Issue
   - IssueManager.Shared.Domain.Label
 ```
 
 ### Identify Violating Types
+
 The failure message lists types that violate the rule. Check:
+
 - What dependencies do they have?
 - Are they in the wrong namespace?
 - Do they follow the naming convention?
 
 ### Fix or Adjust the Rule
+
 - **Fix the code** — Remove the violating dependency/pattern
 - **Adjust the rule** — If the rule is too strict, update the test
 
@@ -442,4 +478,5 @@ dotnet watch test --project tests/Architecture
 ---
 
 **Real examples in the codebase:**
+
 - [`tests/Architecture/ArchitectureTests.cs`](../../tests/Architecture/ArchitectureTests.cs)

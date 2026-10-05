@@ -8,7 +8,8 @@ status: "Draft"
 
 ## Executive Summary
 
-This Product Requirements Document (PRD) defines the comprehensive testing framework and coverage expectations for the IssueManager project. The strategy establishes clear guidelines for unit, integration, Blazor component, architecture, Aspire orchestration, and end-to-end testing using xUnit v3 as the primary testing framework.
+This Product Requirements Document (PRD) defines the comprehensive testing framework and coverage expectations for the IssueManager project.
+The strategy establishes clear guidelines for unit, integration, Blazor component, architecture, Aspire orchestration, and end-to-end testing using xUnit v3 as the primary testing framework.
 
 **Purpose:** Ensure consistent, high-quality test coverage across all layers of the application while maintaining rapid feedback loops and sustainable test maintenance.
 
@@ -39,7 +40,7 @@ This Product Requirements Document (PRD) defines the comprehensive testing frame
 As of 2026-02-18, IssueManager has established test foundations across six projects:
 
 | Project | Type | Tests | Status | Dependencies |
-|---------|------|-------|--------|--------------|
+| --------- | ------ | ------- | -------- | -------------- |
 | **Unit** | Domain/Handler unit tests | 30 tests | ✅ Building & Passing | xunit, FluentAssertions, FluentValidation, NSubstitute |
 | **Integration** | Full-slice tests with MongoDB | 17 tests | ✅ Building & Passing | xunit, FluentAssertions, Testcontainers.MongoDb, MongoDB.Driver |
 | **Architecture** | Layering & dependency rules | 10 tests | ✅ Building & Passing | xunit, FluentAssertions, NetArchTest.Rules |
@@ -141,7 +142,7 @@ As of 2026-02-18, IssueManager has established test foundations across six proje
 
 **Patterns:**
 
-```
+```text
 tests/Unit/
 ├── Domain/
 │   ├── Validators/
@@ -209,7 +210,7 @@ result.Errors.Should().Contain(e => e.PropertyName == nameof(CreateIssueCommand.
 
 **Patterns:**
 
-```
+```text
 tests/Integration/
 ├── Fixtures/
 │   └── MongoDbFixture.cs
@@ -296,7 +297,7 @@ public async Task CreateIssue_WithValidCommand_PersistsToDatabase()
 
 **Patterns:**
 
-```
+```text
 tests/Architecture/
 ├── LayeringTests.cs
 ├── DependencyTests.cs
@@ -365,7 +366,7 @@ public void Domain_ShouldNotDependOn_Api()
 
 **Patterns:**
 
-```
+```text
 tests/BlazorTests/
 ├── Components/
 │   ├── IssueListComponentTests.cs
@@ -450,7 +451,7 @@ public async Task IssueFormComponent_OnSubmit_CallsCallback()
 
 **Patterns:**
 
-```
+```text
 tests/Aspire/
 ├── AppHostTests.cs
 └── ServiceWiringTests.cs
@@ -508,7 +509,7 @@ public async Task AppHost_WithAllServices_ConfiguresSuccessfully()
 
 **Patterns:**
 
-```
+```text
 tests/E2E/
 ├── Fixtures/
 │   └── BrowserFixture.cs
@@ -553,7 +554,7 @@ public async Task CreateIssue_WithValidData_PersistsAndDisplaysInList()
 Define measurable coverage expectations per category:
 
 | Category | Metric | Target | Verification |
-|----------|--------|--------|--------------|
+| ---------- | -------- | -------- | -------------- |
 | **Business Logic** | Command/Query handlers, validators, domain services | 80%+ | Coverage.py, OpenCover report in CI |
 | **UI Components** | Blazor component rendering, interaction | 60%+ | bUnit test coverage report |
 | **Architecture** | Layering rules, dependency rules, naming conventions | 100% | NetArchTest.Rules (all pass/fail) |
@@ -572,7 +573,7 @@ Define measurable coverage expectations per category:
 
 The testing strategy follows the traditional test pyramid for optimal speed and feedback:
 
-```
+```text
        ⬜ E2E (Slow, Few)
       🟩🟩 Integration (Moderate, Some)
     🟦🟦🟦🟦 Unit (Fast, Many)
@@ -816,7 +817,7 @@ All test jobs depend on `build` job, run in parallel after build completes.
 ### Which Tests Run Where
 
 | Workflow | Trigger | Tests Included | Purpose |
-|----------|---------|---|---------|
+| ---------- | --------- | --- | --------- |
 | **squad-ci.yml** | PR #open, PR #edit | Unit, Architecture | Quick smoke test for PR validation |
 | **squad-test.yml** | Push to main, squad/* | All (Unit, Integration, Blazor, Aspire, E2E, Architecture) | Full suite on merge |
 | **Local (developer)** | Before commit | Unit (via `dotnet test Unit.csproj`) | Fast feedback loop |

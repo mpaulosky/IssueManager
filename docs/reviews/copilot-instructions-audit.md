@@ -11,7 +11,7 @@
 Requirements the project already satisfies:
 
 | Category | Requirement | Evidence |
-|---|---|---|
+| --- | --- | --- |
 | Tech Stack | .NET 10, C# 14 | All `.csproj` files: `<TargetFramework>net10.0</TargetFramework>`, `<LangVersion>14.0</LangVersion>` |
 | Tech Stack | SDK `10.0.100` in `global.json` | `global.json` with rollForward: latestMinor |
 | C# Style | `.editorconfig` | Root `.editorconfig` with tab/size-2/lf/utf-8/trim/final-newline |
@@ -61,7 +61,7 @@ Requirements the project already satisfies:
 Requirements partially implemented — some gap exists:
 
 | Category | Requirement | What's Present | What's Missing |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Documentation | Scalar interactive UI | Package `Scalar.AspNetCore` in `.csproj` | `app.MapScalarApiReference()` never called in `Api/Program.cs` — UI not reachable |
 | Architecture | CQRS | Manual handler pattern (Commands/Queries as request objects, Handler classes) | MediatR library NOT installed; instructions claim "MediatR usage" — actually custom CQRS |
 | Security | CORS | `Constants.DefaultCorsPolicy` string defined | `AddCors()` / `UseCors()` never called in any `Program.cs` |
@@ -88,7 +88,7 @@ Requirements partially implemented — some gap exists:
 Requirements with zero implementation:
 
 | Category | Requirement | Priority | Rationale |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Security | Auth0 Authentication | **P0** | No auth library, no middleware, no policies wired. Entire auth system is absent. |
 | Security | Authorization | **P0** | No `AddAuthorization()`, no policies, no `[Authorize]` attributes. `AdminPolicy` constant exists but is never applied. |
 | Logging | Application Insights | **P1** | No `Azure.Monitor.OpenTelemetry.AspNetCore` or `Microsoft.ApplicationInsights.AspNetCore` package. |
@@ -107,7 +107,7 @@ Requirements with zero implementation:
 Prioritized by: Security → Architecture → Quality → Docs
 
 | # | Item | Priority | Category | Action |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | 1 | **Implement Auth0 authentication** | P0 🔴 | Security | Install `Auth0.AspNetCore.Authentication`, configure in `Web/Program.cs` and `Api/Program.cs`. Add `[Authorize]` and wire `AdminPolicy`. |
 | 2 | **Wire CORS policy** | P0 🔴 | Security | Add `builder.Services.AddCors(...)` using `Constants.DefaultCorsPolicy` and `app.UseCors()` in `Api/Program.cs`. |
 | 3 | **Wire Scalar UI** | P1 🟠 | Docs/API | Add `app.MapScalarApiReference()` in `Api/Program.cs` so the Scalar UI is actually accessible. |
@@ -126,7 +126,7 @@ Prioritized by: Security → Architecture → Quality → Docs
 The `.github/copilot-instructions.md` file contains several stale or inaccurate references that must be corrected:
 
 | Line | Current Text | Problem | Correct Text |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Header | "Last updated: June 12, 2025" | Stale date | Update to 2026-02-27 |
 | Line 6-7 | "…conventions in the **TailwindBlogApp** solution" | Wrong project name | "…conventions in the **IssueManager** solution" |
 | Architecture section | "CQRS (see `Domain/Abstractions/`, **MediatR** usage)" | No MediatR; no Domain layer | "CQRS — custom handler pattern (see `Api/Handlers/`, `Shared/Validators/`)" |

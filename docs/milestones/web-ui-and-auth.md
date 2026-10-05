@@ -25,7 +25,7 @@ and authorization; UserDto integration for logged-in user attribution; theme/col
 **Owner:** Sam | **Priority:** P0 | **Blocks:** Streams 2.6, 3, 4.9
 
 | # | Item | Description |
-|---|------|-------------|
+| --- | ------ | ------------- |
 | 1.1 | `IssueApiClient` | Typed HTTP client for `/api/v1/issues`: list (paginated), get by id, create, update, archive |
 | 1.2 | `CategoryApiClient` | Typed HTTP client for `/api/v1/categories`: list, get by id, create, update, archive |
 | 1.3 | `StatusApiClient` | Typed HTTP client for `/api/v1/statuses`: list, get by id, create, update, archive |
@@ -39,7 +39,7 @@ and authorization; UserDto integration for logged-in user attribution; theme/col
 **Owner:** Legolas | **Priority:** P0 | **Blocks:** Stream 3
 
 | # | Item | Description |
-|---|------|-------------|
+| --- | ------ | ------------- |
 | 2.1 | `DataTable<T>` | Generic table component: column definitions, empty state, theming |
 | 2.2 | `Pagination` | Page prev/next/numbers; `OnPageChanged` callback |
 | 2.3 | `ConfirmDialog` | Modal overlay; confirm/cancel; `OnConfirm` EventCallback |
@@ -54,7 +54,7 @@ and authorization; UserDto integration for logged-in user attribution; theme/col
 **Owner:** Legolas (markup) + Sam (code) | **Priority:** P1 | **Depends on:** Streams 1, 2
 
 | # | Item | Route |
-|---|------|-------|
+| --- | ------ | ------- |
 | 3.1 | Issues list + search by author | `/issues` — includes filter bar: search by author name/email, filter by status, filter by category; results paginated |
 | 3.2 | Issue create | `/issues/create` |
 | 3.3 | Issue detail + comments | `/issues/{id}` |
@@ -79,7 +79,7 @@ and authorization; UserDto integration for logged-in user attribution; theme/col
 Tokens remain server-side (Blazor Server). API validates JWT Bearer tokens.
 
 | # | Item | Description |
-|---|------|-------------|
+| --- | ------ | ------------- |
 | 4.1 | NuGet packages | `Auth0.AspNetCore.Authentication`, `Microsoft.AspNetCore.Authentication.JwtBearer` in `Directory.Packages.props` |
 | 4.2 | Web auth middleware | `AddAuth0WebAppAuthentication` in `Web/Program.cs`; `UseAuthentication` + `UseAuthorization`; `appsettings.json` Auth0 section |
 | 4.3 | API JWT validation | `AddAuthentication().AddJwtBearer(...)` in `Api/Program.cs` |
@@ -93,7 +93,7 @@ Tokens remain server-side (Blazor Server). API validates JWT Bearer tokens.
 **RBAC Roles:**
 
 | Role | Permissions |
-|------|-------------|
+| ------ | ------------- |
 | `admin` | Full access including delete and category/status management |
 | `editor` | Create/update own Issues and Comments |
 | `viewer` | Read-only |
@@ -105,7 +105,7 @@ Tokens remain server-side (Blazor Server). API validates JWT Bearer tokens.
 **Owner:** Legolas | **Priority:** P2
 
 | # | Item | Description |
-|---|------|-------------|
+| --- | ------ | ------------- |
 | 5.1 | Runtime verification | Test dark/light toggle + color switcher persistence; document findings |
 | 5.2 | Fix identified issues | Likely: Flash of Unstyled Content (FOUC) from `<body>` IIFE placement; SSR icon flash; Blazor re-render reset |
 | 5.3 | OS preference fallback | Default to `prefers-color-scheme` for first-time visitors |
@@ -117,7 +117,7 @@ Tokens remain server-side (Blazor Server). API validates JWT Bearer tokens.
 **Owner:** Gimli | **Priority:** P1
 
 | # | Item | Target |
-|---|------|--------|
+| --- | ------ | -------- |
 | 6.1 | API client bUnit tests | ≥1 test per client method (20+ tests) |
 | 6.2 | Shared component bUnit tests | All 6 new components |
 | 6.3 | CRUD page bUnit tests | ≥2 per page (30+ tests) |
@@ -128,7 +128,7 @@ Tokens remain server-side (Blazor Server). API validates JWT Bearer tokens.
 
 ## Dependency Graph
 
-```
+```text
 Stream 1 (API Clients) ─────────────────────────────────────────▶ Stream 3
   (start immediately)                                                   ▲
                                                                         │
@@ -192,7 +192,7 @@ Before development begins, the Auth0 tenant needs:
 ## Team Assignments
 
 | Agent | Primary Streams | Notes |
-|-------|-----------------|-------|
+| ------- | ----------------- | ------- |
 | Aragorn | Architecture review, PR gates | Unblocks decisions |
 | Sam | Streams 1, 3 (`@code` blocks), 4.3/4.7 | Backend + API wiring |
 | Legolas | Streams 2, 3 (markup), 5 | Frontend + theme |

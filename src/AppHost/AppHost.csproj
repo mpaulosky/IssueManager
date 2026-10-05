@@ -3,6 +3,8 @@
 		<OutputType>Exe</OutputType>
 		<RootNamespace>AppHost</RootNamespace>
 		<UserSecretsId>bbbd06b3-39ee-4f7b-a804-ed311d5e2aeb</UserSecretsId>
+		<!-- CI builds with -warnaserror. ASPIRE010 flags AspireUseCliBundle=false; remove once that's resolved. -->
+		<NoWarn>$(NoWarn);ASPIRE010</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>

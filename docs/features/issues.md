@@ -11,7 +11,7 @@ Retrieves a paginated list of issues with optional filtering and search.
 ### Query Parameters
 
 | Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
+| ----------- | ------ | ---------- | ------------- |
 | `page` | integer | No | Page number (0-indexed, default: 0) |
 | `pageSize` | integer | No | Results per page (default: 10, max: 100) |
 | `searchTerm` | string | No | Searches issue titles and descriptions (regex-based, case-insensitive) |
@@ -22,28 +22,33 @@ Retrieves a paginated list of issues with optional filtering and search.
 ### Example Requests
 
 **List first 10 issues:**
-```
+
+```http
 GET /api/v1/issues?page=0&pageSize=10
 ```
 
 **Search for issues with "login" in title/description:**
-```
+
+```http
 GET /api/v1/issues?searchTerm=login&page=0&pageSize=10
 ```
 
 **Filter by author and status:**
-```
+
+```http
 GET /api/v1/issues?authorName=john&statusName=Open&page=0&pageSize=10
 ```
 
 **Combine search and filters:**
-```
+
+```http
 GET /api/v1/issues?searchTerm=auth&categoryName=Bug&statusName=Open&page=0&pageSize=20
 ```
 
 ### Response
 
 Returns an `IssuesPage` object:
+
 ```json
 {
   "page": 0,
