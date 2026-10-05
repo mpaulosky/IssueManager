@@ -34,7 +34,14 @@ enable_pnpm() {
 # API) reject it unless it's trusted. On Linux, --trust exports it to
 # ~/.aspnet/dev-certs/trust, which OpenSSL reads only through SSL_CERT_DIR.
 trust_dev_cert() {
-  dotnet dev-certs https --trust
+  # Exit code 4 is partial trust: OpenSSL (what .NET reads) trusts the
+  # certificate, but the runner has no browser store to add it to. Playwright
+  # ignores HTTPS errors, so that's enough.
+  local status=0
+  dotnet dev-certs https --trust || status=$?
+  if (( status != 0 && status != 4 )); then
+    return "$status"
+  fi
   local trust_dir="$HOME/.aspnet/dev-certs/trust"
   local system_dir
   system_dir="$(openssl version -d | sed -E 's/^OPENSSLDIR: "(.*)"$/\1/')/certs"
