@@ -4,6 +4,7 @@ This directory contains concise release-review posts for merged PR releases.
 
 | Date | Title | Tags |
 | ---- | ----- | ---- |
+| 2026-10-05 | [fix: Make the 11 skipped E2E tests pass](2026-10-05-pr-249-fix-make-the-11-skipped-e2e-tests-pass.md) | release,automation |
 | 2026-10-05 | [fix: Start the E2E host so its Playwright tests run instead of skipping](2026-10-05-pr-247-fix-start-the-e2e-host-so-its-playwright-tests-run-instead-of-skipping.md) | release,automation |
 | 2026-10-05 | [ci: Standardize on the repo-ci-baseline Template](2026-10-05-pr-241-ci-standardize-on-the-repo-ci-baseline-template.md) | release,automation |
 | 2026-10-02 | [chore: drop leaked Context7 MCP key and stale security policies](2026-10-02-pr-237-chore-drop-leaked-context7-mcp-key-and-stale-security-policies.md) | release,automation |
