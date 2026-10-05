@@ -1,7 +1,7 @@
 # IssueManager
 
 [![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](../LICENSE)
 [![xUnit Tests](https://img.shields.io/badge/Tests-xUnit-blueviolet?logo=github)](https://github.com/mpaulosky/IssueManager/actions/workflows/ci.yml)
 [![Latest Release](https://img.shields.io/github/v/release/mpaulosky/IssueManager?logo=github&color=blue&label=Release)](https://github.com/mpaulosky/IssueManager/releases/latest)
 
@@ -49,20 +49,30 @@ Aspire manages service topology and local development.
 
 ## Contributing
 
-See [`.github/CODE_OF_CONDUCT.md`](.github/CODE_OF_CONDUCT.md) for community guidelines. Work happens on feature/fix/chore branches with PR review before merging to `main`.
+See [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md).
+Branches, worktrees, commits, PRs, merging and releases follow [PROCESS.md](PROCESS.md).
 
 ## License
 
-See [LICENSE](LICENSE) for details.
+See [LICENSE](../LICENSE) for details.
 
-## Dev Blog
+## Releases
 
-<!-- BLOG_START -->
-| Date | Title | Tags |
-| ------ | ------- | ------ |
-| 2026-10-02 | [chore: drop leaked Context7 MCP key and stale security policies](docs/blogs/2026-10-02-pr-237-chore-drop-leaked-context7-mcp-key-and-stale-security-policies.md) | release,automation |
-| 2026-09-30 | [ci: Merge a PR only after Copilot's review and resolved threads](docs/blogs/2026-09-30-pr-235-ci-merge-a-pr-only-after-copilot-s-review-and-resolved-threads.md) | release,automation |
-| 2026-09-30 | [docs: Point the rest of CONTRIBUTING.md at main](docs/blogs/2026-09-30-pr-233-docs-point-the-rest-of-contributing-md-at-main.md) | release,automation |
-| 2026-09-30 | [ci(hooks): Adopt the shared branch-name standard](docs/blogs/2026-09-30-pr-231-ci-hooks-adopt-the-shared-branch-name-standard.md) | release,automation |
-| 2026-09-30 | [ci(hooks): Lint the staged Markdown, not the working copy](docs/blogs/2026-09-30-pr-228-ci-hooks-lint-the-staged-markdown-not-the-working-copy.md) | release,automation |
-<!-- BLOG_END -->
+<!-- RELEASES_START -->
+
+| Version | Date | Title | Blog post |
+| ------- | ---- | ----- | --------- |
+| [v0.0.47](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.47) | 2026-10-05 | ci: Standardize on the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-241-ci-standardize-on-the-repo-ci-baseline-template.md) |
+| [v0.0.46](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.46) | 2026-10-02 | chore: drop leaked Context7 MCP key and stale security policies | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-02-pr-237-chore-drop-leaked-context7-mcp-key-and-stale-security-policies.md) |
+| [v0.0.45](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.45) | 2026-09-30 | ci: Merge a PR only after Copilot's review and resolved threads | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-235-ci-merge-a-pr-only-after-copilot-s-review-and-resolved-threads.md) |
+| [v0.0.44](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.44) | 2026-09-30 | docs: Point the rest of CONTRIBUTING.md at main | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-233-docs-point-the-rest-of-contributing-md-at-main.md) |
+| [v0.0.43](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.43) | 2026-09-30 | ci(hooks): Adopt the shared branch-name standard | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-231-ci-hooks-adopt-the-shared-branch-name-standard.md) |
+| [v0.0.42](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.42) | 2026-09-30 | ci(hooks): Lint the staged Markdown, not the working copy | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-228-ci-hooks-lint-the-staged-markdown-not-the-working-copy.md) |
+| [v0.0.41](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.41) | 2026-09-29 | build: write a single-document pnpm lockfile | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-29-pr-225-build-write-a-single-document-pnpm-lockfile.md) |
+| [v0.0.40](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.40) | 2026-09-29 | build: switch the web project from npm to pnpm | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-29-pr-222-build-switch-the-web-project-from-npm-to-pnpm.md) |
+| [v0.0.39](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.39) | 2026-09-28 | chore(web): Stop committing the generated app.css | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-28-pr-220-chore-web-stop-committing-the-generated-app-css.md) |
+| [v0.0.38](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.38) | 2026-09-28 | ci: Lint workflows and shell scripts before push and in CI | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-28-pr-218-ci-lint-workflows-and-shell-scripts-before-push-and-in-ci.md) |
+
+<!-- RELEASES_END -->
+
+[All releases →](https://github.com/mpaulosky/IssueManager/releases)
