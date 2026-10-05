@@ -63,10 +63,8 @@ app.UseOutputCache();
 
 app.MapGet("/auth/login", async Task (HttpContext httpContext, string returnUrl = "/") =>
 {
-	// Only redirect back into this app; a crafted returnUrl must not send the user off-site.
-	var redirectUri = Microsoft.AspNetCore.Http.HttpResults.RedirectHttpResult.IsLocalUrl(returnUrl) ? returnUrl : "/";
 	var authProperties = new LoginAuthenticationPropertiesBuilder()
-		.WithRedirectUri(redirectUri)
+		.WithRedirectUri(AuthExtensions.GetLocalReturnUrl(returnUrl))
 		.Build();
 	await httpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authProperties);
 });

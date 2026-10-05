@@ -58,4 +58,36 @@ public class AuthExtensionsTests
 		using var app = builder.Build();
 		app.Services.GetService<IAuthorizationService>().Should().NotBeNull();
 	}
+
+	[Theory]
+	[InlineData("/")]
+	[InlineData("/issues")]
+	[InlineData("/issues/create?x=1")]
+	[InlineData("~/issues")]
+	public void GetLocalReturnUrl_WithLocalUrl_ReturnsIt(string returnUrl)
+	{
+		// Act
+		var result = AuthExtensions.GetLocalReturnUrl(returnUrl);
+
+		// Assert
+		result.Should().Be(returnUrl);
+	}
+
+	[Theory]
+	[InlineData("https://example.com/")]
+	[InlineData("http://example.com")]
+	[InlineData("//example.com")]
+	[InlineData("/\\example.com")]
+	[InlineData("javascript:alert(1)")]
+	[InlineData("issues")]
+	[InlineData("")]
+	[InlineData(null)]
+	public void GetLocalReturnUrl_WithNonLocalUrl_ReturnsRoot(string? returnUrl)
+	{
+		// Act
+		var result = AuthExtensions.GetLocalReturnUrl(returnUrl);
+
+		// Assert
+		result.Should().Be("/");
+	}
 }

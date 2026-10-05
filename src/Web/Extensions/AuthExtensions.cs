@@ -137,4 +137,11 @@ public static class AuthExtensions
 
 		return builder;
 	}
+
+	/// <summary>
+	/// Returns <paramref name="returnUrl"/> when it points into this app, otherwise "/",
+	/// so a crafted login link can't send a signed-in user off-site.
+	/// </summary>
+	public static string GetLocalReturnUrl(string? returnUrl) =>
+		Microsoft.AspNetCore.Http.HttpResults.RedirectHttpResult.IsLocalUrl(returnUrl) ? returnUrl! : "/";
 }
