@@ -84,9 +84,14 @@ public sealed class PlaywrightFixture : IAsyncLifetime
 		_mongoContainer = new MongoDbBuilder(MongoDbImage).Build();
 		await _mongoContainer.StartAsync();
 
-		// Step 2: Initialize Aspire AppHost
+		// Step 2: Initialize Aspire AppHost. Keep the launchSettings ports rather
+		// than the testing builder's random ones: Auth0 only accepts callback URLs
+		// on its allowed list, so the web app must run on a known port to log in.
 		_builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.AppHost>(
-			[$"--ConnectionStrings:{DatabaseName}={_mongoContainer.GetConnectionString()}"],
+			[
+				$"--ConnectionStrings:{DatabaseName}={_mongoContainer.GetConnectionString()}",
+				"--DcpPublisher:RandomizePorts=false"
+			],
 			CancellationToken.None);
 
 		_builder.Services.ConfigureHttpClientDefaults(clientBuilder =>
