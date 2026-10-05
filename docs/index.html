@@ -265,6 +265,14 @@ dotnet restore</code></pre>
     <ul class="post-grid">
       <li class="post-card">
         <article>
+          <p class="post-meta"><time datetime="2026-10-05">5 Oct 2026</time><span class="post-tag">v0.0.48</span></p>
+          <h3 class="post-title"><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-247-fix-start-the-e2e-host-so-its-playwright-tests-run-instead-of-skipping.md">fix: Start the E2E host so its Playwright tests run instead of skipping</a></h3>
+          <p class="post-excerpt">The Playwright fixture never brought the host up: nothing supplied the issuemanagerdb connection string, so api-service failed to start, WebApp failed with it, and the fixture waited out its…</p>
+          <p class="post-source"><a href="https://github.com/mpaulosky/IssueManager/pull/247">PR #247</a></p>
+        </article>
+      </li>
+      <li class="post-card">
+        <article>
           <p class="post-meta"><time datetime="2026-10-05">5 Oct 2026</time><span class="post-tag">v0.0.47</span></p>
           <h3 class="post-title"><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-241-ci-standardize-on-the-repo-ci-baseline-template.md">ci: Standardize on the repo-ci-baseline Template</a></h3>
           <p class="post-excerpt">TicketManager, IssueTracker, atelier-store and Blazor-Server already run the shared CI, release and git-hook Baseline, kept as a Template in mpaulosky/dotfiles. One Apply of the Template brings…</p>
@@ -335,14 +343,6 @@ dotnet restore</code></pre>
           <p class="post-source"><a href="https://github.com/mpaulosky/IssueManager/pull/220">PR #220</a></p>
         </article>
       </li>
-      <li class="post-card">
-        <article>
-          <p class="post-meta"><time datetime="2026-09-28">28 Sep 2026</time><span class="post-tag">v0.0.38</span></p>
-          <h3 class="post-title"><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-28-pr-218-ci-lint-workflows-and-shell-scripts-before-push-and-in-ci.md">ci: Lint workflows and shell scripts before push and in CI</a></h3>
-          <p class="post-excerpt">Brings over the workflow and shell lint that atelier-store and TicketManager run (mpaulosky/TicketManager#69), and fixes everything it found on main.</p>
-          <p class="post-source"><a href="https://github.com/mpaulosky/IssueManager/pull/218">PR #218</a></p>
-        </article>
-      </li>
     </ul>
     <!-- BLOGS_HTML_END -->
   </section>
@@ -366,6 +366,12 @@ dotnet restore</code></pre>
           </tr>
         </thead>
         <tbody>
+          <tr>
+            <td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.48">v0.0.48</a></td>
+            <td>2026-10-05</td>
+            <td>fix: Start the E2E host so its Playwright tests run instead of skipping</td>
+            <td><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-247-fix-start-the-e2e-host-so-its-playwright-tests-run-instead-of-skipping.md">Post</a></td>
+          </tr>
           <tr>
             <td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.47">v0.0.47</a></td>
             <td>2026-10-05</td>
@@ -419,12 +425,6 @@ dotnet restore</code></pre>
             <td>2026-09-28</td>
             <td>chore(web): Stop committing the generated app.css</td>
             <td><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-28-pr-220-chore-web-stop-committing-the-generated-app-css.md">Post</a></td>
-          </tr>
-          <tr>
-            <td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.38">v0.0.38</a></td>
-            <td>2026-09-28</td>
-            <td>ci: Lint workflows and shell scripts before push and in CI</td>
-            <td><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-28-pr-218-ci-lint-workflows-and-shell-scripts-before-push-and-in-ci.md">Post</a></td>
           </tr>
         </tbody>
       </table>
