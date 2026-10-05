@@ -132,6 +132,16 @@ public static class AuthExtensions
 				};
 			});
 
+		// Challenges (a signed-out user opening a protected page) and forbids go to
+		// this app's endpoints, not the cookie defaults /Account/Login and
+		// /Account/AccessDenied, which don't exist here.
+		builder.Services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+		{
+			options.LoginPath = "/auth/login";
+			options.ReturnUrlParameter = "returnUrl";
+			options.AccessDeniedPath = "/not-authorized";
+		});
+
 		builder.Services.AddCascadingAuthenticationState();
 		builder.Services.AddAuthorization();
 
