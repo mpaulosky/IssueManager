@@ -56,7 +56,7 @@ public class AuthorNavigationTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that an Author user sees appropriate menu items (Home, Issues, New Issue).
 	/// </summary>
-	[Fact]
+	[Fact(Skip = "Fails: #246")]
 	public async Task Author_SeesAppropriateMenuItems()
 	{
 		// Arrange

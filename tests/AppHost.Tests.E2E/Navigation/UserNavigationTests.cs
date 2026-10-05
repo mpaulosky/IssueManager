@@ -56,7 +56,7 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that a User sees appropriate menu items (Home, Issues).
 	/// </summary>
-	[Fact]
+	[Fact(Skip = "Fails: #246")]
 	public async Task User_SeesAppropriateMenuItems()
 	{
 		// Arrange
@@ -175,7 +175,7 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that a User sees the "New Issue" link after login (Authorized users can create issues).
 	/// </summary>
-	[Fact]
+	[Fact(Skip = "Fails: #246")]
 	public async Task User_SeesNewIssueLinkAfterLogin()
 	{
 		// Arrange

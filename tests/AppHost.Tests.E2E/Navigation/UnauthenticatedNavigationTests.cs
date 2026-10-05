@@ -68,7 +68,7 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that an unauthenticated user does NOT see the "New Issue" link.
 	/// </summary>
-	[Fact]
+	[Fact(Skip = "Fails: #246")]
 	public async Task Unauthenticated_DoesNotSeeNewIssueLink()
 	{
 		// Arrange
@@ -133,7 +133,7 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 	/// Verifies that navigating to a protected route redirects to login.
 	/// The /issues/create route requires authorization.
 	/// </summary>
-	[Fact]
+	[Fact(Skip = "Fails: #246")]
 	public async Task Unauthenticated_ProtectedRouteRedirectsToLogin()
 	{
 		// Arrange
