@@ -62,6 +62,7 @@ See [LICENSE](../LICENSE) for details.
 
 | Version | Date | Title | Blog post |
 | ------- | ---- | ----- | --------- |
+| [v0.0.48](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.48) | 2026-10-05 | fix: Start the E2E host so its Playwright tests run instead of skipping | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-247-fix-start-the-e2e-host-so-its-playwright-tests-run-instead-of-skipping.md) |
 | [v0.0.47](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.47) | 2026-10-05 | ci: Standardize on the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-241-ci-standardize-on-the-repo-ci-baseline-template.md) |
 | [v0.0.46](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.46) | 2026-10-02 | chore: drop leaked Context7 MCP key and stale security policies | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-02-pr-237-chore-drop-leaked-context7-mcp-key-and-stale-security-policies.md) |
 | [v0.0.45](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.45) | 2026-09-30 | ci: Merge a PR only after Copilot's review and resolved threads | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-235-ci-merge-a-pr-only-after-copilot-s-review-and-resolved-threads.md) |
@@ -71,7 +72,6 @@ See [LICENSE](../LICENSE) for details.
 | [v0.0.41](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.41) | 2026-09-29 | build: write a single-document pnpm lockfile | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-29-pr-225-build-write-a-single-document-pnpm-lockfile.md) |
 | [v0.0.40](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.40) | 2026-09-29 | build: switch the web project from npm to pnpm | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-29-pr-222-build-switch-the-web-project-from-npm-to-pnpm.md) |
 | [v0.0.39](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.39) | 2026-09-28 | chore(web): Stop committing the generated app.css | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-28-pr-220-chore-web-stop-committing-the-generated-app-css.md) |
-| [v0.0.38](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.38) | 2026-09-28 | ci: Lint workflows and shell scripts before push and in CI | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-28-pr-218-ci-lint-workflows-and-shell-scripts-before-push-and-in-ci.md) |
 
 <!-- RELEASES_END -->
 
