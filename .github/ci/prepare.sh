@@ -29,8 +29,32 @@ enable_pnpm() {
   corepack enable
 }
 
+# The E2E host serves the web app over HTTPS with the ASP.NET Core dev
+# certificate, and the AppHost's health check (and the web app's calls to the
+# API) reject it unless it's trusted. On Linux, --trust exports it to
+# ~/.aspnet/dev-certs/trust, which OpenSSL reads only through SSL_CERT_DIR.
+trust_dev_cert() {
+  # Exit code 4 is partial trust: OpenSSL (what .NET reads) trusts the
+  # certificate, but the runner has no browser store to add it to. Playwright
+  # ignores HTTPS errors, so that's enough.
+  local status=0
+  dotnet dev-certs https --trust || status=$?
+  if (( status != 0 && status != 4 )); then
+    return "$status"
+  fi
+  local trust_dir="$HOME/.aspnet/dev-certs/trust"
+  local system_dir
+  system_dir="$(openssl version -d | sed -E 's/^OPENSSLDIR: "(.*)"$/\1/')/certs"
+  echo "SSL_CERT_DIR=${trust_dir}:${system_dir}" >> "${GITHUB_ENV:-/dev/null}"
+}
+
 case "$job" in
   build) enable_pnpm ;;
-  test) : "$test_name"; enable_pnpm ;;
+  test)
+    enable_pnpm
+    if [[ "$test_name" == "AppHost.Tests.E2E" ]]; then
+      trust_dev_cert
+    fi
+    ;;
   *) echo "prepare.sh: unknown job '$job'" >&2; exit 2 ;;
 esac

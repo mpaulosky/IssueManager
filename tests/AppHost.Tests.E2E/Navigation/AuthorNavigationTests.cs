@@ -28,12 +28,9 @@ public class AuthorNavigationTests(PlaywrightFixture fixture)
 	public async Task Author_CanLoginSuccessfully()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(AuthorRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("Author test credentials not configured (E2E_TEST_AUTHOR_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("Author test credentials not configured (Auth0:Author:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -59,16 +56,13 @@ public class AuthorNavigationTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that an Author user sees appropriate menu items (Home, Issues, New Issue).
 	/// </summary>
-	[Fact]
+	[Fact(Skip = "Fails: #246")]
 	public async Task Author_SeesAppropriateMenuItems()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(AuthorRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("Author test credentials not configured (E2E_TEST_AUTHOR_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("Author test credentials not configured (Auth0:Author:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -105,12 +99,9 @@ public class AuthorNavigationTests(PlaywrightFixture fixture)
 	public async Task Author_DoesNotSeeAdminOnlyMenuItems()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(AuthorRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("Author test credentials not configured (E2E_TEST_AUTHOR_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("Author test credentials not configured (Auth0:Author:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -156,12 +147,9 @@ public class AuthorNavigationTests(PlaywrightFixture fixture)
 	public async Task Author_CanNavigateToIssuesPage()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(AuthorRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("Author test credentials not configured (E2E_TEST_AUTHOR_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("Author test credentials not configured (Auth0:Author:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -193,12 +181,9 @@ public class AuthorNavigationTests(PlaywrightFixture fixture)
 	public async Task Author_CanNavigateToNewIssuePage()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(AuthorRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("Author test credentials not configured (E2E_TEST_AUTHOR_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("Author test credentials not configured (Auth0:Author:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 

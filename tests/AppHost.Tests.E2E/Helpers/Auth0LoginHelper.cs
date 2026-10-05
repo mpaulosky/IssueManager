@@ -7,23 +7,30 @@
 // Project Name :  AppHost.Tests.E2E
 // =============================================
 
+using Microsoft.Extensions.Configuration;
+
 namespace AppHost.Tests.E2E.Helpers;
 
 /// <summary>
 /// Helper for authenticating with Auth0 via browser-based OIDC flow in Playwright tests.
-/// Test credentials are read from environment variables for security.
+/// Test credentials are read from configuration: user secrets locally, environment variables in CI.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public static class Auth0LoginHelper
 {
+	private static readonly IConfiguration Configuration = new ConfigurationBuilder()
+		.AddUserSecrets(typeof(Auth0LoginHelper).Assembly, optional: true)
+		.AddEnvironmentVariables()
+		.Build();
+
 	/// <summary>
-	/// Gets test credentials from environment variables.
+	/// Gets test credentials for a role from Auth0:{role}:Username and Auth0:{role}:Password
+	/// (Auth0__{role}__Username and Auth0__{role}__Password as environment variables).
 	/// </summary>
 	public static (string Email, string Password)? GetTestCredentials(string role)
 	{
-		var suffix = role.ToUpperInvariant();
-		var email = Environment.GetEnvironmentVariable($"E2E_TEST_{suffix}_EMAIL");
-		var password = Environment.GetEnvironmentVariable($"E2E_TEST_{suffix}_PASSWORD");
+		var email = Configuration[$"Auth0:{role}:Username"];
+		var password = Configuration[$"Auth0:{role}:Password"];
 
 		if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
 		{

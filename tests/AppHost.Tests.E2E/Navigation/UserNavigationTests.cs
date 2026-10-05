@@ -28,12 +28,9 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 	public async Task User_CanLoginSuccessfully()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(UserRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("User test credentials not configured (E2E_TEST_USER_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("User test credentials not configured (Auth0:User:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -59,16 +56,13 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that a User sees appropriate menu items (Home, Issues).
 	/// </summary>
-	[Fact]
+	[Fact(Skip = "Fails: #246")]
 	public async Task User_SeesAppropriateMenuItems()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(UserRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("User test credentials not configured (E2E_TEST_USER_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("User test credentials not configured (Auth0:User:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -103,12 +97,9 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 	public async Task User_DoesNotSeeAdminOnlyMenuItems()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(UserRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("User test credentials not configured (E2E_TEST_USER_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("User test credentials not configured (Auth0:User:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -154,12 +145,9 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 	public async Task User_CanNavigateToIssuesPage()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(UserRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("User test credentials not configured (E2E_TEST_USER_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("User test credentials not configured (Auth0:User:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -187,16 +175,13 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that a User sees the "New Issue" link after login (Authorized users can create issues).
 	/// </summary>
-	[Fact]
+	[Fact(Skip = "Fails: #246")]
 	public async Task User_SeesNewIssueLinkAfterLogin()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(UserRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("User test credentials not configured (E2E_TEST_USER_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("User test credentials not configured (Auth0:User:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 

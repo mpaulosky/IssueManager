@@ -5,6 +5,7 @@
 		<IsTestProject>true</IsTestProject>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>AppHost.Tests.E2E</RootNamespace>
+		<UserSecretsId>94491f6e-auth0-values-3ff40da38702</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -15,6 +16,7 @@
 		<PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
 		<PackageReference Include="Aspire.Hosting.Testing" />
 		<PackageReference Include="Microsoft.Playwright" />
+		<PackageReference Include="Testcontainers.MongoDB" />
 		<!-- Force non-vulnerable transitive dependency versions -->
 		<PackageReference Include="MessagePack" />
 		<PackageReference Include="SharpCompress" />

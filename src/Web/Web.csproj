@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<RootNamespace>Web</RootNamespace>
-		<UserSecretsId>9ea929cd-8b58-4052-a68a-b79a1b47c36c</UserSecretsId>
+		<UserSecretsId>94491f6e-auth0-values-3ff40da38702</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>

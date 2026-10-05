@@ -89,34 +89,50 @@ exports.onExecutePostLogin = async (event, api) => {
 
 ## Local Development Configuration
 
-Add to user secrets for the **Api** project:
+The Api, Web and `AppHost.Tests.E2E` projects share one user-secrets store (`UserSecretsId`
+`94491f6e-auth0-values-3ff40da38702`), so each value is set once:
 
 ```bash
-cd src/Api
-dotnet user-secrets set "Auth0:Domain" "dev-63xbriztum2j1765.us.auth0.com"
-dotnet user-secrets set "Auth0:Audience" "https://api.issuemanager.com"
+dotnet user-secrets set "Auth0:Domain" "your-tenant.auth0.com" --project src/Api
+dotnet user-secrets set "Auth0:Audience" "https://api.issuemanager.com" --project src/Api
+dotnet user-secrets set "Auth0:ClientId" "<Web application Client ID>" --project src/Api
+dotnet user-secrets set "Auth0:ClientSecret" "<Web application Client Secret>" --project src/Api
 ```
 
-Add to user secrets for the **Web** project:
+The E2E tests log in as one test user per role:
 
 ```bash
-cd src/Web
-dotnet user-secrets set "Auth0:Domain" "dev-63xbriztum2j1765.us.auth0.com"
-dotnet user-secrets set "Auth0:ClientId" "TCtpPzgZldVYUo1OdhFTrEUMLYwrZibs"
-dotnet user-secrets set "Auth0:ClientSecret" "EIB-OTL_mWm87JD61g-jg_-5kwlNPZ6UXJzEB9-1yVTIZ8Nkpp6EeOE5FC86DwaL"
-dotnet user-secrets set "Auth0:Audience" "https://api.issuemanager.com"
+dotnet user-secrets set "Auth0:Admin:Username" "<admin email>" --project src/Api
+dotnet user-secrets set "Auth0:Admin:Password" "<admin password>" --project src/Api
+# ...and the same for Auth0:Author and Auth0:User
 ```
 
-## GitHub Actions Secrets
+The E2E host runs the Web app on `https://localhost:7176`, so the Auth0 application needs
+`https://localhost:7176/callback` in **Allowed Callback URLs** and `https://localhost:7176/` in **Allowed Logout URLs**.
 
-Add these secrets to the repository at **Settings → Secrets and variables → Actions**:
+> **Moving from per-project secrets:** the Api and Web projects used to have their own stores
+> (`37795a0b-dd55-4ca7-a0ac-d5b6effd8208` and `9ea929cd-8b58-4052-a68a-b79a1b47c36c`). Values left there
+> are no longer read. Copy them into the shared store with the commands above; `dotnet user-secrets list --id <old id>` shows what you had.
 
-| Secret Name | Value |
-| ------------- | ------- |
-| `AUTH0_DOMAIN` | `your-tenant.auth0.com` |
-| `AUTH0_CLIENT_ID` | Your Auth0 Web application Client ID |
-| `AUTH0_CLIENT_SECRET` | Your Auth0 Web application Client Secret |
-| `AUTH0_AUDIENCE` | `https://api.issuemanager.com` |
+## CI Secrets
+
+CI reads one repository secret, `TEST_ENV` (**Settings → Secrets and variables → Actions**), holding `NAME=value` lines
+that are exported to the test jobs:
+
+```text
+Auth0__Domain=your-tenant.auth0.com
+Auth0__ClientId=<Web application Client ID>
+Auth0__ClientSecret=<Web application Client Secret>
+Auth0__Audience=https://api.issuemanager.com
+Auth0__Admin__Username=<admin email>
+Auth0__Admin__Password=<admin password>
+Auth0__Author__Username=<author email>
+Auth0__Author__Password=<author password>
+Auth0__User__Username=<user email>
+Auth0__User__Password=<user password>
+```
+
+Without the Auth0 values the E2E host can't start, and the E2E job fails.
 
 ## Verification
 
