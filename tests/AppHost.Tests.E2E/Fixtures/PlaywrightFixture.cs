@@ -125,22 +125,40 @@ public sealed class PlaywrightFixture : IAsyncLifetime
 
 	public async ValueTask DisposeAsync()
 	{
-		if (_browser is not null)
+		// Each step runs even if an earlier one throws, so a partial startup
+		// failure can't leave the AppHost or the MongoDB container behind.
+		try
 		{
-			await _browser.CloseAsync();
+			if (_browser is not null)
+			{
+				await _browser.CloseAsync();
+			}
+
+			_playwright?.Dispose();
 		}
-
-		_playwright?.Dispose();
-
-		if (_app is not null)
+		finally
 		{
-			await _app.StopAsync();
-			await _app.DisposeAsync();
-		}
-
-		if (_mongoContainer is not null)
-		{
-			await _mongoContainer.DisposeAsync();
+			try
+			{
+				if (_app is not null)
+				{
+					try
+					{
+						await _app.StopAsync();
+					}
+					finally
+					{
+						await _app.DisposeAsync();
+					}
+				}
+			}
+			finally
+			{
+				if (_mongoContainer is not null)
+				{
+					await _mongoContainer.DisposeAsync();
+				}
+			}
 		}
 	}
 }
