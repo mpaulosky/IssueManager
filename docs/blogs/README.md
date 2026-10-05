@@ -4,6 +4,7 @@ This directory contains concise release-review posts for merged PR releases.
 
 | Date | Title | Tags |
 | ---- | ----- | ---- |
+| 2026-10-05 | [chore: Use pnpm instead of npm and npx in the gate, hooks and Squad skill](2026-10-05-pr-252-chore-use-pnpm-instead-of-npm-and-npx-in-the-gate-hooks-and-squad-skill.md) | release,automation |
 | 2026-10-05 | [chore: Re-apply the repo-ci-baseline Template](2026-10-05-pr-251-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
 | 2026-10-05 | [fix: Make the 11 skipped E2E tests pass](2026-10-05-pr-249-fix-make-the-11-skipped-e2e-tests-pass.md) | release,automation |
 | 2026-10-05 | [fix: Start the E2E host so its Playwright tests run instead of skipping](2026-10-05-pr-247-fix-start-the-e2e-host-so-its-playwright-tests-run-instead-of-skipping.md) | release,automation |

@@ -62,6 +62,7 @@ See [LICENSE](LICENSE) for details.
 
 | Version | Date | Title | Blog post |
 | ------- | ---- | ----- | --------- |
+| [v0.0.51](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.51) | 2026-10-05 | chore: Use pnpm instead of npm and npx in the gate, hooks and Squad skill | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-252-chore-use-pnpm-instead-of-npm-and-npx-in-the-gate-hooks-and-squad-skill.md) |
 | [v0.0.50](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.50) | 2026-10-05 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-251-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.49](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.49) | 2026-10-05 | fix: Make the 11 skipped E2E tests pass | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-249-fix-make-the-11-skipped-e2e-tests-pass.md) |
 | [v0.0.48](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.48) | 2026-10-05 | fix: Start the E2E host so its Playwright tests run instead of skipping | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-247-fix-start-the-e2e-host-so-its-playwright-tests-run-instead-of-skipping.md) |
@@ -71,7 +72,6 @@ See [LICENSE](LICENSE) for details.
 | [v0.0.44](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.44) | 2026-09-30 | docs: Point the rest of CONTRIBUTING.md at main | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-233-docs-point-the-rest-of-contributing-md-at-main.md) |
 | [v0.0.43](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.43) | 2026-09-30 | ci(hooks): Adopt the shared branch-name standard | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-231-ci-hooks-adopt-the-shared-branch-name-standard.md) |
 | [v0.0.42](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.42) | 2026-09-30 | ci(hooks): Lint the staged Markdown, not the working copy | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-228-ci-hooks-lint-the-staged-markdown-not-the-working-copy.md) |
-| [v0.0.41](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.41) | 2026-09-29 | build: write a single-document pnpm lockfile | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-29-pr-225-build-write-a-single-document-pnpm-lockfile.md) |
 
 <!-- RELEASES_END -->
 
