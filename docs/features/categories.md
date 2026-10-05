@@ -2,7 +2,8 @@
 
 ## Overview
 
-Categories allow issues to be classified by type (e.g., "Bug", "Feature Request", "Documentation"). Admins can manage categories, including archiving (soft-deleting) them to prevent new usage while preserving historical data.
+Categories allow issues to be classified by type (e.g., "Bug", "Feature Request", "Documentation").
+Admins can manage categories, including archiving (soft-deleting) them to prevent new usage while preserving historical data.
 
 ## DELETE /api/v1/categories/{id}
 
@@ -16,6 +17,7 @@ Archives (soft-deletes) a category. Only administrators can perform this action.
 ### Behavior
 
 When a category is archived:
+
 - The category document is marked with `Archived = true`
 - The `ArchivedBy` field is set to the current user's ID
 - The `ArchivedAt` timestamp is recorded
@@ -25,14 +27,14 @@ When a category is archived:
 
 ### Example Request
 
-```
+```http
 DELETE /api/v1/categories/507f1f77bcf86cd799439011
 Authorization: Bearer {token}
 ```
 
 ### Example Response
 
-```
+```http
 HTTP/1.1 204 No Content
 ```
 

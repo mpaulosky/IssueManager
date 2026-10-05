@@ -1,0 +1,9 @@
+# Test-project overrides on top of the root .editorconfig, which is Owned by
+# the repo-ci-baseline Template and overwritten on every Apply.
+
+[*.cs]
+# xUnit v3 analyzer rules, off for the tests:
+# xUnit1030: ConfigureAwait(false) is not recommended in test methods
+# xUnit1051: Use TestContext.Current.CancellationToken (informational/style choice)
+dotnet_diagnostic.xUnit1030.severity = none
+dotnet_diagnostic.xUnit1051.severity = none

@@ -156,6 +156,40 @@
     padding: 2rem 1.5rem 3rem;
     font-size: 0.9rem;
   }
+  .post-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+  .post-card {
+    padding: 1.2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 0 0 0.6rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+  .post-tag {
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    background: var(--badge-bg);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+  .post-title { font-size: 1.08rem; margin: 0; }
+  .post-title a, .post-source a { color: var(--accent); font-weight: 700; }
+  .post-excerpt, .post-empty { margin: 0.55rem 0 0; color: var(--text-muted); }
+  .post-source { margin: 0.8rem 0 0; font-size: 0.9rem; }
 </style>
 </head>
 <body>
@@ -223,69 +257,94 @@ dotnet restore</code></pre>
 
   <section id="blogs">
     <h2>Blog Posts</h2>
-          <!-- BLOG_HTML_START -->
-<ul class="blog-list">
-  <li>
-    <span class="mini-meta">2026-10-02</span>
-    <a href="blogs/2026-10-02-pr-237-chore-drop-leaked-context7-mcp-key-and-stale-security-policies.md">chore: drop leaked Context7 MCP key and stale security policies</a>
-  </li>
-  <li>
-    <span class="mini-meta">2026-09-30</span>
-    <a href="blogs/2026-09-30-pr-235-ci-merge-a-pr-only-after-copilot-s-review-and-resolved-threads.md">ci: Merge a PR only after Copilot&#x27;s review and resolved threads</a>
-  </li>
-  <li>
-    <span class="mini-meta">2026-09-30</span>
-    <a href="blogs/2026-09-30-pr-233-docs-point-the-rest-of-contributing-md-at-main.md">docs: Point the rest of CONTRIBUTING.md at main</a>
-  </li>
-  <li>
-    <span class="mini-meta">2026-09-30</span>
-    <a href="blogs/2026-09-30-pr-231-ci-hooks-adopt-the-shared-branch-name-standard.md">ci(hooks): Adopt the shared branch-name standard</a>
-  </li>
-  <li>
-    <span class="mini-meta">2026-09-30</span>
-    <a href="blogs/2026-09-30-pr-228-ci-hooks-lint-the-staged-markdown-not-the-working-copy.md">ci(hooks): Lint the staged Markdown, not the working copy</a>
-  </li>
-</ul>
-<!-- BLOG_HTML_END -->
     <p class="muted">
-      Commit summaries generated via <code>scripts/New-BlogPost.ps1</code> and release notes
-      generated via <code>scripts/New-ReleaseBlogPost.ps1</code>, both stored in
+      Written by the release workflow for each merged PR and stored in
       <a href="blogs/">docs/blogs/</a>.
     </p>
-    <div class="table-wrap">
-      <table id="blogs-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Title</th>
-            <th>Type</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>2026-08-29</td><td><a href="blogs/2026-08-29-release-v0.0.19.md">Release v0.0.19</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-08-29</td><td><a href="blogs/2026-08-29-release-v0.0.18.md">Release v0.0.18</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-08-29</td><td><a href="blogs/2026-08-29-ci-skip-buildtest-jobs-when-only-unrelated-files-change-177.md">ci: skip build/test jobs when only unrelated files change (#177)</a></td><td><span class="pill">commit</span></td></tr>
-          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.17.md">Release v0.0.17</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.16.md">Release v0.0.16</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.15.md">Release v0.0.15</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.14.md">Release v0.0.14</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.13.md">Release v0.0.13</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.12.md">Release v0.0.12</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.11.md">Release v0.0.11</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.10.md">Release v0.0.10</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-08-27</td><td><a href="blogs/2026-08-27-release-v0.0.9.md">Release v0.0.9</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-07-24</td><td><a href="blogs/2026-07-24-release-v0.0.9-108.md">Release v0.0.9-108</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-02-27</td><td><a href="blogs/2026-02-27-release-v0.0.8.md">Release v0.0.8</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-02-27</td><td><a href="blogs/2026-02-27-release-v0.0.7.md">Release v0.0.7</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-02-27</td><td><a href="blogs/2026-02-27-release-v0.0.6.md">Release v0.0.6</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-02-20</td><td><a href="blogs/2026-02-20-release-v0.0.5.md">Release v0.0.5</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-02-20</td><td><a href="blogs/2026-02-20-release-v0.0.4.md">Release v0.0.4</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-02-20</td><td><a href="blogs/2026-02-20-release-v0.0.3.md">Release v0.0.3</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-02-20</td><td><a href="blogs/2026-02-20-release-v0.0.2.md">Release v0.0.2</a></td><td><span class="pill">release</span></td></tr>
-          <tr><td>2026-02-20</td><td><a href="blogs/2026-02-20-release-v0.0.1.md">Release v0.0.1</a></td><td><span class="pill">release</span></td></tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- BLOGS_HTML_START -->
+    <ul class="post-grid">
+      <li class="post-card">
+        <article>
+          <p class="post-meta"><time datetime="2026-10-05">5 Oct 2026</time><span class="post-tag">v0.0.47</span></p>
+          <h3 class="post-title"><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-241-ci-standardize-on-the-repo-ci-baseline-template.md">ci: Standardize on the repo-ci-baseline Template</a></h3>
+          <p class="post-excerpt">TicketManager, IssueTracker, atelier-store and Blazor-Server already run the shared CI, release and git-hook Baseline, kept as a Template in mpaulosky/dotfiles. One Apply of the Template brings…</p>
+          <p class="post-source"><a href="https://github.com/mpaulosky/IssueManager/pull/241">PR #241</a></p>
+        </article>
+      </li>
+      <li class="post-card">
+        <article>
+          <p class="post-meta"><time datetime="2026-10-02">2 Oct 2026</time><span class="post-tag">v0.0.46</span></p>
+          <h3 class="post-title"><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-02-pr-237-chore-drop-leaked-context7-mcp-key-and-stale-security-policies.md">chore: drop leaked Context7 MCP key and stale security policies</a></h3>
+          <p class="post-excerpt">Remove the Context7 MCP server from .github/mcp-config.json. Its entry hardcoded an API key (ctx7sk-6c71…) in this public repo. The key has been in history since #155, so it must be rotated as well…</p>
+          <p class="post-source"><a href="https://github.com/mpaulosky/IssueManager/pull/237">PR #237</a></p>
+        </article>
+      </li>
+      <li class="post-card">
+        <article>
+          <p class="post-meta"><time datetime="2026-09-30">30 Sep 2026</time><span class="post-tag">v0.0.45</span></p>
+          <h3 class="post-title"><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-235-ci-merge-a-pr-only-after-copilot-s-review-and-resolved-threads.md">ci: Merge a PR only after Copilot&#x27;s review and resolved threads</a></h3>
+          <p class="post-excerpt">Part 3 of #227.</p>
+          <p class="post-source"><a href="https://github.com/mpaulosky/IssueManager/pull/235">PR #235</a></p>
+        </article>
+      </li>
+      <li class="post-card">
+        <article>
+          <p class="post-meta"><time datetime="2026-09-30">30 Sep 2026</time><span class="post-tag">v0.0.44</span></p>
+          <h3 class="post-title"><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-233-docs-point-the-rest-of-contributing-md-at-main.md">docs: Point the rest of CONTRIBUTING.md at main</a></h3>
+          <p class="post-excerpt">Follow-up to #231. Its review found three more places in docs/CONTRIBUTING.md that still said develop, a branch this repo doesn&#x27;t have: the &quot;Respond to an Issue&quot; steps said to branch from and open…</p>
+          <p class="post-source"><a href="https://github.com/mpaulosky/IssueManager/pull/233">PR #233</a></p>
+        </article>
+      </li>
+      <li class="post-card">
+        <article>
+          <p class="post-meta"><time datetime="2026-09-30">30 Sep 2026</time><span class="post-tag">v0.0.43</span></p>
+          <h3 class="post-title"><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-231-ci-hooks-adopt-the-shared-branch-name-standard.md">ci(hooks): Adopt the shared branch-name standard</a></h3>
+          <p class="post-excerpt">Part 2 of #227, porting mpaulosky/IssueTracker#182 and #186: the branch-name standard every repo now shares.</p>
+          <p class="post-source"><a href="https://github.com/mpaulosky/IssueManager/pull/231">PR #231</a></p>
+        </article>
+      </li>
+      <li class="post-card">
+        <article>
+          <p class="post-meta"><time datetime="2026-09-30">30 Sep 2026</time><span class="post-tag">v0.0.42</span></p>
+          <h3 class="post-title"><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-228-ci-hooks-lint-the-staged-markdown-not-the-working-copy.md">ci(hooks): Lint the staged Markdown, not the working copy</a></h3>
+          <p class="post-excerpt">Part 1 of #227, porting mpaulosky/IssueTracker#170 and #180.</p>
+          <p class="post-source"><a href="https://github.com/mpaulosky/IssueManager/pull/228">PR #228</a></p>
+        </article>
+      </li>
+      <li class="post-card">
+        <article>
+          <p class="post-meta"><time datetime="2026-09-29">29 Sep 2026</time><span class="post-tag">v0.0.41</span></p>
+          <h3 class="post-title"><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-29-pr-225-build-write-a-single-document-pnpm-lockfile.md">build: write a single-document pnpm lockfile</a></h3>
+          <p class="post-excerpt">Requested by Matthew · project thread</p>
+          <p class="post-source"><a href="https://github.com/mpaulosky/IssueManager/pull/225">PR #225</a></p>
+        </article>
+      </li>
+      <li class="post-card">
+        <article>
+          <p class="post-meta"><time datetime="2026-09-29">29 Sep 2026</time><span class="post-tag">v0.0.40</span></p>
+          <h3 class="post-title"><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-29-pr-222-build-switch-the-web-project-from-npm-to-pnpm.md">build: switch the web project from npm to pnpm</a></h3>
+          <p class="post-excerpt">Requested by Matthew · project thread</p>
+          <p class="post-source"><a href="https://github.com/mpaulosky/IssueManager/pull/222">PR #222</a></p>
+        </article>
+      </li>
+      <li class="post-card">
+        <article>
+          <p class="post-meta"><time datetime="2026-09-28">28 Sep 2026</time><span class="post-tag">v0.0.39</span></p>
+          <h3 class="post-title"><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-28-pr-220-chore-web-stop-committing-the-generated-app-css.md">chore(web): Stop committing the generated app.css</a></h3>
+          <p class="post-excerpt">Every Tailwind bump from Dependabot left the committed src/Web/wwwroot/css/app.css stale. The lockfile moved on, but the CSS in git was still the old build (#218 fixed the latest case by hand). Each…</p>
+          <p class="post-source"><a href="https://github.com/mpaulosky/IssueManager/pull/220">PR #220</a></p>
+        </article>
+      </li>
+      <li class="post-card">
+        <article>
+          <p class="post-meta"><time datetime="2026-09-28">28 Sep 2026</time><span class="post-tag">v0.0.38</span></p>
+          <h3 class="post-title"><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-28-pr-218-ci-lint-workflows-and-shell-scripts-before-push-and-in-ci.md">ci: Lint workflows and shell scripts before push and in CI</a></h3>
+          <p class="post-excerpt">Brings over the workflow and shell lint that atelier-store and TicketManager run (mpaulosky/TicketManager#69), and fixes everything it found on main.</p>
+          <p class="post-source"><a href="https://github.com/mpaulosky/IssueManager/pull/218">PR #218</a></p>
+        </article>
+      </li>
+    </ul>
+    <!-- BLOGS_HTML_END -->
   </section>
 
   <section id="releases">
@@ -295,24 +354,82 @@ dotnet restore</code></pre>
       <a href="CHANGELOG.md">CHANGELOG.md</a> or on
       <a href="https://github.com/mpaulosky/IssueManager/releases">GitHub Releases</a>.
     </p>
+    <!-- RELEASES_HTML_START -->
     <div class="table-wrap">
-      <table id="releases-table">
+      <table>
         <thead>
           <tr>
             <th>Version</th>
-            <th>Published</th>
-            <th>Link</th>
+            <th>Date</th>
+            <th>Title</th>
+            <th>Blog post</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td>v0.0.19</td><td>2026-08-29</td><td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.19">Release notes</a></td></tr>
-          <tr><td>v0.0.18</td><td>2026-08-29</td><td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.18">Release notes</a></td></tr>
-          <tr><td>v0.0.17</td><td>2026-08-27</td><td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.17">Release notes</a></td></tr>
-          <tr><td>v0.0.16</td><td>2026-08-27</td><td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.16">Release notes</a></td></tr>
-          <tr><td>v0.0.15</td><td>2026-08-27</td><td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.15">Release notes</a></td></tr>
+          <tr>
+            <td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.47">v0.0.47</a></td>
+            <td>2026-10-05</td>
+            <td>ci: Standardize on the repo-ci-baseline Template</td>
+            <td><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-241-ci-standardize-on-the-repo-ci-baseline-template.md">Post</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.46">v0.0.46</a></td>
+            <td>2026-10-02</td>
+            <td>chore: drop leaked Context7 MCP key and stale security policies</td>
+            <td><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-02-pr-237-chore-drop-leaked-context7-mcp-key-and-stale-security-policies.md">Post</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.45">v0.0.45</a></td>
+            <td>2026-09-30</td>
+            <td>ci: Merge a PR only after Copilot&#x27;s review and resolved threads</td>
+            <td><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-235-ci-merge-a-pr-only-after-copilot-s-review-and-resolved-threads.md">Post</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.44">v0.0.44</a></td>
+            <td>2026-09-30</td>
+            <td>docs: Point the rest of CONTRIBUTING.md at main</td>
+            <td><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-233-docs-point-the-rest-of-contributing-md-at-main.md">Post</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.43">v0.0.43</a></td>
+            <td>2026-09-30</td>
+            <td>ci(hooks): Adopt the shared branch-name standard</td>
+            <td><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-231-ci-hooks-adopt-the-shared-branch-name-standard.md">Post</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.42">v0.0.42</a></td>
+            <td>2026-09-30</td>
+            <td>ci(hooks): Lint the staged Markdown, not the working copy</td>
+            <td><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-228-ci-hooks-lint-the-staged-markdown-not-the-working-copy.md">Post</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.41">v0.0.41</a></td>
+            <td>2026-09-29</td>
+            <td>build: write a single-document pnpm lockfile</td>
+            <td><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-29-pr-225-build-write-a-single-document-pnpm-lockfile.md">Post</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.40">v0.0.40</a></td>
+            <td>2026-09-29</td>
+            <td>build: switch the web project from npm to pnpm</td>
+            <td><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-29-pr-222-build-switch-the-web-project-from-npm-to-pnpm.md">Post</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.39">v0.0.39</a></td>
+            <td>2026-09-28</td>
+            <td>chore(web): Stop committing the generated app.css</td>
+            <td><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-28-pr-220-chore-web-stop-committing-the-generated-app-css.md">Post</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.38">v0.0.38</a></td>
+            <td>2026-09-28</td>
+            <td>ci: Lint workflows and shell scripts before push and in CI</td>
+            <td><a href="https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-28-pr-218-ci-lint-workflows-and-shell-scripts-before-push-and-in-ci.md">Post</a></td>
+          </tr>
         </tbody>
       </table>
     </div>
+    <!-- RELEASES_HTML_END -->
   </section>
 
   <section id="contributing">
@@ -332,53 +449,6 @@ dotnet restore</code></pre>
   IssueManager · <a href="https://github.com/mpaulosky/IssueManager">GitHub</a> ·
   <a href="../LICENSE">MIT License</a>
 </footer>
-
-<script>
-  // Progressive enhancement: refresh the blog/release tables from GitHub's API when
-  // this page is served over http(s). Falls back silently to the static rows above
-  // when offline, opened via file://, or the API is unreachable/rate-limited.
-  (function () {
-    var REPO = "mpaulosky/IssueManager";
-
-    function fmtDate(iso) {
-      return iso ? iso.slice(0, 10) : "";
-    }
-
-    function renderReleases(releases) {
-      var tbody = document.querySelector("#releases-table tbody");
-      if (!releases || !releases.length) return;
-      tbody.innerHTML = releases.slice(0, 10).map(function (r) {
-        return "<tr><td>" + r.tag_name + "</td><td>" + fmtDate(r.published_at) +
-          "</td><td><a href=\"" + r.html_url + "\">Release notes</a></td></tr>";
-      }).join("");
-    }
-
-    function renderBlogs(files) {
-      var tbody = document.querySelector("#blogs-table tbody");
-      var posts = files.filter(function (f) { return f.name.endsWith(".md"); })
-        .sort(function (a, b) { return b.name.localeCompare(a.name); });
-      if (!posts.length) return;
-      tbody.innerHTML = posts.map(function (f) {
-        var date = f.name.slice(0, 10);
-        var titleSlug = f.name.slice(11).replace(/\.md$/, "");
-        return "<tr><td>" + date + "</td><td><a href=\"blogs/" + f.name + "\">" +
-          titleSlug + "</a></td><td><span class=\"pill\">docs/blogs</span></td></tr>";
-      }).join("");
-    }
-
-    if (window.location.protocol === "file:") return;
-
-    fetch("https://api.github.com/repos/" + REPO + "/releases?per_page=10")
-      .then(function (res) { return res.ok ? res.json() : null; })
-      .then(function (data) { if (data) renderReleases(data); })
-      .catch(function () {});
-
-    fetch("https://api.github.com/repos/" + REPO + "/contents/docs/blogs")
-      .then(function (res) { return res.ok ? res.json() : null; })
-      .then(function (data) { if (Array.isArray(data)) renderBlogs(data); })
-      .catch(function () {});
-  })();
-</script>
 
 </body>
 </html>

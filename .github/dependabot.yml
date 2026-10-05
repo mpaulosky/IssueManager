@@ -1,6 +1,8 @@
 # Dependabot version updates. Every label used below must exist in the repo:
 # Dependabot doesn't create them, and silently leaves them off the PR.
 # https://docs.github.com/code-security/dependabot/working-with-dependabot/dependabot-options-reference
+# This file is Seed, so it belongs to the repo: add its other ecosystems (such
+# as npm for a pnpm project) and its own ignores here.
 ---
 
 version: 2
@@ -19,6 +21,10 @@ updates:
     # one is usually caught upstream before it reaches a PR here.
     cooldown:
       default-days: 7
+    # Conventional commits, like the repo's own: "chore(deps): bump ...".
+    commit-message:
+      prefix: "chore"
+      include: "scope"
     labels:
       - "github-actions"
       - "dependencies"
@@ -40,6 +46,10 @@ updates:
     # one is usually caught upstream before it reaches a PR here.
     cooldown:
       default-days: 7
+    # Conventional commits, like the repo's own: "chore(deps): bump ...".
+    commit-message:
+      prefix: "chore"
+      include: "scope"
     ignore:
       # Microsoft.AspNetCore.OpenApi 10.x requires Microsoft.OpenApi < 3.0.0,
       # so a 3.x bump breaks restore. Drop this once ASP.NET allows 3.x.
@@ -49,6 +59,12 @@ updates:
       - "nuget"
       - "dependencies"
     groups:
+      # Testcontainers modules only work with the matching core version,
+      # so they always move together. A dependency joins the first group
+      # that matches it, so this group stays ahead of all-nuget.
+      testcontainers:
+        patterns:
+          - "Testcontainers*"
       all-nuget:
         patterns:
           - "*"
@@ -66,6 +82,10 @@ updates:
     # one is usually caught upstream before it reaches a PR here.
     cooldown:
       default-days: 7
+    # Conventional commits, like the repo's own: "chore(deps): bump ...".
+    commit-message:
+      prefix: "chore"
+      include: "scope"
     labels:
       - "dotnet-sdk"
       - "dependencies"
@@ -87,6 +107,10 @@ updates:
     # one is usually caught upstream before it reaches a PR here.
     cooldown:
       default-days: 7
+    # Conventional commits, like the repo's own: "chore(deps): bump ...".
+    commit-message:
+      prefix: "chore"
+      include: "scope"
     labels:
       - "npm"
       - "dependencies"

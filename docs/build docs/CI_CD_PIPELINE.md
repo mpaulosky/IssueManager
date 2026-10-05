@@ -8,7 +8,7 @@ A comprehensive GitHub Actions workflow that executes all test suites in paralle
 
 ## Test Suite Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │ Checkout & Setup                                                 │
 │ └─ .NET 10, NuGet cache, global.json                            │
@@ -56,7 +56,7 @@ Total: ~12-15 minutes (parallel >> sequential)
 ## Test Suites
 
 | Suite | Framework | Coverage | Trigger | Notes |
-|-------|-----------|----------|---------|-------|
+| ------- | ----------- | ---------- | --------- | ------- |
 | **Unit** | xUnit v3 | ✅ Yes | Always | Business logic, domain layer |
 | **Architecture** | NetArchTest | ❌ Excluded | Always | Layer constraints, dependency rules |
 | **Blazor** | bUnit | ✅ Yes | Always | Component rendering, interactions |
@@ -91,6 +91,7 @@ services:
 ## Artifacts
 
 **Test Results** (always uploaded):
+
 - `unit-test-results/unit.trx`
 - `architecture-test-results/architecture.trx`
 - `bunit-test-results/bunit.trx`
@@ -99,6 +100,7 @@ services:
 - `e2e-test-results/e2e.trx`
 
 **Coverage Reports** (uploaded after coverage analysis):
+
 - `coverage-reports/index.html` — Human-readable coverage report
 - `coverage-reports/Cobertura.xml` — Machine-readable (Codecov)
 - `coverage-reports/Summary.json` — Coverage metrics
@@ -106,6 +108,7 @@ services:
 ## Triggers
 
 Workflow runs on:
+
 - `push` to `main` or `squad/*` branches
 - `pull_request` to any branch
 - Manual trigger via `workflow_dispatch`
@@ -131,7 +134,7 @@ reportgenerator -reports:coverage/**/*.opencover.xml -targetdir:coverage -report
 ## Performance Targets
 
 | Phase | Time | Acceptable |
-|-------|------|-----------|
+| ------- | ------ | ----------- |
 | Build | 5-10 min | ✅ Cached deps |
 | Tests (parallel) | 5-10 min | ✅ All suites concurrent |
 | Coverage | 1-2 min | ✅ Report generation |
@@ -141,7 +144,7 @@ reportgenerator -reports:coverage/**/*.opencover.xml -targetdir:coverage -report
 ## Failure Scenarios
 
 | Scenario | Behavior |
-|----------|----------|
+| ---------- | ---------- |
 | Build fails | All test jobs skipped (dependency) |
 | Test job fails | Job reports failure, continues to coverage |
 | Coverage <80% | Warning message, workflow continues to pass |

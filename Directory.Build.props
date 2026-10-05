@@ -1,8 +1,5 @@
 <Project>
 	<PropertyGroup>
-		<AnalysisMode>all</AnalysisMode>
-		<!-- Keep analyzer diagnostics as warnings so TreatWarningsAsErrors doesn't fail CI -->
-		<CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<ImplicitUsings>enable</ImplicitUsings>

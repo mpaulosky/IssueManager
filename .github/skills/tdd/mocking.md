@@ -1,4 +1,4 @@
-## When to Mock
+# When to Mock
 
 Examples below use C#, xUnit, FluentAssertions, and NSubstitute.
 

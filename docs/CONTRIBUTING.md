@@ -2,7 +2,9 @@
 
 Thank you for taking the time to consider contributing to our project.
 
-The following is a set of guidelines for contributing to the project. These are mostly guidelines, not rules, and can be changed in the future. Please submit your suggestions with a pull-request to this document.
+The following is a set of guidelines for contributing to the project.
+These are mostly guidelines, not rules, and can be changed in the future.
+Please submit your suggestions with a pull-request to this document.
 
 ## Table of Contents
 
@@ -29,14 +31,10 @@ We have adopted a code of conduct from the Contributor Covenant. Contributors to
 ## Quick Start
 
 1. Fork the repository and clone your fork.
-2. Create a branch from `main`, named `feature/{issue}-{slug}`, `fix/{issue}-{slug}`, `hotfix/{issue}-{slug}` or
-   `chore/{slug}` for work without an issue (e.g. `feature/123-add-search`). Slugs are lowercase letters and digits in
-   words joined by `-`, and a `chore/` slug starts with a letter. The pre-push hook refuses any other name.
-3. Make your changes, following the code style and guidelines below.
-4. Add or update tests as needed.
-5. Commit with clear messages (see below).
-6. Push your branch and open a Pull Request to `main`.
-7. Ensure all checks pass and respond to review feedback.
+2. Follow [PROCESS.md](PROCESS.md): the one-time hook setup, a branch named to the standard in its own worktree,
+   commit and PR title format, the PR description, and how checks, review, merging and releases work.
+3. Make your changes, following the code style and guidelines below, with tests.
+4. Push your branch and open a Pull Request to `main` using the template.
 
 ## What should I know before I get started
 
@@ -45,14 +43,16 @@ This project is a project to build a [describe your solution, e.g., web applicat
 ### Code Style & Commit Messages
 
 - Use consistent formatting (C# conventions, .editorconfig if present).
-- Write clear, descriptive commit messages:
-  - Use present tense (e.g., "Add search feature")
-  - Reference issues (e.g., `Fixes #123`)
+- Commits and PR titles follow [git-commit-instructions.md](../.github/instructions/git-commit-instructions.md)
+  (`<type>(<scope>): <Summary>`); see [PROCESS.md](PROCESS.md#commits-and-pr-titles).
 - Add comments to explain complex logic.
 
 ### Project Folder Structure
 
-This project is designed to be built and run primarily with [your preferred IDEs/editors]. The folders are configured so that they will support editing and working in other editors and on other operating systems. We encourage you to develop with these other environments, because we would like to be able to support developers who use those tools as well. The folders are configured as follows:
+This project is designed to be built and run primarily with [your preferred IDEs/editors].
+The folders are configured so that they will support editing and working in other editors and on other operating systems.
+We encourage you to develop with these other environments, because we would like to be able to support developers who use those tools as well.
+The folders are configured as follows:
 
 ```bash
 docs/                                   -- Documentation and guides
@@ -89,7 +89,7 @@ tests/                                  -- Unit and Integration tests
   Web.Tests.Integration/                -- Web integration tests
   Web.Tests.Unit/                       -- Web/UI unit tests
 
- [SolutionName].slnx                    -- Solution file
+ IssueManager.slnx                    -- Solution file
 codecov.yml                             -- Code coverage configuration
 Directory.Packages.props                -- Central NuGet package management
 global.json                             -- Global SDK version
@@ -99,7 +99,7 @@ README.md                               -- Project overview
 
 See the main [README.md](../README.md) for more details.
 
-All official versions of the project are built and delivered with [your CI/CD system, e.g., GitHub Actions] and linked in the main README.md and [releases tab in your repository].
+All official versions of the project are built and delivered with GitHub Actions and linked in the main README.md and the [releases tab](https://github.com/mpaulosky/IssueManager/releases).
 
 ### Design Decisions
 
@@ -132,7 +132,7 @@ This means one of several types of contributions:
 
 ### Create an Issue
 
-Create a [New Issue Here]( [your repository issues URL] ).
+Create a [New Issue Here](https://github.com/mpaulosky/IssueManager/issues/new/choose).
 
 1. If you are reporting a `Bug` that you have found. Be sure to add the `Bug` label so that we can triage and track it.
 1. If you are reporting an `Enhancement` that you think would improve the project. Be sure to add the `Enhancement`
@@ -142,26 +142,25 @@ Please provide as much detail as possible, including steps to reproduce, expecte
 
 ### Respond to an Issue
 
-[Fork the Repository to your account]( [your repository fork URL] ).
+[Fork the Repository to your account](https://github.com/mpaulosky/IssueManager/fork).
 
-1. Create a new branch from `main` named for the Issue, such as `feature/{issue}-{slug}` or `fix/{issue}-{slug}`
-   (see Quick Start).
+1. Create a branch in its own worktree, named for the existing Issue number (e.g. `fix/123-null-title`); see [PROCESS.md](PROCESS.md#branches-and-worktrees).
 1. Work on the issue.
 1. Create Unit, Integration tests for any code that require them. We use [your test frameworks, e.g., xUnit, bUnit] to test our code and components.
-1. When you are done, create a Pull Request from your branch to `main`.
+1. When you are done Create a Pull Request from your branch to the main branch.
 1. Submit the Pull Request.
 
 **Note:** Pull requests without unit tests will be delayed until tests are added. All new features and bug fixes must
 include appropriate tests.
 
-Any code that is written to support a component or new functionality are required to be accompanied with unit tests at the time the pull request is submitted. Pull requests without unit tests will be delayed and asked for unit tests to prove their functionality.
+Any code that is written to support a component or new functionality are required to be accompanied with unit tests at the time the pull request is submitted.
+Pull requests without unit tests will be delayed and asked for unit tests to prove their functionality.
 
 ### Review Process
 
-1. All PRs are reviewed by maintainers and may require changes before merging.
-2. Automated checks (build, tests, lint) must pass before review.
-3. Be responsive to feedback and update your PR as needed.
-4. Once approved, your PR will be merged into `main`.
+Every PR is reviewed by Copilot on each push, and merges once its required checks pass and every review thread is
+resolved: a same-repo PR merges on its own, and the maintainer merges a fork's. The details are in
+[PROCESS.md](PROCESS.md#checks-review-and-merging).
 
 ### Write code
 
@@ -185,6 +184,7 @@ All code contributions must include appropriate tests. We follow a comprehensive
 ### Test Requirements
 
 Before submitting a PR, ensure:
+
 - ✅ All tests pass locally (`dotnet test`)
 - ✅ New features include tests (unit + integration)
 - ✅ Bug fixes include regression tests
@@ -244,6 +244,7 @@ dotnet watch test --project tests/Unit
 ### Test Documentation
 
 For comprehensive testing guides, see:
+
 - **[Testing Strategy](TESTING.md)** — Philosophy, pyramid, coverage goals
 - **[Unit Testing Guide](guides/UNIT-TESTS.md)** — xUnit, FluentValidation, FluentAssertions
 - **[Architecture Testing Guide](guides/ARCHITECTURE-TESTS.md)** — NetArchTest, design rules
@@ -255,6 +256,7 @@ For comprehensive testing guides, see:
 ### Quality Checklist
 
 When reviewing PRs, verify:
+
 - [ ] Tests exist for new code
 - [ ] Tests are clear and maintainable
 - [ ] Tests follow naming conventions (descriptive names)
@@ -262,6 +264,10 @@ When reviewing PRs, verify:
 - [ ] Assertions are specific (not just `Should().BeTrue()`)
 - [ ] No commented-out tests
 - [ ] Tests pass consistently (no flaky tests)
+
+---
+
+Thank you for helping us make this project better!
 
 ---
 

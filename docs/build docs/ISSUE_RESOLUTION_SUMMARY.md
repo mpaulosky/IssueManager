@@ -11,13 +11,15 @@ All compilation errors in the IssueManager solution have been successfully resol
 
 ## 1. IssueRepository.cs
 
-### Issues Fixed:
+### IssueRepository Issues Fixed
+
 - ✅ **CreateAsync Return Type Error**: Changed from `Task<IssueDto>` to `Task<Result<IssueDto>>` to match interface contract
 - ✅ **ArchiveAsync Parameter Type**: Changed parameter from `string issueId` to `ObjectId issueId` to match interface
 - ✅ **CountAsync Parameter Error**: Fixed invalid parameter value from `= bad` to `= default`
 - ✅ **GetAllAsync Return Type**: Fixed to properly return `Result<IReadOnlyList<IssueDto>>` instead of tuple with filter error
 
-### Changes:
+### IssueRepository Changes
+
 ```csharp
 // Before
 public async Task<IssueDto> CreateAsync(IssueDto dto, ...)
@@ -34,13 +36,15 @@ public async Task<Result<long>> CountAsync(CancellationToken cancellationToken =
 
 ## 2. CategoryRepository.cs
 
-### Issues Fixed:
+### CategoryRepository Issues Fixed
+
 - ✅ **Model/DTO Confusion**: Fixed repository to use `Category` model internally and convert to/from `CategoryDto`
 - ✅ **Init-only Property Mutations**: Removed attempts to mutate init-only properties on DTOs
 - ✅ **Type Conversion Errors**: Added proper `ToModel()` and `ToDto()` conversions
 - ✅ **ObjectId Comparison**: Fixed ObjectId.Empty comparison syntax
 
-### Changes:
+### CategoryRepository Changes
+
 - All methods now properly convert between `CategoryDto` and `Category` model
 - Removed redundant null checks (warnings only)
 - Fixed type argument specification in generic Result calls
@@ -49,19 +53,22 @@ public async Task<Result<long>> CountAsync(CancellationToken cancellationToken =
 
 ## 3. Issue Handlers
 
-### Files Updated:
+### Issue Handler Files Updated
+
 - `GetIssueHandler.cs`
 - `ListIssuesHandler.cs`
 - `UpdateIssueHandler.cs`
 - `UpdateIssueStatusHandler.cs`
 
-### Issues Fixed:
+### Issue Handler Issues Fixed
+
 - ✅ **String to ObjectId Conversion**: Added `ObjectId.TryParse()` for all string ID parameters
 - ✅ **Result Type Handling**: Changed all `IsSuccess` to `Success` (correct property name)
 - ✅ **Result Value Unwrapping**: Properly unwrap `Result<T>.Value` before using values
 - ✅ **Tuple Deconstruction**: Fixed deconstruction of paginated results from `Result<(Items, Total)>`
 
-### Changes:
+### Issue Handler Changes
+
 ```csharp
 // Before
 var result = await _repository.GetByIdAsync(command.IssueId, ...)
@@ -78,17 +85,20 @@ if (!result.Success || result.Value is null)
 
 ## 4. Category Handlers
 
-### Files Updated:
+### Category Handler Files Updated
+
 - `GetCategoryHandler.cs`
 - `ListCategoriesHandler.cs`
 - `UpdateCategoryHandler.cs`
 
-### Issues Fixed:
+### Category Handler Issues Fixed
+
 - ✅ **Redundant ToDto Calls**: Removed unnecessary `ToDto()` calls on already-converted DTOs
 - ✅ **Result Property Access**: Changed `IsSuccess` to `Success` and `Failure` checks
 - ✅ **Immutable DTO Updates**: Used `with` expressions instead of property mutations
 
-### Changes:
+### Category Handler Changes
+
 ```csharp
 // Before
 var category = getResult.Value;
@@ -130,6 +140,7 @@ These warnings can be addressed in a future cleanup pass but do not affect funct
 ## Verification
 
 All changes have been verified using:
+
 - `get_errors` tool for syntax/compilation checking
 - Proper type matching with interface definitions
 - Consistent use of Result pattern throughout

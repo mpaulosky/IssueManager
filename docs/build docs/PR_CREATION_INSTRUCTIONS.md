@@ -17,7 +17,7 @@ GitHub CLI authentication failed. Please create PR manually:
 
 ### Option 1: GitHub Web UI
 
-1. Visit: https://github.com/mpaulosky/IssueManager/pull/new/squad/17-ci-review
+1. Visit: <https://github.com/mpaulosky/IssueManager/pull/new/squad/17-ci-review>
 2. Title: `docs(review): squad-ci.yml .NET compatibility review (#17)`
 3. Body: See `PR_BODY.md` below
 
@@ -34,7 +34,7 @@ gh pr create --repo mpaulosky/IssueManager \
 
 ## PR_BODY.md
 
-```markdown
+````markdown
 Closes #17
 
 ## Review Summary
@@ -79,7 +79,7 @@ See [docs/reviews/squad-ci-review-issue-17.md](./docs/reviews/squad-ci-review-is
 
 ### Workflow Architecture
 
-```
+```text
 squad-ci.yml (Orchestration)
 ├── versioning (GitVersion)
 ├── test-suite (calls squad-test.yml)
@@ -114,7 +114,7 @@ The squad-ci.yml workflow benefits from recent fixes:
 - `docs/reviews/squad-ci-review-issue-17.md` (new)
 - `.ai-team/agents/legolas/history.md` (updated)
 - `.ai-team/decisions/inbox/legolas-ci-compatibility.md` (new)
-```
+````
 
 ---
 

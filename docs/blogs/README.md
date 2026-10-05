@@ -3,7 +3,8 @@
 This directory contains concise release-review posts for merged PR releases.
 
 | Date | Title | Tags |
-|------|-------|------|
+| ---- | ----- | ---- |
+| 2026-10-05 | [ci: Standardize on the repo-ci-baseline Template](2026-10-05-pr-241-ci-standardize-on-the-repo-ci-baseline-template.md) | release,automation |
 | 2026-10-02 | [chore: drop leaked Context7 MCP key and stale security policies](2026-10-02-pr-237-chore-drop-leaked-context7-mcp-key-and-stale-security-policies.md) | release,automation |
 | 2026-09-30 | [ci: Merge a PR only after Copilot's review and resolved threads](2026-09-30-pr-235-ci-merge-a-pr-only-after-copilot-s-review-and-resolved-threads.md) | release,automation |
 | 2026-09-30 | [docs: Point the rest of CONTRIBUTING.md at main](2026-09-30-pr-233-docs-point-the-rest-of-contributing-md-at-main.md) | release,automation |
@@ -28,4 +29,6 @@ This directory contains concise release-review posts for merged PR releases.
 | 2026-08-30 | [refactor: delete pass-through GetIssueHandler, call repository directly](2026-08-30-pr-186-refactor-delete-pass-through-getissuehandler-call-repository-directly.md) | release,automation |
 | 2026-08-30 | [refactor: hoist paginated GetAllAsync into MongoRepository base](2026-08-30-pr-185-refactor-hoist-paginated-getallasync-into-mongorepository-base.md) | release,automation |
 | 2026-08-30 | [refactor: collapse Category/Status CRUD handlers into generic TaxonomyCrudHandler](2026-08-30-pr-183-refactor-collapse-category-status-crud-handlers-into-generic-taxonomycrudhandler.md) | release,automation |
+| 2026-08-29 | [ci: keep test matrix expanded so skipped runs still report by name](2026-08-29-pr-181-ci-keep-test-matrix-expanded-so-skipped-runs-still-report-by-name.md) | release,automation |
+| 2026-08-29 | [ci: fix matrix test jobs never reporting required checks on skip](2026-08-29-pr-180-ci-fix-matrix-test-jobs-never-reporting-required-checks-on-skip.md) | release,automation |
 | 2026-08-29 | [docs: add commit/release blog-post scripts and docs index page](2026-08-29-pr-179-docs-add-commit-release-blog-post-scripts-and-docs-index-page.md) | release,automation |
