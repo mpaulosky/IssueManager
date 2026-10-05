@@ -28,9 +28,6 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 	public async Task User_CanLoginSuccessfully()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(UserRole);
 		if (credentials is null)
 			throw SkipException.ForSkip("User test credentials not configured (E2E_TEST_USER_EMAIL/PASSWORD)");
@@ -63,9 +60,6 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 	public async Task User_SeesAppropriateMenuItems()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(UserRole);
 		if (credentials is null)
 			throw SkipException.ForSkip("User test credentials not configured (E2E_TEST_USER_EMAIL/PASSWORD)");
@@ -103,9 +97,6 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 	public async Task User_DoesNotSeeAdminOnlyMenuItems()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(UserRole);
 		if (credentials is null)
 			throw SkipException.ForSkip("User test credentials not configured (E2E_TEST_USER_EMAIL/PASSWORD)");
@@ -154,9 +145,6 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 	public async Task User_CanNavigateToIssuesPage()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(UserRole);
 		if (credentials is null)
 			throw SkipException.ForSkip("User test credentials not configured (E2E_TEST_USER_EMAIL/PASSWORD)");
@@ -191,9 +179,6 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 	public async Task User_SeesNewIssueLinkAfterLogin()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(UserRole);
 		if (credentials is null)
 			throw SkipException.ForSkip("User test credentials not configured (E2E_TEST_USER_EMAIL/PASSWORD)");

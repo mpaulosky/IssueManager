@@ -26,9 +26,6 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 	public async Task Unauthenticated_SeesLoginButton()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var page = await fixture.NewPageAsync();
 
 		try
@@ -52,9 +49,6 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 	public async Task Unauthenticated_DoesNotSeeLogoutButton()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var page = await fixture.NewPageAsync();
 
 		try
@@ -78,9 +72,6 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 	public async Task Unauthenticated_DoesNotSeeNewIssueLink()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var page = await fixture.NewPageAsync();
 
 		try
@@ -106,9 +97,6 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 	public async Task Unauthenticated_DoesNotSeeAdminOnlyMenuItems()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var page = await fixture.NewPageAsync();
 
 		try
@@ -149,9 +137,6 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 	public async Task Unauthenticated_ProtectedRouteRedirectsToLogin()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var page = await fixture.NewPageAsync();
 
 		try
@@ -185,9 +170,6 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 	public async Task Unauthenticated_CanAccessIssuesPage()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var page = await fixture.NewPageAsync();
 
 		try
@@ -212,9 +194,6 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 	public async Task Unauthenticated_CanAccessHomePage()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var page = await fixture.NewPageAsync();
 
 		try

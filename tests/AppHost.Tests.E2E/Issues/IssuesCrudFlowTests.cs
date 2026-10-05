@@ -26,9 +26,6 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 	public async Task Admin_CanNavigateToIssuesPage()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(AdminRole);
 		if (credentials is null)
 			throw SkipException.ForSkip("Admin test credentials not configured (E2E_TEST_ADMIN_EMAIL/PASSWORD)");
@@ -62,9 +59,6 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 	public async Task Admin_CanNavigateToCreateIssuePage()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(AdminRole);
 		if (credentials is null)
 			throw SkipException.ForSkip("Admin test credentials not configured (E2E_TEST_ADMIN_EMAIL/PASSWORD)");
@@ -102,9 +96,6 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 	public async Task Admin_CanCreateAndViewIssue()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(AdminRole);
 		if (credentials is null)
 			throw SkipException.ForSkip("Admin test credentials not configured (E2E_TEST_ADMIN_EMAIL/PASSWORD)");
@@ -155,9 +146,6 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 	public async Task Admin_CanFilterIssuesPage()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(AdminRole);
 		if (credentials is null)
 			throw SkipException.ForSkip("Admin test credentials not configured (E2E_TEST_ADMIN_EMAIL/PASSWORD)");
@@ -208,9 +196,6 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 	public async Task Admin_CanNavigateToCategoriesPage()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(AdminRole);
 		if (credentials is null)
 			throw SkipException.ForSkip("Admin test credentials not configured (E2E_TEST_ADMIN_EMAIL/PASSWORD)");
@@ -244,9 +229,6 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 	public async Task Admin_CanViewCategoriesForArchive()
 	{
 		// Arrange
-		if (!fixture.IsAvailable)
-			throw SkipException.ForSkip(fixture.UnavailableReason ?? "Playwright fixture unavailable");
-
 		var credentials = Auth0LoginHelper.GetTestCredentials(AdminRole);
 		if (credentials is null)
 			throw SkipException.ForSkip("Admin test credentials not configured (E2E_TEST_ADMIN_EMAIL/PASSWORD)");

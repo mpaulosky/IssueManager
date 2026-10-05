@@ -7,56 +7,51 @@
 // Project Name :  AppHost.Tests.E2E
 // =============================================
 
+using Testcontainers.MongoDb;
+
 namespace AppHost.Tests.E2E.Fixtures;
 
 /// <summary>
 /// Playwright fixture that hosts the Aspire AppHost for end-to-end tests.
 /// Initializes Playwright and provides browser/page instances for E2E tests.
-/// Starts the Aspire AppHost and captures the Web app URL for browser navigation.
+/// Starts the Aspire AppHost against a MongoDB test container and captures the Web app URL for browser navigation.
+/// If the host can't start, initialization throws and every test in the collection fails.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public sealed class PlaywrightFixture : IAsyncLifetime
 {
+	private const string MongoDbImage = "mongo:latest";
+
+	private MongoDbContainer? _mongoContainer;
 	private IPlaywright? _playwright;
 	private IBrowser? _browser;
 	private IDistributedApplicationTestingBuilder? _builder;
 	private DistributedApplication? _app;
 	private string? _webUrl;
-	private ResourceNotificationService? _notificationService;
 
 	/// <summary>
 	/// Gets the Playwright instance.
 	/// </summary>
 	public IPlaywright Playwright =>
-		_playwright ?? throw new InvalidOperationException("Playwright not initialized. Check IsAvailable.");
+		_playwright ?? throw new InvalidOperationException("Playwright not initialized.");
 
 	/// <summary>
 	/// Gets the browser instance.
 	/// </summary>
 	public IBrowser Browser =>
-		_browser ?? throw new InvalidOperationException("Browser not initialized. Check IsAvailable.");
+		_browser ?? throw new InvalidOperationException("Browser not initialized.");
 
 	/// <summary>
 	/// Gets the base URL of the web application.
 	/// </summary>
 	public string WebUrl =>
-		_webUrl ?? throw new InvalidOperationException("Web URL not available. Check IsAvailable.");
+		_webUrl ?? throw new InvalidOperationException("Web URL not available.");
 
 	/// <summary>
 	/// Gets the Aspire app instance.
 	/// </summary>
 	public DistributedApplication App =>
-		_app ?? throw new InvalidOperationException("Aspire app not initialized. Check IsAvailable.");
-
-	/// <summary>
-	/// True if the fixture was successfully initialized.
-	/// </summary>
-	public bool IsAvailable { get; private set; }
-
-	/// <summary>
-	/// The reason initialization was skipped or failed, if IsAvailable is false.
-	/// </summary>
-	public string? UnavailableReason { get; private set; }
+		_app ?? throw new InvalidOperationException("Aspire app not initialized.");
 
 	/// <summary>
 	/// Creates a new browser context with isolated state for test isolation.
@@ -80,58 +75,47 @@ public sealed class PlaywrightFixture : IAsyncLifetime
 
 	public async ValueTask InitializeAsync()
 	{
-		try
+		// No try/catch: a fixture that can't start must fail every test in the
+		// collection, not skip them, so a broken host can't pass CI unnoticed.
+
+		// Step 1: Start a throwaway MongoDB for the API. The AppHost expects the
+		// Atlas URI as the issuemanagerdb connection string; without it the API
+		// fails to start and the web app never comes up.
+		_mongoContainer = new MongoDbBuilder(MongoDbImage).Build();
+		await _mongoContainer.StartAsync();
+
+		// Step 2: Initialize Aspire AppHost
+		_builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.AppHost>(
+			[$"--ConnectionStrings:{DatabaseName}={_mongoContainer.GetConnectionString()}"],
+			CancellationToken.None);
+
+		_builder.Services.ConfigureHttpClientDefaults(clientBuilder =>
 		{
-			// Step 1: Initialize Aspire AppHost
-			_builder = await DistributedApplicationTestingBuilder
-				.CreateAsync<Projects.AppHost>(CancellationToken.None);
+			clientBuilder.AddStandardResilienceHandler();
+		});
 
-			_builder.Services.ConfigureHttpClientDefaults(clientBuilder =>
-			{
-				clientBuilder.AddStandardResilienceHandler();
-			});
+		_app = await _builder.BuildAsync(CancellationToken.None);
 
-			_app = await _builder.BuildAsync(CancellationToken.None);
+		// Start the app and wait for the web app's health check, with one timeout
+		// so unhealthy containers don't hang CI. The wait throws as soon as the web
+		// app or a dependency fails to start, rather than running out the clock.
+		using var startCts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+		await _app.StartAsync(startCts.Token);
+		await _app.ResourceNotifications.WaitForResourceHealthyAsync(Website, startCts.Token);
 
-			_notificationService = _app.Services.GetRequiredService<ResourceNotificationService>();
+		// Get the web app URL
+		_webUrl = _app.GetEndpoint(Website, "https")?.ToString()
+			?? _app.GetEndpoint(Website, "http")?.ToString()
+			?? throw new InvalidOperationException("Could not get web app endpoint URL");
 
-			// Start the distributed application with a timeout so unhealthy containers don't hang CI
-			using var startCts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
-			await _app.StartAsync(startCts.Token);
+		// Step 3: Initialize Playwright
+		_playwright = await Microsoft.Playwright.Playwright.CreateAsync();
 
-			// Wait for the web app to be running
-			await _notificationService.WaitForResourceAsync(
-				Website,
-				KnownResourceStates.Running,
-				CancellationToken.None).WaitAsync(TimeSpan.FromMinutes(3));
-
-			// Get the web app URL
-			_webUrl = _app.GetEndpoint(Website, "https")?.ToString()
-				?? _app.GetEndpoint(Website, "http")?.ToString();
-
-			if (string.IsNullOrEmpty(_webUrl))
-			{
-				IsAvailable = false;
-				UnavailableReason = "Could not get web app endpoint URL";
-				return;
-			}
-
-			// Step 2: Initialize Playwright
-			_playwright = await Microsoft.Playwright.Playwright.CreateAsync();
-
-			// Launch Chromium in headless mode
-			_browser = await _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
-			{
-				Headless = true
-			});
-
-			IsAvailable = true;
-		}
-		catch (Exception ex)
+		// Launch Chromium in headless mode
+		_browser = await _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
 		{
-			IsAvailable = false;
-			UnavailableReason = $"Fixture initialization failed: {ex.Message}";
-		}
+			Headless = true
+		});
 	}
 
 	public async ValueTask DisposeAsync()
@@ -147,6 +131,11 @@ public sealed class PlaywrightFixture : IAsyncLifetime
 		{
 			await _app.StopAsync();
 			await _app.DisposeAsync();
+		}
+
+		if (_mongoContainer is not null)
+		{
+			await _mongoContainer.DisposeAsync();
 		}
 	}
 }
