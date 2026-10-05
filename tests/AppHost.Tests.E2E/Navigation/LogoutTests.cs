@@ -32,7 +32,7 @@ public class LogoutTests(PlaywrightFixture fixture)
 		// Arrange
 		var credentials = Auth0LoginHelper.GetTestCredentials(AdminRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("Admin test credentials not configured (E2E_TEST_ADMIN_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("Admin test credentials not configured (Auth0:Admin:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -70,7 +70,7 @@ public class LogoutTests(PlaywrightFixture fixture)
 		// Arrange
 		var credentials = Auth0LoginHelper.GetTestCredentials(AdminRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("Admin test credentials not configured (E2E_TEST_ADMIN_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("Admin test credentials not configured (Auth0:Admin:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -126,7 +126,7 @@ public class LogoutTests(PlaywrightFixture fixture)
 		// Arrange
 		var credentials = Auth0LoginHelper.GetTestCredentials(AuthorRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("Author test credentials not configured (E2E_TEST_AUTHOR_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("Author test credentials not configured (Auth0:Author:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -163,7 +163,7 @@ public class LogoutTests(PlaywrightFixture fixture)
 		// Arrange
 		var credentials = Auth0LoginHelper.GetTestCredentials(AuthorRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("Author test credentials not configured (E2E_TEST_AUTHOR_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("Author test credentials not configured (Auth0:Author:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -209,7 +209,7 @@ public class LogoutTests(PlaywrightFixture fixture)
 		// Arrange
 		var credentials = Auth0LoginHelper.GetTestCredentials(UserRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("User test credentials not configured (E2E_TEST_USER_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("User test credentials not configured (Auth0:User:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -246,7 +246,7 @@ public class LogoutTests(PlaywrightFixture fixture)
 		// Arrange
 		var credentials = Auth0LoginHelper.GetTestCredentials(UserRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("User test credentials not configured (E2E_TEST_USER_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("User test credentials not configured (Auth0:User:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 

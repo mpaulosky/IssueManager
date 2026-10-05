@@ -30,7 +30,7 @@ public class AuthorNavigationTests(PlaywrightFixture fixture)
 		// Arrange
 		var credentials = Auth0LoginHelper.GetTestCredentials(AuthorRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("Author test credentials not configured (E2E_TEST_AUTHOR_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("Author test credentials not configured (Auth0:Author:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -62,7 +62,7 @@ public class AuthorNavigationTests(PlaywrightFixture fixture)
 		// Arrange
 		var credentials = Auth0LoginHelper.GetTestCredentials(AuthorRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("Author test credentials not configured (E2E_TEST_AUTHOR_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("Author test credentials not configured (Auth0:Author:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -101,7 +101,7 @@ public class AuthorNavigationTests(PlaywrightFixture fixture)
 		// Arrange
 		var credentials = Auth0LoginHelper.GetTestCredentials(AuthorRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("Author test credentials not configured (E2E_TEST_AUTHOR_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("Author test credentials not configured (Auth0:Author:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -149,7 +149,7 @@ public class AuthorNavigationTests(PlaywrightFixture fixture)
 		// Arrange
 		var credentials = Auth0LoginHelper.GetTestCredentials(AuthorRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("Author test credentials not configured (E2E_TEST_AUTHOR_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("Author test credentials not configured (Auth0:Author:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 
@@ -183,7 +183,7 @@ public class AuthorNavigationTests(PlaywrightFixture fixture)
 		// Arrange
 		var credentials = Auth0LoginHelper.GetTestCredentials(AuthorRole);
 		if (credentials is null)
-			throw SkipException.ForSkip("Author test credentials not configured (E2E_TEST_AUTHOR_EMAIL/PASSWORD)");
+			throw SkipException.ForSkip("Author test credentials not configured (Auth0:Author:Username/Password)");
 
 		var page = await fixture.NewPageAsync();
 

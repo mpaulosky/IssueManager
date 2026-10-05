@@ -5,6 +5,7 @@
 		<IsTestProject>true</IsTestProject>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>AppHost.Tests.E2E</RootNamespace>
+		<UserSecretsId>94491f6e-auth0-values-3ff40da38702</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
