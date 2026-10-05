@@ -41,7 +41,7 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 			credentials.Value.Password);
 
 			// Act
-			await page.GotoAsync($"{fixture.WebUrl}/issues", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+			await page.GotoAsync($"{fixture.WebUrl.TrimEnd('/')}/issues", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
 			// Assert
 			page.Url.Should().Contain("/issues", "should navigate to Issues page");
@@ -55,7 +55,7 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that an Admin user can navigate to the Create Issue page.
 	/// </summary>
-	[Fact(Skip = "Fails: #246")]
+	[Fact]
 	public async Task Admin_CanNavigateToCreateIssuePage()
 	{
 		// Arrange
@@ -74,7 +74,7 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 			credentials.Value.Password);
 
 			// Act
-			await page.GotoAsync($"{fixture.WebUrl}/issues/create", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+			await page.GotoAsync($"{fixture.WebUrl.TrimEnd('/')}/issues/create", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
 			// Assert
 			page.Url.Should().Contain("/issues/create", "should navigate to Create Issue page");
@@ -92,7 +92,7 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that an Admin user can create and view an issue via the form.
 	/// </summary>
-	[Fact(Skip = "Fails: #246")]
+	[Fact]
 	public async Task Admin_CanCreateAndViewIssue()
 	{
 		// Arrange
@@ -111,7 +111,7 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 			credentials.Value.Password);
 
 			// Act - Navigate to create page
-			await page.GotoAsync($"{fixture.WebUrl}/issues/create", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+			await page.GotoAsync($"{fixture.WebUrl.TrimEnd('/')}/issues/create", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
 			// Wait for form to load
 			await page.WaitForSelectorAsync("form", new PageWaitForSelectorOptions { Timeout = 15000 });
@@ -142,7 +142,7 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that the Issues page has filter/search UI when issues exist.
 	/// </summary>
-	[Fact(Skip = "Fails: #246")]
+	[Fact]
 	public async Task Admin_CanFilterIssuesPage()
 	{
 		// Arrange
@@ -161,7 +161,7 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 			credentials.Value.Password);
 
 			// Act
-			await page.GotoAsync($"{fixture.WebUrl}/issues", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+			await page.GotoAsync($"{fixture.WebUrl.TrimEnd('/')}/issues", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
 			// Assert - Page should load
 			page.Url.Should().Contain("/issues", "should navigate to Issues page");
@@ -211,7 +211,7 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 			credentials.Value.Password);
 
 			// Act
-			await page.GotoAsync($"{fixture.WebUrl}/categories", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+			await page.GotoAsync($"{fixture.WebUrl.TrimEnd('/')}/categories", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
 			// Assert
 			page.Url.Should().Contain("/categories", "should navigate to Categories page");
@@ -225,7 +225,7 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that the Categories page shows archive UI for Admin users.
 	/// </summary>
-	[Fact(Skip = "Fails: #246")]
+	[Fact]
 	public async Task Admin_CanViewCategoriesForArchive()
 	{
 		// Arrange
@@ -244,7 +244,7 @@ public class IssuesCrudFlowTests(PlaywrightFixture fixture)
 			credentials.Value.Password);
 
 			// Act
-			await page.GotoAsync($"{fixture.WebUrl}/categories", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+			await page.GotoAsync($"{fixture.WebUrl.TrimEnd('/')}/categories", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
 			// Assert - Page should load
 			page.Url.Should().Contain("/categories", "should navigate to Categories page");

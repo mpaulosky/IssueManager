@@ -56,7 +56,7 @@ public class AuthorNavigationTests(PlaywrightFixture fixture)
 	/// <summary>
 	/// Verifies that an Author user sees appropriate menu items (Home, Issues, New Issue).
 	/// </summary>
-	[Fact(Skip = "Fails: #246")]
+	[Fact]
 	public async Task Author_SeesAppropriateMenuItems()
 	{
 		// Arrange
@@ -78,9 +78,9 @@ public class AuthorNavigationTests(PlaywrightFixture fixture)
 			await page.GotoAsync(fixture.WebUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
 			// Assert - Author should see basic menu items
-			var homeLink = page.Locator("a[href='/']").First;
-			var issuesLink = page.Locator("a[href='/issues']");
-			var newIssueLink = page.Locator("a[href='/issues/create']");
+			var homeLink = page.Locator("nav[aria-label='Main navigation'] a[href='/']").First;
+			var issuesLink = page.Locator("nav[aria-label='Main navigation'] a[href='/issues']");
+			var newIssueLink = page.Locator("nav[aria-label='Main navigation'] a[href='/issues/create']");
 
 			(await homeLink.IsVisibleAsync()).Should().BeTrue("Author should see Home link");
 			(await issuesLink.IsVisibleAsync()).Should().BeTrue("Author should see Issues link");
@@ -120,10 +120,10 @@ public class AuthorNavigationTests(PlaywrightFixture fixture)
 			await page.GotoAsync(fixture.WebUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
 
 			// Assert - Author should NOT see admin-only menu items
-			var categoriesLink = page.Locator("a[href='/categories']");
-			var statusesLink = page.Locator("a[href='/statuses']");
-			var adminLink = page.Locator("a[href='/admin']");
-			var sampleDataLink = page.Locator("a[href='/sample-data']");
+			var categoriesLink = page.Locator("nav[aria-label='Main navigation'] a[href='/categories']");
+			var statusesLink = page.Locator("nav[aria-label='Main navigation'] a[href='/statuses']");
+			var adminLink = page.Locator("nav[aria-label='Main navigation'] a[href='/admin']");
+			var sampleDataLink = page.Locator("nav[aria-label='Main navigation'] a[href='/sample-data']");
 
 			(await categoriesLink.IsVisibleAsync())
 				.Should().BeFalse("Author should NOT see Categories link");
