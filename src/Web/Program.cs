@@ -23,23 +23,26 @@ builder.Services.AddOutputCache();
 builder.Services.AddRadzenComponents();
 builder.Services.AddBlazoredLocalStorage();
 
+// Service discovery resolves the API by its AppHost resource name.
+var apiBaseAddress = new Uri($"https+http://{Shared.Constants.Constants.ApiService}");
+
 builder.Services.AddHttpClient<IIssueApiClient, IssueApiClient>(client =>
-	client.BaseAddress = new Uri("https+http://api"))
+	client.BaseAddress = apiBaseAddress)
 	.AddServiceDiscovery()
 	.AddHttpMessageHandler<TokenForwardingHandler>();
 
 builder.Services.AddHttpClient<ICategoryApiClient, CategoryApiClient>(client =>
-	client.BaseAddress = new Uri("https+http://api"))
+	client.BaseAddress = apiBaseAddress)
 	.AddServiceDiscovery()
 	.AddHttpMessageHandler<TokenForwardingHandler>();
 
 builder.Services.AddHttpClient<IStatusApiClient, StatusApiClient>(client =>
-	client.BaseAddress = new Uri("https+http://api"))
+	client.BaseAddress = apiBaseAddress)
 	.AddServiceDiscovery()
 	.AddHttpMessageHandler<TokenForwardingHandler>();
 
 builder.Services.AddHttpClient<ICommentApiClient, CommentApiClient>(client =>
-	client.BaseAddress = new Uri("https+http://api"))
+	client.BaseAddress = apiBaseAddress)
 	.AddServiceDiscovery()
 	.AddHttpMessageHandler<TokenForwardingHandler>();
 
@@ -58,7 +61,7 @@ app.UseAuthorization();
 app.UseAntiforgery();
 app.UseOutputCache();
 
-app.MapGet("/auth/login", async void (HttpContext httpContext, string returnUrl = "/") =>
+app.MapGet("/auth/login", async Task (HttpContext httpContext, string returnUrl = "/") =>
 {
 	var authProperties = new LoginAuthenticationPropertiesBuilder()
 		.WithRedirectUri(returnUrl)
