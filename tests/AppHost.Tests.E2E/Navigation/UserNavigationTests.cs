@@ -139,6 +139,46 @@ public class UserNavigationTests(PlaywrightFixture fixture)
 	}
 
 	/// <summary>
+	/// Verifies that a User opening an admin-only page lands on the Access Denied page,
+	/// not the cookie default /Account/AccessDenied (which doesn't exist).
+	/// </summary>
+	[Fact]
+	public async Task User_OpeningAdminPage_ShowsAccessDenied()
+	{
+		// Arrange
+		var credentials = Auth0LoginHelper.GetTestCredentials(UserRole);
+		if (credentials is null)
+			throw SkipException.ForSkip("User test credentials not configured (Auth0:User:Username/Password)");
+
+		var page = await fixture.NewPageAsync();
+
+		try
+		{
+			await Auth0LoginHelper.LoginAsync(
+				page,
+				fixture.WebUrl,
+				credentials.Value.Email,
+				credentials.Value.Password);
+
+			(await Auth0LoginHelper.IsLoggedInAsync(page)).Should().BeTrue("User should be logged in before opening an admin page");
+
+			// Act
+			await page.GotoAsync($"{fixture.WebUrl.TrimEnd('/')}/admin",
+				new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+
+			// Assert
+			new Uri(page.Url).AbsolutePath.Should().Be("/not-authorized",
+				$"a User opening /admin should be sent to the Access Denied page, but URL is: {page.Url}");
+			(await page.GetByRole(AriaRole.Heading, new() { Name = "Access Denied" }).IsVisibleAsync())
+				.Should().BeTrue("the Access Denied heading should be visible");
+		}
+		finally
+		{
+			await page.Context.CloseAsync();
+		}
+	}
+
+	/// <summary>
 	/// Verifies that a User can navigate to the Issues page.
 	/// </summary>
 	[Fact]
