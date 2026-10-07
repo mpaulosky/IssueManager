@@ -62,6 +62,7 @@ See [LICENSE](LICENSE) for details.
 
 | Version | Date | Title | Blog post |
 | ------- | ---- | ----- | --------- |
+| [v0.0.53](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.53) | 2026-10-07 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-07-pr-257-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.52](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.52) | 2026-10-05 | chore: Re-apply the repo-ci-baseline Template for the release-post fixes | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-255-chore-re-apply-the-repo-ci-baseline-template-for-the-release-post-fixes.md) |
 | [v0.0.51](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.51) | 2026-10-05 | chore: Use pnpm instead of npm and npx in the gate, hooks and Squad skill | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-252-chore-use-pnpm-instead-of-npm-and-npx-in-the-gate-hooks-and-squad-skill.md) |
 | [v0.0.50](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.50) | 2026-10-05 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-251-chore-re-apply-the-repo-ci-baseline-template.md) |
@@ -71,7 +72,6 @@ See [LICENSE](LICENSE) for details.
 | [v0.0.46](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.46) | 2026-10-02 | chore: drop leaked Context7 MCP key and stale security policies | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-02-pr-237-chore-drop-leaked-context7-mcp-key-and-stale-security-policies.md) |
 | [v0.0.45](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.45) | 2026-09-30 | ci: Merge a PR only after Copilot's review and resolved threads | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-235-ci-merge-a-pr-only-after-copilot-s-review-and-resolved-threads.md) |
 | [v0.0.44](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.44) | 2026-09-30 | docs: Point the rest of CONTRIBUTING.md at main | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-233-docs-point-the-rest-of-contributing-md-at-main.md) |
-| [v0.0.43](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.43) | 2026-09-30 | ci(hooks): Adopt the shared branch-name standard | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-09-30-pr-231-ci-hooks-adopt-the-shared-branch-name-standard.md) |
 
 <!-- RELEASES_END -->
 
