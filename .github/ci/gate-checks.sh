@@ -18,3 +18,15 @@ set -euo pipefail
 
 base="${1-}"
 : "$base"
+
+# Sandcastle's type check and tests (pnpm run test:sandcastle), when this
+# branch changes Sandcastle, the root Node packages it runs on, or the branch
+# and PR title scripts its tests run its branch names and PR titles through.
+# Without a merge base every file counts as changed. CI doesn't run this file,
+# so the pre-push gate and .sandcastle/check.sh are where those tests run.
+sandcastle_paths=(.sandcastle package.json pnpm-lock.yaml pnpm-workspace.yaml scripts/check-branch-name.sh scripts/check-pr-title.sh)
+if [[ -z "$base" ]] || ! git diff --quiet "$base" HEAD -- "${sandcastle_paths[@]}"; then
+  echo "Sandcastle changed: running pnpm run test:sandcastle"
+  pnpm install --frozen-lockfile --silent
+  pnpm run test:sandcastle
+fi
