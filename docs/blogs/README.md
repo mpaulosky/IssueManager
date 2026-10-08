@@ -4,6 +4,7 @@ This directory contains concise release-review posts for merged PR releases.
 
 | Date | Title | Tags |
 | ---- | ----- | ---- |
+| 2026-10-08 | [fix(Tests): Give the E2E host fake Auth0 settings when none are set](2026-10-08-pr-282-fix-tests-give-the-e2e-host-fake-auth0-settings-when-none-are-set.md) | release,automation |
 | 2026-10-08 | [chore: Commit the Sandcastle setup](2026-10-08-pr-276-chore-commit-the-sandcastle-setup.md) | release,automation |
 | 2026-10-08 | [chore: Re-apply the repo-ci-baseline Template](2026-10-08-pr-277-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
 | 2026-10-08 | [chore: Re-apply the repo-ci-baseline Template](2026-10-08-pr-274-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
