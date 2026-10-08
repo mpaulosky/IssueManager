@@ -62,6 +62,7 @@ See [LICENSE](../LICENSE) for details.
 
 | Version | Date | Title | Blog post |
 | ------- | ---- | ----- | --------- |
+| [v0.0.61](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.61) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-274-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.60](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.60) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-272-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.59](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.59) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-270-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.58](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.58) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-268-chore-re-apply-the-repo-ci-baseline-template.md) |
@@ -71,7 +72,6 @@ See [LICENSE](../LICENSE) for details.
 | [v0.0.54](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.54) | 2026-10-07 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-07-pr-260-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.53](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.53) | 2026-10-07 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-07-pr-257-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.52](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.52) | 2026-10-05 | chore: Re-apply the repo-ci-baseline Template for the release-post fixes | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-255-chore-re-apply-the-repo-ci-baseline-template-for-the-release-post-fixes.md) |
-| [v0.0.51](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.51) | 2026-10-05 | chore: Use pnpm instead of npm and npx in the gate, hooks and Squad skill | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-252-chore-use-pnpm-instead-of-npm-and-npx-in-the-gate-hooks-and-squad-skill.md) |
 
 <!-- RELEASES_END -->
 
