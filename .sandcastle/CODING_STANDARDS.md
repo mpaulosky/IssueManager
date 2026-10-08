@@ -30,8 +30,10 @@ When this summary and those files disagree, those files win.
   markers in test methods.
 - Never change the code under test just to make a test pass; fix the implementation or the test to match the
   intended behaviour.
-- The gate is `bash scripts/gate.sh`: it lints the changed Markdown, YAML, workflow and shell files, builds the
-  solution with warnings as errors, and runs every test project.
+- In the sandbox, the check is `.sandcastle/check.sh`: it lints the changed Markdown, builds the solution with
+  warnings as errors, and runs every test project that doesn't need Docker, then the Sandcastle tests. The sandbox
+  has no Docker, on purpose, so the test projects that reference Testcontainers or Aspire.Hosting.Testing are
+  skipped there. The host's pre-push gate (`scripts/gate.sh`) and CI run every test project, those included.
 
 ## Architecture
 

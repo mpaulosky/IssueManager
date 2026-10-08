@@ -7,14 +7,21 @@
 //                               each issue's branch (lib/branches.mts).
 //   Phase 2 (Execute + Review): For each issue, a sandbox is created via
 //                               createSandbox(). The implementer runs first
-//                               (100 iterations). If it signals completion, a
+//                               (100 iterations). If it signals completion and
+//                               .sandcastle/check.sh passes in the sandbox, a
 //                               reviewer runs in the same sandbox on the same
-//                               branch (1 iteration). All issue pipelines run
-//                               concurrently via Promise.allSettled().
+//                               branch (1 iteration), and the check runs again.
+//                               All issue pipelines run concurrently via
+//                               Promise.allSettled().
 //   Phase 3 (Merge):            A single agent merges the completed branches
 //                               (the implementer and reviewer both signalled
-//                               completion after the gate passed) into the
-//                               current branch.
+//                               completion, and the host's check passed) into
+//                               the current branch.
+//
+// The sandbox has no Docker, on purpose: the host's Docker socket would give
+// the agents, who read public issue content, root on the host. So check.sh
+// skips the Docker-backed test projects; the host's pre-push gate
+// (scripts/gate.sh) and CI run those.
 //
 // The outer loop repeats up to MAX_ITERATIONS times so that newly unblocked
 // issues are picked up after each round of merges. It stops early when a
@@ -28,6 +35,7 @@ import * as sandcastle from "@ai-hero/sandcastle";
 import { docker } from "@ai-hero/sandcastle/sandboxes/docker";
 import { z } from "zod";
 import { branchFor, localIssueBranches, openSandcastleIssues } from "./lib/branches.mts";
+import { runCheck, tail } from "./lib/check.mts";
 
 // The planner emits its plan as JSON inside <plan> tags; Output.object extracts
 // and validates it against this schema. We use Zod here, but any Standard
@@ -60,8 +68,9 @@ const hooks = {
 // platform-specific binaries and any packages added since the last copy.
 const copyToWorktree = ["node_modules"];
 
-// What the implementer and reviewer print once their work is done and the
-// gate passes (see implement-prompt.md and review-prompt.md).
+// What the implementer and reviewer print once their work is done and
+// .sandcastle/check.sh passes (see implement-prompt.md and review-prompt.md).
+// The host runs the check itself before it believes them.
 const COMPLETE = "<promise>COMPLETE</promise>";
 
 // The branch the run started on: issue branches are cut from it, the reviewer
@@ -73,6 +82,20 @@ const baseBranch = execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
 }).trim();
 if (baseBranch === "HEAD") {
   throw new Error("Run Sandcastle from a branch, not a detached HEAD.");
+}
+
+// Runs .sandcastle/check.sh in the issue's sandbox and logs a failure's last
+// lines. Its exit code, not an agent's completion signal, decides.
+async function checkPasses(
+  sandbox: Parameters<typeof runCheck>[0],
+  issue: { id: string; branch: string },
+  when: string,
+): Promise<boolean> {
+  const check = await runCheck(sandbox);
+  if (!check.passed) {
+    console.log(`  ${issue.id} (${issue.branch}): .sandcastle/check.sh failed ${when}:\n${tail(check.output, 40)}`);
+  }
+  return check.passed;
 }
 
 // ---------------------------------------------------------------------------
@@ -170,10 +193,13 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
 
         // The implementer may commit partial work and stop without
         // finishing (out of iterations, or blocked). Only a run that printed
-        // the completion signal, which the prompt allows only once the gate
-        // passes, is reviewed and counted complete. Partial work stays on
+        // the completion signal, and whose branch then passes the host's
+        // check, is reviewed and counted complete. Partial work stays on
         // the issue's branch, and a later round picks the branch up again.
         if (implement.completionSignal !== COMPLETE) {
+          return { commits: implement.commits, complete: false };
+        }
+        if (!(await checkPasses(sandbox, issue, "after the implementer"))) {
           return { commits: implement.commits, complete: false };
         }
 
@@ -189,11 +215,13 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
         });
 
         // Merge commits from both runs: each sandbox.run() only returns
-        // commits from its own run.
-        return {
-          commits: [...implement.commits, ...review.commits],
-          complete: review.completionSignal === COMPLETE,
-        };
+        // commits from its own run. A reviewer that committed changed the
+        // branch, so the host checks it again.
+        const commits = [...implement.commits, ...review.commits];
+        const complete =
+          review.completionSignal === COMPLETE &&
+          (review.commits.length === 0 || (await checkPasses(sandbox, issue, "after the reviewer")));
+        return { commits, complete };
       } finally {
         await sandbox.close();
       }
@@ -254,7 +282,8 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   // Phase 3: Merge
   //
   // One agent merges all completed branches into the current branch,
-  // resolving any conflicts and running tests to confirm everything works.
+  // resolving any conflicts and running .sandcastle/check.sh to confirm
+  // everything works.
   //
   // The {{BRANCHES}} and {{ISSUES}} prompt arguments are lists that the agent
   // uses to know which branches to merge and which issues to close.

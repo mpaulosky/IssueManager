@@ -35,16 +35,15 @@ If applicable, use RGR to complete the task.
 
 # FEEDBACK LOOPS
 
-Run the repository's gate, the same one the pre-push hook runs: `bash scripts/gate.sh`. It lints the changed files,
-builds the solution with warnings as errors, and runs every test project.
+Before each commit, run `.sandcastle/check.sh`. It lints the changed Markdown, builds the solution with warnings as
+errors, runs every test project that doesn't need Docker, then the Sandcastle tests. The host runs it too before it
+counts the issue complete, so its exit code decides, not what you report.
 
-The sandbox has no Docker, so the Docker-backed test projects (`tests/Api.Tests.Integration` and
-`tests/AppHost.Tests.E2E`) can't run here. If the gate gets that far and fails only on one of them for want of Docker,
-run each remaining test project from `python3 .github/scripts/discover_tests.py --list` with
-`dotnet test <project> --configuration Release`. The pre-push hook on the host runs the full gate before anything is
-pushed.
+The sandbox has no Docker, on purpose, so don't try to run `scripts/gate.sh` or the Docker-backed test projects (those
+that reference Testcontainers or Aspire.Hosting.Testing). The host's pre-push gate runs them before anything is
+pushed, and CI runs every test project.
 
-Only commit work that passes the gate.
+Only commit work that passes `.sandcastle/check.sh`.
 
 # COMMIT
 
@@ -64,8 +63,8 @@ If the task is not complete, leave a comment on the issue with what was done.
 
 Do not close the issue - this will be done later.
 
-Once the task is complete and the gate passes, output <promise>COMPLETE</promise>. Don't output it for partial work:
-the branch is then left unmerged and picked up again in a later round.
+Once the task is complete and `.sandcastle/check.sh` passes, output <promise>COMPLETE</promise>. Don't output it for
+partial work: the branch is then left unmerged and picked up again in a later round.
 
 # FINAL RULES
 

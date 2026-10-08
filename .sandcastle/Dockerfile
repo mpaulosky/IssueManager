@@ -1,7 +1,9 @@
 FROM node:22-bookworm
 
 # Install system dependencies. python3 runs .github/scripts/discover_tests.py
-# for the gate; libicu is the .NET SDK's globalization dependency.
+# for .sandcastle/check.sh; libicu is the .NET SDK's globalization dependency.
+# There is no Docker, on purpose: the host's Docker socket would give the
+# agents root on the host. check.sh skips the test projects that need Docker.
 RUN apt-get update && apt-get install -y \
   git \
   curl \
@@ -10,7 +12,7 @@ RUN apt-get update && apt-get install -y \
   libicu72 \
   && rm -rf /var/lib/apt/lists/*
 
-# Install the .NET SDK the gate (scripts/gate.sh) builds and tests with.
+# Install the .NET SDK .sandcastle/check.sh builds and tests with.
 # global.json pins 10.0.x with rollForward latestMinor, so the latest GA SDK
 # on the 10.0 channel satisfies it, and keeps satisfying it as Dependabot
 # bumps global.json within 10.0. Rebuild the image to pick up a newer SDK;
