@@ -35,7 +35,7 @@ import * as sandcastle from "@ai-hero/sandcastle";
 import { docker } from "@ai-hero/sandcastle/sandboxes/docker";
 import { z } from "zod";
 import { branchFor, localIssueBranches, openSandcastleIssues } from "./lib/branches.mts";
-import { runCheck, tail } from "./lib/check.mts";
+import { type BaseCheck, baseCheck, headOf, runCheck, tail } from "./lib/check.mts";
 
 // The planner emits its plan as JSON inside <plan> tags; Output.object extracts
 // and validates it against this schema. We use Zod here, but any Standard
@@ -73,6 +73,9 @@ const copyToWorktree = ["node_modules"];
 // The host runs the check itself before it believes them.
 const COMPLETE = "<promise>COMPLETE</promise>";
 
+// The label that hands an issue to a person (see lib/branches.mts).
+const NEEDS_HUMAN = "sandcastle:needs-human";
+
 // The branch the run started on: issue branches are cut from it, the reviewer
 // diffs against it, and the merger merges into it. Sandcastle's built-in
 // {{TARGET_BRANCH}} can't serve here, since inside a createSandbox() sandbox
@@ -84,17 +87,28 @@ if (baseBranch === "HEAD") {
   throw new Error("Run Sandcastle from a branch, not a detached HEAD.");
 }
 
-// Runs .sandcastle/check.sh in the issue's sandbox and logs a failure's last
-// lines. Its exit code, not an agent's completion signal, decides.
-// It runs the base branch's copy of the check (see lib/check.mts).
+// Runs the base's .sandcastle/check.sh in the issue's sandbox (see
+// lib/check.mts) and logs a failure's last lines. Its exit code, not an
+// agent's completion signal, decides. A branch that changes the check's own
+// files goes to a person: the issue is labelled sandcastle:needs-human, which
+// keeps it out of later plans until the owner removes the label.
 async function checkPasses(
   sandbox: Parameters<typeof runCheck>[0],
   issue: { id: string; branch: string },
+  base: BaseCheck,
   when: string,
 ): Promise<boolean> {
-  const check = await runCheck(sandbox, baseBranch);
+  const check = await runCheck(sandbox, base);
   if (!check.passed) {
     console.log(`  ${issue.id} (${issue.branch}): .sandcastle/check.sh failed ${when}:\n${tail(check.output, 40)}`);
+  }
+  if (check.needsHuman) {
+    const body =
+      `Sandcastle stopped work on this issue: branch \`${issue.branch}\` changes the files ` +
+      `\`.sandcastle/check.sh\` relies on, so the host can't trust its check. A person needs to review it.\n\n` +
+      `\`\`\`text\n${tail(check.output, 20)}\n\`\`\``;
+    execFileSync("gh", ["issue", "edit", issue.id, "--add-label", NEEDS_HUMAN]);
+    execFileSync("gh", ["issue", "comment", issue.id, "--body", body]);
   }
   return check.passed;
 }
@@ -105,6 +119,11 @@ async function checkPasses(
 
 for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   console.log(`\n=== Iteration ${iteration}/${MAX_ITERATIONS} ===\n`);
+
+  // Pin the base branch and its check.sh before any agent of this round runs:
+  // agents share the repo's refs, so the name alone could be moved under us.
+  // Each round re-reads it, after the last round's merge.
+  const base = baseCheck(baseBranch);
 
   // -------------------------------------------------------------------------
   // Phase 1: Plan
@@ -139,7 +158,7 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   const issues = plan.output.issues.flatMap(({ id }) => {
     const issue = openIssues.find((open) => String(open.number) === id);
     if (!issue) {
-      console.warn(`  Skipping ${id}: not an open issue labelled Sandcastle.`);
+      console.warn(`  Skipping ${id}: not an open issue labelled Sandcastle, or it waits on a person.`);
       return [];
     }
     return [{ id, title: issue.title, branch: branchFor(issue, existingBranches) }];
@@ -200,10 +219,13 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
         if (implement.completionSignal !== COMPLETE) {
           return { commits: implement.commits, complete: false };
         }
-        if (!(await checkPasses(sandbox, issue, "after the implementer"))) {
+        if (!(await checkPasses(sandbox, issue, base, "after the implementer"))) {
           return { commits: implement.commits, complete: false };
         }
 
+        // A reviewer can rewrite the branch without adding commits (a reset
+        // or a rebase), so the host compares HEAD, not the commit count.
+        const checkedHead = await headOf(sandbox);
         const review = await sandbox.run({
           name: "reviewer",
           maxIterations: 1,
@@ -216,12 +238,13 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
         });
 
         // Merge commits from both runs: each sandbox.run() only returns
-        // commits from its own run. A reviewer that committed changed the
+        // commits from its own run. A reviewer that moved HEAD changed the
         // branch, so the host checks it again.
         const commits = [...implement.commits, ...review.commits];
+        const unchanged = checkedHead !== undefined && (await headOf(sandbox)) === checkedHead;
         const complete =
           review.completionSignal === COMPLETE &&
-          (review.commits.length === 0 || (await checkPasses(sandbox, issue, "after the reviewer")));
+          (unchanged || (await checkPasses(sandbox, issue, base, "after the reviewer")));
         return { commits, complete };
       } finally {
         await sandbox.close();

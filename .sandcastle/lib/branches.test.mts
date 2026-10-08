@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { describe, it } from "node:test";
-import { branchFor, isIssueBranch, slugFor } from "./branches.mts";
+import { branchFor, isIssueBranch, isQueued, slugFor } from "./branches.mts";
 
 const issue = (number: number, title: string, labels: string[] = ["Sandcastle"]) => ({ number, title, labels });
 
@@ -77,5 +77,15 @@ describe("branchFor", () => {
         assert.ok(passesBranchStandard(branch), `${branch} fails scripts/check-branch-name.sh`);
       }
     }
+  });
+});
+
+describe("isQueued", () => {
+  it("queues a Sandcastle issue", () => {
+    assert.equal(isQueued({ labels: ["Sandcastle", "bug"] }), true);
+  });
+
+  it("holds back an issue handed to a person", () => {
+    assert.equal(isQueued({ labels: ["Sandcastle", "sandcastle:needs-human"] }), false);
   });
 });
