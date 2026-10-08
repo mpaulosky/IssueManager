@@ -7,6 +7,8 @@
 // Project Name :  AppHost.Tests.E2E
 // =============================================
 
+using Microsoft.Extensions.Configuration;
+
 using Testcontainers.MongoDb;
 
 namespace AppHost.Tests.E2E.Fixtures;
@@ -99,6 +101,8 @@ public sealed class PlaywrightFixture : IAsyncLifetime
 			clientBuilder.AddStandardResilienceHandler();
 		});
 
+		UseFakeAuth0WhenUnconfigured(_builder);
+
 		_app = await _builder.BuildAsync(CancellationToken.None);
 
 		// Start the app and wait for the web app's health check, with one timeout
@@ -121,6 +125,38 @@ public sealed class PlaywrightFixture : IAsyncLifetime
 		{
 			Headless = true
 		});
+	}
+
+	/// <summary>
+	/// Gives the web app and the API fake Auth0 settings when nothing configures Auth0, so the host still starts.
+	/// </summary>
+	/// <remarks>
+	/// Both read Auth0 from the user secrets this project shares with them, or from environment variables (CI's
+	/// TEST_ENV secret). Dependabot runs get neither, and without them the API throws at startup and the web app
+	/// crashes on UseAuthentication. The fake domain is never reached: the tests that log in skip without
+	/// credentials, and the rest only need the host up.
+	/// </remarks>
+	private static void UseFakeAuth0WhenUnconfigured(IDistributedApplicationTestingBuilder builder)
+	{
+		var configuration = new ConfigurationBuilder()
+			.AddUserSecrets(typeof(PlaywrightFixture).Assembly, optional: true)
+			.AddEnvironmentVariables()
+			.Build();
+
+		if (!string.IsNullOrEmpty(configuration["Auth0:Domain"]))
+		{
+			return;
+		}
+
+		const string fakeDomain = "issuemanager-e2e.invalid";
+
+		builder.CreateResourceBuilder<ProjectResource>(Website)
+			.WithEnvironment("Auth0__Domain", fakeDomain)
+			.WithEnvironment("Auth0__ClientId", "e2e-fake-client-id");
+
+		builder.CreateResourceBuilder<ProjectResource>(ApiService)
+			.WithEnvironment("Auth0__Domain", fakeDomain)
+			.WithEnvironment("Auth0__Audience", "https://issuemanager-e2e.invalid/api");
 	}
 
 	public async ValueTask DisposeAsync()
