@@ -140,7 +140,7 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 		// fixture uses when Auth0 isn't configured.
 		if (!Auth0LoginHelper.IsAuth0Configured)
 		{
-			throw SkipException.ForSkip("Auth0 not configured (Auth0:Domain)");
+			throw SkipException.ForSkip("Auth0 not configured (Auth0:Domain, Auth0:ClientId, Auth0:Audience)");
 		}
 
 		// Arrange
