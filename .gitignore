@@ -310,6 +310,9 @@ FakesAssemblies/
 # Node.js Tools for Visual Studio
 .ntvs_analysis.dat
 node_modules/
+# pnpm puts its store at the repo root when the home folder is on another
+# file system, as in the Sandcastle sandbox, where the worktree is bind-mounted.
+.pnpm-store/
 
 # Visual Studio 6 build log
 *.plg
