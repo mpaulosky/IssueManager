@@ -33,7 +33,7 @@ When this summary and those files disagree, those files win.
 - In the sandbox, the check is `.sandcastle/check.sh`: it lints the changed Markdown, builds the solution with
   warnings as errors, and runs every test project that doesn't need Docker, then the Sandcastle tests. The sandbox
   has no Docker, on purpose, so the test projects that reference Testcontainers or Aspire.Hosting.Testing are
-  skipped there. The host's pre-push gate (`scripts/gate.sh`) and CI run every test project, those included.
+  skipped there. CI runs every test project on the pull request, those included.
 
 ## Architecture
 

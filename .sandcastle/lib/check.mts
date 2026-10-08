@@ -61,3 +61,10 @@ export async function runCheck(sandbox: Pick<Sandbox, "exec">, baseBranch: strin
 export function tail(output: string, lines: number): string {
   return output.replace(/\n$/, "").split("\n").slice(-lines).join("\n");
 }
+
+// Text quoted in a fence longer than any run of backticks inside it.
+export function fenced(text: string): string {
+  const longestRun = Math.max(0, ...[...text.matchAll(/`+/g)].map((match) => match[0].length));
+  const fence = "`".repeat(Math.max(3, longestRun + 1));
+  return `${fence}text\n${text}\n${fence}`;
+}
