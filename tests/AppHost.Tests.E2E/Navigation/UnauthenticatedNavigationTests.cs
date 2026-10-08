@@ -136,6 +136,13 @@ public class UnauthenticatedNavigationTests(PlaywrightFixture fixture)
 	[Fact]
 	public async Task Unauthenticated_ProtectedRouteRedirectsToLogin()
 	{
+		// The redirect ends in an Auth0 challenge, which fails on the fake settings the
+		// fixture uses when Auth0 isn't configured.
+		if (!Auth0LoginHelper.IsAuth0Configured)
+		{
+			throw SkipException.ForSkip("Auth0 not configured (Auth0:Domain, Auth0:ClientId, Auth0:Audience)");
+		}
+
 		// Arrange
 		var page = await fixture.NewPageAsync();
 
