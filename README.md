@@ -62,6 +62,7 @@ See [LICENSE](LICENSE) for details.
 
 | Version | Date | Title | Blog post |
 | ------- | ---- | ----- | --------- |
+| [v0.0.57](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.57) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-266-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.56](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.56) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-264-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.55](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.55) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-262-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.54](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.54) | 2026-10-07 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-07-pr-260-chore-re-apply-the-repo-ci-baseline-template.md) |
@@ -71,7 +72,6 @@ See [LICENSE](LICENSE) for details.
 | [v0.0.50](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.50) | 2026-10-05 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-251-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.49](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.49) | 2026-10-05 | fix: Make the 11 skipped E2E tests pass | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-249-fix-make-the-11-skipped-e2e-tests-pass.md) |
 | [v0.0.48](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.48) | 2026-10-05 | fix: Start the E2E host so its Playwright tests run instead of skipping | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-247-fix-start-the-e2e-host-so-its-playwright-tests-run-instead-of-skipping.md) |
-| [v0.0.47](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.47) | 2026-10-05 | ci: Standardize on the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-241-ci-standardize-on-the-repo-ci-baseline-template.md) |
 
 <!-- RELEASES_END -->
 
