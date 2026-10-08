@@ -62,6 +62,7 @@ See [LICENSE](../LICENSE) for details.
 
 | Version | Date | Title | Blog post |
 | ------- | ---- | ----- | --------- |
+| [v0.0.63](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.63) | 2026-10-08 | chore: Commit the Sandcastle setup | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-276-chore-commit-the-sandcastle-setup.md) |
 | [v0.0.62](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.62) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-277-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.61](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.61) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-274-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.60](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.60) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-272-chore-re-apply-the-repo-ci-baseline-template.md) |
@@ -71,7 +72,6 @@ See [LICENSE](../LICENSE) for details.
 | [v0.0.56](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.56) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-264-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.55](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.55) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-262-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.54](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.54) | 2026-10-07 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-07-pr-260-chore-re-apply-the-repo-ci-baseline-template.md) |
-| [v0.0.53](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.53) | 2026-10-07 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-07-pr-257-chore-re-apply-the-repo-ci-baseline-template.md) |
 
 <!-- RELEASES_END -->
 
