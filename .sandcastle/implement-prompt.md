@@ -36,8 +36,11 @@ If applicable, use RGR to complete the task.
 # FEEDBACK LOOPS
 
 Before each commit, run `.sandcastle/check.sh`. It lints the changed Markdown, builds the solution with warnings as
-errors, runs every test project that doesn't need Docker, then the Sandcastle tests. The host runs it too before it
-counts the issue complete, so its exit code decides, not what you report.
+errors, runs every test project that doesn't need Docker, then the Sandcastle tests. The host runs the base branch's
+copy too before it counts the issue complete, so its exit code decides, not what you report. Don't change
+`.sandcastle/check.sh`, `.github/scripts/discover_tests.py` or `.github/ci/gate-checks.sh`: the host fails a branch
+that does, and leaves those changes for a human. If this branch has no `.sandcastle/check.sh` yet, merge the branch
+it was cut from into it first.
 
 The sandbox has no Docker, on purpose, so don't try to run `scripts/gate.sh` or the Docker-backed test projects (those
 that reference Testcontainers or Aspire.Hosting.Testing). The host's pre-push gate runs them before anything is

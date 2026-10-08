@@ -86,12 +86,13 @@ if (baseBranch === "HEAD") {
 
 // Runs .sandcastle/check.sh in the issue's sandbox and logs a failure's last
 // lines. Its exit code, not an agent's completion signal, decides.
+// It runs the base branch's copy of the check (see lib/check.mts).
 async function checkPasses(
   sandbox: Parameters<typeof runCheck>[0],
   issue: { id: string; branch: string },
   when: string,
 ): Promise<boolean> {
-  const check = await runCheck(sandbox);
+  const check = await runCheck(sandbox, baseBranch);
   if (!check.passed) {
     console.log(`  ${issue.id} (${issue.branch}): .sandcastle/check.sh failed ${when}:\n${tail(check.output, 40)}`);
   }
