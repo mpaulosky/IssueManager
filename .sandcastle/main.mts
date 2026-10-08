@@ -1,4 +1,4 @@
-// Parallel Planner with Review — four-phase orchestration loop
+// Parallel Planner with Review — three-phase orchestration loop
 //
 // This template drives a multi-phase workflow:
 //   Phase 1 (Plan):             An opus agent analyzes open issues, builds a
@@ -7,21 +7,23 @@
 //                               each issue's branch (lib/branches.mts).
 //   Phase 2 (Execute + Review): For each issue, a sandbox is created via
 //                               createSandbox(). The implementer runs first
-//                               (100 iterations). If it produces commits, a
+//                               (100 iterations). If it signals completion, a
 //                               reviewer runs in the same sandbox on the same
 //                               branch (1 iteration). All issue pipelines run
 //                               concurrently via Promise.allSettled().
-//   Phase 3 (Merge):            A single agent merges all completed branches
-//                               into the current branch.
+//   Phase 3 (Merge):            A single agent merges the completed branches
+//                               (the implementer and reviewer both signalled
+//                               completion after the gate passed) into the
+//                               current branch.
 //
 // The outer loop repeats up to MAX_ITERATIONS times so that newly unblocked
-// issues are picked up after each round of merges.
+// issues are picked up after each round of merges. It stops early when a
+// round produces no commits at all, since nothing changed to replan.
 //
-// Usage:
-//   npx tsx .sandcastle/main.mts
-// Or add to package.json:
-//   "scripts": { "sandcastle": "npx tsx .sandcastle/main.mts" }
+// Usage (from the repo root, on the branch the work should land on):
+//   pnpm dlx tsx .sandcastle/main.mts
 
+import { execFileSync } from "node:child_process";
 import * as sandcastle from "@ai-hero/sandcastle";
 import { docker } from "@ai-hero/sandcastle/sandboxes/docker";
 import { z } from "zod";
@@ -46,15 +48,32 @@ const planSchema = z.object({
 const MAX_ITERATIONS = 10;
 
 // Hooks run inside the sandbox before the agent starts each iteration.
-// npm install ensures the sandbox always has fresh dependencies.
+// pnpm (the version pinned by package.json's packageManager, enabled in the
+// image through corepack) installs exactly what pnpm-lock.yaml records, and
+// fails rather than re-resolve when the lockfile is out of date.
 const hooks = {
-  sandbox: { onSandboxReady: [{ command: "npm install" }] },
+  sandbox: { onSandboxReady: [{ command: "pnpm install --frozen-lockfile" }] },
 };
 
 // Copy node_modules from the host into the worktree before each sandbox
-// starts. Avoids a full npm install from scratch; the hook above handles
+// starts. Avoids a full install from scratch; the hook above handles
 // platform-specific binaries and any packages added since the last copy.
 const copyToWorktree = ["node_modules"];
+
+// What the implementer and reviewer print once their work is done and the
+// gate passes (see implement-prompt.md and review-prompt.md).
+const COMPLETE = "<promise>COMPLETE</promise>";
+
+// The branch the run started on: issue branches are cut from it, the reviewer
+// diffs against it, and the merger merges into it. Sandcastle's built-in
+// {{TARGET_BRANCH}} can't serve here, since inside a createSandbox() sandbox
+// it names the issue branch itself, so the review prompt uses BASE_BRANCH.
+const baseBranch = execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
+  encoding: "utf8",
+}).trim();
+if (baseBranch === "HEAD") {
+  throw new Error("Run Sandcastle from a branch, not a detached HEAD.");
+}
 
 // ---------------------------------------------------------------------------
 // Main loop
@@ -120,7 +139,7 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   //
   // For each issue, create a sandbox via createSandbox() so the implementer
   // and reviewer share the same sandbox instance per branch. The implementer
-  // runs first; if it produces commits, the reviewer runs in the same sandbox.
+  // runs first; if it signals completion, the reviewer runs in the same sandbox.
   //
   // Promise.allSettled means one failing pipeline doesn't cancel the others.
   // -------------------------------------------------------------------------
@@ -129,6 +148,7 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
     issues.map(async (issue) => {
       const sandbox = await sandcastle.createSandbox({
         branch: issue.branch,
+        baseBranch,
         sandbox: docker(),
         hooks,
         copyToWorktree,
@@ -148,27 +168,32 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
           },
         });
 
-        // Only review if the implementer produced commits
-        if (implement.commits.length > 0) {
-          const review = await sandbox.run({
-            name: "reviewer",
-            maxIterations: 1,
-            agent: sandcastle.claudeCode("claude-opus-4-8"),
-            promptFile: "./.sandcastle/review-prompt.md",
-            promptArgs: {
-              BRANCH: issue.branch,
-            },
-          });
-
-          // Merge commits from both runs so the merge phase sees all of them.
-          // Each sandbox.run() only returns commits from its own run.
-          return {
-            ...review,
-            commits: [...implement.commits, ...review.commits],
-          };
+        // The implementer may commit partial work and stop without
+        // finishing (out of iterations, or blocked). Only a run that printed
+        // the completion signal, which the prompt allows only once the gate
+        // passes, is reviewed and counted complete. Partial work stays on
+        // the issue's branch, and a later round picks the branch up again.
+        if (implement.completionSignal !== COMPLETE) {
+          return { commits: implement.commits, complete: false };
         }
 
-        return implement;
+        const review = await sandbox.run({
+          name: "reviewer",
+          maxIterations: 1,
+          agent: sandcastle.claudeCode("claude-opus-4-8"),
+          promptFile: "./.sandcastle/review-prompt.md",
+          promptArgs: {
+            BRANCH: issue.branch,
+            BASE_BRANCH: baseBranch,
+          },
+        });
+
+        // Merge commits from both runs: each sandbox.run() only returns
+        // commits from its own run.
+        return {
+          commits: [...implement.commits, ...review.commits],
+          complete: review.completionSignal === COMPLETE,
+        };
       } finally {
         await sandbox.close();
       }
@@ -184,29 +209,44 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
     }
   }
 
-  // Only pass branches that actually produced commits to the merge phase.
-  // An agent that ran successfully but made no commits has nothing to merge.
-  const completedIssues = settled
-    .map((outcome, i) => ({ outcome, issue: issues[i]! }))
-    .filter(
-      (entry) =>
-        entry.outcome.status === "fulfilled" &&
-        entry.outcome.value.commits.length > 0,
-    )
-    .map((entry) => entry.issue);
+  const results = settled.map((outcome, i) => ({
+    issue: issues[i]!,
+    commits: outcome.status === "fulfilled" ? outcome.value.commits.length : 0,
+    complete: outcome.status === "fulfilled" && outcome.value.complete,
+  }));
+
+  if (results.every((result) => result.commits === 0)) {
+    // No pipeline changed anything, so the next plan would pick the same
+    // issues and repeat the same runs. Stop rather than burn iterations.
+    console.log("\nNo commits produced this round. Stopping.");
+    break;
+  }
+
+  // Only branches whose implementer and reviewer both signalled completion
+  // go to the merge phase, which closes their issues.
+  const completedIssues = results
+    .filter((result) => result.complete && result.commits > 0)
+    .map((result) => result.issue);
+
+  for (const result of results) {
+    if (result.commits > 0 && !result.complete) {
+      console.log(`  ${result.issue.id} (${result.issue.branch}) is not complete; left unmerged.`);
+    }
+  }
 
   const completedBranches = completedIssues.map((i) => i.branch);
 
   console.log(
-    `\nExecution complete. ${completedBranches.length} branch(es) with commits:`,
+    `\nExecution complete. ${completedBranches.length} completed branch(es):`,
   );
   for (const branch of completedBranches) {
     console.log(`  ${branch}`);
   }
 
   if (completedBranches.length === 0) {
-    // All agents ran but none made commits — nothing to merge this cycle.
-    console.log("No commits produced. Nothing to merge.");
+    // Some work was committed but nothing finished: the next round picks
+    // the unfinished branches up again.
+    console.log("Nothing complete to merge this round.");
     continue;
   }
 

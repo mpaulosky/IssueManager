@@ -94,6 +94,31 @@ updates:
         patterns:
           - "*"
 
+  # Maintain the root pnpm packages (Sandcastle and Zod, for .sandcastle/)
+  - package-ecosystem: "npm"
+    directory: "/"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "16:00"
+    open-pull-requests-limit: 10
+    # Wait a week before proposing a new release, so a compromised or broken
+    # one is usually caught upstream before it reaches a PR here.
+    cooldown:
+      default-days: 7
+    # Conventional commits, like the repo's own: "chore(deps): bump ...".
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "npm"
+      - "dependencies"
+    groups:
+      all-npm:
+        patterns:
+          - "*"
+
   # Maintain the web project's pnpm packages (Tailwind CLI)
   - package-ecosystem: "npm"
     directory: "/src/Web"

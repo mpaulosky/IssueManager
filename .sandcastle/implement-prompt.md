@@ -35,7 +35,16 @@ If applicable, use RGR to complete the task.
 
 # FEEDBACK LOOPS
 
-Before committing, run `npm run typecheck` and `npm run test` to ensure the tests pass.
+Run the repository's gate, the same one the pre-push hook runs: `bash scripts/gate.sh`. It lints the changed files,
+builds the solution with warnings as errors, and runs every test project.
+
+The sandbox has no Docker, so the Docker-backed test projects (`tests/Api.Tests.Integration` and
+`tests/AppHost.Tests.E2E`) can't run here. If the gate gets that far and fails only on one of them for want of Docker,
+run each remaining test project from `python3 .github/scripts/discover_tests.py --list` with
+`dotnet test <project> --configuration Release`. The pre-push hook on the host runs the full gate before anything is
+pushed.
+
+Only commit work that passes the gate.
 
 # COMMIT
 
@@ -55,7 +64,8 @@ If the task is not complete, leave a comment on the issue with what was done.
 
 Do not close the issue - this will be done later.
 
-Once complete, output <promise>COMPLETE</promise>.
+Once the task is complete and the gate passes, output <promise>COMPLETE</promise>. Don't output it for partial work:
+the branch is then left unmerged and picked up again in a later round.
 
 # FINAL RULES
 
