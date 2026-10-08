@@ -62,6 +62,7 @@ See [LICENSE](LICENSE) for details.
 
 | Version | Date | Title | Blog post |
 | ------- | ---- | ----- | --------- |
+| [v0.0.59](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.59) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-270-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.58](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.58) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-268-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.57](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.57) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-266-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.56](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.56) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-264-chore-re-apply-the-repo-ci-baseline-template.md) |
@@ -71,7 +72,6 @@ See [LICENSE](LICENSE) for details.
 | [v0.0.52](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.52) | 2026-10-05 | chore: Re-apply the repo-ci-baseline Template for the release-post fixes | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-255-chore-re-apply-the-repo-ci-baseline-template-for-the-release-post-fixes.md) |
 | [v0.0.51](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.51) | 2026-10-05 | chore: Use pnpm instead of npm and npx in the gate, hooks and Squad skill | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-252-chore-use-pnpm-instead-of-npm-and-npx-in-the-gate-hooks-and-squad-skill.md) |
 | [v0.0.50](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.50) | 2026-10-05 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-251-chore-re-apply-the-repo-ci-baseline-template.md) |
-| [v0.0.49](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.49) | 2026-10-05 | fix: Make the 11 skipped E2E tests pass | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-05-pr-249-fix-make-the-11-skipped-e2e-tests-pass.md) |
 
 <!-- RELEASES_END -->
 
