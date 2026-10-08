@@ -24,6 +24,13 @@ public static class Auth0LoginHelper
 		.Build();
 
 	/// <summary>
+	/// Gets whether Auth0 is configured for the web app and the API, through the user secrets this project shares
+	/// with them or Auth0__Domain in the environment. Without it the E2E host runs on fake Auth0 settings, so an
+	/// Auth0 challenge fails.
+	/// </summary>
+	public static bool IsAuth0Configured => !string.IsNullOrEmpty(Configuration["Auth0:Domain"]);
+
+	/// <summary>
 	/// Gets test credentials for a role from Auth0:{role}:Username and Auth0:{role}:Password
 	/// (Auth0__{role}__Username and Auth0__{role}__Password as environment variables).
 	/// </summary>

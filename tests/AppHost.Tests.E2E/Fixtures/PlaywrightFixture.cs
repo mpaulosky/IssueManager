@@ -7,8 +7,6 @@
 // Project Name :  AppHost.Tests.E2E
 // =============================================
 
-using Microsoft.Extensions.Configuration;
-
 using Testcontainers.MongoDb;
 
 namespace AppHost.Tests.E2E.Fixtures;
@@ -133,17 +131,14 @@ public sealed class PlaywrightFixture : IAsyncLifetime
 	/// <remarks>
 	/// Both read Auth0 from the user secrets this project shares with them, or from environment variables (CI's
 	/// TEST_ENV secret). Dependabot runs get neither, and without them the API throws at startup and the web app
-	/// crashes on UseAuthentication. The fake domain is never reached: the tests that log in skip without
-	/// credentials, and the rest only need the host up.
+	/// crashes on UseAuthentication. The fake domain can't be reached, so any Auth0 challenge (/auth/login)
+	/// fails. The tests that log in skip without credentials, the one that follows the redirect to /auth/login
+	/// skips without Auth0 settings (<see cref="Auth0LoginHelper.IsAuth0Configured"/>), and the rest only need
+	/// the host up.
 	/// </remarks>
 	private static void UseFakeAuth0WhenUnconfigured(IDistributedApplicationTestingBuilder builder)
 	{
-		var configuration = new ConfigurationBuilder()
-			.AddUserSecrets(typeof(PlaywrightFixture).Assembly, optional: true)
-			.AddEnvironmentVariables()
-			.Build();
-
-		if (!string.IsNullOrEmpty(configuration["Auth0:Domain"]))
+		if (Auth0LoginHelper.IsAuth0Configured)
 		{
 			return;
 		}
