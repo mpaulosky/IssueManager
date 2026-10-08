@@ -134,13 +134,23 @@ public sealed class PlaywrightFixture : IAsyncLifetime
 	/// crashes on UseAuthentication. The fake domain can't be reached, so any Auth0 challenge (/auth/login)
 	/// fails. The tests that log in skip without credentials, the one that follows the redirect to /auth/login
 	/// skips without Auth0 settings (<see cref="Auth0LoginHelper.IsAuth0Configured"/>), and the rest only need
-	/// the host up.
+	/// the host up. Fakes are used only when none of the settings is set: a partial setup is a mistake, so it
+	/// throws and names the missing keys, rather than letting the login tests run against the fake domain.
 	/// </remarks>
 	private static void UseFakeAuth0WhenUnconfigured(IDistributedApplicationTestingBuilder builder)
 	{
-		if (Auth0LoginHelper.IsAuth0Configured)
+		var missing = Auth0LoginHelper.MissingAuth0Settings;
+
+		if (missing.Count == 0)
 		{
 			return;
+		}
+
+		if (missing.Count < Auth0LoginHelper.RequiredAuth0Settings.Count)
+		{
+			throw new InvalidOperationException(
+				$"Auth0 is only partly configured; missing {string.Join(", ", missing)}. Set all of " +
+				$"{string.Join(", ", Auth0LoginHelper.RequiredAuth0Settings)}, or none to run on fake settings.");
 		}
 
 		const string fakeDomain = "issuemanager-e2e.invalid";
