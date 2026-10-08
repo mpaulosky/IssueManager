@@ -24,6 +24,25 @@ public static class Auth0LoginHelper
 		.Build();
 
 	/// <summary>
+	/// The Auth0 settings the web app and the API need to start: Domain, the web app's ClientId and the API's
+	/// Audience.
+	/// </summary>
+	public static readonly IReadOnlyList<string> RequiredAuth0Settings = ["Auth0:Domain", "Auth0:ClientId", "Auth0:Audience"];
+
+	/// <summary>
+	/// Gets the <see cref="RequiredAuth0Settings"/> that neither the user secrets this project shares with the apps
+	/// nor Auth0__* environment variables set.
+	/// </summary>
+	public static IReadOnlyList<string> MissingAuth0Settings =>
+		[.. RequiredAuth0Settings.Where(key => string.IsNullOrEmpty(Configuration[key]))];
+
+	/// <summary>
+	/// Gets whether every one of the <see cref="RequiredAuth0Settings"/> is set. When none is, the E2E host runs on
+	/// fake Auth0 settings, so an Auth0 challenge fails.
+	/// </summary>
+	public static bool IsAuth0Configured => MissingAuth0Settings.Count == 0;
+
+	/// <summary>
 	/// Gets test credentials for a role from Auth0:{role}:Username and Auth0:{role}:Password
 	/// (Auth0__{role}__Username and Auth0__{role}__Password as environment variables).
 	/// </summary>
