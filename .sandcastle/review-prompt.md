@@ -47,13 +47,12 @@ Review the code changes on branch `{{BRANCH}}` and improve code clarity, consist
 If you find improvements to make:
 
 1. Make the changes directly on this branch
-2. Run the repository's gate, `bash scripts/gate.sh`, to ensure nothing is broken. The sandbox has no Docker, so if
-   the gate fails only on `tests/Api.Tests.Integration` or `tests/AppHost.Tests.E2E` for want of Docker, run each
-   remaining project from `python3 .github/scripts/discover_tests.py --list` with
-   `dotnet test <project> --configuration Release`
+2. Run `.sandcastle/check.sh` to ensure nothing is broken. It builds the solution and runs every test project that
+   doesn't need Docker. The sandbox has no Docker, on purpose: the host's pre-push gate and CI run the Docker-backed
+   test projects
 3. Commit describing the refinements
 
 If the code is already clean and well-structured, do nothing.
 
-Once complete, and the gate passes on the branch, output <promise>COMPLETE</promise>. If you can't get the gate to pass,
-don't output it: the branch is then left unmerged.
+Once complete, and `.sandcastle/check.sh` passes on the branch, output <promise>COMPLETE</promise>. If you can't get it
+to pass, don't output it: the branch is then left unmerged. If you commit, the host runs the check again.

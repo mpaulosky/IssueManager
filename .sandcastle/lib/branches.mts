@@ -58,7 +58,8 @@ export function localIssueBranches(): string[] {
     .filter(Boolean);
 }
 
-// The open issues labelled Sandcastle, the same list the planner reads.
+// The open issues labelled Sandcastle, the same list the planner reads, less
+// those handed to a person.
 export function openSandcastleIssues(): BranchIssue[] {
   const json = execFileSync(
     "gh",
@@ -66,5 +67,13 @@ export function openSandcastleIssues(): BranchIssue[] {
     { encoding: "utf8" },
   );
   const issues = JSON.parse(json) as { number: number; title: string; labels: { name: string }[] }[];
-  return issues.map(({ number, title, labels }) => ({ number, title, labels: labels.map((label) => label.name) }));
+  return issues
+    .map(({ number, title, labels }) => ({ number, title, labels: labels.map((label) => label.name) }))
+    .filter(isQueued);
+}
+
+// Whether Sandcastle may work an issue: not while it's handed to a person
+// with sandcastle:needs-human. The owner removing the label re-queues it.
+export function isQueued(issue: Pick<BranchIssue, "labels">): boolean {
+  return !issue.labels.includes("sandcastle:needs-human");
 }
