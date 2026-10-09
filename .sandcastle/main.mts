@@ -136,6 +136,11 @@ function commitOf(branch: string): string | undefined {
   }
 }
 
+// Whether a commit adds anything to the base branch.
+function aheadOfBase(commit: string): boolean {
+  return execFileSync("git", ["rev-list", "--count", `${baseBranch}..${commit}`], { encoding: "utf8" }).trim() !== "0";
+}
+
 // Pin the base branch and its check.sh once, before any agent runs: agents
 // share the repo's refs, so the name alone could be moved under us. No
 // branch that changes the check's files is merged, so they can't change
@@ -301,7 +306,13 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
     checked: outcome.status === "fulfilled" ? outcome.value.checked : undefined,
   }));
 
-  if (results.every((result) => result.commits === 0)) {
+  // A checked commit that adds to the base is progress even when this round
+  // made no commits: an earlier round's work that failed the check then (a
+  // flaky test, say) and passes now.
+  const mergeable = (result: (typeof results)[number]) =>
+    result.complete && result.checked !== undefined && aheadOfBase(result.checked);
+
+  if (results.every((result) => result.commits === 0 && !mergeable(result))) {
     // No pipeline changed anything, so the next plan would pick the same
     // issues and repeat the same runs. Stop rather than burn iterations.
     console.log("\nNo commits produced this round. Stopping.");
@@ -313,7 +324,7 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   // The merger merges the commit the host checked, and only while the branch
   // still points to it: any agent could have moved the branch since.
   const completed = results.filter((result) => {
-    if (!result.complete || result.commits === 0 || result.checked === undefined) return false;
+    if (!mergeable(result)) return false;
     if (commitOf(result.issue.branch) === result.checked) return true;
     console.log(`  ${result.issue.id} (${result.issue.branch}) moved after the host checked it; left unmerged.`);
     return false;
@@ -347,7 +358,9 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   //
   // One agent merges all completed branches into the current branch,
   // resolving any conflicts and running .sandcastle/check.sh to confirm
-  // everything works.
+  // everything works. The host doesn't re-check the merged result, a known
+  // gap: the next round's checks run on top of it, and the pre-push gate
+  // runs everything before any of it is pushed.
   //
   // The {{BRANCHES}} and {{ISSUES}} prompt arguments are lists that the agent
   // uses to know which branches to merge and which issues to close.

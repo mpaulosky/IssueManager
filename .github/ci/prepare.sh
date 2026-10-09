@@ -48,8 +48,22 @@ trust_dev_cert() {
   echo "SSL_CERT_DIR=${trust_dir}:${system_dir}" >> "${GITHUB_ENV:-/dev/null}"
 }
 
+# Sandcastle's orchestration code (.sandcastle/): run its tests when the PR
+# changes it or the root package files, as the local gate's
+# .github/ci/gate-checks.sh does. Without an origin/main to compare with, run them.
+sandcastle_tests() {
+  local base
+  if base="$(git merge-base HEAD origin/main 2>/dev/null)" \
+    && git diff --quiet --no-renames "$base" HEAD -- .sandcastle package.json pnpm-lock.yaml; then
+    echo "No Sandcastle or root package changes to test."
+    return
+  fi
+  pnpm install --frozen-lockfile
+  pnpm run test:sandcastle
+}
+
 case "$job" in
-  build) enable_pnpm ;;
+  build) enable_pnpm; sandcastle_tests ;;
   test)
     enable_pnpm
     if [[ "$test_name" == "AppHost.Tests.E2E" ]]; then

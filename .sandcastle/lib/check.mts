@@ -68,9 +68,11 @@ export async function headOf(sandbox: Pick<Sandbox, "exec">): Promise<string | u
 export async function runCheck(sandbox: Pick<Sandbox, "exec">, base: BaseCheck): Promise<CheckRun> {
   // What the branch changed since it left the base (three dots), so a base
   // that moved on since doesn't count against it.
-  const changed = await sandbox.exec(`${run} git diff --name-only ${base.sha}...HEAD -- ${checkFiles.join(" ")} 2>&1`);
+  // Only stdout lists files; a warning on stderr (say, multiple merge bases)
+  // mustn't read as one.
+  const changed = await sandbox.exec(`${run} git diff --name-only ${base.sha}...HEAD -- ${checkFiles.join(" ")}`);
   if (changed.exitCode !== 0) {
-    return { passed: false, output: `git diff failed, so the check's own files can't be shown unchanged:\n${changed.stdout}` };
+    return { passed: false, output: `git diff failed, so the check's own files can't be shown unchanged:\n${changed.stderr}` };
   }
   if (changed.stdout.trim()) {
     return {
@@ -85,9 +87,9 @@ export async function runCheck(sandbox: Pick<Sandbox, "exec">, base: BaseCheck):
 
   // pnpm leaves its store at the worktree's root in the sandbox; a branch
   // cut before .gitignore listed it would otherwise never pass.
-  const status = await sandbox.exec(`${run} git status --porcelain -- . ':(exclude).pnpm-store' 2>&1`);
+  const status = await sandbox.exec(`${run} git status --porcelain -- . ':(exclude).pnpm-store'`);
   if (status.exitCode !== 0) {
-    return { passed: false, output: `${stdout}\ngit status failed, so the worktree can't be shown to be clean:\n${status.stdout}` };
+    return { passed: false, output: `${stdout}\ngit status failed, so the worktree can't be shown to be clean:\n${status.stderr}` };
   }
   if (status.stdout.trim()) {
     return { passed: false, output: `${stdout}\nThe check passed, but the worktree has uncommitted changes:\n${status.stdout}` };
