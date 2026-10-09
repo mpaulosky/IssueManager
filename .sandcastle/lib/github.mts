@@ -3,7 +3,8 @@
 // every write (comments, pushes, pull requests) is made here, in code.
 
 import { execFileSync } from "node:child_process";
-import { sh } from "./shell.mts";
+import { tmpdir } from "node:os";
+import { REPO } from "./config.mts";
 
 // The author associations whose text may reach an agent. Anyone else can open
 // or comment on a public issue, so their words could steer an agent.
@@ -51,16 +52,15 @@ export function trustedIssues(raw: readonly RawIssue[]): { issues: SandcastleIss
   return { issues, untrusted };
 }
 
-let repo: { owner: string; name: string } | undefined;
-
-// The repository in the current directory. Read on first use rather than at
-// import, so importing a module never shells out to gh.
-export function repoName(): { owner: string; name: string } {
-  if (!repo) {
-    const [owner, name] = sh(process.cwd(), "gh", "repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner").split("/");
-    repo = { owner: owner!, name: name! };
-  }
-  return repo;
+// Run gh for REPO from a neutral folder, so it never reads the clone's
+// agent-writable git config (gh resolves a repo from the local remotes).
+function gh(args: string[], input?: string): string {
+  return execFileSync("gh", args, {
+    cwd: tmpdir(),
+    encoding: "utf8",
+    stdio: [input === undefined ? "ignore" : "pipe", "pipe", "inherit"],
+    input,
+  }).trim();
 }
 
 const issuesQuery = `
@@ -107,9 +107,9 @@ export function isQueued(issue: Pick<SandcastleIssue, "labels">): boolean {
 // The open issues labelled Sandcastle and not handed to a person, keeping only
 // what trusted authors wrote.
 export function listSandcastleIssues(): SandcastleIssue[] {
-  const { owner, name } = repoName();
+  const [owner, name] = REPO.split("/");
   const response = JSON.parse(
-    sh(process.cwd(), "gh", "api", "graphql", "-f", `query=${issuesQuery}`, "-F", `owner=${owner}`, "-F", `name=${name}`),
+    gh(["api", "graphql", "-f", `query=${issuesQuery}`, "-F", `owner=${owner}`, "-F", `name=${name}`]),
   ) as IssuesResponse;
   const { pageInfo, nodes } = response.data.repository.issues;
   if (pageInfo.hasNextPage) console.warn("  More than 100 open Sandcastle issues: only the first 100 are considered.");
@@ -144,22 +144,17 @@ const pullRequestFields = ["headRefName", "isCrossRepository", "url"].join(",");
 // The head branches of the open same-repo pull requests.
 export function openPullRequestBranches(): string[] {
   const prs = JSON.parse(
-    sh(process.cwd(), "gh", "pr", "list", "--state", "open", "--limit", "1000", "--json", pullRequestFields),
+    gh(["pr", "list", "-R", REPO, "--state", "open", "--limit", "1000", "--json", pullRequestFields]),
   ) as PullRequestHead[];
   return sameRepoPullRequests(prs).map((pr) => pr.headRefName);
 }
 
 export function commentOnIssue(issue: number, body: string): void {
-  execFileSync("gh", ["issue", "comment", String(issue), "--body-file", "-"], {
-    cwd: process.cwd(),
-    encoding: "utf8",
-    stdio: ["pipe", "pipe", "inherit"],
-    input: body,
-  });
+  gh(["issue", "comment", String(issue), "-R", REPO, "--body-file", "-"], body);
 }
 
 export function labelIssue(issue: number, label: string): void {
-  execFileSync("gh", ["issue", "edit", String(issue), "--add-label", label], { stdio: ["ignore", "ignore", "inherit"] });
+  gh(["issue", "edit", String(issue), "-R", REPO, "--add-label", label]);
 }
 
 // Open a draft pull request for the branch, or return the open same-repo one
@@ -168,13 +163,9 @@ export function labelIssue(issue: number, label: string): void {
 export function openPullRequest(branch: string, title: string, body: string): string {
   const existing = sameRepoPullRequests(
     JSON.parse(
-      sh(process.cwd(), "gh", "pr", "list", "--head", branch, "--state", "open", "--json", pullRequestFields),
+      gh(["pr", "list", "-R", REPO, "--head", branch, "--state", "open", "--json", pullRequestFields]),
     ) as PullRequestHead[],
   )[0];
   if (existing) return existing.url;
-  return execFileSync(
-    "gh",
-    ["pr", "create", "--draft", "--base", "main", "--head", branch, "--title", title, "--body-file", "-"],
-    { cwd: process.cwd(), encoding: "utf8", stdio: ["pipe", "pipe", "inherit"], input: body },
-  ).trim();
+  return gh(["pr", "create", "-R", REPO, "--draft", "--base", "main", "--head", branch, "--title", title, "--body-file", "-"], body);
 }

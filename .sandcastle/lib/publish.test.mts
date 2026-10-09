@@ -47,7 +47,7 @@ describe("prBody", () => {
   it("uses the template's headings, quotes the review and fixes the issue", () => {
     const body = prBody({ number: 42, title: "Add search" }, "Clean.\nTested.");
     for (const heading of ["## Why", "## What changed", "## Verification"]) assert.ok(body.includes(heading), heading);
-    assert.ok(body.includes("> Clean.\n> Tested."));
+    assert.ok(body.includes("```text\nClean.\nTested.\n```"));
     assert.ok(body.endsWith("Fixes #42"));
   });
 });

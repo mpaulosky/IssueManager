@@ -2,7 +2,7 @@
 // so re-planning an issue always lands on the branch that holds its earlier
 // work, and every name passes scripts/check-branch-name.sh.
 
-import { sh, worktreeGit } from "./shell.mts";
+import { fetchFromOrigin, liveRepos, localBranches, remoteBranches, syncLocalBranch } from "./git.mts";
 
 const maxSlugLength = 50;
 
@@ -72,51 +72,34 @@ export function uniqueIssues<T extends { number: number }>(issues: readonly T[])
   return issues.filter((issue) => !seen.has(issue.number) && seen.add(issue.number));
 }
 
-// Branch names from `git ls-remote --heads` output, without refs/heads/.
-export function parseHeads(lsRemote: string): string[] {
-  return lsRemote
-    .split("\n")
-    .filter(Boolean)
-    .map((line) => line.split("\t")[1]!.replace(/^refs\/heads\//, ""));
-}
-
 // The git operations prepareBranches needs; tests pass a stub.
 export type IssueBranchGit = {
   // The issue branches on origin.
   remoteBranches(): string[];
   // The issue branches in this clone, where unpublished work stays.
   localBranches(): string[];
-  // Fetch origin's branch into its remote-tracking ref.
+  // Bring origin's branch into the clone, and its local branch up to date.
   fetch(branch: string): void;
 };
 
-const cloneGit: IssueBranchGit = {
-  remoteBranches: () =>
-    parseHeads(
-      sh(process.cwd(), "git", "ls-remote", "--heads", "origin", ...issuePrefixes.map((prefix) => `refs/heads/${prefix}/*`)),
-    ),
-  localBranches: () =>
-    sh(process.cwd(), "git", "for-each-ref", "--format=%(refname:short)", ...issuePrefixes.map((prefix) => `refs/heads/${prefix}/`))
-      .split("\n")
-      .filter(Boolean),
-  fetch: (branch) => {
-    sh(process.cwd(), "git", "fetch", "--quiet", "origin", `+refs/heads/${branch}:refs/remotes/origin/${branch}`);
-  },
+const liveGit = (): IssueBranchGit => {
+  const repos = liveRepos();
+  return {
+    remoteBranches: () => remoteBranches(repos, issuePrefixes.map((prefix) => `refs/heads/${prefix}/*`)),
+    localBranches: () => localBranches(repos, issuePrefixes.map((prefix) => `refs/heads/${prefix}/`)),
+    fetch: (branch) => {
+      fetchFromOrigin(repos, branch);
+      syncLocalBranch(repos, branch);
+    },
+  };
 };
-
-// Refresh origin/main, the base of every new issue branch and of every diff
-// the reviewer reads. Done once per round, before the pipelines start, because
-// concurrent fetches would contend on the same ref lock.
-export function fetchMain(): void {
-  sh(process.cwd(), "git", "fetch", "--quiet", "origin", "main");
-}
 
 // Name each issue's branch from the issue branches on origin and in this
 // clone, and fetch the ones that exist on origin, so the sandbox starts from
 // the work already pushed rather than from main.
 export function prepareBranches<T extends BranchIssue>(
   issues: readonly T[],
-  git: IssueBranchGit = cloneGit,
+  git: IssueBranchGit = liveGit(),
 ): { issue: T; branch: string }[] {
   const remote = git.remoteBranches();
   const existing = [...new Set([...remote, ...git.localBranches()])];
@@ -125,59 +108,4 @@ export function prepareBranches<T extends BranchIssue>(
     if (remote.includes(branch)) git.fetch(branch);
     return { issue, branch };
   });
-}
-
-// The commit the worktree has checked out, and the branch it's on ("HEAD"
-// when detached), read on the host.
-export function worktreeHead(worktreePath: string): { sha: string; branch: string } {
-  return {
-    sha: worktreeGit(worktreePath, "rev-parse", "HEAD"),
-    branch: worktreeGit(worktreePath, "rev-parse", "--abbrev-ref", "HEAD"),
-  };
-}
-
-// The functions below take the base as the commit the host pinned for the
-// round (see baseCheck in lib/check.mts), not as a ref name: agents share the
-// clone's refs, so they could move origin/main.
-
-// Count the commits at `sha` that the base doesn't have.
-export function commitsAhead(worktreePath: string, baseSha: string, sha: string): number {
-  return Number(worktreeGit(worktreePath, "rev-list", "--count", `${baseSha}..${sha}`));
-}
-
-// Whether `sha` already holds everything on the base.
-export function containsBase(worktreePath: string, baseSha: string, sha: string): boolean {
-  try {
-    worktreeGit(worktreePath, "merge-base", "--is-ancestor", baseSha, sha);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-// Merge the base branch into the worktree's branch when it's behind, so the
-// work is built, checked and reviewed against current main and its PR can
-// merge. Returns false, with the merge undone, when it conflicts; the
-// implementer is then asked to merge it.
-export function mergeBase(worktreePath: string, baseSha: string): boolean {
-  if (containsBase(worktreePath, baseSha, "HEAD")) return true;
-  try {
-    worktreeGit(worktreePath, "merge", "--no-edit", baseSha);
-    return true;
-  } catch {
-    try {
-      worktreeGit(worktreePath, "merge", "--abort");
-    } catch {
-      // Nothing to abort: the merge failed before it started.
-    }
-    return false;
-  }
-}
-
-// Push exactly the commit the host checked, never whatever the branch points
-// at by then. Not forced: a branch on origin that has commits this one lacks
-// fails the push rather than losing them. No hooks run (see worktreeGit), so
-// the pre-push gate's Docker test suites are left to CI.
-export function pushChecked(worktreePath: string, sha: string, branch: string): void {
-  worktreeGit(worktreePath, "push", "--quiet", "origin", `${sha}:refs/heads/${branch}`);
 }

@@ -1,33 +1,33 @@
-// Parallel Planner with Review: plan → build → review → pull request loop
+// Parallel Planner with Review: plan → build → review → pull request, one round
 //
-//   Phase 1 (Plan):   The host reads the open Sandcastle issues with its own gh
-//                     auth, keeping only issues and comments from the owner,
-//                     members and collaborators, and holds back every issue
-//                     handed to a person (sandcastle:needs-human) or that
-//                     already has an open same-repo PR. A planner agent
-//                     picks the ones that can be built in parallel. The host
-//                     names each issue's branch (lib/branches.mts).
-//   Phase 2 (Build):  For each issue, in its own sandbox (lib/build.mts): the
-//                     host merges origin/main into the branch, the implementer
-//                     works the issue, the host runs .sandcastle/check.sh, a
-//                     reviewer refines the change and returns an approve or
-//                     reject verdict, and the host checks again if HEAD moved.
-//                     An approved branch's checked commit is pushed and gets
-//                     its own draft PR that fixes the issue; anything else
-//                     gets a comment on the issue and isn't pushed. All
-//                     pipelines run concurrently.
+//   Plan:   The host reads the open Sandcastle issues with its own gh auth,
+//           keeping only issues and comments from the owner, members and
+//           collaborators, and leaving out those handed to a person
+//           (sandcastle:needs-human). Issues that already have an open
+//           same-repo PR can't be picked, but the planner sees them, since
+//           they still block the issues that depend on them. A planner
+//           agent picks the ready issues that can be built in parallel, and
+//           the host names each issue's branch (lib/branches.mts).
+//   Build:  For each issue, in its own sandbox (lib/build.mts): origin/main is
+//           merged into the branch, the implementer works the issue, the host
+//           runs .sandcastle/check.sh, a reviewer refines the change and
+//           returns an approve or reject verdict, and the host checks again
+//           if HEAD moved. An approved branch's checked commit is pushed and
+//           gets its own draft PR that fixes the issue; anything else gets a
+//           comment on the issue and isn't pushed. All pipelines run
+//           concurrently.
 //
-// Nothing is merged into main and no issue is closed here: each change reaches
-// main through its PR and the checks in docs/PROCESS.md, and the PR's
-// "Fixes #n" closes the issue when it merges.
+// One round per run: nothing merges into main during a run (each PR waits for
+// a person), so a second round couldn't unblock anything, and would only
+// retry the issues that stopped. Run it again once PRs have merged.
+//
+// No issue is closed here: each change reaches main through its PR and the
+// checks in docs/PROCESS.md, and the PR's "Fixes #n" closes the issue.
 //
 // The sandbox gets no GitHub token and no Docker. Agents read the issue from
 // their prompt, and every GitHub write (comments, pushes, PRs) is made by the
-// host, in code. The host never runs the worktree's git hooks, since agents
-// can edit them, so the Docker-backed test suites run in CI.
-//
-// The loop repeats up to MAX_ITERATIONS times so that newly unblocked issues
-// are picked up, and stops early when a round opens no pull request.
+// host, in code, with git config the sandbox can't reach (lib/git.mts). The
+// Docker-backed test suites run in CI.
 //
 // Usage (from the repo root, with `gh auth login` done):
 //   pnpm run sandcastle
@@ -36,10 +36,11 @@ import { existsSync, readFileSync } from "node:fs";
 import * as sandcastle from "@ai-hero/sandcastle";
 import { docker } from "@ai-hero/sandcastle/sandboxes/docker";
 import { z } from "zod";
-import { fetchMain, prepareBranches, uniqueIssues, withoutOpenPullRequests } from "./lib/branches.mts";
+import { prepareBranches, uniqueIssues, withoutOpenPullRequests } from "./lib/branches.mts";
 import { buildIssue } from "./lib/build.mts";
 import { baseCheck } from "./lib/check.mts";
-import { BASE_BRANCH, MAX_ITERATIONS, MODEL } from "./lib/config.mts";
+import { BASE_BRANCH, MODEL } from "./lib/config.mts";
+import { fetchFromOrigin, liveRepos } from "./lib/git.mts";
 import { listSandcastleIssues, openPullRequestBranches } from "./lib/github.mts";
 import { plannerPromptArgs } from "./lib/prompts.mts";
 import { githubTokensIn } from "./lib/sandbox-env.mts";
@@ -60,19 +61,17 @@ const planSchema = z.object({
   issues: z.array(z.object({ id: z.string(), title: z.string() })),
 });
 
-for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
-  console.log(`\n=== Iteration ${iteration}/${MAX_ITERATIONS} ===\n`);
-
+async function main(): Promise<void> {
   // -------------------------------------------------------------------------
-  // Phase 1: Plan
+  // Plan
   // -------------------------------------------------------------------------
   const { ready, inReview } = withoutOpenPullRequests(listSandcastleIssues(), openPullRequestBranches());
   for (const issue of inReview) {
     console.log(`  ⏸ #${issue.number} is held back: its pull request is open.`);
   }
   if (ready.length === 0) {
-    console.log("No open Sandcastle issues ready to build. Exiting.");
-    break;
+    console.log("No open Sandcastle issues ready to build.");
+    return;
   }
 
   const plan = await sandcastle.run({
@@ -82,15 +81,15 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
     maxIterations: 1,
     agent: sandcastle.claudeCode(MODEL),
     promptFile: "./.sandcastle/plan-prompt.md",
-    promptArgs: plannerPromptArgs(ready),
+    promptArgs: plannerPromptArgs(ready, inReview),
     // Throws StructuredOutputError if the tag is missing, the JSON is
-    // malformed, or validation fails, which aborts the loop.
+    // malformed, or validation fails, which ends the run.
     output: sandcastle.Output.object({ tag: "plan", schema: planSchema }),
   });
 
-  // Keep only ids from the ready list, so a hallucinated or stale id can't
-  // start work on an issue that wasn't offered, and each issue only once, so
-  // two pipelines never share a branch.
+  // Keep only ids from the ready list, so a hallucinated, stale or in-review
+  // id can't start work on an issue that wasn't offered, and each issue only
+  // once, so two pipelines never share a branch.
   const picks = uniqueIssues(
     plan.output.issues.flatMap(({ id }) => {
       const issue = ready.find((open) => String(open.number) === id);
@@ -98,19 +97,19 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
       return issue ? [issue] : [];
     }),
   );
-
   if (picks.length === 0) {
-    console.log("No unblocked issues to work on. Exiting.");
-    break;
+    console.log("No unblocked issues to work on.");
+    return;
   }
 
   // -------------------------------------------------------------------------
-  // Phase 2: Build, review and publish
+  // Build, review and publish
   // -------------------------------------------------------------------------
-  // Pin the base and its check.sh right after the fetch: agents share the
-  // clone's refs, so every later decision uses this commit, not the ref.
-  fetchMain();
-  const base = baseCheck(BASE_BRANCH);
+  // Pin the base and its check.sh right after the fetch, from the host-only
+  // repo: agents share the clone's refs, so every later decision uses this
+  // commit, not a ref.
+  const repos = liveRepos();
+  const base = baseCheck(fetchFromOrigin(repos, BASE_BRANCH), repos.host);
   const work = prepareBranches(picks);
 
   console.log(`Planning complete. ${work.length} issue(s) to build in parallel:`);
@@ -128,18 +127,13 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
       console.error(`  ✗ #${issue.number} (${branch}) failed: ${outcome.reason}`);
     } else if (outcome.value.prUrl) {
       published.push(`  #${issue.number} (${branch}) → ${outcome.value.prUrl}`);
+    } else {
+      console.log(`  #${issue.number} (${branch}): ${outcome.value.outcome}`);
     }
   }
 
-  console.log(`\nRound complete. ${published.length} pull request(s):`);
+  console.log(`\nDone. ${published.length} pull request(s):`);
   for (const line of published) console.log(line);
-
-  if (published.length === 0) {
-    // Nothing reached a PR, so the next plan would pick the same issues and
-    // repeat the same round. Stop and let a person look at the issue comments.
-    console.log("No pull requests opened this round. Stopping.");
-    break;
-  }
 }
 
-console.log("\nAll done.");
+await main();

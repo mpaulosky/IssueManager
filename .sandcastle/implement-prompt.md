@@ -56,8 +56,9 @@ If applicable, use red-green-refactor to complete the task.
 
 # FEEDBACK LOOPS
 
-Before each commit, run `.sandcastle/check.sh`. It lints the changed Markdown, builds the solution with warnings as
-errors, runs every test project that doesn't need Docker, then the Sandcastle tests. The host runs the base branch's
+Before each commit, run `.sandcastle/check.sh`. It lints the changed Markdown, runs the repo checks (the Sandcastle
+tests among them, when Sandcastle changed), builds the solution with warnings as errors, and runs every test project
+that doesn't need Docker. The host runs the base branch's
 copy too before it publishes the branch, so its exit code decides, not what you report. Don't change
 `.sandcastle/check.sh`, `.github/scripts/discover_tests.py`, `.github/ci/gate-checks.sh` or `package.json`: the host
 fails a branch that does, and hands the issue to a person.

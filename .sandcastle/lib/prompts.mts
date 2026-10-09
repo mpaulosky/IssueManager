@@ -26,6 +26,9 @@ export function issuePromptArgs(issue: SandcastleIssue, branch: string, baseSha:
   };
 }
 
-export function plannerPromptArgs(ready: readonly SandcastleIssue[]) {
-  return { ISSUES_JSON: JSON.stringify(ready) };
+// The ready issues the planner may pick, and the in-review ones it may not
+// but must still count as open: they block whatever depends on them until
+// their PRs merge.
+export function plannerPromptArgs(ready: readonly SandcastleIssue[], inReview: readonly SandcastleIssue[]) {
+  return { ISSUES_JSON: JSON.stringify(ready), IN_REVIEW_JSON: JSON.stringify(inReview) };
 }

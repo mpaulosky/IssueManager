@@ -2,12 +2,12 @@
 // Configuration
 // ---------------------------------------------------------------------------
 
+// The GitHub repository Sandcastle works on. Fixed here rather than read from
+// the clone's remotes, which agents can rewrite.
+export const REPO = "mpaulosky/IssueManager";
+
 // The model every agent runs on.
 export const MODEL = "claude-opus-4-8";
-
-// Maximum number of plan → build → publish rounds before stopping.
-// Raise this if your backlog is large; lower it for a quick smoke-test run.
-export const MAX_ITERATIONS = 10;
 
 // Iterations the implementer gets to finish an issue.
 export const IMPLEMENTER_ITERATIONS = 100;
@@ -18,7 +18,7 @@ export const CHECK_COMMENT_LINES = 100;
 // The branch every issue branch starts from, is kept up to date with, and is
 // reviewed and checked against. The host fetches it once per round and pins
 // the commit (baseCheck in lib/check.mts).
-export const BASE_BRANCH = "origin/main";
+export const BASE_BRANCH = "main";
 
 // Hooks run inside the sandbox before the agent starts. pnpm, through
 // Corepack at the version package.json's "packageManager" pins, installs

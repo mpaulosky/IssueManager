@@ -60,6 +60,18 @@ export async function headOf(sandbox: Pick<Sandbox, "exec">): Promise<string | u
   return head.exitCode === 0 ? head.stdout.trim() : undefined;
 }
 
+// Merge the base into the sandbox's branch when it's behind, so the work is
+// built, checked and reviewed against current main and its PR can merge.
+// Runs in the sandbox, where merge drivers and filters from the agent-writable
+// config can't reach the host. Returns false, with the merge undone, when it
+// conflicts; the implementer is then asked to merge it.
+export async function mergeBaseInSandbox(sandbox: Pick<Sandbox, "exec">, baseSha: string): Promise<boolean> {
+  if ((await sandbox.exec(`${run} git merge-base --is-ancestor ${baseSha} HEAD`)).exitCode === 0) return true;
+  if ((await sandbox.exec(`${run} git merge --no-edit ${baseSha} 2>&1`)).exitCode === 0) return true;
+  await sandbox.exec(`${run} git merge --abort 2>&1`);
+  return false;
+}
+
 // Run the check with stderr folded into stdout, so the output keeps the order
 // it was printed in. The script gets its text as an argument and /dev/null as
 // stdin, so no command in it can read the rest of the script. A passing check

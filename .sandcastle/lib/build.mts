@@ -5,9 +5,9 @@
 
 import * as sandcastle from "@ai-hero/sandcastle";
 import { docker } from "@ai-hero/sandcastle/sandboxes/docker";
-import { commitsAhead, containsBase, mergeBase, pushChecked, worktreeHead } from "./branches.mts";
-import { type BaseCheck, fenced, runCheck, tail } from "./check.mts";
+import { type BaseCheck, fenced, mergeBaseInSandbox, runCheck, tail } from "./check.mts";
 import { BASE_BRANCH, CHECK_COMMENT_LINES, copyToWorktree, hooks, IMPLEMENTER_ITERATIONS, MODEL } from "./config.mts";
+import { commitsAhead, containsBase, liveRepos, pushChecked, worktreeHead } from "./git.mts";
 import { commentOnIssue, labelIssue, NEEDS_HUMAN, openPullRequest, type SandcastleIssue } from "./github.mts";
 import { issuePromptArgs } from "./prompts.mts";
 import { prBody, prTitle } from "./publish.mts";
@@ -20,8 +20,6 @@ export type BuildSandbox = Pick<sandcastle.Sandbox, "run" | "exec" | "close" | "
 export type BuildHost = {
   // A new branch starts at baseSha.
   createSandbox(branch: string, baseSha: string): Promise<BuildSandbox>;
-  // Merge the base into the worktree's branch; false when it conflicts.
-  mergeBase(worktreePath: string, baseSha: string): boolean;
   head(worktreePath: string): { sha: string; branch: string };
   commitsAhead(worktreePath: string, baseSha: string, sha: string): number;
   containsBase(worktreePath: string, baseSha: string, sha: string): boolean;
@@ -35,14 +33,13 @@ export type BuildHost = {
 const liveHost: BuildHost = {
   createSandbox: (branch, baseSha) =>
     sandcastle.createSandbox({ branch, baseBranch: baseSha, sandbox: docker(), hooks, copyToWorktree }),
-  mergeBase,
   head: worktreeHead,
   commitsAhead,
   containsBase,
   commentOnIssue,
   labelIssue,
   publish: (worktreePath, sha, branch, title, body) => {
-    pushChecked(worktreePath, sha, branch);
+    pushChecked(liveRepos(), sha, branch);
     return openPullRequest(branch, title, body);
   },
   log: console.log,
@@ -82,7 +79,7 @@ export async function buildIssue(
     // Bring an existing branch up to date first, so the work is built on
     // current main. A conflict is left to the implementer, which the prompt
     // asks to merge the base branch when it's behind.
-    if (!host.mergeBase(worktree, base.sha)) log(`merging ${BASE_BRANCH} conflicts; left to the implementer`);
+    if (!(await mergeBaseInSandbox(sandbox, base.sha))) log(`merging ${BASE_BRANCH} conflicts; left to the implementer`);
 
     // Implement. A run that throws or uses up its iterations without
     // signalling completion stops the issue for this round.
@@ -174,7 +171,9 @@ export async function buildIssue(
     }
     log(`reviewer ${verdict.approved ? "approved" : "rejected"}`);
     if (!verdict.approved) {
-      return stop("rejected", `Sandcastle's reviewer rejected this issue's change, so ${notPushed}\n\n${verdict.summary}`);
+      // Quoted in a fence: the summary is model output, and as plain text
+      // GitHub would act on its mentions and closing keywords.
+      return stop("rejected", `Sandcastle's reviewer rejected this issue's change, so ${notPushed}\n\n${fenced(verdict.summary)}`);
     }
 
     // Check again whatever the reviewer did to HEAD, committed or not.

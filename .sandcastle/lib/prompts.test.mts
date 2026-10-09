@@ -32,8 +32,16 @@ describe("issuePromptArgs", () => {
   }
 
   it("supplies every placeholder plan-prompt.md uses", () => {
-    const args = plannerPromptArgs([issue]);
+    const args = plannerPromptArgs([issue], []);
     for (const key of placeholders("plan-prompt.md")) assert.ok(key in args, `plan-prompt.md uses {{${key}}}`);
+  });
+});
+
+describe("plannerPromptArgs", () => {
+  it("passes the in-review issues apart from the ready ones", () => {
+    const args = plannerPromptArgs([issue], [{ ...issue, number: 6 }]);
+    assert.deepEqual(JSON.parse(args.ISSUES_JSON).map((i: { number: number }) => i.number), [5]);
+    assert.deepEqual(JSON.parse(args.IN_REVIEW_JSON).map((i: { number: number }) => i.number), [6]);
   });
 });
 

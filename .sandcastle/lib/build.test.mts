@@ -49,6 +49,11 @@ function pipeline(options: {
       return { iterations: [], stdout: "", commits: [], ...result };
     },
     exec: async (command: string) => {
+      if (command.includes("git merge-base --is-ancestor")) return { stdout: "", stderr: "", exitCode: 1 };
+      if (command.includes("git merge --no-edit")) {
+        calls.merged++;
+        return { stdout: "", stderr: "", exitCode: options.mergeBase === false ? 1 : 0 };
+      }
       if (command.includes("git diff --name-only")) {
         return { stdout: options.changesCheckFiles ? "package.json\n" : "", stderr: "", exitCode: 0 };
       }
@@ -67,10 +72,6 @@ function pipeline(options: {
 
   const host: BuildHost = {
     createSandbox: async () => sandbox,
-    mergeBase: () => {
-      calls.merged++;
-      return options.mergeBase ?? true;
-    },
     head: () => head,
     commitsAhead: () => options.ahead ?? 1,
     containsBase: () => options.containsBase ?? true,

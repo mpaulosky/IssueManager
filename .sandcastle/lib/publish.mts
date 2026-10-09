@@ -2,6 +2,7 @@
 // follow docs/PROCESS.md, so the required PR title check passes and the
 // description reads like any other.
 
+import { fenced } from "./check.mts";
 import type { SandcastleIssue } from "./github.mts";
 
 const conventionalTitle = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([^)]+\))?!?: \S/;
@@ -26,9 +27,10 @@ export function prBody(issue: Pick<SandcastleIssue, "number" | "title">, reviewS
     "",
     "## What changed",
     "",
-    "Sandcastle's implementer built the change in a sandbox, and its reviewer approved it:",
+    "Sandcastle's implementer built the change in a sandbox, and its reviewer approved it. The reviewer's summary,",
+    "fenced so GitHub doesn't act on any issue references or mentions in it:",
     "",
-    ...reviewSummary.split("\n").map((line) => `> ${line}`),
+    fenced(reviewSummary),
     "",
     "## Verification",
     "",

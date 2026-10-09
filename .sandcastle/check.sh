@@ -68,7 +68,4 @@ for project in "${TEST_PROJECTS[@]}"; do
 done
 echo "Ran ${ran} of ${#TEST_PROJECTS[@]} test project(s)."
 
-step "Sandcastle tests"
-pnpm run test:sandcastle
-
 echo -e "\n${GREEN}✅ Sandcastle check passed.${RESET}"
