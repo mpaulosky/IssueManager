@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { buildIssue, type BuildHost, type BuildSandbox } from "./build.mts";
 
+const base = { sha: "b0", script: "echo check" };
+
 const issue = { number: 7, title: "Add search", body: "Search issues.", labels: ["Sandcastle"], comments: [] };
 const branch = "feature/7-add-search";
 
@@ -20,11 +22,13 @@ function pipeline(options: {
   containsBase?: boolean;
   mergeBase?: boolean;
   publishError?: Error;
+  changesCheckFiles?: boolean;
 }) {
   const checks = [...(options.checks ?? [true, true])];
   const calls = {
     runs: [] as string[],
     comments: [] as string[],
+    labels: [] as string[],
     published: [] as { sha: string; title: string; body: string }[],
     merged: 0,
     closed: false,
@@ -45,7 +49,10 @@ function pipeline(options: {
       return { iterations: [], stdout: "", commits: [], ...result };
     },
     exec: async (command: string) => {
-      if (command.includes(".sandcastle/check.sh | bash")) {
+      if (command.includes("git diff --name-only")) {
+        return { stdout: options.changesCheckFiles ? "package.json\n" : "", stderr: "", exitCode: 0 };
+      }
+      if (command.includes("bash -c 'echo check'")) {
         const passed = checks.shift();
         if (passed === undefined) throw new Error("check ran more often than scripted");
         return { stdout: passed ? "ok" : "error CS1002", stderr: "", exitCode: passed ? 0 : 1 };
@@ -68,6 +75,7 @@ function pipeline(options: {
     commitsAhead: () => options.ahead ?? 1,
     containsBase: () => options.containsBase ?? true,
     commentOnIssue: (_, body) => calls.comments.push(body),
+    labelIssue: (_, label) => calls.labels.push(label),
     publish: (_, sha, __, title, body) => {
       if (options.publishError) throw options.publishError;
       calls.published.push({ sha, title, body });
@@ -76,7 +84,7 @@ function pipeline(options: {
     log: () => {},
   };
 
-  return { run: () => buildIssue(issue, branch, host), calls, checksLeft: checks };
+  return { run: () => buildIssue(issue, branch, base, host), calls, checksLeft: checks };
 }
 
 describe("buildIssue", () => {
@@ -175,6 +183,14 @@ describe("buildIssue", () => {
     assert.equal((await run()).outcome, "nothing-to-publish");
     assert.deepEqual(calls.runs, ["implementer"]);
     assert.deepEqual(calls.comments, []);
+  });
+
+  it("hands the issue to a person when the branch changes the check's own files", async () => {
+    const { run, calls } = pipeline({ changesCheckFiles: true });
+    assert.equal((await run()).outcome, "needs-human");
+    assert.deepEqual(calls.labels, ["sandcastle:needs-human"]);
+    assert.match(calls.comments[0]!, /A person needs to review it/);
+    assert.deepEqual(calls.published, []);
   });
 
   it("reports a failed push on the issue", async () => {

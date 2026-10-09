@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { sameRepoPullRequests, trustedIssues, type RawIssue } from "./github.mts";
+import { isQueued, NEEDS_HUMAN, sameRepoPullRequests, trustedIssues, type RawIssue } from "./github.mts";
 
 const raw = (number: number, authorAssociation: string, comments: RawIssue["comments"] = []): RawIssue => ({
   number,
@@ -49,5 +49,12 @@ describe("sameRepoPullRequests", () => {
       { headRefName: "feature/3-add-search", isCrossRepository: false, url: "https://github.com/o/r/pull/2" },
     ];
     assert.deepEqual(sameRepoPullRequests(prs).map((pr) => pr.headRefName), ["feature/3-add-search"]);
+  });
+});
+
+describe("isQueued", () => {
+  it("holds back an issue handed to a person", () => {
+    assert.equal(isQueued({ labels: ["Sandcastle"] }), true);
+    assert.equal(isQueued({ labels: ["Sandcastle", NEEDS_HUMAN] }), false);
   });
 });

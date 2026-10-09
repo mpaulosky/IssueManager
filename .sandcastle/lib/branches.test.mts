@@ -8,7 +8,6 @@ import {
   branchFor,
   commitsAhead,
   containsBase,
-  headOf,
   isIssueBranch,
   mergeBase,
   parseHeads,
@@ -16,6 +15,7 @@ import {
   pushChecked,
   slugFor,
   uniqueIssues,
+  worktreeHead,
   withoutOpenPullRequests,
 } from "./branches.mts";
 
@@ -177,8 +177,8 @@ describe("worktree git", () => {
     const repo = setup();
     try {
       const sha = repo.commit("a.txt", "a\n");
-      assert.equal(commitsAhead(repo.clone, sha), 1);
-      assert.deepEqual(headOf(repo.clone), { sha, branch: "feature/1-work" });
+      assert.equal(commitsAhead(repo.clone, "origin/main", sha), 1);
+      assert.deepEqual(worktreeHead(repo.clone), { sha, branch: "feature/1-work" });
     } finally {
       repo.cleanup();
     }
@@ -193,9 +193,9 @@ describe("worktree git", () => {
       repo.git(repo.clone, "push", "-q", "origin", "main");
       repo.git(repo.clone, "fetch", "-q", "origin");
       repo.git(repo.clone, "checkout", "-q", "feature/1-work");
-      assert.equal(containsBase(repo.clone, "HEAD"), false);
-      assert.equal(mergeBase(repo.clone), true);
-      assert.equal(containsBase(repo.clone, "HEAD"), true);
+      assert.equal(containsBase(repo.clone, "origin/main", "HEAD"), false);
+      assert.equal(mergeBase(repo.clone, "origin/main"), true);
+      assert.equal(containsBase(repo.clone, "origin/main", "HEAD"), true);
     } finally {
       repo.cleanup();
     }
@@ -210,7 +210,7 @@ describe("worktree git", () => {
       repo.git(repo.clone, "push", "-q", "origin", "main");
       repo.git(repo.clone, "fetch", "-q", "origin");
       repo.git(repo.clone, "checkout", "-q", "feature/1-work");
-      assert.equal(mergeBase(repo.clone), false);
+      assert.equal(mergeBase(repo.clone, "origin/main"), false);
       assert.equal(repo.git(repo.clone, "rev-parse", "HEAD"), before);
       assert.equal(repo.git(repo.clone, "status", "--porcelain"), "");
     } finally {

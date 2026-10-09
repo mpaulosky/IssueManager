@@ -4,13 +4,16 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
-import { checkFiles, runCheck, shellQuote, tail } from "./check.mts";
+import { baseCheck, checkFiles, fixedPath, headOf, runCheck, shellQuote, tail } from "./check.mts";
 
 type Result = { stdout: string; stderr: string; exitCode: number };
 
-const diff = `git diff --name-only 'main'...HEAD -- ${checkFiles.join(" ")} 2>&1`;
-const check = `bash -c 'set -o pipefail; git show '\\''main'\\'':.sandcastle/check.sh | bash -s' 2>&1`;
-const status = "git status --porcelain 2>&1";
+const base = { sha: "abc123", script: "echo it's checked\n" };
+const run = `env PATH=${fixedPath}`;
+const diff = `${run} git diff --name-only abc123...HEAD -- ${checkFiles.join(" ")} 2>&1`;
+const check = `${run} bash -c 'echo it'\\''s checked\n' check.sh </dev/null 2>&1`;
+const status = `${run} git status --porcelain -- . ':(exclude).pnpm-store' 2>&1`;
+const head = `${run} git rev-parse HEAD`;
 
 // A sandbox whose exec answers each command from a table; any other command fails the test.
 const sandboxWith = (results: Record<string, { stdout: string; exitCode: number }>) => ({
@@ -24,34 +27,37 @@ const sandboxWith = (results: Record<string, { stdout: string; exitCode: number 
 const unchanged = { stdout: "", exitCode: 0 };
 
 describe("runCheck", () => {
-  it("runs the base branch's check.sh and passes when it passes over a clean worktree", async () => {
+  it("runs the base's script, passed in as text, and passes when it passes over a clean worktree", async () => {
     const result = await runCheck(
       sandboxWith({ [diff]: unchanged, [check]: { stdout: "ok\n", exitCode: 0 }, [status]: { stdout: "", exitCode: 0 } }),
-      "main",
+      base,
     );
     assert.deepEqual(result, { passed: true, output: "ok\n" });
   });
 
   it("fails when the check fails, without looking at the worktree", async () => {
-    const result = await runCheck(
-      sandboxWith({ [diff]: unchanged, [check]: { stdout: "error CS1002", exitCode: 1 } }),
-      "main",
-    );
+    const result = await runCheck(sandboxWith({ [diff]: unchanged, [check]: { stdout: "error CS1002", exitCode: 1 } }), base);
     assert.deepEqual(result, { passed: false, output: "error CS1002" });
   });
 
-  it("fails, without running it, when the branch changes the check's own files", async () => {
-    const result = await runCheck(
-      sandboxWith({ [diff]: { stdout: ".sandcastle/check.sh\n", exitCode: 0 } }),
-      "main",
-    );
+  it("fails, without running it, and asks for a person when the branch changes the check's own files", async () => {
+    const result = await runCheck(sandboxWith({ [diff]: { stdout: "package.json\n", exitCode: 0 } }), base);
     assert.equal(result.passed, false);
-    assert.match(result.output, /changes the check's own files.*\n\.sandcastle\/check\.sh/);
+    assert.equal(result.needsHuman, true);
+    assert.match(result.output, /changes the check's own files.*\npackage\.json/);
+  });
+
+  it("protects every file check.sh runs from the worktree", () => {
+    assert.deepEqual(
+      [...checkFiles].sort(),
+      [".github/ci/gate-checks.sh", ".github/scripts/discover_tests.py", ".sandcastle/check.sh", "package.json"],
+    );
   });
 
   it("fails when git diff fails", async () => {
-    const result = await runCheck(sandboxWith({ [diff]: { stdout: "fatal: bad revision", exitCode: 128 } }), "main");
+    const result = await runCheck(sandboxWith({ [diff]: { stdout: "fatal: bad revision", exitCode: 128 } }), base);
     assert.equal(result.passed, false);
+    assert.equal(result.needsHuman, undefined);
     assert.match(result.output, /git diff failed/);
   });
 
@@ -62,7 +68,7 @@ describe("runCheck", () => {
         [check]: { stdout: "ok", exitCode: 0 },
         [status]: { stdout: " M src/Api/Program.cs\n", exitCode: 0 },
       }),
-      "main",
+      base,
     );
     assert.equal(result.passed, false);
     assert.match(result.output, /uncommitted changes:\n M src\/Api\/Program\.cs/);
@@ -75,10 +81,17 @@ describe("runCheck", () => {
         [check]: { stdout: "ok", exitCode: 0 },
         [status]: { stdout: "fatal: not a git repository", exitCode: 128 },
       }),
-      "main",
+      base,
     );
     assert.equal(result.passed, false);
     assert.match(result.output, /git status failed/);
+  });
+});
+
+describe("headOf", () => {
+  it("returns the commit, or undefined when git fails", async () => {
+    assert.equal(await headOf(sandboxWith({ [head]: { stdout: "abc\n", exitCode: 0 } })), "abc");
+    assert.equal(await headOf(sandboxWith({ [head]: { stdout: "fatal", exitCode: 128 } })), undefined);
   });
 });
 
@@ -86,64 +99,6 @@ describe("shellQuote", () => {
   it("keeps text intact through the shell, quotes and all", () => {
     const text = "it's $HOME `x` \"y\"";
     assert.equal(execFileSync("bash", ["-c", `printf %s ${shellQuote(text)}`], { encoding: "utf8" }), text);
-  });
-});
-
-// The real commands in a throwaway repo: main has a check.sh, and an issue
-// branch cut before it existed doesn't.
-describe("runCheck in a git repo", () => {
-  const exec = (cwd: string) => async (command: string): Promise<Result> => {
-    try {
-      return { stdout: execFileSync("bash", ["-c", command], { cwd, encoding: "utf8" }), stderr: "", exitCode: 0 };
-    } catch (error) {
-      const failed = error as { stdout?: string; status?: number };
-      return { stdout: failed.stdout ?? "", stderr: "", exitCode: failed.status ?? 1 };
-    }
-  };
-  const repo = (checkScript: string) => {
-    const dir = mkdtempSync(join(tmpdir(), "check-test-"));
-    const git = (...args: string[]) => execFileSync("git", args, { cwd: dir, stdio: "ignore" });
-    git("init", "-q", "-b", "main");
-    git("config", "user.email", "test@example.com");
-    git("config", "user.name", "Test");
-    writeFileSync(join(dir, "README.md"), "x\n");
-    git("add", ".");
-    git("commit", "-q", "-m", "first");
-    git("branch", "feature/1-old");
-    mkdirSync(join(dir, ".sandcastle"));
-    writeFileSync(join(dir, ".sandcastle", "check.sh"), checkScript);
-    git("add", ".");
-    git("commit", "-q", "-m", "add check");
-    git("checkout", "-q", "feature/1-old");
-    return dir;
-  };
-
-  it("runs the base branch's check.sh on a branch that has none", async () => {
-    const dir = repo("echo base check ran\n");
-    try {
-      assert.deepEqual(await runCheck({ exec: exec(dir) }, "main"), { passed: true, output: "base check ran\n" });
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
-
-  it("fails when the base branch's check.sh fails", async () => {
-    const dir = repo("echo broken; exit 3\n");
-    try {
-      assert.deepEqual(await runCheck({ exec: exec(dir) }, "main"), { passed: false, output: "broken\n" });
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
-
-  it("fails when the base branch has no check.sh, rather than running an empty script", async () => {
-    const dir = repo("echo ok\n");
-    try {
-      const result = await runCheck({ exec: exec(dir) }, "feature/1-old");
-      assert.equal(result.passed, false);
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
   });
 });
 
@@ -155,4 +110,69 @@ describe("tail", () => {
   it("keeps everything when there are fewer lines", () => {
     assert.equal(tail("a", 5), "a");
   });
+});
+
+// The real commands in a throwaway repo: main has a check.sh, and an issue
+// branch cut before it existed doesn't.
+describe("the check in a git repo", () => {
+  const exec = (cwd: string) => async (command: string): Promise<Result> => {
+    try {
+      return { stdout: execFileSync("bash", ["-c", command], { cwd, encoding: "utf8" }), stderr: "", exitCode: 0 };
+    } catch (error) {
+      const failed = error as { stdout?: string; status?: number };
+      return { stdout: failed.stdout ?? "", stderr: "", exitCode: failed.status ?? 1 };
+    }
+  };
+  const withRepo = async (checkScript: string, test: (dir: string) => Promise<void>) => {
+    const dir = mkdtempSync(join(tmpdir(), "check-test-"));
+    const git = (...args: string[]) => execFileSync("git", args, { cwd: dir, stdio: "ignore" });
+    try {
+      git("init", "-q", "-b", "main");
+      git("config", "user.email", "test@example.com");
+      git("config", "user.name", "Test");
+      writeFileSync(join(dir, "README.md"), "x\n");
+      git("add", ".");
+      git("commit", "-q", "-m", "first");
+      git("branch", "feature/1-old");
+      mkdirSync(join(dir, ".sandcastle"));
+      writeFileSync(join(dir, ".sandcastle", "check.sh"), checkScript);
+      git("add", ".");
+      git("commit", "-q", "-m", "add check");
+      git("checkout", "-q", "feature/1-old");
+      await test(dir);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  };
+
+  it("runs the base branch's check.sh on a branch that has none", () =>
+    withRepo("echo base check ran\n", async (dir) => {
+      assert.deepEqual(await runCheck({ exec: exec(dir) }, baseCheck("main", dir)), {
+        passed: true,
+        output: "base check ran\n",
+      });
+    }));
+
+  it("ignores the pnpm store pnpm leaves at the root, even where .gitignore doesn't list it", () =>
+    withRepo("mkdir -p .pnpm-store/v11 && touch .pnpm-store/v11/x\n", async (dir) => {
+      assert.equal((await runCheck({ exec: exec(dir) }, baseCheck("main", dir))).passed, true);
+    }));
+
+  it("fails when the base branch's check.sh fails", () =>
+    withRepo("echo broken; exit 3\n", async (dir) => {
+      assert.deepEqual(await runCheck({ exec: exec(dir) }, baseCheck("main", dir)), { passed: false, output: "broken\n" });
+    }));
+
+  it("gives the script no stdin, so a command that reads it can't swallow the rest", () =>
+    withRepo("cat >/dev/null\necho still running\nexit 4\n", async (dir) => {
+      assert.deepEqual(await runCheck({ exec: exec(dir) }, baseCheck("main", dir)), {
+        passed: false,
+        output: "still running\n",
+      });
+    }));
+
+  it("can't resolve a base without a check.sh", () =>
+    withRepo("echo ok\n", async (dir) => {
+      assert.throws(() => baseCheck("feature/1-old", dir));
+    }));
 });

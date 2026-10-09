@@ -99,6 +99,8 @@ public sealed class PlaywrightFixture : IAsyncLifetime
 			clientBuilder.AddStandardResilienceHandler();
 		});
 
+		UseFakeAuth0WhenUnconfigured(_builder);
+
 		_app = await _builder.BuildAsync(CancellationToken.None);
 
 		// Start the app and wait for the web app's health check, with one timeout
@@ -121,6 +123,45 @@ public sealed class PlaywrightFixture : IAsyncLifetime
 		{
 			Headless = true
 		});
+	}
+
+	/// <summary>
+	/// Gives the web app and the API fake Auth0 settings when nothing configures Auth0, so the host still starts.
+	/// </summary>
+	/// <remarks>
+	/// Both read Auth0 from the user secrets this project shares with them, or from environment variables (CI's
+	/// TEST_ENV secret). Dependabot runs get neither, and without them the API throws at startup and the web app
+	/// crashes on UseAuthentication. The fake domain can't be reached, so any Auth0 challenge (/auth/login)
+	/// fails. The tests that log in skip without credentials, the one that follows the redirect to /auth/login
+	/// skips without Auth0 settings (<see cref="Auth0LoginHelper.IsAuth0Configured"/>), and the rest only need
+	/// the host up. Fakes are used only when none of the settings is set: a partial setup is a mistake, so it
+	/// throws and names the missing keys, rather than letting the login tests run against the fake domain.
+	/// </remarks>
+	private static void UseFakeAuth0WhenUnconfigured(IDistributedApplicationTestingBuilder builder)
+	{
+		var missing = Auth0LoginHelper.MissingAuth0Settings;
+
+		if (missing.Count == 0)
+		{
+			return;
+		}
+
+		if (missing.Count < Auth0LoginHelper.RequiredAuth0Settings.Count)
+		{
+			throw new InvalidOperationException(
+				$"Auth0 is only partly configured; missing {string.Join(", ", missing)}. Set all of " +
+				$"{string.Join(", ", Auth0LoginHelper.RequiredAuth0Settings)}, or none to run on fake settings.");
+		}
+
+		const string fakeDomain = "issuemanager-e2e.invalid";
+
+		builder.CreateResourceBuilder<ProjectResource>(Website)
+			.WithEnvironment("Auth0__Domain", fakeDomain)
+			.WithEnvironment("Auth0__ClientId", "e2e-fake-client-id");
+
+		builder.CreateResourceBuilder<ProjectResource>(ApiService)
+			.WithEnvironment("Auth0__Domain", fakeDomain)
+			.WithEnvironment("Auth0__Audience", "https://issuemanager-e2e.invalid/api");
 	}
 
 	public async ValueTask DisposeAsync()

@@ -5,10 +5,10 @@
 
 import * as sandcastle from "@ai-hero/sandcastle";
 import { docker } from "@ai-hero/sandcastle/sandboxes/docker";
-import { commitsAhead, containsBase, headOf, mergeBase, pushChecked } from "./branches.mts";
-import { fenced, runCheck, tail } from "./check.mts";
+import { commitsAhead, containsBase, mergeBase, pushChecked, worktreeHead } from "./branches.mts";
+import { type BaseCheck, fenced, runCheck, tail } from "./check.mts";
 import { BASE_BRANCH, CHECK_COMMENT_LINES, copyToWorktree, hooks, IMPLEMENTER_ITERATIONS, MODEL } from "./config.mts";
-import { commentOnIssue, openPullRequest, type SandcastleIssue } from "./github.mts";
+import { commentOnIssue, labelIssue, NEEDS_HUMAN, openPullRequest, type SandcastleIssue } from "./github.mts";
 import { issuePromptArgs } from "./prompts.mts";
 import { prBody, prTitle } from "./publish.mts";
 import { parseVerdict, type Verdict } from "./verdict.mts";
@@ -18,26 +18,29 @@ export type BuildSandbox = Pick<sandcastle.Sandbox, "run" | "exec" | "close" | "
 
 // What buildIssue needs from outside the pipeline; tests pass stubs.
 export type BuildHost = {
-  createSandbox(branch: string): Promise<BuildSandbox>;
-  // Merge the base branch into the worktree's branch; false when it conflicts.
-  mergeBase(worktreePath: string): boolean;
+  // A new branch starts at baseSha.
+  createSandbox(branch: string, baseSha: string): Promise<BuildSandbox>;
+  // Merge the base into the worktree's branch; false when it conflicts.
+  mergeBase(worktreePath: string, baseSha: string): boolean;
   head(worktreePath: string): { sha: string; branch: string };
-  commitsAhead(worktreePath: string, sha: string): number;
-  containsBase(worktreePath: string, sha: string): boolean;
+  commitsAhead(worktreePath: string, baseSha: string, sha: string): number;
+  containsBase(worktreePath: string, baseSha: string, sha: string): boolean;
   commentOnIssue(issueNumber: number, body: string): void;
+  labelIssue(issueNumber: number, label: string): void;
   // Push the checked commit to the branch and open (or reuse) its pull request.
   publish(worktreePath: string, sha: string, branch: string, title: string, body: string): string;
   log(line: string): void;
 };
 
 const liveHost: BuildHost = {
-  createSandbox: (branch) =>
-    sandcastle.createSandbox({ branch, baseBranch: BASE_BRANCH, sandbox: docker(), hooks, copyToWorktree }),
+  createSandbox: (branch, baseSha) =>
+    sandcastle.createSandbox({ branch, baseBranch: baseSha, sandbox: docker(), hooks, copyToWorktree }),
   mergeBase,
-  head: headOf,
+  head: worktreeHead,
   commitsAhead,
   containsBase,
   commentOnIssue,
+  labelIssue,
   publish: (worktreePath, sha, branch, title, body) => {
     pushChecked(worktreePath, sha, branch);
     return openPullRequest(branch, title, body);
@@ -52,12 +55,16 @@ export type BuildOutcome =
   | "wrong-branch"
   | "behind-base"
   | "check-failed"
+  | "needs-human"
   | "rejected"
   | "publish-failed";
 
+// `base` is the commit of origin/main the host pinned for the round, with its
+// check.sh; every host decision about the branch is made against it.
 export async function buildIssue(
   issue: SandcastleIssue,
   branch: string,
+  base: BaseCheck,
   host: BuildHost = liveHost,
 ): Promise<{ outcome: BuildOutcome; prUrl?: string }> {
   const log = (line: string) => host.log(`  #${issue.number} ${line}`);
@@ -67,15 +74,15 @@ export async function buildIssue(
     return { outcome };
   };
   const notPushed = `\`${branch}\` wasn't pushed; the local branch keeps its commits.`;
-  const promptArgs = issuePromptArgs(issue, branch);
+  const promptArgs = issuePromptArgs(issue, branch, base.sha);
 
-  const sandbox = await host.createSandbox(branch);
+  const sandbox = await host.createSandbox(branch, base.sha);
   const worktree = sandbox.worktreePath;
   try {
     // Bring an existing branch up to date first, so the work is built on
     // current main. A conflict is left to the implementer, which the prompt
     // asks to merge the base branch when it's behind.
-    if (!host.mergeBase(worktree)) log(`merging ${BASE_BRANCH} conflicts; left to the implementer`);
+    if (!host.mergeBase(worktree, base.sha)) log(`merging ${BASE_BRANCH} conflicts; left to the implementer`);
 
     // Implement. A run that throws or uses up its iterations without
     // signalling completion stops the issue for this round.
@@ -110,20 +117,35 @@ export async function buildIssue(
       // Whenever the branch holds work main doesn't, not only when this
       // round added commits: a re-run of a finished issue makes none, and
       // its earlier work still needs a PR.
-      if (host.commitsAhead(worktree, head.sha) === 0) {
+      if (host.commitsAhead(worktree, base.sha, head.sha) === 0) {
         log(`nothing to publish ${when}`);
         return { outcome: "nothing-to-publish" };
       }
-      if (!host.containsBase(worktree, head.sha)) {
+      if (!host.containsBase(worktree, base.sha, head.sha)) {
         return stop("behind-base", `Sandcastle stopped building this issue: ${when}, \`${branch}\` doesn't contain \`${BASE_BRANCH}\`, and merging it conflicted. ${notPushed}`);
       }
 
-      const check = await runCheck(sandbox, BASE_BRANCH);
+      const check = await runCheck(sandbox, base);
       const after = host.head(worktree);
       const moved = after.sha !== head.sha || after.branch !== branch;
       const passed = check.passed && !moved;
       log(`check ${when}: ${passed ? "passed" : "failed"}`);
       if (passed) return { sha: head.sha };
+      if (check.needsHuman) {
+        // The comment matters more than the label, so a failed label (say it
+        // was deleted from the repo) doesn't stop it.
+        try {
+          host.labelIssue(issue.number, NEEDS_HUMAN);
+        } catch (error) {
+          log(`couldn't add ${NEEDS_HUMAN}: ${error}`);
+        }
+        return stop(
+          "needs-human",
+          `Sandcastle stopped building this issue: \`${branch}\` changes the files \`.sandcastle/check.sh\` relies on, ` +
+            `so the host can't trust its check. ${notPushed} A person needs to review it, then remove \`${NEEDS_HUMAN}\` ` +
+            `to queue the issue again.\n\n${fenced(tail(check.output, 20))}`,
+        );
+      }
       const output = moved ? `${check.output}\nThe branch moved while the check ran.` : check.output;
       return stop(
         "check-failed",

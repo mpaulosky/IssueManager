@@ -16,7 +16,8 @@ export const IMPLEMENTER_ITERATIONS = 100;
 export const CHECK_COMMENT_LINES = 100;
 
 // The branch every issue branch starts from, is kept up to date with, and is
-// reviewed and checked against. The host fetches it once per round.
+// reviewed and checked against. The host fetches it once per round and pins
+// the commit (baseCheck in lib/check.mts).
 export const BASE_BRANCH = "origin/main";
 
 // Hooks run inside the sandbox before the agent starts. pnpm, through

@@ -3,7 +3,8 @@
 //   Phase 1 (Plan):   The host reads the open Sandcastle issues with its own gh
 //                     auth, keeping only issues and comments from the owner,
 //                     members and collaborators, and holds back every issue
-//                     that already has an open same-repo PR. A planner agent
+//                     handed to a person (sandcastle:needs-human) or that
+//                     already has an open same-repo PR. A planner agent
 //                     picks the ones that can be built in parallel. The host
 //                     names each issue's branch (lib/branches.mts).
 //   Phase 2 (Build):  For each issue, in its own sandbox (lib/build.mts): the
@@ -37,7 +38,8 @@ import { docker } from "@ai-hero/sandcastle/sandboxes/docker";
 import { z } from "zod";
 import { fetchMain, prepareBranches, uniqueIssues, withoutOpenPullRequests } from "./lib/branches.mts";
 import { buildIssue } from "./lib/build.mts";
-import { MAX_ITERATIONS, MODEL } from "./lib/config.mts";
+import { baseCheck } from "./lib/check.mts";
+import { BASE_BRANCH, MAX_ITERATIONS, MODEL } from "./lib/config.mts";
 import { listSandcastleIssues, openPullRequestBranches } from "./lib/github.mts";
 import { plannerPromptArgs } from "./lib/prompts.mts";
 import { githubTokensIn } from "./lib/sandbox-env.mts";
@@ -105,7 +107,10 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   // -------------------------------------------------------------------------
   // Phase 2: Build, review and publish
   // -------------------------------------------------------------------------
+  // Pin the base and its check.sh right after the fetch: agents share the
+  // clone's refs, so every later decision uses this commit, not the ref.
   fetchMain();
+  const base = baseCheck(BASE_BRANCH);
   const work = prepareBranches(picks);
 
   console.log(`Planning complete. ${work.length} issue(s) to build in parallel:`);
@@ -114,7 +119,7 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   }
 
   // Promise.allSettled means one failing pipeline doesn't cancel the others.
-  const settled = await Promise.allSettled(work.map(({ issue, branch }) => buildIssue(issue, branch)));
+  const settled = await Promise.allSettled(work.map(({ issue, branch }) => buildIssue(issue, branch, base)));
 
   const published: string[] = [];
   for (const [i, outcome] of settled.entries()) {

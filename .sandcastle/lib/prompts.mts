@@ -9,20 +9,20 @@
 // argument filled in inside a !`...` block would be run, so only the
 // host-made BRANCH and BASE_BRANCH go there.
 
-import { BASE_BRANCH } from "./config.mts";
 import type { SandcastleIssue } from "./github.mts";
 
 // Sandcastle sets {{TARGET_BRANCH}} itself (to the sandbox's own branch inside
-// createSandbox) and refuses an override, so the branch to compare against
-// goes in as {{BASE_BRANCH}}.
-export function issuePromptArgs(issue: SandcastleIssue, branch: string) {
+// createSandbox) and refuses an override, so the base to compare against goes
+// in as {{BASE_BRANCH}}: the commit of origin/main the host pinned for the
+// round, which no agent can move.
+export function issuePromptArgs(issue: SandcastleIssue, branch: string, baseSha: string) {
   return {
     TASK_ID: String(issue.number),
     ISSUE_TITLE: issue.title,
     ISSUE_BODY: issue.body || "(no description)",
     ISSUE_COMMENTS: issue.comments.length > 0 ? issue.comments.join("\n\n---\n\n") : "(no comments)",
     BRANCH: branch,
-    BASE_BRANCH,
+    BASE_BRANCH: baseSha,
   };
 }
 

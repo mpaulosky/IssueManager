@@ -95,7 +95,17 @@ type IssuesResponse = {
   };
 };
 
-// The open issues labelled Sandcastle, keeping only what trusted authors wrote.
+// The label that hands an issue to a person. Sandcastle adds it when a branch
+// changes the check's own files; the owner removing it re-queues the issue.
+export const NEEDS_HUMAN = "sandcastle:needs-human";
+
+// Whether Sandcastle may work an issue: not while it's handed to a person.
+export function isQueued(issue: Pick<SandcastleIssue, "labels">): boolean {
+  return !issue.labels.includes(NEEDS_HUMAN);
+}
+
+// The open issues labelled Sandcastle and not handed to a person, keeping only
+// what trusted authors wrote.
 export function listSandcastleIssues(): SandcastleIssue[] {
   const { owner, name } = repoName();
   const response = JSON.parse(
@@ -117,7 +127,7 @@ export function listSandcastleIssues(): SandcastleIssue[] {
   for (const number of untrusted) {
     console.warn(`  Skipping #${number}: its author isn't an owner, member or collaborator. Re-file it to have it built.`);
   }
-  return issues;
+  return issues.filter(isQueued);
 }
 
 export type PullRequestHead = { headRefName: string; isCrossRepository: boolean; url: string };
@@ -146,6 +156,10 @@ export function commentOnIssue(issue: number, body: string): void {
     stdio: ["pipe", "pipe", "inherit"],
     input: body,
   });
+}
+
+export function labelIssue(issue: number, label: string): void {
+  execFileSync("gh", ["issue", "edit", String(issue), "--add-label", label], { stdio: ["ignore", "ignore", "inherit"] });
 }
 
 // Open a draft pull request for the branch, or return the open same-repo one

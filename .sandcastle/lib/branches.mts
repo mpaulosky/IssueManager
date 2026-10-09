@@ -2,7 +2,6 @@
 // so re-planning an issue always lands on the branch that holds its earlier
 // work, and every name passes scripts/check-branch-name.sh.
 
-import { BASE_BRANCH } from "./config.mts";
 import { sh, worktreeGit } from "./shell.mts";
 
 const maxSlugLength = 50;
@@ -129,23 +128,27 @@ export function prepareBranches<T extends BranchIssue>(
 }
 
 // The commit the worktree has checked out, and the branch it's on ("HEAD"
-// when detached).
-export function headOf(worktreePath: string): { sha: string; branch: string } {
+// when detached), read on the host.
+export function worktreeHead(worktreePath: string): { sha: string; branch: string } {
   return {
     sha: worktreeGit(worktreePath, "rev-parse", "HEAD"),
     branch: worktreeGit(worktreePath, "rev-parse", "--abbrev-ref", "HEAD"),
   };
 }
 
-// Count the commits at `sha` that the base branch doesn't have.
-export function commitsAhead(worktreePath: string, sha: string): number {
-  return Number(worktreeGit(worktreePath, "rev-list", "--count", `${BASE_BRANCH}..${sha}`));
+// The functions below take the base as the commit the host pinned for the
+// round (see baseCheck in lib/check.mts), not as a ref name: agents share the
+// clone's refs, so they could move origin/main.
+
+// Count the commits at `sha` that the base doesn't have.
+export function commitsAhead(worktreePath: string, baseSha: string, sha: string): number {
+  return Number(worktreeGit(worktreePath, "rev-list", "--count", `${baseSha}..${sha}`));
 }
 
-// Whether `sha` already holds everything on the base branch.
-export function containsBase(worktreePath: string, sha: string): boolean {
+// Whether `sha` already holds everything on the base.
+export function containsBase(worktreePath: string, baseSha: string, sha: string): boolean {
   try {
-    worktreeGit(worktreePath, "merge-base", "--is-ancestor", BASE_BRANCH, sha);
+    worktreeGit(worktreePath, "merge-base", "--is-ancestor", baseSha, sha);
     return true;
   } catch {
     return false;
@@ -156,10 +159,10 @@ export function containsBase(worktreePath: string, sha: string): boolean {
 // work is built, checked and reviewed against current main and its PR can
 // merge. Returns false, with the merge undone, when it conflicts; the
 // implementer is then asked to merge it.
-export function mergeBase(worktreePath: string): boolean {
-  if (containsBase(worktreePath, "HEAD")) return true;
+export function mergeBase(worktreePath: string, baseSha: string): boolean {
+  if (containsBase(worktreePath, baseSha, "HEAD")) return true;
   try {
-    worktreeGit(worktreePath, "merge", "--no-edit", BASE_BRANCH);
+    worktreeGit(worktreePath, "merge", "--no-edit", baseSha);
     return true;
   } catch {
     try {
