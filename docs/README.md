@@ -62,6 +62,7 @@ See [LICENSE](../LICENSE) for details.
 
 | Version | Date | Title | Blog post |
 | ------- | ---- | ----- | --------- |
+| [v0.0.67](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.67) | 2026-10-09 | fix: Publish each Sandcastle issue as its own PR, and fix the other #276 review findings | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-09-pr-285-fix-publish-each-sandcastle-issue-as-its-own-pr-and-fix-the-other-276-review-findings.md) |
 | [v0.0.66](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.66) | 2026-10-09 | fix: Follow up on Sandcastle check review findings from #281 | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-09-pr-286-fix-follow-up-on-sandcastle-check-review-findings-from-281.md) |
 | [v0.0.65](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.65) | 2026-10-09 | chore: Give Sandcastle a Docker-free check script | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-09-pr-281-chore-give-sandcastle-a-docker-free-check-script.md) |
 | [v0.0.64](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.64) | 2026-10-08 | fix(Tests): Give the E2E host fake Auth0 settings when none are set | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-282-fix-tests-give-the-e2e-host-fake-auth0-settings-when-none-are-set.md) |
@@ -71,7 +72,6 @@ See [LICENSE](../LICENSE) for details.
 | [v0.0.60](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.60) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-272-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.59](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.59) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-270-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.58](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.58) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-268-chore-re-apply-the-repo-ci-baseline-template.md) |
-| [v0.0.57](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.57) | 2026-10-08 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-08-pr-266-chore-re-apply-the-repo-ci-baseline-template.md) |
 
 <!-- RELEASES_END -->
 
