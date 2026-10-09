@@ -17,16 +17,18 @@
 set -euo pipefail
 
 base="${1-}"
-: "$base"
 
-# Sandcastle's type check and tests (pnpm run test:sandcastle), when this
-# branch changes Sandcastle, the root Node packages it runs on, or the branch
-# and PR title scripts its tests run its branch names and PR titles through.
-# Without a merge base every file counts as changed. CI doesn't run this file,
-# so the pre-push gate and .sandcastle/check.sh are where those tests run.
-sandcastle_paths=(.sandcastle package.json pnpm-lock.yaml pnpm-workspace.yaml scripts/check-branch-name.sh scripts/check-pr-title.sh)
-if [[ -z "$base" ]] || ! git diff --quiet "$base" HEAD -- "${sandcastle_paths[@]}"; then
-  echo "Sandcastle changed: running pnpm run test:sandcastle"
-  pnpm install --frozen-lockfile --silent
+# Sandcastle's orchestration code (.sandcastle/): run its tests when this
+# branch changes it, the root package files, or the branch-name and PR-title
+# scripts its tests run its names through, or always without a base. CI's
+# Build Solution job runs the same through .github/ci/prepare.sh.
+# .sandcastle/check.sh runs them itself, every time, and sets SANDCASTLE_CHECK.
+if [[ -n "${SANDCASTLE_CHECK:-}" ]]; then
+  echo "Sandcastle tests: .sandcastle/check.sh runs them."
+elif [[ -z "$base" ]] || ! git diff --quiet --no-renames "$base" HEAD -- .sandcastle package.json pnpm-lock.yaml pnpm-workspace.yaml scripts/check-branch-name.sh scripts/check-pr-title.sh; then
+  echo "Sandcastle tests"
+  pnpm install --frozen-lockfile
   pnpm run test:sandcastle
+else
+  echo "No Sandcastle or root package changes to test."
 fi

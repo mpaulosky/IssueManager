@@ -40,7 +40,9 @@ fi
 
 if [[ -f .github/ci/gate-checks.sh ]]; then
   step "Repo checks (.github/ci/gate-checks.sh)"
-  bash .github/ci/gate-checks.sh "$BASE"
+  # check.sh runs the Sandcastle tests itself, below: a branch cut before
+  # gate-checks.sh ran them would otherwise skip them.
+  SANDCASTLE_CHECK=1 bash .github/ci/gate-checks.sh "$BASE"
 fi
 
 step "Build"
@@ -67,5 +69,8 @@ for project in "${TEST_PROJECTS[@]}"; do
   ran=$((ran + 1))
 done
 echo "Ran ${ran} of ${#TEST_PROJECTS[@]} test project(s)."
+
+step "Sandcastle tests"
+pnpm run test:sandcastle
 
 echo -e "\n${GREEN}✅ Sandcastle check passed.${RESET}"
