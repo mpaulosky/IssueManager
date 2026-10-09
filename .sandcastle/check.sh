@@ -40,7 +40,9 @@ fi
 
 if [[ -f .github/ci/gate-checks.sh ]]; then
   step "Repo checks (.github/ci/gate-checks.sh)"
-  bash .github/ci/gate-checks.sh "$BASE"
+  # check.sh runs the Sandcastle tests itself, below: a branch cut before
+  # gate-checks.sh ran them would otherwise skip them.
+  SANDCASTLE_CHECK=1 bash .github/ci/gate-checks.sh "$BASE"
 fi
 
 step "Build"

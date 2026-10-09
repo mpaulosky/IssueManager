@@ -25,7 +25,8 @@
 //
 // The outer loop repeats up to MAX_ITERATIONS times so that newly unblocked
 // issues are picked up after each round of merges. It stops early when a
-// round produces no commits at all, since nothing changed to replan.
+// round produces no commits and no checked commit the merger hasn't been
+// offered yet, since nothing changed to replan.
 //
 // Usage (from the repo root, on the branch the work should land on):
 //   pnpm dlx tsx .sandcastle/main.mts
@@ -36,6 +37,7 @@ import { docker } from "@ai-hero/sandcastle/sandboxes/docker";
 import { z } from "zod";
 import { branchFor, localIssueBranches, openSandcastleIssues } from "./lib/branches.mts";
 import { type BaseCheck, baseCheck, checkFiles, headOf, runCheck, tail } from "./lib/check.mts";
+import { mergeCandidates } from "./lib/rounds.mts";
 
 // The planner emits its plan as JSON inside <plan> tags; Output.object extracts
 // and validates it against this schema. We use Zod here, but any Standard
@@ -134,6 +136,14 @@ function commitOf(branch: string): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+// The checked commits handed to the merger so far in this run.
+const offeredToMerger = new Set<string>();
+
+// Whether a commit adds anything to the base branch.
+function aheadOfBase(commit: string): boolean {
+  return execFileSync("git", ["rev-list", "--count", `${baseBranch}..${commit}`], { encoding: "utf8" }).trim() !== "0";
 }
 
 // Pin the base branch and its check.sh once, before any agent runs: agents
@@ -301,7 +311,11 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
     checked: outcome.status === "fulfilled" ? outcome.value.checked : undefined,
   }));
 
-  if (results.every((result) => result.commits === 0)) {
+  // Checked commits ahead of the base that the merger hasn't been offered
+  // yet (see lib/rounds.mts).
+  const { toMerge, progress } = mergeCandidates<(typeof results)[number]>(results, aheadOfBase, offeredToMerger);
+
+  if (!progress) {
     // No pipeline changed anything, so the next plan would pick the same
     // issues and repeat the same runs. Stop rather than burn iterations.
     console.log("\nNo commits produced this round. Stopping.");
@@ -312,8 +326,7 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   // go to the merge phase, which closes their issues.
   // The merger merges the commit the host checked, and only while the branch
   // still points to it: any agent could have moved the branch since.
-  const completed = results.filter((result) => {
-    if (!result.complete || result.commits === 0 || result.checked === undefined) return false;
+  const completed = toMerge.filter((result) => {
     if (commitOf(result.issue.branch) === result.checked) return true;
     console.log(`  ${result.issue.id} (${result.issue.branch}) moved after the host checked it; left unmerged.`);
     return false;
@@ -347,11 +360,14 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   //
   // One agent merges all completed branches into the current branch,
   // resolving any conflicts and running .sandcastle/check.sh to confirm
-  // everything works.
+  // everything works. The host doesn't re-check the merged result, a known
+  // gap: the next round's checks run on top of it, and the pre-push gate
+  // runs everything before any of it is pushed.
   //
   // The {{BRANCHES}} and {{ISSUES}} prompt arguments are lists that the agent
   // uses to know which branches to merge and which issues to close.
   // -------------------------------------------------------------------------
+  for (const result of completed) offeredToMerger.add(result.checked!);
   await sandcastle.run({
     hooks,
     sandbox: docker(),

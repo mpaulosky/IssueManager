@@ -10,17 +10,17 @@ type Result = { stdout: string; stderr: string; exitCode: number };
 
 const base = { sha: "abc123", script: "echo it's checked\n" };
 const run = `env PATH=${fixedPath}`;
-const diff = `${run} git diff --name-only abc123...HEAD -- ${checkFiles.join(" ")} 2>&1`;
+const diff = `${run} git diff --name-only abc123...HEAD -- ${checkFiles.join(" ")}`;
 const check = `${run} bash -c 'echo it'\\''s checked\n' check.sh </dev/null 2>&1`;
-const status = `${run} git status --porcelain -- . ':(exclude).pnpm-store' 2>&1`;
+const status = `${run} git status --porcelain -- . ':(exclude).pnpm-store'`;
 const head = `${run} git rev-parse HEAD`;
 
 // A sandbox whose exec answers each command from a table; any other command fails the test.
-const sandboxWith = (results: Record<string, { stdout: string; exitCode: number }>) => ({
+const sandboxWith = (results: Record<string, { stdout: string; exitCode: number; stderr?: string }>) => ({
   exec: async (command: string): Promise<Result> => {
     const result = results[command];
     if (!result) throw new Error(`unexpected command: ${command}`);
-    return { ...result, stderr: "" };
+    return { stderr: "", ...result };
   },
 });
 
@@ -54,8 +54,20 @@ describe("runCheck", () => {
     );
   });
 
+  it("doesn't read a git warning on stderr as a changed file", async () => {
+    const result = await runCheck(
+      sandboxWith({
+        [diff]: { stdout: "", stderr: "warning: abc123...HEAD: multiple merge bases, using def456\n", exitCode: 0 },
+        [check]: { stdout: "ok", exitCode: 0 },
+        [status]: { stdout: "", stderr: "warning: something\n", exitCode: 0 },
+      }),
+      base,
+    );
+    assert.deepEqual(result, { passed: true, output: "ok" });
+  });
+
   it("fails when git diff fails", async () => {
-    const result = await runCheck(sandboxWith({ [diff]: { stdout: "fatal: bad revision", exitCode: 128 } }), base);
+    const result = await runCheck(sandboxWith({ [diff]: { stdout: "", stderr: "fatal: bad revision", exitCode: 128 } }), base);
     assert.equal(result.passed, false);
     assert.equal(result.needsHuman, undefined);
     assert.match(result.output, /git diff failed/);
@@ -79,7 +91,7 @@ describe("runCheck", () => {
       sandboxWith({
         [diff]: unchanged,
         [check]: { stdout: "ok", exitCode: 0 },
-        [status]: { stdout: "fatal: not a git repository", exitCode: 128 },
+        [status]: { stdout: "", stderr: "fatal: not a git repository", exitCode: 128 },
       }),
       base,
     );
@@ -117,10 +129,11 @@ describe("tail", () => {
 describe("the check in a git repo", () => {
   const exec = (cwd: string) => async (command: string): Promise<Result> => {
     try {
-      return { stdout: execFileSync("bash", ["-c", command], { cwd, encoding: "utf8" }), stderr: "", exitCode: 0 };
+      const stdout = execFileSync("bash", ["-c", command], { cwd, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
+      return { stdout, stderr: "", exitCode: 0 };
     } catch (error) {
-      const failed = error as { stdout?: string; status?: number };
-      return { stdout: failed.stdout ?? "", stderr: "", exitCode: failed.status ?? 1 };
+      const failed = error as { stdout?: string; stderr?: string; status?: number };
+      return { stdout: failed.stdout ?? "", stderr: failed.stderr ?? "", exitCode: failed.status ?? 1 };
     }
   };
   const withRepo = async (checkScript: string, test: (dir: string) => Promise<void>) => {
