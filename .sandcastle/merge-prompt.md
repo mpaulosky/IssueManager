@@ -1,12 +1,12 @@
 # TASK
 
-Merge the following branches into the current branch:
+Merge the following branches into the current branch. Each is listed with the commit the host checked:
 
 {{BRANCHES}}
 
 For each branch:
 
-1. Run `git merge <branch> --no-edit`
+1. Run `git merge <commit> --no-edit` with the commit listed, not the branch name
 2. If there are merge conflicts, resolve them intelligently by reading both sides and choosing the correct resolution
 3. After merging, run `.sandcastle/check.sh` (build with warnings as errors, and every test project that doesn't
    need Docker). The sandbox has no Docker, on purpose: the host's pre-push gate and CI run the Docker-backed test

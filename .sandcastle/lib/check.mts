@@ -1,14 +1,18 @@
 // The host's check of an issue branch: .sandcastle/check.sh, run inside the
-// sandbox. Its exit code decides whether the branch counts as complete, never
+// sandbox. Its exit code decides whether the branch counts as complete, not
 // what an agent says about it.
 //
-// The agent can edit anything on its branch, and any ref or config in the
-// repo its worktree shares, so nothing the check trusts is looked up in the
-// sandbox. The host resolves the base branch to a commit, reads that
-// commit's check.sh, and passes its text in; the sandbox only runs it. A
-// branch that changes the files the script runs from the worktree fails, and
-// is left for a human. Running the base's copy also checks branches cut
-// before check.sh existed.
+// The host resolves the base branch to a commit, reads that commit's
+// check.sh, and passes its text in; the sandbox only runs it. A branch that
+// changes the files the script runs from the worktree fails, and is left for
+// a human. Running the base's copy also checks branches cut before check.sh
+// existed. The commands run with a fixed PATH, so a shim in the agent's
+// ~/.local/bin isn't picked up.
+//
+// This guards against mistakes and false claims of completion, not against a
+// determined agent: the sandbox is the agent's, and the branch's other files
+// (a csproj that adds Testcontainers, say, or .npmrc) still steer the check.
+// The boundary is the host's pre-push gate and CI, which run everything.
 
 import { execFileSync } from "node:child_process";
 import type { Sandbox } from "@ai-hero/sandcastle";
@@ -32,6 +36,11 @@ export const checkFiles = [
   "package.json",
 ];
 
+// The PATH every check command runs with: the image's system directories,
+// without the agent-writable ~/.local/bin.
+export const fixedPath = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
+const run = `env PATH=${fixedPath}`;
+
 // A shell word that stands for text, whatever it contains.
 export function shellQuote(text: string): string {
   return `'${text.replace(/'/g, `'\\''`)}'`;
@@ -47,7 +56,7 @@ export function baseCheck(baseBranch: string, cwd?: string): BaseCheck {
 
 // The commit the sandbox's worktree is on, or undefined when git fails.
 export async function headOf(sandbox: Pick<Sandbox, "exec">): Promise<string | undefined> {
-  const head = await sandbox.exec("git rev-parse HEAD");
+  const head = await sandbox.exec(`${run} git rev-parse HEAD`);
   return head.exitCode === 0 ? head.stdout.trim() : undefined;
 }
 
@@ -59,7 +68,7 @@ export async function headOf(sandbox: Pick<Sandbox, "exec">): Promise<string | u
 export async function runCheck(sandbox: Pick<Sandbox, "exec">, base: BaseCheck): Promise<CheckRun> {
   // What the branch changed since it left the base (three dots), so a base
   // that moved on since doesn't count against it.
-  const changed = await sandbox.exec(`git diff --name-only ${base.sha}...HEAD -- ${checkFiles.join(" ")} 2>&1`);
+  const changed = await sandbox.exec(`${run} git diff --name-only ${base.sha}...HEAD -- ${checkFiles.join(" ")} 2>&1`);
   if (changed.exitCode !== 0) {
     return { passed: false, output: `git diff failed, so the check's own files can't be shown unchanged:\n${changed.stdout}` };
   }
@@ -71,10 +80,12 @@ export async function runCheck(sandbox: Pick<Sandbox, "exec">, base: BaseCheck):
     };
   }
 
-  const { stdout, exitCode } = await sandbox.exec(`bash -c ${shellQuote(base.script)} check.sh </dev/null 2>&1`);
+  const { stdout, exitCode } = await sandbox.exec(`${run} bash -c ${shellQuote(base.script)} check.sh </dev/null 2>&1`);
   if (exitCode !== 0) return { passed: false, output: stdout };
 
-  const status = await sandbox.exec("git status --porcelain 2>&1");
+  // pnpm leaves its store at the worktree's root in the sandbox; a branch
+  // cut before .gitignore listed it would otherwise never pass.
+  const status = await sandbox.exec(`${run} git status --porcelain -- . ':(exclude).pnpm-store' 2>&1`);
   if (status.exitCode !== 0) {
     return { passed: false, output: `${stdout}\ngit status failed, so the worktree can't be shown to be clean:\n${status.stdout}` };
   }

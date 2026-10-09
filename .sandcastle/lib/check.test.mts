@@ -4,14 +4,16 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
-import { baseCheck, checkFiles, headOf, runCheck, shellQuote, tail } from "./check.mts";
+import { baseCheck, checkFiles, fixedPath, headOf, runCheck, shellQuote, tail } from "./check.mts";
 
 type Result = { stdout: string; stderr: string; exitCode: number };
 
 const base = { sha: "abc123", script: "echo it's checked\n" };
-const diff = `git diff --name-only abc123...HEAD -- ${checkFiles.join(" ")} 2>&1`;
-const check = `bash -c 'echo it'\\''s checked\n' check.sh </dev/null 2>&1`;
-const status = "git status --porcelain 2>&1";
+const run = `env PATH=${fixedPath}`;
+const diff = `${run} git diff --name-only abc123...HEAD -- ${checkFiles.join(" ")} 2>&1`;
+const check = `${run} bash -c 'echo it'\\''s checked\n' check.sh </dev/null 2>&1`;
+const status = `${run} git status --porcelain -- . ':(exclude).pnpm-store' 2>&1`;
+const head = `${run} git rev-parse HEAD`;
 
 // A sandbox whose exec answers each command from a table; any other command fails the test.
 const sandboxWith = (results: Record<string, { stdout: string; exitCode: number }>) => ({
@@ -88,8 +90,8 @@ describe("runCheck", () => {
 
 describe("headOf", () => {
   it("returns the commit, or undefined when git fails", async () => {
-    assert.equal(await headOf(sandboxWith({ "git rev-parse HEAD": { stdout: "abc\n", exitCode: 0 } })), "abc");
-    assert.equal(await headOf(sandboxWith({ "git rev-parse HEAD": { stdout: "fatal", exitCode: 128 } })), undefined);
+    assert.equal(await headOf(sandboxWith({ [head]: { stdout: "abc\n", exitCode: 0 } })), "abc");
+    assert.equal(await headOf(sandboxWith({ [head]: { stdout: "fatal", exitCode: 128 } })), undefined);
   });
 });
 
@@ -149,6 +151,11 @@ describe("the check in a git repo", () => {
         passed: true,
         output: "base check ran\n",
       });
+    }));
+
+  it("ignores the pnpm store pnpm leaves at the root, even where .gitignore doesn't list it", () =>
+    withRepo("mkdir -p .pnpm-store/v11 && touch .pnpm-store/v11/x\n", async (dir) => {
+      assert.equal((await runCheck({ exec: exec(dir) }, baseCheck("main", dir))).passed, true);
     }));
 
   it("fails when the base branch's check.sh fails", () =>

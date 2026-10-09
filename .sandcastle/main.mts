@@ -35,7 +35,7 @@ import * as sandcastle from "@ai-hero/sandcastle";
 import { docker } from "@ai-hero/sandcastle/sandboxes/docker";
 import { z } from "zod";
 import { branchFor, localIssueBranches, openSandcastleIssues } from "./lib/branches.mts";
-import { type BaseCheck, baseCheck, headOf, runCheck, tail } from "./lib/check.mts";
+import { type BaseCheck, baseCheck, checkFiles, headOf, runCheck, tail } from "./lib/check.mts";
 
 // The planner emits its plan as JSON inside <plan> tags; Output.object extracts
 // and validates it against this schema. We use Zod here, but any Standard
@@ -89,7 +89,8 @@ if (baseBranch === "HEAD") {
 
 // Runs the base's .sandcastle/check.sh in the issue's sandbox (see
 // lib/check.mts) and logs a failure's last lines. Its exit code, not an
-// agent's completion signal, decides. A branch that changes the check's own
+// agent's completion signal, decides. Returns the commit it checked, or
+// undefined when the check failed or HEAD moved while it ran. A branch that changes the check's own
 // files goes to a person: the issue is labelled sandcastle:needs-human, which
 // keeps it out of later plans until the owner removes the label.
 async function checkPasses(
@@ -97,8 +98,10 @@ async function checkPasses(
   issue: { id: string; branch: string },
   base: BaseCheck,
   when: string,
-): Promise<boolean> {
+): Promise<string | undefined> {
+  const before = await headOf(sandbox);
   const check = await runCheck(sandbox, base);
+  const after = await headOf(sandbox);
   if (!check.passed) {
     console.log(`  ${issue.id} (${issue.branch}): .sandcastle/check.sh failed ${when}:\n${tail(check.output, 40)}`);
   }
@@ -107,11 +110,37 @@ async function checkPasses(
       `Sandcastle stopped work on this issue: branch \`${issue.branch}\` changes the files ` +
       `\`.sandcastle/check.sh\` relies on, so the host can't trust its check. A person needs to review it.\n\n` +
       `\`\`\`text\n${tail(check.output, 20)}\n\`\`\``;
-    execFileSync("gh", ["issue", "edit", issue.id, "--add-label", NEEDS_HUMAN]);
+    // The comment matters more than the label, so a failed label (say it
+    // was deleted from the repo) doesn't stop it.
+    try {
+      execFileSync("gh", ["issue", "edit", issue.id, "--add-label", NEEDS_HUMAN]);
+    } catch (error) {
+      console.error(`  Couldn't label ${issue.id} ${NEEDS_HUMAN}: ${error}`);
+    }
     execFileSync("gh", ["issue", "comment", issue.id, "--body", body]);
   }
-  return check.passed;
+  if (!check.passed) return undefined;
+  if (before === undefined || before !== after) {
+    console.log(`  ${issue.id} (${issue.branch}): HEAD moved while the check ran ${when}.`);
+    return undefined;
+  }
+  return after;
 }
+
+// The commit a branch points to on the host, or undefined if it has none.
+function commitOf(branch: string): string | undefined {
+  try {
+    return execFileSync("git", ["rev-parse", "--verify", `refs/heads/${branch}^{commit}`], { encoding: "utf8" }).trim();
+  } catch {
+    return undefined;
+  }
+}
+
+// Pin the base branch and its check.sh once, before any agent runs: agents
+// share the repo's refs, so the name alone could be moved under us. No
+// branch that changes the check's files is merged, so they can't change
+// legitimately during a run; each round confirms they haven't.
+const base = baseCheck(baseBranch);
 
 // ---------------------------------------------------------------------------
 // Main loop
@@ -120,10 +149,13 @@ async function checkPasses(
 for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   console.log(`\n=== Iteration ${iteration}/${MAX_ITERATIONS} ===\n`);
 
-  // Pin the base branch and its check.sh before any agent of this round runs:
-  // agents share the repo's refs, so the name alone could be moved under us.
-  // Each round re-reads it, after the last round's merge.
-  const base = baseCheck(baseBranch);
+  const drift = execFileSync("git", ["diff", "--name-only", base.sha, baseBranch, "--", ...checkFiles], {
+    encoding: "utf8",
+  }).trim();
+  if (drift) {
+    console.error(`${baseBranch} changed the check's own files during the run, so it stops here:\n${drift}`);
+    break;
+  }
 
   // -------------------------------------------------------------------------
   // Phase 1: Plan
@@ -219,13 +251,13 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
         if (implement.completionSignal !== COMPLETE) {
           return { commits: implement.commits, complete: false };
         }
-        if (!(await checkPasses(sandbox, issue, base, "after the implementer"))) {
+        const checkedHead = await checkPasses(sandbox, issue, base, "after the implementer");
+        if (checkedHead === undefined) {
           return { commits: implement.commits, complete: false };
         }
 
         // A reviewer can rewrite the branch without adding commits (a reset
         // or a rebase), so the host compares HEAD, not the commit count.
-        const checkedHead = await headOf(sandbox);
         const review = await sandbox.run({
           name: "reviewer",
           maxIterations: 1,
@@ -241,11 +273,12 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
         // commits from its own run. A reviewer that moved HEAD changed the
         // branch, so the host checks it again.
         const commits = [...implement.commits, ...review.commits];
-        const unchanged = checkedHead !== undefined && (await headOf(sandbox)) === checkedHead;
-        const complete =
-          review.completionSignal === COMPLETE &&
-          (unchanged || (await checkPasses(sandbox, issue, base, "after the reviewer")));
-        return { commits, complete };
+        if (review.completionSignal !== COMPLETE) return { commits, complete: false };
+        const checked =
+          (await headOf(sandbox)) === checkedHead
+            ? checkedHead
+            : await checkPasses(sandbox, issue, base, "after the reviewer");
+        return { commits, complete: checked !== undefined, checked };
       } finally {
         await sandbox.close();
       }
@@ -265,6 +298,7 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
     issue: issues[i]!,
     commits: outcome.status === "fulfilled" ? outcome.value.commits.length : 0,
     complete: outcome.status === "fulfilled" && outcome.value.complete,
+    checked: outcome.status === "fulfilled" ? outcome.value.checked : undefined,
   }));
 
   if (results.every((result) => result.commits === 0)) {
@@ -276,9 +310,15 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
 
   // Only branches whose implementer and reviewer both signalled completion
   // go to the merge phase, which closes their issues.
-  const completedIssues = results
-    .filter((result) => result.complete && result.commits > 0)
-    .map((result) => result.issue);
+  // The merger merges the commit the host checked, and only while the branch
+  // still points to it: any agent could have moved the branch since.
+  const completed = results.filter((result) => {
+    if (!result.complete || result.commits === 0 || result.checked === undefined) return false;
+    if (commitOf(result.issue.branch) === result.checked) return true;
+    console.log(`  ${result.issue.id} (${result.issue.branch}) moved after the host checked it; left unmerged.`);
+    return false;
+  });
+  const completedIssues = completed.map((result) => result.issue);
 
   for (const result of results) {
     if (result.commits > 0 && !result.complete) {
@@ -320,8 +360,8 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
     agent: sandcastle.claudeCode("claude-opus-4-8"),
     promptFile: "./.sandcastle/merge-prompt.md",
     promptArgs: {
-      // A markdown list of branch names, one per line.
-      BRANCHES: completedBranches.map((b) => `- ${b}`).join("\n"),
+      // A markdown list of branches and the commits the host checked, one per line.
+      BRANCHES: completed.map((result) => `- ${result.issue.branch} at ${result.checked}`).join("\n"),
       // A markdown list of issue IDs and titles, one per line.
       ISSUES: completedIssues.map((i) => `- ${i.id}: ${i.title}`).join("\n"),
     },
