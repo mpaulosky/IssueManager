@@ -25,7 +25,8 @@
 //
 // The outer loop repeats up to MAX_ITERATIONS times so that newly unblocked
 // issues are picked up after each round of merges. It stops early when a
-// round produces no commits at all, since nothing changed to replan.
+// round produces no commits and no checked commit the merger hasn't been
+// offered yet, since nothing changed to replan.
 //
 // Usage (from the repo root, on the branch the work should land on):
 //   pnpm dlx tsx .sandcastle/main.mts
@@ -135,6 +136,9 @@ function commitOf(branch: string): string | undefined {
     return undefined;
   }
 }
+
+// The checked commits handed to the merger so far in this run.
+const offeredToMerger = new Set<string>();
 
 // Whether a commit adds anything to the base branch.
 function aheadOfBase(commit: string): boolean {
@@ -309,10 +313,15 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   // A checked commit that adds to the base is progress even when this round
   // made no commits: an earlier round's work that failed the check then (a
   // flaky test, say) and passes now.
+  // A commit the merger was offered before and didn't merge (a conflict it
+  // couldn't resolve, say) isn't progress: offering it again would repeat
+  // the same rounds.
   const mergeable = (result: (typeof results)[number]) =>
     result.complete && result.checked !== undefined && aheadOfBase(result.checked);
+  const newlyMergeable = (result: (typeof results)[number]) =>
+    mergeable(result) && !offeredToMerger.has(result.checked!);
 
-  if (results.every((result) => result.commits === 0 && !mergeable(result))) {
+  if (results.every((result) => result.commits === 0 && !newlyMergeable(result))) {
     // No pipeline changed anything, so the next plan would pick the same
     // issues and repeat the same runs. Stop rather than burn iterations.
     console.log("\nNo commits produced this round. Stopping.");
@@ -365,6 +374,7 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   // The {{BRANCHES}} and {{ISSUES}} prompt arguments are lists that the agent
   // uses to know which branches to merge and which issues to close.
   // -------------------------------------------------------------------------
+  for (const result of completed) offeredToMerger.add(result.checked!);
   await sandcastle.run({
     hooks,
     sandbox: docker(),
