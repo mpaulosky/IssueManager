@@ -29,7 +29,8 @@
 // host, in code, with git config the sandbox can't reach (lib/git.mts). The
 // Docker-backed test suites run in CI.
 //
-// Usage (from the repo root, with `gh auth login` done):
+// Usage (from the repo root, with `gh auth login` and `gh auth setup-git` done,
+// so git can push over HTTPS):
 //   pnpm run sandcastle
 
 import { existsSync, readFileSync } from "node:fs";
@@ -40,7 +41,7 @@ import { prepareBranches, uniqueIssues, withoutOpenPullRequests } from "./lib/br
 import { buildIssue } from "./lib/build.mts";
 import { baseCheck } from "./lib/check.mts";
 import { BASE_BRANCH, MODEL } from "./lib/config.mts";
-import { fetchFromOrigin, liveRepos } from "./lib/git.mts";
+import { fetchFromOrigin, liveRepos, requirePushCredentials } from "./lib/git.mts";
 import { listSandcastleIssues, openPullRequestBranches } from "./lib/github.mts";
 import { plannerPromptArgs } from "./lib/prompts.mts";
 import { githubTokensIn } from "./lib/sandbox-env.mts";
@@ -62,6 +63,8 @@ const planSchema = z.object({
 });
 
 async function main(): Promise<void> {
+  requirePushCredentials(liveRepos().host);
+
   // -------------------------------------------------------------------------
   // Plan
   // -------------------------------------------------------------------------

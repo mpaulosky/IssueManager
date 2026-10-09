@@ -85,6 +85,29 @@ describe("host git", () => {
     }
   });
 
+  it("doesn't run an alternate-refs command an agent planted in the clone", () => {
+    const repo = setup();
+    try {
+      // An alternate object store and a command git would run to list its refs.
+      mkdirSync(join(repo.clone, ".git", "x", "objects", "info"), { recursive: true });
+      mkdirSync(join(repo.clone, ".git", "x", "refs"), { recursive: true });
+      writeFileSync(join(repo.clone, ".git", "objects", "info", "alternates"), "../x/objects\n");
+      repo.git(repo.clone, "config", "core.alternateRefsCommand", `touch '${repo.marker}'; true`);
+      // Origin moves on, so the fetch has something to negotiate.
+      repo.git(repo.clone, "checkout", "-q", "main");
+      repo.commit("c.txt", "c\n");
+      repo.git(repo.clone, "push", "-q", "origin", "main");
+      repo.git(repo.clone, "reset", "-q", "--hard", "HEAD~1");
+      repo.git(repo.clone, "update-ref", "refs/remotes/origin/main", "HEAD");
+
+      fetchFromOrigin(repo.repos, "main");
+
+      assert.equal(existsSync(repo.marker), false);
+    } finally {
+      repo.cleanup();
+    }
+  });
+
   it("pushes the checked commit, not the branch's later one, to the host repo's origin", () => {
     const repo = setup();
     try {

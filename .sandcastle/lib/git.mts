@@ -11,8 +11,8 @@
 //   uploadpack.packObjectsHook from repo config).
 // - The few commands the host runs in the clone itself (reading refs and
 //   history, and fetching from the host repo) go through cloneGit, which
-//   switches off hooks, fsmonitor, replace refs, automatic gc and every
-//   transport but local files.
+//   switches off hooks, fsmonitor, alternate-refs commands, replace refs,
+//   automatic gc and every transport but local files.
 // - The base branch is merged into an issue branch inside the sandbox (see
 //   mergeBaseInSandbox in check.mts), where merge drivers and filters can't
 //   reach the host.
@@ -24,6 +24,7 @@ import { existsSync, mkdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { REPO } from "./config.mts";
+import { execFileSync } from "node:child_process";
 import { sh } from "./shell.mts";
 
 // Settings that override anything the clone's own config sets.
@@ -31,6 +32,9 @@ export const untrustedCloneConfig = [
   "--no-replace-objects",
   "-c", "core.hooksPath=/dev/null",
   "-c", "core.fsmonitor=false",
+  // Fetch negotiation runs this for every alternate object store an agent
+  // lists in objects/info/alternates; `true` lists no refs.
+  "-c", "core.alternateRefsCommand=true",
   "-c", "gc.auto=0",
   "-c", "maintenance.auto=false",
   "-c", "protocol.allow=never",
@@ -40,6 +44,32 @@ export const untrustedCloneConfig = [
 
 // Run git in the clone (or one of its worktrees) with untrustedCloneConfig.
 export const cloneGit = (cwd: string, ...args: string[]) => sh(cwd, "git", ...untrustedCloneConfig, ...args);
+
+// Run git in the host repo. It never prompts: a missing credential fails the
+// command at once instead of waiting on a terminal mid-run.
+const hostGit = (host: string, ...args: string[]) =>
+  execFileSync("git", args, {
+    cwd: host,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "inherit"],
+    env: { ...process.env, GIT_TERMINAL_PROMPT: "0" },
+  }).trim();
+
+// Fail before any agent runs when git has no HTTPS credential for GitHub,
+// which the host repo's pushes need (`gh auth setup-git` provides one).
+export function requirePushCredentials(host: string): void {
+  try {
+    execFileSync("git", ["credential", "fill"], {
+      cwd: host,
+      encoding: "utf8",
+      stdio: ["pipe", "pipe", "ignore"],
+      input: "protocol=https\nhost=github.com\n\n",
+      env: { ...process.env, GIT_TERMINAL_PROMPT: "0", GIT_ASKPASS: "", SSH_ASKPASS: "" },
+    });
+  } catch {
+    throw new Error("git has no HTTPS credential for github.com, so Sandcastle couldn't push. Run `gh auth setup-git`.");
+  }
+}
 
 // The host-only bare repo, created on first use.
 export function hostRepo(path = join(homedir(), ".cache", "sandcastle", `${REPO.replace("/", "-")}.git`)): string {
@@ -60,9 +90,9 @@ export const liveRepos = (): Repos => ({ host: hostRepo(), clone: process.cwd() 
 // refs/remotes/origin/<branch>, and return the commit.
 export function fetchFromOrigin(repos: Repos, branch: string): string {
   const ref = `refs/remotes/origin/${branch}`;
-  sh(repos.host, "git", "fetch", "--quiet", "origin", `+refs/heads/${branch}:${ref}`);
-  cloneGit(repos.clone, "fetch", "--quiet", "--no-write-fetch-head", repos.host, `+${ref}:${ref}`);
-  return sh(repos.host, "git", "rev-parse", "--verify", `${ref}^{commit}`);
+  hostGit(repos.host, "fetch", "--quiet", "origin", `+refs/heads/${branch}:${ref}`);
+  cloneGit(repos.clone, "fetch", "--quiet", "--no-write-fetch-head", "--no-recurse-submodules", repos.host, `+${ref}:${ref}`);
+  return hostGit(repos.host, "rev-parse", "--verify", `${ref}^{commit}`);
 }
 
 // Branch names from `git ls-remote --heads` output, without refs/heads/.
@@ -75,7 +105,7 @@ export function parseHeads(lsRemote: string): string[] {
 
 // The branches on origin matching the ref patterns, read from the host repo.
 export function remoteBranches(repos: Repos, patterns: readonly string[]): string[] {
-  return parseHeads(sh(repos.host, "git", "ls-remote", "--heads", "origin", ...patterns));
+  return parseHeads(hostGit(repos.host, "ls-remote", "--heads", "origin", ...patterns));
 }
 
 // The clone's local branches matching the ref prefixes.
@@ -147,7 +177,7 @@ export function containsBase(worktreePath: string, baseSha: string, sha: string)
 // losing them. No hook runs anywhere, so the Docker test suites are left to
 // CI.
 export function pushChecked(repos: Repos, sha: string, branch: string): void {
-  sh(repos.host, "git", "fetch", "--quiet", "--no-write-fetch-head", repos.clone, `+refs/heads/${branch}:refs/sandcastle/${branch}`);
-  sh(repos.host, "git", "cat-file", "-e", `${sha}^{commit}`);
-  sh(repos.host, "git", "push", "--quiet", "origin", `${sha}:refs/heads/${branch}`);
+  hostGit(repos.host, "fetch", "--quiet", "--no-write-fetch-head", repos.clone, `+refs/heads/${branch}:refs/sandcastle/${branch}`);
+  hostGit(repos.host, "cat-file", "-e", `${sha}^{commit}`);
+  hostGit(repos.host, "push", "--quiet", "origin", `${sha}:refs/heads/${branch}`);
 }
