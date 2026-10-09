@@ -4,6 +4,7 @@ This directory contains concise release-review posts for merged PR releases.
 
 | Date | Title | Tags |
 | ---- | ----- | ---- |
+| 2026-10-09 | [fix: Follow up on Sandcastle check review findings from #281](2026-10-09-pr-286-fix-follow-up-on-sandcastle-check-review-findings-from-281.md) | release,automation |
 | 2026-10-09 | [chore: Give Sandcastle a Docker-free check script](2026-10-09-pr-281-chore-give-sandcastle-a-docker-free-check-script.md) | release,automation |
 | 2026-10-08 | [fix(Tests): Give the E2E host fake Auth0 settings when none are set](2026-10-08-pr-282-fix-tests-give-the-e2e-host-fake-auth0-settings-when-none-are-set.md) | release,automation |
 | 2026-10-08 | [chore: Commit the Sandcastle setup](2026-10-08-pr-276-chore-commit-the-sandcastle-setup.md) | release,automation |
