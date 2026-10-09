@@ -37,6 +37,7 @@ import { docker } from "@ai-hero/sandcastle/sandboxes/docker";
 import { z } from "zod";
 import { branchFor, localIssueBranches, openSandcastleIssues } from "./lib/branches.mts";
 import { type BaseCheck, baseCheck, checkFiles, headOf, runCheck, tail } from "./lib/check.mts";
+import { mergeCandidates } from "./lib/rounds.mts";
 
 // The planner emits its plan as JSON inside <plan> tags; Output.object extracts
 // and validates it against this schema. We use Zod here, but any Standard
@@ -310,18 +311,11 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
     checked: outcome.status === "fulfilled" ? outcome.value.checked : undefined,
   }));
 
-  // A checked commit that adds to the base is progress even when this round
-  // made no commits: an earlier round's work that failed the check then (a
-  // flaky test, say) and passes now.
-  // A commit the merger was offered before and didn't merge (a conflict it
-  // couldn't resolve, say) isn't progress: offering it again would repeat
-  // the same rounds.
-  const mergeable = (result: (typeof results)[number]) =>
-    result.complete && result.checked !== undefined && aheadOfBase(result.checked);
-  const newlyMergeable = (result: (typeof results)[number]) =>
-    mergeable(result) && !offeredToMerger.has(result.checked!);
+  // Checked commits ahead of the base that the merger hasn't been offered
+  // yet (see lib/rounds.mts).
+  const { toMerge, progress } = mergeCandidates<(typeof results)[number]>(results, aheadOfBase, offeredToMerger);
 
-  if (results.every((result) => result.commits === 0 && !newlyMergeable(result))) {
+  if (!progress) {
     // No pipeline changed anything, so the next plan would pick the same
     // issues and repeat the same runs. Stop rather than burn iterations.
     console.log("\nNo commits produced this round. Stopping.");
@@ -332,8 +326,7 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
   // go to the merge phase, which closes their issues.
   // The merger merges the commit the host checked, and only while the branch
   // still points to it: any agent could have moved the branch since.
-  const completed = results.filter((result) => {
-    if (!mergeable(result)) return false;
+  const completed = toMerge.filter((result) => {
     if (commitOf(result.issue.branch) === result.checked) return true;
     console.log(`  ${result.issue.id} (${result.issue.branch}) moved after the host checked it; left unmerged.`);
     return false;

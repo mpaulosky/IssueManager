@@ -58,6 +58,13 @@ sandcastle_tests() {
     echo "No Sandcastle or root package changes to test."
     return
   fi
+  # The tests are TypeScript run by node --test with a glob: they need a Node
+  # that strips types unflagged (22.18+). The job has no setup-node, so say
+  # so plainly if the runner's default Node is too old.
+  if ! node -e 'process.exit(process.features.typescript ? 0 : 1)' 2>/dev/null; then
+    echo "::error::The Sandcastle tests need Node 22.18 or later; the runner has $(node --version)."
+    exit 1
+  fi
   pnpm install --frozen-lockfile
   pnpm run test:sandcastle
 }
