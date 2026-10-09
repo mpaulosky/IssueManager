@@ -310,9 +310,6 @@ FakesAssemblies/
 # Node.js Tools for Visual Studio
 .ntvs_analysis.dat
 node_modules/
-# pnpm puts its store at the repo root when the home folder is on another
-# file system, as in the Sandcastle sandbox, where the worktree is bind-mounted.
-.pnpm-store/
 
 # Visual Studio 6 build log
 *.plg
@@ -430,6 +427,10 @@ Thumbs.db
 # Local .NET SDK state and NuGet package cache (set by DOTNET_CLI_HOME / NUGET_PACKAGES)
 .dotnet/
 .nuget/
+
+# pnpm's content-addressable store, which pnpm creates at the worktree root in
+# Sandcastle sandboxes
+.pnpm-store/
 
 # Local dotCover reports
 docs/coverage/
