@@ -49,12 +49,13 @@ trust_dev_cert() {
 }
 
 # Sandcastle's orchestration code (.sandcastle/): run its tests when the PR
-# changes it or the root package files, as the local gate's
+# changes it, the root package files, or the branch-name and PR-title scripts,
+# as the local gate's
 # .github/ci/gate-checks.sh does. Without an origin/main to compare with, run them.
 sandcastle_tests() {
   local base
   if base="$(git merge-base HEAD origin/main 2>/dev/null)" \
-    && git diff --quiet --no-renames "$base" HEAD -- .sandcastle package.json pnpm-lock.yaml; then
+    && git diff --quiet --no-renames "$base" HEAD -- .sandcastle package.json pnpm-lock.yaml pnpm-workspace.yaml scripts/check-branch-name.sh scripts/check-pr-title.sh; then
     echo "No Sandcastle or root package changes to test."
     return
   fi

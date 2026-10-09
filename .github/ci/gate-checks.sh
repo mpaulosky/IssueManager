@@ -19,12 +19,13 @@ set -euo pipefail
 base="${1-}"
 
 # Sandcastle's orchestration code (.sandcastle/): run its tests when this
-# branch changes it or the root package files, or always without a base. CI's
+# branch changes it, the root package files, or the branch-name and PR-title
+# scripts its tests run its names through, or always without a base. CI's
 # Build Solution job runs the same through .github/ci/prepare.sh.
 # .sandcastle/check.sh runs them itself, every time, and sets SANDCASTLE_CHECK.
 if [[ -n "${SANDCASTLE_CHECK:-}" ]]; then
   echo "Sandcastle tests: .sandcastle/check.sh runs them."
-elif [[ -z "$base" ]] || ! git diff --quiet --no-renames "$base" HEAD -- .sandcastle package.json pnpm-lock.yaml; then
+elif [[ -z "$base" ]] || ! git diff --quiet --no-renames "$base" HEAD -- .sandcastle package.json pnpm-lock.yaml pnpm-workspace.yaml scripts/check-branch-name.sh scripts/check-pr-title.sh; then
   echo "Sandcastle tests"
   pnpm install --frozen-lockfile
   pnpm run test:sandcastle

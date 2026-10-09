@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { describe, it } from "node:test";
-import { branchFor, isIssueBranch, isQueued, slugFor } from "./branches.mts";
+import { branchFor, isIssueBranch, prepareBranches, slugFor, uniqueIssues, withoutOpenPullRequests } from "./branches.mts";
 
 const issue = (number: number, title: string, labels: string[] = ["Sandcastle"]) => ({ number, title, labels });
 
@@ -48,17 +48,19 @@ describe("slugFor", () => {
 });
 
 describe("isIssueBranch", () => {
-  it("matches the issue's feature and hotfix branches, not another issue's", () => {
+  it("matches the issue's feature, fix and hotfix branches, not another issue's", () => {
     assert.ok(isIssueBranch("feature/4-add-search", 4));
+    assert.ok(isIssueBranch("fix/4-stop-the-crash", 4));
     assert.ok(isIssueBranch("hotfix/4-stop-the-crash", 4));
     assert.ok(!isIssueBranch("feature/42-add-search", 4));
+    assert.ok(!isIssueBranch("fix/42-stop-the-crash", 4));
     assert.ok(!isIssueBranch("chore/4-add-search", 4));
   });
 });
 
 describe("branchFor", () => {
-  it("names a bug's branch hotfix/{n}-{slug}", () => {
-    assert.equal(branchFor(issue(7, "fix: Stop the crash", ["Sandcastle", "bug"]), []), "hotfix/7-stop-the-crash");
+  it("names a bug's branch fix/{n}-{slug}", () => {
+    assert.equal(branchFor(issue(7, "fix: Stop the crash", ["Sandcastle", "bug"]), []), "fix/7-stop-the-crash");
   });
 
   it("names any other issue's branch feature/{n}-{slug}", () => {
@@ -68,6 +70,11 @@ describe("branchFor", () => {
   it("reuses the issue's existing branch after its title or labels change", () => {
     const existing = ["feature/80-other-work", "feature/8-add-search"];
     assert.equal(branchFor(issue(8, "feat: Add full-text search", ["Sandcastle", "bug"]), existing), "feature/8-add-search");
+  });
+
+  it("reuses an existing fix/ or hotfix/ branch", () => {
+    assert.equal(branchFor(issue(9, "Add search"), ["fix/9-stop-the-crash"]), "fix/9-stop-the-crash");
+    assert.equal(branchFor(issue(9, "Add search", ["bug"]), ["hotfix/9-urgent"]), "hotfix/9-urgent");
   });
 
   it("only names branches that pass the branch standard", () => {
@@ -80,12 +87,42 @@ describe("branchFor", () => {
   });
 });
 
-describe("isQueued", () => {
-  it("queues a Sandcastle issue", () => {
-    assert.equal(isQueued({ labels: ["Sandcastle", "bug"] }), true);
+describe("withoutOpenPullRequests", () => {
+  it("holds back issues with an open PR from one of their branches", () => {
+    const issues = [issue(1, "One"), issue(2, "Two"), issue(3, "Three")];
+    const { ready, inReview } = withoutOpenPullRequests(issues, ["fix/2-two", "feature/30-other", "chore/tidy"]);
+    assert.deepEqual(ready.map((i) => i.number), [1, 3]);
+    assert.deepEqual(inReview.map((i) => i.number), [2]);
+  });
+});
+
+describe("uniqueIssues", () => {
+  it("keeps each issue once, in first-seen order", () => {
+    const issues = [issue(2, "Two"), issue(1, "One"), issue(2, "Two again")];
+    assert.deepEqual(uniqueIssues(issues).map((i) => i.title), ["Two", "One"]);
+  });
+});
+
+describe("prepareBranches", () => {
+  it("fetches only the branches that already exist on origin", () => {
+    const fetched: string[] = [];
+    const work = prepareBranches([issue(1, "Add search"), issue(2, "Stop the crash", ["bug"])], {
+      remoteBranches: () => ["feature/1-add-search"],
+      localBranches: () => [],
+      fetch: (branch) => fetched.push(branch),
+    });
+    assert.deepEqual(work.map((w) => w.branch), ["feature/1-add-search", "fix/2-stop-the-crash"]);
+    assert.deepEqual(fetched, ["feature/1-add-search"]);
   });
 
-  it("holds back an issue handed to a person", () => {
-    assert.equal(isQueued({ labels: ["Sandcastle", "sandcastle:needs-human"] }), false);
+  it("reuses a local branch that was never pushed", () => {
+    const fetched: string[] = [];
+    const work = prepareBranches([issue(3, "Renamed title")], {
+      remoteBranches: () => [],
+      localBranches: () => ["fix/3-old-title"],
+      fetch: (branch) => fetched.push(branch),
+    });
+    assert.deepEqual(work.map((w) => w.branch), ["fix/3-old-title"]);
+    assert.deepEqual(fetched, []);
   });
 });

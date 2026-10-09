@@ -1,389 +1,142 @@
-// Parallel Planner with Review — three-phase orchestration loop
+// Parallel Planner with Review: plan → build → review → pull request, one round
 //
-// This template drives a multi-phase workflow:
-//   Phase 1 (Plan):             An opus agent analyzes open issues, builds a
-//                               dependency graph, and outputs a <plan> JSON
-//                               listing unblocked issues. The host names
-//                               each issue's branch (lib/branches.mts).
-//   Phase 2 (Execute + Review): For each issue, a sandbox is created via
-//                               createSandbox(). The implementer runs first
-//                               (100 iterations). If it signals completion and
-//                               .sandcastle/check.sh passes in the sandbox, a
-//                               reviewer runs in the same sandbox on the same
-//                               branch (1 iteration), and the check runs again.
-//                               All issue pipelines run concurrently via
-//                               Promise.allSettled().
-//   Phase 3 (Merge):            A single agent merges the completed branches
-//                               (the implementer and reviewer both signalled
-//                               completion, and the host's check passed) into
-//                               the current branch.
+//   Plan:   The host reads the open Sandcastle issues with its own gh auth,
+//           keeping only issues and comments from the owner, members and
+//           collaborators, and leaving out those handed to a person
+//           (sandcastle:needs-human). Issues that already have an open
+//           same-repo PR can't be picked, but the planner sees them, since
+//           they still block the issues that depend on them. A planner
+//           agent picks the ready issues that can be built in parallel, and
+//           the host names each issue's branch (lib/branches.mts).
+//   Build:  For each issue, in its own sandbox (lib/build.mts): origin/main is
+//           merged into the branch, the implementer works the issue, the host
+//           runs .sandcastle/check.sh, a reviewer refines the change and
+//           returns an approve or reject verdict, and the host checks again
+//           if HEAD moved. An approved branch's checked commit is pushed and
+//           gets its own draft PR that fixes the issue; anything else gets a
+//           comment on the issue and isn't pushed. All pipelines run
+//           concurrently.
 //
-// The sandbox has no Docker, on purpose: the host's Docker socket would give
-// the agents, who read public issue content, root on the host. So check.sh
-// skips the Docker-backed test projects; the host's pre-push gate
-// (scripts/gate.sh) and CI run those.
+// One round per run: nothing merges into main during a run (each PR waits for
+// a person), so a second round couldn't unblock anything, and would only
+// retry the issues that stopped. Run it again once PRs have merged.
 //
-// The outer loop repeats up to MAX_ITERATIONS times so that newly unblocked
-// issues are picked up after each round of merges. It stops early when a
-// round produces no commits and no checked commit the merger hasn't been
-// offered yet, since nothing changed to replan.
+// No issue is closed here: each change reaches main through its PR and the
+// checks in docs/PROCESS.md, and the PR's "Fixes #n" closes the issue.
 //
-// Usage (from the repo root, on the branch the work should land on):
-//   pnpm dlx tsx .sandcastle/main.mts
+// The sandbox gets no GitHub token and no Docker. Agents read the issue from
+// their prompt, and every GitHub write (comments, pushes, PRs) is made by the
+// host, in code, with git config the sandbox can't reach (lib/git.mts). The
+// Docker-backed test suites run in CI.
+//
+// Usage (from the repo root, with `gh auth login` and `gh auth setup-git` done,
+// so git can push over HTTPS):
+//   pnpm run sandcastle
 
-import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 import * as sandcastle from "@ai-hero/sandcastle";
 import { docker } from "@ai-hero/sandcastle/sandboxes/docker";
 import { z } from "zod";
-import { branchFor, localIssueBranches, openSandcastleIssues } from "./lib/branches.mts";
-import { type BaseCheck, baseCheck, checkFiles, headOf, runCheck, tail } from "./lib/check.mts";
-import { mergeCandidates } from "./lib/rounds.mts";
+import { prepareBranches, uniqueIssues, withoutOpenPullRequests } from "./lib/branches.mts";
+import { buildIssue } from "./lib/build.mts";
+import { baseCheck } from "./lib/check.mts";
+import { BASE_BRANCH, MODEL } from "./lib/config.mts";
+import { fetchFromOrigin, liveRepos, requirePushCredentials } from "./lib/git.mts";
+import { listSandcastleIssues, openPullRequestBranches } from "./lib/github.mts";
+import { plannerPromptArgs } from "./lib/prompts.mts";
+import { githubTokensIn } from "./lib/sandbox-env.mts";
+
+const envFile = ".sandcastle/.env";
+const leakedTokens = existsSync(envFile) ? githubTokensIn(readFileSync(envFile, "utf8")) : [];
+if (leakedTokens.length > 0) {
+  throw new Error(
+    `${envFile} sets ${leakedTokens.join(" and ")}, which Sandcastle would pass into the sandbox. ` +
+      "Remove it: the host uses its own gh auth, and agents must not reach GitHub.",
+  );
+}
 
 // The planner emits its plan as JSON inside <plan> tags; Output.object extracts
-// and validates it against this schema. We use Zod here, but any Standard
-// Schema validator works just as well — Valibot, ArkType, etc. See
-// https://standardschema.dev.
+// and validates it against this schema. There's no branch field: the host
+// names branches, so a re-plan can't move an issue's work to a new branch.
 const planSchema = z.object({
-  issues: z.array(
-    z.object({ id: z.string(), title: z.string() }),
-  ),
+  issues: z.array(z.object({ id: z.string(), title: z.string() })),
 });
 
-// ---------------------------------------------------------------------------
-// Configuration
-// ---------------------------------------------------------------------------
-
-// Maximum number of plan→execute→merge cycles before stopping.
-// Raise this if your backlog is large; lower it for a quick smoke-test run.
-const MAX_ITERATIONS = 10;
-
-// Hooks run inside the sandbox before the agent starts each iteration.
-// pnpm (the version pinned by package.json's packageManager, enabled in the
-// image through corepack) installs exactly what pnpm-lock.yaml records, and
-// fails rather than re-resolve when the lockfile is out of date.
-const hooks = {
-  sandbox: { onSandboxReady: [{ command: "pnpm install --frozen-lockfile" }] },
-};
-
-// Copy node_modules from the host into the worktree before each sandbox
-// starts. Avoids a full install from scratch; the hook above handles
-// platform-specific binaries and any packages added since the last copy.
-const copyToWorktree = ["node_modules"];
-
-// What the implementer and reviewer print once their work is done and
-// .sandcastle/check.sh passes (see implement-prompt.md and review-prompt.md).
-// The host runs the check itself before it believes them.
-const COMPLETE = "<promise>COMPLETE</promise>";
-
-// The label that hands an issue to a person (see lib/branches.mts).
-const NEEDS_HUMAN = "sandcastle:needs-human";
-
-// The branch the run started on: issue branches are cut from it, the reviewer
-// diffs against it, and the merger merges into it. Sandcastle's built-in
-// {{TARGET_BRANCH}} can't serve here, since inside a createSandbox() sandbox
-// it names the issue branch itself, so the review prompt uses BASE_BRANCH.
-const baseBranch = execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
-  encoding: "utf8",
-}).trim();
-if (baseBranch === "HEAD") {
-  throw new Error("Run Sandcastle from a branch, not a detached HEAD.");
-}
-
-// Runs the base's .sandcastle/check.sh in the issue's sandbox (see
-// lib/check.mts) and logs a failure's last lines. Its exit code, not an
-// agent's completion signal, decides. Returns the commit it checked, or
-// undefined when the check failed or HEAD moved while it ran. A branch that changes the check's own
-// files goes to a person: the issue is labelled sandcastle:needs-human, which
-// keeps it out of later plans until the owner removes the label.
-async function checkPasses(
-  sandbox: Parameters<typeof runCheck>[0],
-  issue: { id: string; branch: string },
-  base: BaseCheck,
-  when: string,
-): Promise<string | undefined> {
-  const before = await headOf(sandbox);
-  const check = await runCheck(sandbox, base);
-  const after = await headOf(sandbox);
-  if (!check.passed) {
-    console.log(`  ${issue.id} (${issue.branch}): .sandcastle/check.sh failed ${when}:\n${tail(check.output, 40)}`);
-  }
-  if (check.needsHuman) {
-    const body =
-      `Sandcastle stopped work on this issue: branch \`${issue.branch}\` changes the files ` +
-      `\`.sandcastle/check.sh\` relies on, so the host can't trust its check. A person needs to review it.\n\n` +
-      `\`\`\`text\n${tail(check.output, 20)}\n\`\`\``;
-    // The comment matters more than the label, so a failed label (say it
-    // was deleted from the repo) doesn't stop it.
-    try {
-      execFileSync("gh", ["issue", "edit", issue.id, "--add-label", NEEDS_HUMAN]);
-    } catch (error) {
-      console.error(`  Couldn't label ${issue.id} ${NEEDS_HUMAN}: ${error}`);
-    }
-    execFileSync("gh", ["issue", "comment", issue.id, "--body", body]);
-  }
-  if (!check.passed) return undefined;
-  if (before === undefined || before !== after) {
-    console.log(`  ${issue.id} (${issue.branch}): HEAD moved while the check ran ${when}.`);
-    return undefined;
-  }
-  return after;
-}
-
-// The commit a branch points to on the host, or undefined if it has none.
-function commitOf(branch: string): string | undefined {
-  try {
-    return execFileSync("git", ["rev-parse", "--verify", `refs/heads/${branch}^{commit}`], { encoding: "utf8" }).trim();
-  } catch {
-    return undefined;
-  }
-}
-
-// The checked commits handed to the merger so far in this run.
-const offeredToMerger = new Set<string>();
-
-// Whether a commit adds anything to the base branch.
-function aheadOfBase(commit: string): boolean {
-  return execFileSync("git", ["rev-list", "--count", `${baseBranch}..${commit}`], { encoding: "utf8" }).trim() !== "0";
-}
-
-// Pin the base branch and its check.sh once, before any agent runs: agents
-// share the repo's refs, so the name alone could be moved under us. No
-// branch that changes the check's files is merged, so they can't change
-// legitimately during a run; each round confirms they haven't.
-const base = baseCheck(baseBranch);
-
-// ---------------------------------------------------------------------------
-// Main loop
-// ---------------------------------------------------------------------------
-
-for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
-  console.log(`\n=== Iteration ${iteration}/${MAX_ITERATIONS} ===\n`);
-
-  const drift = execFileSync("git", ["diff", "--name-only", base.sha, baseBranch, "--", ...checkFiles], {
-    encoding: "utf8",
-  }).trim();
-  if (drift) {
-    console.error(`${baseBranch} changed the check's own files during the run, so it stops here:\n${drift}`);
-    break;
-  }
+async function main(): Promise<void> {
+  requirePushCredentials(liveRepos().host);
 
   // -------------------------------------------------------------------------
-  // Phase 1: Plan
-  //
-  // The planning agent (opus, for deeper reasoning) reads the open issue list,
-  // builds a dependency graph, and selects the issues that can be worked in
-  // parallel right now (i.e., no blocking dependencies on other open issues).
-  //
-  // It outputs a <plan> JSON block — Output.object parses and validates it.
+  // Plan
   // -------------------------------------------------------------------------
+  const { ready, inReview } = withoutOpenPullRequests(listSandcastleIssues(), openPullRequestBranches());
+  for (const issue of inReview) {
+    console.log(`  ⏸ #${issue.number} is held back: its pull request is open.`);
+  }
+  if (ready.length === 0) {
+    console.log("No open Sandcastle issues ready to build.");
+    return;
+  }
+
   const plan = await sandcastle.run({
-    hooks,
     sandbox: docker(),
     name: "planner",
-    // One iteration is enough: the planner just needs to read and reason,
-    // not write code. (Structured output requires maxIterations: 1.)
+    // Structured output requires maxIterations: 1.
     maxIterations: 1,
-    // Opus for planning: dependency analysis benefits from deeper reasoning.
-    agent: sandcastle.claudeCode("claude-opus-4-8"),
+    agent: sandcastle.claudeCode(MODEL),
     promptFile: "./.sandcastle/plan-prompt.md",
-    // Extract and validate the <plan> JSON into a typed object. Throws
-    // StructuredOutputError if the tag is missing, the JSON is malformed, or
-    // validation fails — which aborts the loop.
+    promptArgs: plannerPromptArgs(ready, inReview),
+    // Throws StructuredOutputError if the tag is missing, the JSON is
+    // malformed, or validation fails, which ends the run.
     output: sandcastle.Output.object({ tag: "plan", schema: planSchema }),
   });
 
-  // Name each picked issue's branch from its number, title and labels on
-  // GitHub, so the name follows the branch standard and doesn't drift
-  // between plans. An id that isn't an open Sandcastle issue is skipped.
-  const openIssues = openSandcastleIssues();
-  const existingBranches = localIssueBranches();
-  const issues = plan.output.issues.flatMap(({ id }) => {
-    const issue = openIssues.find((open) => String(open.number) === id);
-    if (!issue) {
-      console.warn(`  Skipping ${id}: not an open issue labelled Sandcastle, or it waits on a person.`);
-      return [];
-    }
-    return [{ id, title: issue.title, branch: branchFor(issue, existingBranches) }];
-  });
-
-  if (issues.length === 0) {
-    // No unblocked work — either everything is done or everything is blocked.
-    console.log("No unblocked issues to work on. Exiting.");
-    break;
-  }
-
-  console.log(
-    `Planning complete. ${issues.length} issue(s) to work in parallel:`,
-  );
-  for (const issue of issues) {
-    console.log(`  ${issue.id}: ${issue.title} → ${issue.branch}`);
-  }
-
-  // -------------------------------------------------------------------------
-  // Phase 2: Execute + Review
-  //
-  // For each issue, create a sandbox via createSandbox() so the implementer
-  // and reviewer share the same sandbox instance per branch. The implementer
-  // runs first; if it signals completion, the reviewer runs in the same sandbox.
-  //
-  // Promise.allSettled means one failing pipeline doesn't cancel the others.
-  // -------------------------------------------------------------------------
-
-  const settled = await Promise.allSettled(
-    issues.map(async (issue) => {
-      const sandbox = await sandcastle.createSandbox({
-        branch: issue.branch,
-        baseBranch,
-        sandbox: docker(),
-        hooks,
-        copyToWorktree,
-      });
-
-      try {
-        // Run the implementer
-        const implement = await sandbox.run({
-          name: "implementer",
-          maxIterations: 100,
-          agent: sandcastle.claudeCode("claude-opus-4-8"),
-          promptFile: "./.sandcastle/implement-prompt.md",
-          promptArgs: {
-            TASK_ID: issue.id,
-            ISSUE_TITLE: issue.title,
-            BRANCH: issue.branch,
-          },
-        });
-
-        // The implementer may commit partial work and stop without
-        // finishing (out of iterations, or blocked). Only a run that printed
-        // the completion signal, and whose branch then passes the host's
-        // check, is reviewed and counted complete. Partial work stays on
-        // the issue's branch, and a later round picks the branch up again.
-        if (implement.completionSignal !== COMPLETE) {
-          return { commits: implement.commits, complete: false };
-        }
-        const checkedHead = await checkPasses(sandbox, issue, base, "after the implementer");
-        if (checkedHead === undefined) {
-          return { commits: implement.commits, complete: false };
-        }
-
-        // A reviewer can rewrite the branch without adding commits (a reset
-        // or a rebase), so the host compares HEAD, not the commit count.
-        const review = await sandbox.run({
-          name: "reviewer",
-          maxIterations: 1,
-          agent: sandcastle.claudeCode("claude-opus-4-8"),
-          promptFile: "./.sandcastle/review-prompt.md",
-          promptArgs: {
-            BRANCH: issue.branch,
-            BASE_BRANCH: baseBranch,
-          },
-        });
-
-        // Merge commits from both runs: each sandbox.run() only returns
-        // commits from its own run. A reviewer that moved HEAD changed the
-        // branch, so the host checks it again.
-        const commits = [...implement.commits, ...review.commits];
-        if (review.completionSignal !== COMPLETE) return { commits, complete: false };
-        const checked =
-          (await headOf(sandbox)) === checkedHead
-            ? checkedHead
-            : await checkPasses(sandbox, issue, base, "after the reviewer");
-        return { commits, complete: checked !== undefined, checked };
-      } finally {
-        await sandbox.close();
-      }
+  // Keep only ids from the ready list, so a hallucinated, stale or in-review
+  // id can't start work on an issue that wasn't offered, and each issue only
+  // once, so two pipelines never share a branch.
+  const picks = uniqueIssues(
+    plan.output.issues.flatMap(({ id }) => {
+      const issue = ready.find((open) => String(open.number) === id);
+      if (!issue) console.warn(`  Skipping ${id}: it isn't one of the ready issues.`);
+      return issue ? [issue] : [];
     }),
   );
+  if (picks.length === 0) {
+    console.log("No unblocked issues to work on.");
+    return;
+  }
 
-  // Log any agents that threw (network error, sandbox crash, etc.).
+  // -------------------------------------------------------------------------
+  // Build, review and publish
+  // -------------------------------------------------------------------------
+  // Pin the base and its check.sh right after the fetch, from the host-only
+  // repo: agents share the clone's refs, so every later decision uses this
+  // commit, not a ref.
+  const repos = liveRepos();
+  const base = baseCheck(fetchFromOrigin(repos, BASE_BRANCH), repos.host);
+  const work = prepareBranches(picks);
+
+  console.log(`Planning complete. ${work.length} issue(s) to build in parallel:`);
+  for (const { issue, branch } of work) {
+    console.log(`  #${issue.number}: ${issue.title} → ${branch}`);
+  }
+
+  // Promise.allSettled means one failing pipeline doesn't cancel the others.
+  const settled = await Promise.allSettled(work.map(({ issue, branch }) => buildIssue(issue, branch, base)));
+
+  const published: string[] = [];
   for (const [i, outcome] of settled.entries()) {
+    const { issue, branch } = work[i]!;
     if (outcome.status === "rejected") {
-      console.error(
-        `  ✗ ${issues[i]!.id} (${issues[i]!.branch}) failed: ${outcome.reason}`,
-      );
+      console.error(`  ✗ #${issue.number} (${branch}) failed: ${outcome.reason}`);
+    } else if (outcome.value.prUrl) {
+      published.push(`  #${issue.number} (${branch}) → ${outcome.value.prUrl}`);
+    } else {
+      console.log(`  #${issue.number} (${branch}): ${outcome.value.outcome}`);
     }
   }
 
-  const results = settled.map((outcome, i) => ({
-    issue: issues[i]!,
-    commits: outcome.status === "fulfilled" ? outcome.value.commits.length : 0,
-    complete: outcome.status === "fulfilled" && outcome.value.complete,
-    checked: outcome.status === "fulfilled" ? outcome.value.checked : undefined,
-  }));
-
-  // Checked commits ahead of the base that the merger hasn't been offered
-  // yet (see lib/rounds.mts).
-  const { toMerge, progress } = mergeCandidates<(typeof results)[number]>(results, aheadOfBase, offeredToMerger);
-
-  if (!progress) {
-    // No pipeline changed anything, so the next plan would pick the same
-    // issues and repeat the same runs. Stop rather than burn iterations.
-    console.log("\nNo commits produced this round. Stopping.");
-    break;
-  }
-
-  // Only branches whose implementer and reviewer both signalled completion
-  // go to the merge phase, which closes their issues.
-  // The merger merges the commit the host checked, and only while the branch
-  // still points to it: any agent could have moved the branch since.
-  const completed = toMerge.filter((result) => {
-    if (commitOf(result.issue.branch) === result.checked) return true;
-    console.log(`  ${result.issue.id} (${result.issue.branch}) moved after the host checked it; left unmerged.`);
-    return false;
-  });
-  const completedIssues = completed.map((result) => result.issue);
-
-  for (const result of results) {
-    if (result.commits > 0 && !result.complete) {
-      console.log(`  ${result.issue.id} (${result.issue.branch}) is not complete; left unmerged.`);
-    }
-  }
-
-  const completedBranches = completedIssues.map((i) => i.branch);
-
-  console.log(
-    `\nExecution complete. ${completedBranches.length} completed branch(es):`,
-  );
-  for (const branch of completedBranches) {
-    console.log(`  ${branch}`);
-  }
-
-  if (completedBranches.length === 0) {
-    // Some work was committed but nothing finished: the next round picks
-    // the unfinished branches up again.
-    console.log("Nothing complete to merge this round.");
-    continue;
-  }
-
-  // -------------------------------------------------------------------------
-  // Phase 3: Merge
-  //
-  // One agent merges all completed branches into the current branch,
-  // resolving any conflicts and running .sandcastle/check.sh to confirm
-  // everything works. The host doesn't re-check the merged result, a known
-  // gap: the next round's checks run on top of it, and the pre-push gate
-  // runs everything before any of it is pushed.
-  //
-  // The {{BRANCHES}} and {{ISSUES}} prompt arguments are lists that the agent
-  // uses to know which branches to merge and which issues to close.
-  // -------------------------------------------------------------------------
-  for (const result of completed) offeredToMerger.add(result.checked!);
-  await sandcastle.run({
-    hooks,
-    sandbox: docker(),
-    name: "merger",
-    maxIterations: 1,
-    agent: sandcastle.claudeCode("claude-opus-4-8"),
-    promptFile: "./.sandcastle/merge-prompt.md",
-    promptArgs: {
-      // A markdown list of branches and the commits the host checked, one per line.
-      BRANCHES: completed.map((result) => `- ${result.issue.branch} at ${result.checked}`).join("\n"),
-      // A markdown list of issue IDs and titles, one per line.
-      ISSUES: completedIssues.map((i) => `- ${i.id}: ${i.title}`).join("\n"),
-    },
-  });
-
-  console.log("\nBranches merged.");
+  console.log(`\nDone. ${published.length} pull request(s):`);
+  for (const line of published) console.log(line);
 }
 
-console.log("\nAll done.");
+await main();

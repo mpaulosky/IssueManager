@@ -12,7 +12,7 @@
 // This guards against mistakes and false claims of completion, not against a
 // determined agent: the sandbox is the agent's, and the branch's other files
 // (a csproj that adds Testcontainers, say, or .npmrc) still steer the check.
-// The boundary is the host's pre-push gate and CI, which run everything.
+// The boundary is CI, which runs everything on the pull request.
 
 import { execFileSync } from "node:child_process";
 import type { Sandbox } from "@ai-hero/sandcastle";
@@ -60,11 +60,23 @@ export async function headOf(sandbox: Pick<Sandbox, "exec">): Promise<string | u
   return head.exitCode === 0 ? head.stdout.trim() : undefined;
 }
 
+// Merge the base into the sandbox's branch when it's behind, so the work is
+// built, checked and reviewed against current main and its PR can merge.
+// Runs in the sandbox, where merge drivers and filters from the agent-writable
+// config can't reach the host. Returns false, with the merge undone, when it
+// conflicts; the implementer is then asked to merge it.
+export async function mergeBaseInSandbox(sandbox: Pick<Sandbox, "exec">, baseSha: string): Promise<boolean> {
+  if ((await sandbox.exec(`${run} git merge-base --is-ancestor ${baseSha} HEAD`)).exitCode === 0) return true;
+  if ((await sandbox.exec(`${run} git merge --no-edit ${baseSha} 2>&1`)).exitCode === 0) return true;
+  await sandbox.exec(`${run} git merge --abort 2>&1`);
+  return false;
+}
+
 // Run the check with stderr folded into stdout, so the output keeps the order
 // it was printed in. The script gets its text as an argument and /dev/null as
 // stdin, so no command in it can read the rest of the script. A passing check
-// over a dirty worktree still fails: only commits are merged, so uncommitted
-// edits would be checked but never land.
+// over a dirty worktree still fails: only commits are published, so
+// uncommitted edits would be checked but never land.
 export async function runCheck(sandbox: Pick<Sandbox, "exec">, base: BaseCheck): Promise<CheckRun> {
   // What the branch changed since it left the base (three dots), so a base
   // that moved on since doesn't count against it.
@@ -100,4 +112,11 @@ export async function runCheck(sandbox: Pick<Sandbox, "exec">, base: BaseCheck):
 // The last `lines` lines of the output.
 export function tail(output: string, lines: number): string {
   return output.replace(/\n$/, "").split("\n").slice(-lines).join("\n");
+}
+
+// Text quoted in a fence longer than any run of backticks inside it.
+export function fenced(text: string): string {
+  const longestRun = Math.max(0, ...[...text.matchAll(/`+/g)].map((match) => match[0].length));
+  const fence = "`".repeat(Math.max(3, longestRun + 1));
+  return `${fence}text\n${text}\n${fence}`;
 }

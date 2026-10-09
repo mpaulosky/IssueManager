@@ -6,8 +6,8 @@
 # It is scripts/gate.sh without Docker. The sandbox deliberately has no Docker
 # (the host's Docker socket would give its agents root on the host), so this
 # skips the test projects that need it: any that references Testcontainers or
-# Aspire.Hosting.Testing. The host's pre-push gate (scripts/gate.sh) runs
-# those before anything is pushed, and CI runs every test project.
+# Aspire.Hosting.Testing. CI runs every test project on the pull request
+# the host opens.
 set -euo pipefail
 
 cd "$(git rev-parse --show-toplevel)"
@@ -26,7 +26,7 @@ fi
 
 # Of the gate's lints only Markdown runs here: the image has pnpm, but not
 # yamllint, actionlint, zizmor or shellcheck (whose fallbacks need Docker).
-# The pre-push gate and CI's lint workflows run those.
+# CI's lint workflows run those.
 mapfile -t MD_FILES < <(grep -E '\.md$' <<< "$CHANGED" | grep -Ev '^docs/blogs/' || true)
 step "Markdown lint (${#MD_FILES[@]} changed file(s))"
 if [[ ${#MD_FILES[@]} -gt 0 ]]; then
@@ -62,7 +62,7 @@ mapfile -t TEST_PROJECTS < <(grep . <<< "$TEST_LIST" || true)
 ran=0
 for project in "${TEST_PROJECTS[@]}"; do
   if needs_docker "$project"; then
-    echo "Skipping ${project}: it needs Docker. The pre-push gate and CI run it."
+    echo "Skipping ${project}: it needs Docker. CI runs it."
     continue
   fi
   dotnet test "$project" --configuration Release
