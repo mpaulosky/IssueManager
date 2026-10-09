@@ -4,6 +4,7 @@ This directory contains concise release-review posts for merged PR releases.
 
 | Date | Title | Tags |
 | ---- | ----- | ---- |
+| 2026-10-09 | [chore: Re-apply the repo-ci-baseline Template](2026-10-09-pr-289-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
 | 2026-10-09 | [fix: Publish each Sandcastle issue as its own PR, and fix the other #276 review findings](2026-10-09-pr-285-fix-publish-each-sandcastle-issue-as-its-own-pr-and-fix-the-other-276-review-findings.md) | release,automation |
 | 2026-10-09 | [fix: Follow up on Sandcastle check review findings from #281](2026-10-09-pr-286-fix-follow-up-on-sandcastle-check-review-findings-from-281.md) | release,automation |
 | 2026-10-09 | [chore: Give Sandcastle a Docker-free check script](2026-10-09-pr-281-chore-give-sandcastle-a-docker-free-check-script.md) | release,automation |
