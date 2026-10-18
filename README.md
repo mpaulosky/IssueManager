@@ -62,6 +62,7 @@ See [LICENSE](LICENSE) for details.
 
 | Version | Date | Title | Blog post |
 | ------- | ---- | ----- | --------- |
+| [v0.0.79](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.79) | 2026-10-18 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-18-pr-316-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.78](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.78) | 2026-10-18 | chore(deps): Have Dependabot ignore claude-code-action | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-18-pr-313-chore-deps-have-dependabot-ignore-claude-code-action.md) |
 | [v0.0.77](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.77) | 2026-10-18 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-18-pr-309-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.76](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.76) | 2026-10-16 | build(deps): Update NuGet packages | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-16-pr-307-build-deps-update-nuget-packages.md) |
@@ -71,7 +72,6 @@ See [LICENSE](LICENSE) for details.
 | [v0.0.72](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.72) | 2026-10-10 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-10-pr-297-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.71](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.71) | 2026-10-10 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-10-pr-295-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.70](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.70) | 2026-10-10 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-10-pr-293-chore-re-apply-the-repo-ci-baseline-template.md) |
-| [v0.0.69](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.69) | 2026-10-10 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-10-pr-291-chore-re-apply-the-repo-ci-baseline-template.md) |
 
 <!-- RELEASES_END -->
 
