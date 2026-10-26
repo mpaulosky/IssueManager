@@ -4,6 +4,7 @@ This directory contains concise release-review posts for merged PR releases.
 
 | Date | Title | Tags |
 | ---- | ----- | ---- |
+| 2026-10-26 | [chore: Re-apply the repo-ci-baseline Template](2026-10-26-pr-332-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
 | 2026-10-26 | [chore: Re-apply the repo-ci-baseline Template](2026-10-26-pr-330-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
 | 2026-10-26 | [fix(sandcastle): Run the YAML, workflow and shell lints in the sandbox check](2026-10-26-pr-329-fix-sandcastle-run-the-yaml-workflow-and-shell-lints-in-the-sandbox-check.md) | release,automation |
 | 2026-10-26 | [chore: Re-apply the repo-ci-baseline Template](2026-10-26-pr-328-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
