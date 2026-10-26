@@ -24,9 +24,10 @@ else
   CHANGED="$(git ls-files)"
 fi
 
-# Of the gate's lints only Markdown runs here: the image has pnpm, but not
-# yamllint, actionlint, zizmor or shellcheck (whose fallbacks need Docker).
-# CI's lint workflows run those.
+# The same lints as scripts/gate.sh, with the tools the image installs (see
+# .sandcastle/Dockerfile): the fallbacks the gate uses need Docker, which the
+# sandbox lacks. A branch that breaks a workflow, YAML file or shell script
+# fails here, not only in CI's lint workflows.
 mapfile -t MD_FILES < <(grep -E '\.md$' <<< "$CHANGED" | grep -Ev '^docs/blogs/' || true)
 step "Markdown lint (${#MD_FILES[@]} changed file(s))"
 if [[ ${#MD_FILES[@]} -gt 0 ]]; then
@@ -36,6 +37,44 @@ if [[ ${#MD_FILES[@]} -gt 0 ]]; then
     # Keep in step with MARKDOWNLINT_CLI2_VERSION in scripts/gate.sh.
     pnpm dlx "markdownlint-cli2@0.23.3" "${MD_FILES[@]}"
   fi
+fi
+
+# pnpm writes its lockfile in its own YAML style; it isn't hand-edited.
+mapfile -t YAML_FILES < <(grep -E '\.ya?ml$' <<< "$CHANGED" | grep -Ev '(^|/)pnpm-lock\.yaml$' || true)
+mapfile -t WORKFLOW_FILES < <(grep -E '^\.github/(workflows/[^/]+\.ya?ml|dependabot\.ya?ml|actionlint\.ya?ml|zizmor\.ya?ml)$' <<< "$CHANGED" || true)
+# Shell scripts, plus extensionless scripts and git hooks.
+mapfile -t SHELL_FILES < <(grep -E '\.sh$|^scripts/[^/.]+$|^\.github/hooks/((pre|post)-[a-z-]+|(prepare-)?commit-msg)$' <<< "$CHANGED" || true)
+
+# Runs a lint tool the image installs. Without it (a host run of this script,
+# say) the check is skipped with a warning, as scripts/gate.sh does.
+YELLOW='\033[1;33m'
+run_lint() {
+  local name="$1"; shift
+  if command -v "$name" &>/dev/null; then
+    "$name" "$@"
+  else
+    echo -e "${YELLOW}⚠️  ${name} not found — skipping. CI's lint workflows still run it.${RESET}"
+  fi
+}
+
+step "YAML lint (${#YAML_FILES[@]} changed file(s))"
+if [[ ${#YAML_FILES[@]} -gt 0 ]]; then
+  YAMLLINT_ARGS=()
+  [[ -f .yamllint.yml ]] && YAMLLINT_ARGS=(-c .yamllint.yml)
+  run_lint yamllint "${YAMLLINT_ARGS[@]}" "${YAML_FILES[@]}"
+fi
+
+step "Workflow lint (${#WORKFLOW_FILES[@]} changed file(s))"
+if [[ ${#WORKFLOW_FILES[@]} -gt 0 ]]; then
+  # No file arguments: actionlint finds every workflow, and zizmor audits the
+  # whole repo, as scripts/gate.sh and CI do. --offline: no GitHub token here.
+  run_lint actionlint
+  run_lint zizmor --offline --min-severity medium .
+fi
+
+step "Shell lint (${#SHELL_FILES[@]} changed file(s))"
+if [[ ${#SHELL_FILES[@]} -gt 0 ]]; then
+  run_lint shellcheck "${SHELL_FILES[@]}"
 fi
 
 if [[ -f .github/ci/gate-checks.sh ]]; then
