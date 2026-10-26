@@ -62,6 +62,9 @@ See [LICENSE](../LICENSE) for details.
 
 | Version | Date | Title | Blog post |
 | ------- | ---- | ----- | --------- |
+| [v0.0.85](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.85) | 2026-10-26 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-26-pr-330-chore-re-apply-the-repo-ci-baseline-template.md) |
+| [v0.0.84](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.84) | 2026-10-26 | fix(sandcastle): Run the YAML, workflow and shell lints in the sandbox check | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-26-pr-329-fix-sandcastle-run-the-yaml-workflow-and-shell-lints-in-the-sandbox-check.md) |
+| [v0.0.83](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.83) | 2026-10-26 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-26-pr-328-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.82](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.82) | 2026-10-26 | chore(sandcastle): Add the names the local review and the Owned modules read | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-26-pr-326-chore-sandcastle-add-the-names-the-local-review-and-the-owned-modules-read.md) |
 | [v0.0.81](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.81) | 2026-10-26 | chore(sandcastle): Migrate to the Baseline Template's full pipeline | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-26-pr-324-chore-sandcastle-migrate-to-the-baseline-template-s-full-pipeline.md) |
 | [v0.0.80](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.80) | 2026-10-20 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-20-pr-318-chore-re-apply-the-repo-ci-baseline-template.md) |
@@ -69,9 +72,6 @@ See [LICENSE](../LICENSE) for details.
 | [v0.0.78](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.78) | 2026-10-18 | chore(deps): Have Dependabot ignore claude-code-action | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-18-pr-313-chore-deps-have-dependabot-ignore-claude-code-action.md) |
 | [v0.0.77](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.77) | 2026-10-18 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-18-pr-309-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.76](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.76) | 2026-10-16 | build(deps): Update NuGet packages | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-16-pr-307-build-deps-update-nuget-packages.md) |
-| [v0.0.75](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.75) | 2026-10-15 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-15-pr-305-chore-re-apply-the-repo-ci-baseline-template.md) |
-| [v0.0.74](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.74) | 2026-10-10 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-10-pr-301-chore-re-apply-the-repo-ci-baseline-template.md) |
-| [v0.0.73](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.73) | 2026-10-10 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-10-pr-299-chore-re-apply-the-repo-ci-baseline-template.md) |
 
 <!-- RELEASES_END -->
 
