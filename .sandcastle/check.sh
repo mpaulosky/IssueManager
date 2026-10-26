@@ -71,6 +71,6 @@ done
 echo "Ran ${ran} of ${#TEST_PROJECTS[@]} test project(s)."
 
 step "Sandcastle tests"
-pnpm run test:sandcastle
+pnpm run check:sandcastle
 
 echo -e "\n${GREEN}✅ Sandcastle check passed.${RESET}"

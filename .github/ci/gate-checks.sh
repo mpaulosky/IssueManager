@@ -28,7 +28,7 @@ if [[ -n "${SANDCASTLE_CHECK:-}" ]]; then
 elif [[ -z "$base" ]] || ! git diff --quiet --no-renames "$base" HEAD -- .sandcastle package.json pnpm-lock.yaml pnpm-workspace.yaml scripts/check-branch-name.sh scripts/check-pr-title.sh; then
   echo "Sandcastle tests"
   pnpm install --frozen-lockfile
-  pnpm run test:sandcastle
+  pnpm run check:sandcastle
 else
   echo "No Sandcastle or root package changes to test."
 fi
