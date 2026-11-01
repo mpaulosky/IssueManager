@@ -67,7 +67,7 @@ sandcastle_tests() {
     exit 1
   fi
   pnpm install --frozen-lockfile
-  pnpm run test:sandcastle
+  pnpm run check:sandcastle
 }
 
 case "$job" in

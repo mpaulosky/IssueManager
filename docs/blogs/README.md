@@ -4,6 +4,18 @@ This directory contains concise release-review posts for merged PR releases.
 
 | Date | Title | Tags |
 | ---- | ----- | ---- |
+| 2026-10-26 | [chore: Re-apply the repo-ci-baseline Template](2026-10-26-pr-332-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
+| 2026-10-26 | [chore: Re-apply the repo-ci-baseline Template](2026-10-26-pr-330-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
+| 2026-10-26 | [fix(sandcastle): Run the YAML, workflow and shell lints in the sandbox check](2026-10-26-pr-329-fix-sandcastle-run-the-yaml-workflow-and-shell-lints-in-the-sandbox-check.md) | release,automation |
+| 2026-10-26 | [chore: Re-apply the repo-ci-baseline Template](2026-10-26-pr-328-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
+| 2026-10-26 | [chore(sandcastle): Add the names the local review and the Owned modules read](2026-10-26-pr-326-chore-sandcastle-add-the-names-the-local-review-and-the-owned-modules-read.md) | release,automation |
+| 2026-10-26 | [chore(sandcastle): Migrate to the Baseline Template's full pipeline](2026-10-26-pr-324-chore-sandcastle-migrate-to-the-baseline-template-s-full-pipeline.md) | release,automation |
+| 2026-10-20 | [chore: Re-apply the repo-ci-baseline Template](2026-10-20-pr-318-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
+| 2026-10-18 | [chore: Re-apply the repo-ci-baseline Template](2026-10-18-pr-316-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
+| 2026-10-18 | [chore(deps): Have Dependabot ignore claude-code-action](2026-10-18-pr-313-chore-deps-have-dependabot-ignore-claude-code-action.md) | release,automation |
+| 2026-10-18 | [chore: Re-apply the repo-ci-baseline Template](2026-10-18-pr-309-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
+| 2026-10-16 | [build(deps): Update NuGet packages](2026-10-16-pr-307-build-deps-update-nuget-packages.md) | release,automation |
+| 2026-10-15 | [chore: Re-apply the repo-ci-baseline Template](2026-10-15-pr-305-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
 | 2026-10-10 | [chore: Re-apply the repo-ci-baseline Template](2026-10-10-pr-301-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
 | 2026-10-10 | [chore: Re-apply the repo-ci-baseline Template](2026-10-10-pr-299-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
 | 2026-10-10 | [chore: Re-apply the repo-ci-baseline Template](2026-10-10-pr-297-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
