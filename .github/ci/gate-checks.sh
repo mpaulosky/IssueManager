@@ -22,9 +22,9 @@ base="${1-}"
 # branch changes it, the root package files, or the branch-name and PR-title
 # scripts its tests run its names through, or always without a base. CI's
 # Build Solution job runs the same through .github/ci/prepare.sh.
-# .sandcastle/check.sh runs them itself, every time, and sets SANDCASTLE_CHECK.
+# .sandcastle/sandbox-gate.sh runs them itself, every time, and sets SANDCASTLE_CHECK.
 if [[ -n "${SANDCASTLE_CHECK:-}" ]]; then
-  echo "Sandcastle tests: .sandcastle/check.sh runs them."
+  echo "Sandcastle tests: .sandcastle/sandbox-gate.sh runs them."
 elif [[ -z "$base" ]] || ! git diff --quiet --no-renames "$base" HEAD -- .sandcastle package.json pnpm-lock.yaml pnpm-workspace.yaml scripts/check-branch-name.sh scripts/check-pr-title.sh; then
   echo "Sandcastle tests"
   pnpm install --frozen-lockfile
