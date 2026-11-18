@@ -4,6 +4,7 @@ This directory contains concise release-review posts for merged PR releases.
 
 | Date | Title | Tags |
 | ---- | ----- | ---- |
+| 2026-11-18 | [chore(sandcastle): Rename the sandbox gate to sandbox-gate.sh](2026-11-18-pr-347-chore-sandcastle-rename-the-sandbox-gate-to-sandbox-gate-sh.md) | release,automation |
 | 2026-11-18 | [chore(deps): Bump Aspire to 13.6.5 for security advisories](2026-11-18-pr-345-chore-deps-bump-aspire-to-13-6-5-for-security-advisories.md) | release,automation |
 | 2026-11-01 | [chore: Update favicon to the MP logo](2026-11-01-pr-337-chore-update-favicon-to-the-mp-logo.md) | release,automation |
 | 2026-10-26 | [chore: Re-apply the repo-ci-baseline Template](2026-10-26-pr-332-chore-re-apply-the-repo-ci-baseline-template.md) | release,automation |
