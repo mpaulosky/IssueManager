@@ -6,12 +6,12 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Aspire.AppHost.Sdk" Version="13.6.1" />
-    <PackageVersion Include="Aspire.Hosting" Version="13.6.4" />
-    <PackageVersion Include="Aspire.Hosting.MongoDB" Version="13.6.4" />
-    <PackageVersion Include="Aspire.Hosting.Redis" Version="13.6.4" />
-    <PackageVersion Include="Aspire.Hosting.Testing" Version="13.6.4" />
-    <PackageVersion Include="Aspire.StackExchange.Redis.OutputCaching" Version="13.6.1" />
+    <PackageVersion Include="Aspire.AppHost.Sdk" Version="13.6.5" />
+    <PackageVersion Include="Aspire.Hosting" Version="13.6.5" />
+    <PackageVersion Include="Aspire.Hosting.MongoDB" Version="13.6.5" />
+    <PackageVersion Include="Aspire.Hosting.Redis" Version="13.6.5" />
+    <PackageVersion Include="Aspire.Hosting.Testing" Version="13.6.5" />
+    <PackageVersion Include="Aspire.StackExchange.Redis.OutputCaching" Version="13.6.5" />
 
     <!-- UI Components -->
     <PackageVersion Include="Radzen.Blazor" Version="12.1.9" />
