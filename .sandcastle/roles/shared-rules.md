@@ -30,6 +30,8 @@ which `scripts/gate.sh` and CI run. It lints the Markdown, YAML, workflow and sh
 `.github/ci/gate-checks.sh` (Sandcastle's check among them, when `.sandcastle/` or its packages changed), builds the solution with warnings as errors, then runs every test
 project. Run it rather than the individual lint and test commands.
 
+- Where a role prompt tells you to run `scripts/gate.sh`, or says the host ran it, in the sandbox that means `.sandcastle/sandbox-gate.sh` (this file's own mentions of
+  `scripts/gate.sh` name the real script): `scripts/gate.sh` runs the Docker test projects, which the sandbox can't, so run or read the sandbox gate instead.
 - If you committed anything, run `.sandcastle/sandbox-gate.sh` once as your last step, before `<promise>COMPLETE</promise>`, and fix what it reports.
 - The tester is exempt, because its tests are red on purpose. It still lints the files it changed.
 - The architect is exempt too. It commits at most one ADR, and lints that file with `markdownlint-cli2 <file>`.
