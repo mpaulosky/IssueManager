@@ -62,6 +62,7 @@ See [LICENSE](LICENSE) for details.
 
 | Version | Date | Title | Blog post |
 | ------- | ---- | ----- | --------- |
+| [v0.0.90](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.90) | 2026-11-23 | chore(deps): Remove the central package pins no project references | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-11-23-pr-352-chore-deps-remove-the-central-package-pins-no-project-references.md) |
 | [v0.0.89](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.89) | 2026-11-18 | chore(sandcastle): Rename the sandbox gate to sandbox-gate.sh | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-11-18-pr-347-chore-sandcastle-rename-the-sandbox-gate-to-sandbox-gate-sh.md) |
 | [v0.0.88](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.88) | 2026-11-18 | chore(deps): Bump Aspire to 13.6.5 for security advisories | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-11-18-pr-345-chore-deps-bump-aspire-to-13-6-5-for-security-advisories.md) |
 | [v0.0.87](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.87) | 2026-11-01 | chore: Update favicon to the MP logo | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-11-01-pr-337-chore-update-favicon-to-the-mp-logo.md) |
@@ -71,7 +72,6 @@ See [LICENSE](LICENSE) for details.
 | [v0.0.83](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.83) | 2026-10-26 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-26-pr-328-chore-re-apply-the-repo-ci-baseline-template.md) |
 | [v0.0.82](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.82) | 2026-10-26 | chore(sandcastle): Add the names the local review and the Owned modules read | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-26-pr-326-chore-sandcastle-add-the-names-the-local-review-and-the-owned-modules-read.md) |
 | [v0.0.81](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.81) | 2026-10-26 | chore(sandcastle): Migrate to the Baseline Template's full pipeline | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-26-pr-324-chore-sandcastle-migrate-to-the-baseline-template-s-full-pipeline.md) |
-| [v0.0.80](https://github.com/mpaulosky/IssueManager/releases/tag/v0.0.80) | 2026-10-20 | chore: Re-apply the repo-ci-baseline Template | [Post](https://github.com/mpaulosky/IssueManager/blob/main/docs/blogs/2026-10-20-pr-318-chore-re-apply-the-repo-ci-baseline-template.md) |
 
 <!-- RELEASES_END -->
 
